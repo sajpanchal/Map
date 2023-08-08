@@ -22,7 +22,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     //this is a object property that will reflect the user location authorization status
     //it is set as a type-alieas @published. which makes updates to swiftui if this object is used in that swiftui view.
     @Published var userlocation: CLLocation?
-    
+    @Published var userHeading: CLHeading?
     //overriding the initializer of NSObject class
     override init() {
         //execute the parent class initializer first
@@ -46,6 +46,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
             case .authorizedWhenInUse:
             //this will request one-time location update of the current user location.
                 manager.startUpdatingLocation()
+                manager.startUpdatingHeading()
                 break
         
             //this status means user don't want app to track location
@@ -73,7 +74,9 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
             self.userlocation = lastUserLocation
         }
     }
-    
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        self.userHeading = newHeading
+    }
     //this method will be called whenever core location fails to access user location
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Error: \(error.localizedDescription)")

@@ -18,10 +18,12 @@ import MapKit
 //this class is only responsible to display map and its accessories.
 struct MapView: UIViewRepresentable {
     typealias UIViewType = MKMapView
-    //this property holds the location coordinate values accessed from core location. it is passed by MapView.
+    //this property holds the location coordinate values accessed from core location. it is passed by Map SwiftUI.
     @Binding var location: CLLocation?
+    //this property is bound to the tapped property of Map SwiftUI. it will be true when re-center button is pressed from Map SwiftUI.
     @Binding var tapped: Bool
-    
+    //this property holds the user's current heading data accessed from core location. it is passed by Map SwiftUI
+    @Binding var heading: CLHeading?
     //this is the function that our MapView will execute the first time on its inception.
     //this function will instantiate the Coordinator class with a copy of its parent object.
     func makeCoordinator() -> (Coordinator) {
@@ -51,16 +53,20 @@ struct MapView: UIViewRepresentable {
             //that means the main thread is not going to wait until this code is executed and it will perform remaining tasks serially.
             DispatchQueue.main.async { [self] in
                     print("location is available")
+                 // mapView.setUserTrackingMode(.followWithHeading, animated: true)
+                print("heading is: \(String(describing: parent.heading))")
                     // if the re-center button is tapped
                     if parent.tapped {
-                        //set the mapview region property by setting its coving region and center coordinates.
-                        //here, we are setting the userLocation coordinates as map' center.
-                        //although we are setting region span, when we set user tracking mode, it will be overwritten.
-                        mapView.region = MKCoordinateRegion(center: userLocation.coordinate, span:  mapView.region.span)
-                        //setting the user tracking mode to follow with user's heading
-                        //with compass locked to north (this data comes from iPhone's magnetometer).
-                        mapView.setUserTrackingMode(.followWithHeading, animated: true)
+                        //if user heading is not nil
+                        if let heading = parent.heading {
+                            //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
+                            //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
+                            let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 300, pitch: 55, heading: heading.trueHeading)
+                            //set the mapview camera to our defined object.
+                            mapView.setCamera(camera, animated: true)
+                        }
                     }
+                    //if re-center button is not pressed or user has dragged the mapview.
                     else {
                         //undoing user tracking to none.
                         mapView.setUserTrackingMode(.none, animated: true)

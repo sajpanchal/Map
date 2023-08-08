@@ -23,7 +23,7 @@ struct Map: View {
             //when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix.
             //we always declare a binding propery in a child component of the associated property from its parent.
             //once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
-            MapView(location: $locationDataManager.userlocation, tapped: $tapped)
+            MapView(location: $locationDataManager.userlocation, tapped: $tapped, heading: $locationDataManager.userHeading)
             //gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a
             //given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged()
             //action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag.
