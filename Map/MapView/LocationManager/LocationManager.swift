@@ -45,7 +45,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
             //this status means user has selected to allow location access when app is in use
             case .authorizedWhenInUse:
             //this will request one-time location update of the current user location.
-                manager.requestLocation()
+                manager.startUpdatingLocation()
                 break
         
             //this status means user don't want app to track location

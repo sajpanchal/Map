@@ -14,8 +14,8 @@
 		726754342A7C004300CE6F46 /* MapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 726754332A7C004300CE6F46 /* MapTests.swift */; };
 		7267543E2A7C004300CE6F46 /* MapUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267543D2A7C004300CE6F46 /* MapUITests.swift */; };
 		726754402A7C004300CE6F46 /* MapUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267543F2A7C004300CE6F46 /* MapUITestsLaunchTests.swift */; };
-		7267544E2A7C051500CE6F46 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267544D2A7C051500CE6F46 /* MapViewController.swift */; };
-		726754502A7C077500CE6F46 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267544F2A7C077500CE6F46 /* MapView.swift */; };
+		7267544E2A7C051500CE6F46 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267544D2A7C051500CE6F46 /* MapView.swift */; };
+		726754502A7C077500CE6F46 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267544F2A7C077500CE6F46 /* Map.swift */; };
 		7271514D2A7D53B200B20767 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7271514C2A7D53B200B20767 /* LocationManager.swift */; };
 /* End PBXBuildFile section */
 
@@ -47,8 +47,8 @@
 		726754392A7C004300CE6F46 /* MapUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7267543D2A7C004300CE6F46 /* MapUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapUITests.swift; sourceTree = "<group>"; };
 		7267543F2A7C004300CE6F46 /* MapUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		7267544D2A7C051500CE6F46 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
-		7267544F2A7C077500CE6F46 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		7267544D2A7C051500CE6F46 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		7267544F2A7C077500CE6F46 /* Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		7271514C2A7D53B200B20767 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -138,8 +138,8 @@
 			isa = PBXGroup;
 			children = (
 				7271514B2A7D538200B20767 /* LocationManager */,
-				7267544D2A7C051500CE6F46 /* MapViewController.swift */,
-				7267544F2A7C077500CE6F46 /* MapView.swift */,
+				7267544D2A7C051500CE6F46 /* MapView.swift */,
+				7267544F2A7C077500CE6F46 /* Map.swift */,
 			);
 			path = MapView;
 			sourceTree = "<group>";
@@ -283,9 +283,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				726754252A7C004000CE6F46 /* ContentView.swift in Sources */,
-				726754502A7C077500CE6F46 /* MapView.swift in Sources */,
+				726754502A7C077500CE6F46 /* Map.swift in Sources */,
 				7271514D2A7D53B200B20767 /* LocationManager.swift in Sources */,
-				7267544E2A7C051500CE6F46 /* MapViewController.swift in Sources */,
+				7267544E2A7C051500CE6F46 /* MapView.swift in Sources */,
 				726754232A7C004000CE6F46 /* MapApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
