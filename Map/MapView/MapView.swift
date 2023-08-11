@@ -21,9 +21,14 @@ struct MapView: UIViewRepresentable {
     //this property holds the location coordinate values accessed from core location. it is passed by Map SwiftUI.
     @Binding var location: CLLocation?
     //this property is bound to the tapped property of Map SwiftUI. it will be true when re-center button is pressed from Map SwiftUI.
-    @Binding var tapped: Bool
+    @Binding var trackLocation: Bool
     //this property holds the user's current heading data accessed from core location. it is passed by Map SwiftUI
     @Binding var heading: CLHeading?
+    //this property holds the error codes that we have defined in enum type in Map SwiftUI file.
+    @Binding var mapError: Map.Errors
+    //this property is needed to set the map region centered to user's location when app is launched for the first time.
+    @Binding var isTracking: Bool
+    var region: MKCoordinateRegion?
     //this is the function that our MapView will execute the first time on its inception.
     //this function will instantiate the Coordinator class with a copy of its parent object.
     func makeCoordinator() -> (Coordinator) {
@@ -45,18 +50,29 @@ struct MapView: UIViewRepresentable {
             //setting a parent property as parent on initialization
             self.parent = parent
         }
-       
+        //if mapView couldn't find the user location this function will be called.
+        func mapView(_ mapView: MKMapView, didFailToLocateUserWithError error: Error) {
+            //we will handle the error by updating our enum type variable in Map SwiftUI. It will then print the error message in text field.
+            parent.mapError = Map.Errors.locationNotFound
+        }
+        
         //this is the delegate method that will be called whenever user location will update
         func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
+            //when this function will be called for the very first time, the region property of our mapView struct will be nil.
+            //so the code inside this if statement will be executed only one time.
+            if parent.region == nil {
+                //set the mapView region centered to user location with 1000 meters of visible region around it.
+                mapView.region = MKCoordinateRegion(center: userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
+                //assign this region to our parent region.
+                parent.region = mapView.region
+            }
             //dispatchqueue is a class that handles the execution of tasks serially or concurrently on apps main/background threads.
             //here we are using a main (serial queue) thread and executing a code inside the block asynchronously in it.
             //that means the main thread is not going to wait until this code is executed and it will perform remaining tasks serially.
             DispatchQueue.main.async { [self] in
                     print("location is available")
-                 // mapView.setUserTrackingMode(.followWithHeading, animated: true)
-                print("heading is: \(String(describing: parent.heading))")
-                    // if the re-center button is tapped
-                    if parent.tapped {
+                    // if the track location button is tapped
+                    if parent.trackLocation {
                         //if user heading is not nil
                         if let heading = parent.heading {
                             //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
@@ -64,12 +80,20 @@ struct MapView: UIViewRepresentable {
                             let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 300, pitch: 55, heading: heading.trueHeading)
                             //set the mapview camera to our defined object.
                             mapView.setCamera(camera, animated: true)
+                            print("mapView Camera: \(mapView.camera)")
+                            parent.isTracking = true
+                        }
+                        //if heading is found nil
+                        else {
+                            //handle the error by updating enum variable in Map SwiftUI.
+                            parent.mapError = .headingNotFound
                         }
                     }
                     //if re-center button is not pressed or user has dragged the mapview.
                     else {
                         //undoing user tracking to none.
                         mapView.setUserTrackingMode(.none, animated: true)
+                        parent.isTracking = false
                     }
                 }
         }
@@ -88,8 +112,10 @@ struct MapView: UIViewRepresentable {
         //this way we can manipulate the data and deal with the user inteactions in mapviews.
         mapView.delegate = context.coordinator
         //this will show a blip where the user location is in the map.
+        //if we don't set this property, mapView won't be able to get location updates.
         mapView.showsUserLocation = true
         //return the mapview object.
+        
         return mapView
     }
     
@@ -99,8 +125,6 @@ struct MapView: UIViewRepresentable {
     func updateUIView(_ uiView: MKMapView, context: Context) {
     // print("updating map view")
     }
-    
-    
     
     
     
