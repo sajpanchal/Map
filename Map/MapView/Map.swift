@@ -15,16 +15,20 @@ struct Map: View {
     @State var trackLocation: Bool
     //enumeration type definition to handle error. it conforms to Error protocol so we can access error description
     @State var isTracking: Bool
-    enum Errors: Error {
-        case locationNotFound, headingNotFound, locationNotVisible,unKnownError, noError
-        
+    enum Errors: String {
+        case locationNotFound = "Sorry, your current location not found!"
+        case headingNotFound = "Sorry, your current heading not found!"
+        case locationNotVisible = "Sorry, your current location is not able to display on map!"
+        case unKnownError = "Sorry, unknown error has occured!"
+        case noError = " -- "
     }
     //enum type variable declaration
     @State var mapError: Errors = .noError
     var body: some View {
         VStack {
             //just a text field to detect error.
-            Text("Errors: \(mapError == .noError ? "NO ERROR" : mapError.localizedDescription)")
+            Text("Errors: \(mapError.rawValue)")
+                .padding(3)
             //calling our custom struct that will render UIView for us in swiftui.
             //we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class.
             //we are also passing the state variable called tapped that is bound to the MapView.

@@ -77,7 +77,7 @@ struct MapView: UIViewRepresentable {
                         if let heading = parent.heading {
                             //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
                             //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
-                            let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 300, pitch: 55, heading: heading.trueHeading)
+                            let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 500, pitch: 0, heading: heading.magneticHeading)
                             //set the mapview camera to our defined object.
                             mapView.setCamera(camera, animated: true)
                             print("mapView Camera: \(mapView.camera)")
