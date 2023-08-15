@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Map(trackLocation: false, isTracking: false)
+        Map()
     }
 }
 

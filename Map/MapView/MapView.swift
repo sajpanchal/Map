@@ -21,13 +21,13 @@ struct MapView: UIViewRepresentable {
     //this property holds the location coordinate values accessed from core location. it is passed by Map SwiftUI.
     @Binding var location: CLLocation?
     //this property is bound to the tapped property of Map SwiftUI. it will be true when re-center button is pressed from Map SwiftUI.
-    @Binding var trackLocation: Bool
+    @Binding var mapViewAction: Map.MapViewAction
     //this property holds the user's current heading data accessed from core location. it is passed by Map SwiftUI
     @Binding var heading: CLHeading?
     //this property holds the error codes that we have defined in enum type in Map SwiftUI file.
     @Binding var mapError: Map.Errors
     //this property is needed to set the map region centered to user's location when app is launched for the first time.
-    @Binding var isTracking: Bool
+    @Binding var mapViewStatus: Map.MapViewStatus
     var region: MKCoordinateRegion?
     //this is the function that our MapView will execute the first time on its inception.
     //this function will instantiate the Coordinator class with a copy of its parent object.
@@ -72,7 +72,7 @@ struct MapView: UIViewRepresentable {
             DispatchQueue.main.async { [self] in
                     print("location is available")
                     // if the track location button is tapped
-                    if parent.trackLocation {
+                if parent.mapViewAction == .navigate {
                         //if user heading is not nil
                         if let heading = parent.heading {
                             //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
@@ -81,7 +81,7 @@ struct MapView: UIViewRepresentable {
                             //set the mapview camera to our defined object.
                             mapView.setCamera(camera, animated: true)
                             print("mapView Camera: \(mapView.camera)")
-                            parent.isTracking = true
+                            parent.mapViewStatus = .navigating
                         }
                         //if heading is found nil
                         else {
@@ -89,13 +89,20 @@ struct MapView: UIViewRepresentable {
                             parent.mapError = .headingNotFound
                         }
                     }
-                    //if re-center button is not pressed or user has dragged the mapview.
-                    else {
-                        //undoing user tracking to none.
-                        mapView.setUserTrackingMode(.none, animated: true)
-                        parent.isTracking = false
-                    }
+                else if parent.mapViewAction == .centerToUserLocation {
+                    mapView.setRegion(MKCoordinateRegion(center: userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), animated: true)
+                    parent.mapViewStatus = .centeredToUserLocation
                 }
+                else if parent.mapViewAction == .inNavigationCenterToUserLocation {
+                    
+                }
+                    //if re-center button is not pressed or user has dragged the mapview.
+                else {
+                    //undoing user tracking to none.
+                    mapView.setUserTrackingMode(.none, animated: true)
+                    parent.mapViewStatus = .idle
+                }
+            }
         }
     }
     
