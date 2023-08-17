@@ -21,13 +21,13 @@ struct MapView: UIViewRepresentable {
     //this property holds the location coordinate values accessed from core location. it is passed by Map SwiftUI.
     @Binding var location: CLLocation?
     //this property is bound to the tapped property of Map SwiftUI. it will be true when re-center button is pressed from Map SwiftUI.
-    @Binding var mapViewAction: Map.MapViewAction
+    @Binding var mapViewAction: MapViewAction
     //this property holds the user's current heading data accessed from core location. it is passed by Map SwiftUI
     @Binding var heading: CLHeading?
     //this property holds the error codes that we have defined in enum type in Map SwiftUI file.
-    @Binding var mapError: Map.Errors
+    @Binding var mapError: Errors
     //this property is needed to set the map region centered to user's location when app is launched for the first time.
-    @Binding var mapViewStatus: Map.MapViewStatus
+    @Binding var mapViewStatus: MapViewStatus
     var region: MKCoordinateRegion?
     //this is the function that our MapView will execute the first time on its inception.
     //this function will instantiate the Coordinator class with a copy of its parent object.
@@ -53,7 +53,7 @@ struct MapView: UIViewRepresentable {
         //if mapView couldn't find the user location this function will be called.
         func mapView(_ mapView: MKMapView, didFailToLocateUserWithError error: Error) {
             //we will handle the error by updating our enum type variable in Map SwiftUI. It will then print the error message in text field.
-            parent.mapError = Map.Errors.locationNotFound
+            parent.mapError = Errors.locationNotFound
         }
         
         //this is the delegate method that will be called whenever user location will update
@@ -72,36 +72,42 @@ struct MapView: UIViewRepresentable {
             DispatchQueue.main.async { [self] in
                     print("location is available")
                     // if the track location button is tapped
-                if parent.mapViewAction == .navigate {
-                        //if user heading is not nil
-                        if let heading = parent.heading {
-                            //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
-                            //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
-                            let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 500, pitch: 0, heading: heading.magneticHeading)
-                            //set the mapview camera to our defined object.
-                            mapView.setCamera(camera, animated: true)
-                            print("mapView Camera: \(mapView.camera)")
-                            parent.mapViewStatus = .navigating
-                        }
-                        //if heading is found nil
-                        else {
-                            //handle the error by updating enum variable in Map SwiftUI.
-                            parent.mapError = .headingNotFound
-                        }
-                    }
-                else if parent.mapViewAction == .centerToUserLocation {
-                    mapView.setRegion(MKCoordinateRegion(center: userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), animated: true)
-                    parent.mapViewStatus = .centeredToUserLocation
-                }
-                else if parent.mapViewAction == .inNavigationCenterToUserLocation {
-                    
-                }
-                    //if re-center button is not pressed or user has dragged the mapview.
-                else {
+                switch parent.mapViewAction {
+                case .idle:
                     //undoing user tracking to none.
                     mapView.setUserTrackingMode(.none, animated: true)
                     parent.mapViewStatus = .idle
+                    break
+                case .idleInNavigation:
+                    parent.mapViewStatus = .inNavigationNotCentered
+                case.centerToUserLocation:
+                    mapView.setRegion(MKCoordinateRegion(center: userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), animated: true)
+                    parent.mapViewStatus = .centeredToUserLocation
+                    break
+                case .inNavigationCenterToUserLocation:
+                    fallthrough
+                   // break
+                case .navigate:
+                    //if user heading is not nil
+                    if let heading = parent.heading {
+                        //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
+                        //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
+                        let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 500, pitch: 0, heading: heading.magneticHeading - heading.headingAccuracy)
+                        
+                        
+                        //set the mapview camera to our defined object.
+                        mapView.setCamera(camera, animated: true)
+                        print("mapView Camera accuracy: \(camera.heading)")
+                        parent.mapViewStatus = .navigating
+                    }
+                    //if heading is found nil
+                    else {
+                        //handle the error by updating enum variable in Map SwiftUI.
+                        parent.mapError = .headingNotFound
+                    }
+                    break
                 }
+                
             }
         }
     }

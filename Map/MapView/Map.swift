@@ -6,37 +6,35 @@
 //
 
 import SwiftUI
+
+//enum type to be used to track the status of MapView
+enum MapViewStatus {
+    case navigating, centeredToUserLocation, inNavigationCentered, notCentered, inNavigationNotCentered, idle
+}
+//enum type to be used to track the button actions of MapView
+enum MapViewAction {
+    case navigate, centerToUserLocation, inNavigationCenterToUserLocation, idle, idleInNavigation
+}
+//enumeration type definition to handle error. it is of string type so we can assign associated values to each enum case as strings.
+enum Errors: String {
+    case locationNotFound = "Sorry, your current location not found!"
+    case headingNotFound = "Sorry, your current heading not found!"
+    case locationNotVisible = "Sorry, your current location is not able to display on map!"
+    case unKnownError = "Sorry, unknown error has occured!"
+    case noError = " -- "
+}
 //this view will observe the LocationDataManager and updates the MapViewController if data in Location
 //Manager changes.
 struct Map: View {
     //this will make our MapView update if any @published value in location manager changes.
     @StateObject var locationDataManager = LocationDataManager()
-    //this is a state variable that will let mapview object know if the track location btn is pressed.
-    enum MapViewStatus {
-        case navigating
-        case centeredToUserLocation
-        case inNavigationCentered
-        case notCentered
-        case inNavigationNotCentered
-        case idle
-    }
-    enum MapViewAction {
-        case navigate
-        case centerToUserLocation
-        case inNavigationCenterToUserLocation
-        case idle
-    }
+    
+    // this variable is used to store the status of our mapview. it is bound to our MapView file
     @State var mapViewStatus: MapViewStatus = .idle
     
+    //this variable is used to store the actions inputted by the user by tapping buttons or other gestures to mapView
     @State var mapViewAction: MapViewAction = .idle
-    //enumeration type definition to handle error. it conforms to Error protocol so we can access error description
-    enum Errors: String {
-        case locationNotFound = "Sorry, your current location not found!"
-        case headingNotFound = "Sorry, your current heading not found!"
-        case locationNotVisible = "Sorry, your current location is not able to display on map!"
-        case unKnownError = "Sorry, unknown error has occured!"
-        case noError = " -- "
-    }
+    
     //enum type variable declaration
     @State var mapError: Errors = .noError
     
@@ -45,50 +43,79 @@ struct Map: View {
             //just a text field to detect error.
             Text("Errors: \(mapError.rawValue)")
                 .padding(3)
-            //calling our custom struct that will render UIView for us in swiftui.
-            //we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class.
-            //we are also passing the state variable called tapped that is bound to the MapView.
-            //when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix.
-            //we always declare a binding propery in a child component of the associated property from its parent.
-            //once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
+            //ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
             ZStack {
-                MapView(location: $locationDataManager.userlocation,mapViewAction: $mapViewAction, heading: $locationDataManager.userHeading, mapError: $mapError, mapViewStatus: $mapViewStatus)
-                //disable the mapview when track location button is tapped but tracking is not on yet.
-                    .disabled(mapViewStatus != .navigating && mapViewAction == .navigate)
-                //gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a
-                //given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged()
-                //action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag.
-                //we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
-                    .gesture(DragGesture().onChanged(dragGestureAction))
-                //this is the button to start tracking the user location. when it is tapped, MapView will start tracking the user location by
-                //instantiating the mapView camera with its associated properties.
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        MapViewButton(imageName: mapViewStatus == .centeredToUserLocation ? "location.fill" : "location")
-                            .gesture(TapGesture()
-                                .onEnded(centerMapToUserLocation))                                                            
+                //grouping mapview and its associated buttons
+                Group() {
+                    //calling our custom struct that will render UIView for us in swiftui.
+                    //we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class.
+                    //we are also passing the state variable called tapped that is bound to the MapView.
+                    //when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix.
+                    //we always declare a binding propery in a child component of the associated property from its parent.
+                    //once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
+                    MapView(location: $locationDataManager.userlocation,mapViewAction: $mapViewAction, heading: $locationDataManager.userHeading, mapError: $mapError, mapViewStatus: $mapViewStatus)
+                    //disable the mapview when track location button is tapped but tracking is not on yet.
+                        .disabled(mapViewStatus != .navigating && mapViewAction == .navigate)
+                    //gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a
+                    //given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged()
+                    //action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag.
+                    //we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
+                        .gesture(DragGesture().onChanged(dragGestureAction))
+                    //custom button that is floating on our mapview.
+                    
+                    
+                    if mapViewStatus == .navigating || mapViewStatus == .inNavigationCentered || mapViewStatus == .inNavigationNotCentered {
+                        MapViewButton(imageName: mapViewStatus == .inNavigationCentered ? "location.fill" : "location")
+                            .gesture(TapGesture().onEnded(centerMapToUserLocation))
                     }
-                    .padding(10)
+                    else {
+                        MapViewButton(imageName: mapViewStatus == .centeredToUserLocation ? "circle.fill" : "circle")
+                            .gesture(TapGesture().onEnded(centerMapToUserLocation))
+                           // .disabled(mapViewStatus == .navigating)
+                    }
+                      
+                    
                 }
-                .padding(20)
+                .opacity((mapViewStatus != .navigating && mapViewAction == .navigate) ? 0.3 : 1.0)
+                
+                //if mapview is not navigating but user has asked to navigate we will show a progessview to make user wait to complete the process.
+                if mapViewStatus != .navigating && mapViewAction == .navigate {
+                    VStack {
+                        //indefinite progress view
+                        ProgressView()
+                        //associated alert to let know user to wait for a process to finish.
+                        Text("Location Tracking configuration is in progress.\n Please Wait...")
+                            .fontWeight(.ultraLight) // modifier to define the font thickness/style
+                            .font(.caption) //modifier to define the font size
+                            .padding(40)
+                    }
+                   
+                }
             }
       
-            Button((mapViewStatus != .navigating && mapViewAction == .navigate) ? "Please Wait..." : "Track Location", action: {
-                //set trackLocation variable to true
-                mapViewAction = .navigate
-                //UIApplocation is the class that has a centralized control over the app.
-                //it has a property called shared that is a singleton instance of UIApplication itself.
-                //this instance has a property called isIdleTimerDisabled.
-                //which will decide if we want to turn off the phone screen after certain amount of time of inactivity in the app.
-                //we will set it to true so it will keep the screen alive when user tracking is on.
-                UIApplication.shared.isIdleTimerDisabled = true
+            Button(mapViewStatus == .navigating || mapViewStatus == .inNavigationCentered || mapViewStatus == .inNavigationNotCentered ? "Stop location Tracking" : "Start Location Tracking", action: {
+                //set mapViewAction to idle mode if status is navigating when button is pressed
+                //set mapViewAction to nagivate if status is not navigating when button is pressed.
+                switch mapViewStatus {
+                case .idle, .notCentered, .centeredToUserLocation:
+                    mapViewAction = .navigate
+                    //UIApplocation is the class that has a centralized control over the app.
+                    //it has a property called shared that is a singleton instance of UIApplication itself.
+                    //this instance has a property called isIdleTimerDisabled.
+                    //which will decide if we want to turn off the phone screen after certain amount of time of inactivity in the app.
+                    //we will set it to true so it will keep the screen alive when user tracking is on.
+                    UIApplication.shared.isIdleTimerDisabled = true
+                    break
+                case .navigating, .inNavigationCentered, .inNavigationNotCentered:
+                    mapViewAction = .idle
+                    UIApplication.shared.isIdleTimerDisabled = false
+                    break
+                }
+               
+               
                 
             })
-            .foregroundColor(mapViewAction == .navigate ? .gray : .blue)
-            //disable this button while the location tracking is on.
-            .disabled(mapViewAction == .navigate)
+            .foregroundColor(mapViewStatus == .navigating || mapViewStatus == .inNavigationCentered || mapViewStatus == .inNavigationNotCentered ? .red : .blue)
         }
         
         
@@ -101,16 +128,33 @@ struct Map: View {
         let y = abs(value.location.y - value.startLocation.y)
         let distance = sqrt((x*x)+(y*y))
         if distance > 10 {
-            //turn off the tracking
-            mapViewStatus = .notCentered
-            mapViewAction = .idle
-            //enable the idle Timer.
-            UIApplication.shared.isIdleTimerDisabled = false
+            print("Drag gesture")
+            print(mapViewStatus)
+            //if map navigation is on and user dragged mapview
+            if mapViewStatus == .navigating || mapViewStatus == .inNavigationCentered {
+                print("navigating")
+                mapViewStatus = .inNavigationNotCentered
+                mapViewAction = .idleInNavigation
+            }
+            else if mapViewStatus == .idle || mapViewStatus == .centeredToUserLocation {
+                print("not navigating")
+                mapViewStatus = .notCentered
+                mapViewAction = .idle
+            }
+            
         }
     }
     //a function to be called whenever the re-center icon on the mapView is tapped.
     func centerMapToUserLocation() {
-        mapViewAction = .centerToUserLocation
+        mapViewAction = mapViewStatus == .navigating ? .inNavigationCenterToUserLocation : .centerToUserLocation
+        switch mapViewStatus {
+        case .idle, .notCentered, .centeredToUserLocation:
+            mapViewAction = .centerToUserLocation
+            break
+        case .navigating, .inNavigationCentered, .inNavigationNotCentered:
+            mapViewAction = .inNavigationCenterToUserLocation
+            break
+        }
     }
 }
 
@@ -124,17 +168,30 @@ struct Map_Previews: PreviewProvider {
 
 struct MapViewButton: View {
     var imageName: String = ""
+    
     var body: some View {
-            ZStack {
-                Rectangle()
-                    .frame(width: 60, height: 60)
-                    .foregroundColor(.gray)
-                    .cornerRadius(10)
-                Image(systemName: imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 35, height: 35)
-                    .foregroundColor(.white)
+        //this is the button to start tracking the user location. when it is tapped, MapView will start tracking the user location by
+        //instantiating the mapView camera with its associated properties.
+        VStack {
+            Spacer()
+            HStack {
+                Spacer()
+                ZStack {
+                    Rectangle()
+                        .frame(width: 60, height: 60)
+                        .foregroundColor(.gray)
+                        .cornerRadius(10)
+                    Image(systemName: imageName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 35, height: 35)
+                        .foregroundColor(.white)
+                }
+                
             }
+            .padding(10)
+        }
+        .padding(20)
+         
     }
 }
