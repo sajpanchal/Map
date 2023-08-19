@@ -58,46 +58,25 @@ struct MapView: UIViewRepresentable {
         
         //this is the delegate method that will be called whenever user location will update
         func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
-            //when this function will be called for the very first time, the region property of our mapView struct will be nil.
-            //so the code inside this if statement will be executed only one time.
-            if parent.region == nil {
-                //set the mapView region centered to user location with 1000 meters of visible region around it.
-                mapView.region = MKCoordinateRegion(center: userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
-                //assign this region to our parent region.
-                parent.region = mapView.region
-            }
-            //dispatchqueue is a class that handles the execution of tasks serially or concurrently on apps main/background threads.
-            //here we are using a main (serial queue) thread and executing a code inside the block asynchronously in it.
-            //that means the main thread is not going to wait until this code is executed and it will perform remaining tasks serially.
-            DispatchQueue.main.async { [self] in
-                    print("location is available")
-                    // if the track location button is tapped
-                switch parent.mapViewAction {
+            MapViewAPI.setRegionIn(mapView: mapView, centeredAt: userLocation, parent: &parent)
+                
+            // if the track location button is tapped
+            switch parent.mapViewAction {
                 case .idle:
-                    //undoing user tracking to none.
-                    mapView.setUserTrackingMode(.none, animated: true)
                     parent.mapViewStatus = .idle
                     break
                 case .idleInNavigation:
                     parent.mapViewStatus = .inNavigationNotCentered
+                    break
                 case.centerToUserLocation:
-                    mapView.setRegion(MKCoordinateRegion(center: userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), animated: true)
                     parent.mapViewStatus = .centeredToUserLocation
                     break
                 case .inNavigationCenterToUserLocation:
                     fallthrough
-                   // break
                 case .navigate:
-                    //if user heading is not nil
-                    if let heading = parent.heading {
-                        //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
-                        //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
-                        let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 500, pitch: 0, heading: heading.magneticHeading - heading.headingAccuracy)
-                        
-                        
-                        //set the mapview camera to our defined object.
-                        mapView.setCamera(camera, animated: true)
-                        print("mapView Camera accuracy: \(camera.heading)")
+                //if user heading is not nil
+                    MapViewAPI.setCameraRegion(of: mapView, centeredAt: userLocation, userHeading: parent.heading)
+                    if parent.heading != nil {
                         parent.mapViewStatus = .navigating
                     }
                     //if heading is found nil
@@ -105,9 +84,7 @@ struct MapView: UIViewRepresentable {
                         //handle the error by updating enum variable in Map SwiftUI.
                         parent.mapError = .headingNotFound
                     }
-                    break
-                }
-                
+                break
             }
         }
     }
@@ -128,7 +105,6 @@ struct MapView: UIViewRepresentable {
         //if we don't set this property, mapView won't be able to get location updates.
         mapView.showsUserLocation = true
         //return the mapview object.
-        
         return mapView
     }
     
@@ -136,10 +112,37 @@ struct MapView: UIViewRepresentable {
     //UIViewController will be updated when our swiftui view MapView will be updated.
     //Mapview will be updated when our @observedObject / @StateObject is updated.
     func updateUIView(_ uiView: MKMapView, context: Context) {
-    // print("updating map view")
+    print("updating map view")
+       
+    switch mapViewAction {
+    case .idle:
+        MapViewAPI.resetLocationTracking(of: uiView)
+        break
+    case .idleInNavigation:
+        break
+    case.centerToUserLocation:
+            uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
+        print("map is centered!")
+        break
+    case .inNavigationCenterToUserLocation:
+        if let heading = heading {
+            //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
+            //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
+            MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: heading)
+        }
+       break
+ 
+    case .navigate:
+        break
     }
-    
-    
-    
-    
+    }
+}
+
+
+extension MKMapView {
+    func animatedZoom(zoomRegion:MKCoordinateRegion, duration:TimeInterval) {
+        MKMapView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 10, options: UIView.AnimationOptions.curveEaseIn, animations: {
+            self.setRegion(zoomRegion, animated: true)
+            }, completion: nil)
+    }
 }

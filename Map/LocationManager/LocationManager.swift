@@ -46,7 +46,9 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
             case .authorizedWhenInUse:
             //this will request one-time location update of the current user location.
                 manager.startUpdatingLocation()
+                manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
                 manager.startUpdatingHeading()
+             //   manager.headingFilter = kCLHeadingFilterNone
                 break
         
             //this status means user don't want app to track location
@@ -82,7 +84,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         print("Error: \(error.localizedDescription)")
     }
     
-    
+   
     
     
 }
