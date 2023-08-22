@@ -52,5 +52,9 @@ class MapViewAPI {
             mapView.setUserTrackingMode(.none, animated: true)
         }
     }
+    
+    static func getNavigationDirections() {
+    
+    }
 
 }

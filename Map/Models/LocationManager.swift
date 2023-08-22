@@ -7,7 +7,7 @@
 
 import Foundation
 import CoreLocation
-
+import MapKit
 //custom Location manager class that inherits NSObject class and CLlocationManageDelegate protocol
 //this class also conforms to ObservableObject type-alias. it means that this instance will be obsered by swiftui view
 // for any changes in data associated with it. to make it possible we just have to type-alias it as @ObservedObject.
@@ -23,6 +23,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     //it is set as a type-alieas @published. which makes updates to swiftui if this object is used in that swiftui view.
     @Published var userlocation: CLLocation?
     @Published var userHeading: CLHeading?
+    @Published var region: MKCoordinateRegion = MKCoordinateRegion()
     //overriding the initializer of NSObject class
     override init() {
         //execute the parent class initializer first
@@ -74,6 +75,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         if let lastUserLocation = locations.last {
             //update the userLocation property with the first user location accessed by CLLocationManager in locations array.
             self.userlocation = lastUserLocation
+            region = MKCoordinateRegion(center: lastUserLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
         }
     }
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {

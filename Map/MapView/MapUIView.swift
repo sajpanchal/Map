@@ -28,6 +28,7 @@ struct MapView: UIViewRepresentable {
     @Binding var mapError: Errors
     //this property is needed to set the map region centered to user's location when app is launched for the first time.
     @Binding var mapViewStatus: MapViewStatus
+    
     var region: MKCoordinateRegion?
     //this is the function that our MapView will execute the first time on its inception.
     //this function will instantiate the Coordinator class with a copy of its parent object.
@@ -59,7 +60,7 @@ struct MapView: UIViewRepresentable {
         //this is the delegate method that will be called whenever user location will update
         func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
             MapViewAPI.setRegionIn(mapView: mapView, centeredAt: userLocation, parent: &parent)
-                
+             
             // if the track location button is tapped
             switch parent.mapViewAction {
                 case .idle:
@@ -112,8 +113,6 @@ struct MapView: UIViewRepresentable {
     //UIViewController will be updated when our swiftui view MapView will be updated.
     //Mapview will be updated when our @observedObject / @StateObject is updated.
     func updateUIView(_ uiView: MKMapView, context: Context) {
-    print("updating map view")
-       
     switch mapViewAction {
     case .idle:
         MapViewAPI.resetLocationTracking(of: uiView)

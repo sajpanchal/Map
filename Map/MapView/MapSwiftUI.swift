@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 //enum type to be used to track the status of MapView
 enum MapViewStatus {
@@ -23,6 +24,8 @@ enum Errors: String {
     case unKnownError = "Sorry, unknown error has occured!"
     case noError = " -- "
 }
+
+
 //this view will observe the LocationDataManager and updates the MapViewController if data in Location
 //Manager changes.
 struct Map: View {
@@ -38,62 +41,83 @@ struct Map: View {
     //enum type variable declaration
     @State var mapError: Errors = .noError
     
+    //state variable for searchable text field to search for nearby locations in the map region
+    @State var searchedLocationText: String = ""
+    
+    //an array type state variable that stores locations' details to display in searched results.
+    @State var searchedLocations: [SearchedLocation] = []
+    
     var body: some View {
-        VStack {
-            //just a text field to detect error.
-            Text("Errors: \(mapError.rawValue)")
-                .padding(3)
-            //ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
-            ZStack {
-                //grouping mapview and its associated buttons
-                Group() {
-                    /*calling our custom struct that will render UIView for us in swiftui.
-                    we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class.
-                    we are also passing the state variable called tapped that is bound to the MapView.
-                    when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix.
-                    we always declare a binding propery in a child component of the associated property from its parent.
-                    once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.*/
-                    MapView(location: $locationDataManager.userlocation,mapViewAction: $mapViewAction, heading: $locationDataManager.userHeading, mapError: $mapError, mapViewStatus: $mapViewStatus)
-                    ///disable the mapview when track location button is tapped but tracking is not on yet.
-                        .disabled(isMapViewWaiting(to: .navigate))
-                    ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a
-                    ///given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged()
-                    ///action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag.
-                    ///we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
-                        .gesture(DragGesture().onChanged(dragGestureAction))
-                    
-                    //custom buttons that is floating on our mapview.
-                    //if map is navigating but it is not centered to user location show the location button to center it on tap.
-                    if isMapInNavigationMode().0 && isMapInNavigationMode().1 == .inNavigationNotCentered {
-                        MapViewButton(imageName: "location.fill")
-                            .gesture(TapGesture().onEnded(centerMapToUserLocation))
-                        
-                    }
-                    //if map is not navigating show the circle button to center the map to user location whenever tapped.
-                    if !isMapInNavigationMode().0 {
-                        MapViewButton(imageName: mapViewStatus == .centeredToUserLocation ? "circle.fill" : "circle")
-                            .gesture(TapGesture().onEnded(centerMapToUserLocation))
-                    }
-                }
-                .opacity(isMapViewWaiting(to: .navigate) ? 0.3 : 1.0)
+        NavigationStack {
+            VStack {
+                //ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
                 
-                //if mapview is not navigating but user has asked to navigate we will show a progessview to make user wait to complete the process.
-                if isMapViewWaiting(to: .navigate) {
-                    MapProgressView(alertMessage: "Starting Tracking location! Please Wait...")
-                   
+                ZStack {
+                    //grouping mapview and its associated buttons
+                    Group() {
+                        /*calling our custom struct that will render UIView for us in swiftui.
+                        we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class.
+                        we are also passing the state variable called tapped that is bound to the MapView.
+                        when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix.
+                        we always declare a binding propery in a child component of the associated property from its parent.
+                        once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.*/
+                        MapView(location: $locationDataManager.userlocation,mapViewAction: $mapViewAction, heading: $locationDataManager.userHeading, mapError: $mapError, mapViewStatus: $mapViewStatus)
+                        ///disable the mapview when track location button is tapped but tracking is not on yet.
+                            .disabled(isMapViewWaiting(to: .navigate))
+                        ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a
+                        ///given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged()
+                        ///action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag.
+                        ///we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
+                            .gesture(DragGesture().onChanged(dragGestureAction))
+                        
+                        //custom buttons that is floating on our mapview.
+                        //if map is navigating but it is not centered to user location show the location button to center it on tap.
+                        if isMapInNavigationMode().0 && isMapInNavigationMode().1 == .inNavigationNotCentered {
+                            MapViewButton(imageName: "location.fill")
+                                .gesture(TapGesture().onEnded(centerMapToUserLocation))
+                            
+                        }
+                        //if map is not navigating show the circle button to center the map to user location whenever tapped.
+                        if !isMapInNavigationMode().0 {
+                            MapViewButton(imageName: mapViewStatus == .centeredToUserLocation ? "circle.fill" : "circle")
+                                .gesture(TapGesture().onEnded(centerMapToUserLocation))
+                        }
+                    }
+                    .opacity(isMapViewWaiting(to: .navigate) ? 0.3 : 1.0)
+                    
+                    //if mapview is not navigating but user has asked to navigate we will show a progessview to make user wait to complete the process.
+                    if isMapViewWaiting(to: .navigate) {
+                        MapProgressView(alertMessage: "Starting Tracking location! Please Wait...")
+                       
+                    }
+                    //if mapview is waiting to center to the userlocation on button tap
+                    else if isMapViewWaiting(to: .centerToUserLocation) {
+                        //show the progressview with a given string message
+                        MapProgressView(alertMessage: "Centering Map to your location! Please Wait...")
+                    }
+                    //if the mapview is waiting to get in idle mode
+                    else if isMapViewWaiting(to: .idle) {
+                        MapProgressView(alertMessage: "Stopping Tracking location! Please Wait...")
+                    }
                 }
-                else if isMapViewWaiting(to: .centerToUserLocation) {
-                    MapProgressView(alertMessage: "Centering Map to your location! Please Wait...")
-                }
-                else if isMapViewWaiting(to: .idle) {
-                    MapProgressView(alertMessage: "Stopping Tracking location! Please Wait...")
-                }
+                //navigation mode button to switch between navigation modes.
+                Button(isMapInNavigationMode().0 ? "Stop location Tracking" : "Start Location Tracking", action: updateUserTracking)
+                .foregroundColor(isMapInNavigationMode().0 ? .red : .blue)
             }
-      
-            Button(isMapInNavigationMode().0 ? "Stop location Tracking" : "Start Location Tracking", action: updateUserTracking)
-            .foregroundColor(isMapInNavigationMode().0 ? .red : .blue)
         }
-        
+        //this is the special swiftui textfield to allow searching with user defined text and popping up suggestions based on text entered.
+        .searchable(text: $searchedLocationText, prompt: "Search for a location")
+        //when the text in a searchable field changes this method will be called and it will perform a method put inside perform parameter.
+        .onChange(of: searchedLocationText, perform: {
+            newValue in
+            //this is the swift struct type that will execute the asynchronous tasks inside its body.
+            Task {
+                //store the results of searchedlocation text in the searchable field returned from startlocalsearch methof of SearchedLocation struct.
+                searchedLocations = await SearchedLocation.startLocalSearch(withSearchText: newValue, inRegion: locationDataManager.region)
+            }
+        })
+        //this modifier will display the SwiftUI view with the suggested results acquired from our search operations.
+        .searchSuggestions({ListView(searchedLocations: $searchedLocations)})
         
     }
     //custom function takes the DragGesture value.
@@ -170,6 +194,8 @@ struct Map: View {
         }
     }
 }
+
+
 
 
 
