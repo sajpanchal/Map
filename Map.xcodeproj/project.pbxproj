@@ -22,6 +22,8 @@
 		7267544E2A7C051500CE6F46 /* MapUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267544D2A7C051500CE6F46 /* MapUIView.swift */; };
 		726754502A7C077500CE6F46 /* MapSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267544F2A7C077500CE6F46 /* MapSwiftUI.swift */; };
 		7271514D2A7D53B200B20767 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7271514C2A7D53B200B20767 /* LocationManager.swift */; };
+		72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */; };
+		72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A62A9911FC0073CCC5 /* Enums.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +62,8 @@
 		7267544D2A7C051500CE6F46 /* MapUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapUIView.swift; sourceTree = "<group>"; };
 		7267544F2A7C077500CE6F46 /* MapSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSwiftUI.swift; sourceTree = "<group>"; };
 		7271514C2A7D53B200B20767 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFieldView.swift; sourceTree = "<group>"; };
+		72C3D8A62A9911FC0073CCC5 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +96,7 @@
 			children = (
 				7271514C2A7D53B200B20767 /* LocationManager.swift */,
 				72053A842A9510AA00B1D3FC /* SearchedLocation.swift */,
+				72C3D8A62A9911FC0073CCC5 /* Enums.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -102,6 +107,7 @@
 				7223439B2A8FD61E00DC7120 /* MapViewButton.swift */,
 				7223439D2A8FD6ED00DC7120 /* MapProgressView.swift */,
 				72053A862A951D5000B1D3FC /* ListView.swift */,
+				72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */,
 			);
 			path = CustomViews;
 			sourceTree = "<group>";
@@ -323,6 +329,8 @@
 				725EF4E02A91089B000FB0E1 /* MapViewAPI.swift in Sources */,
 				726754232A7C004000CE6F46 /* MapApp.swift in Sources */,
 				72053A852A9510AA00B1D3FC /* SearchedLocation.swift in Sources */,
+				72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */,
+				72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

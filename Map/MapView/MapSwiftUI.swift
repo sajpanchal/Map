@@ -8,45 +8,21 @@
 import SwiftUI
 import MapKit
 
-//enum type to be used to track the status of MapView
-enum MapViewStatus {
-    case navigating, centeredToUserLocation, inNavigationCentered, notCentered, inNavigationNotCentered, idle
-}
-//enum type to be used to track the button actions of MapView
-enum MapViewAction {
-    case navigate, centerToUserLocation, inNavigationCenterToUserLocation, idle, idleInNavigation
-}
-//enumeration type definition to handle error. it is of string type so we can assign associated values to each enum case as strings.
-enum Errors: String {
-    case locationNotFound = "Sorry, your current location not found!"
-    case headingNotFound = "Sorry, your current heading not found!"
-    case locationNotVisible = "Sorry, your current location is not able to display on map!"
-    case unKnownError = "Sorry, unknown error has occured!"
-    case noError = " -- "
-}
-
-
 //this view will observe the LocationDataManager and updates the MapViewController if data in Location
 //Manager changes.
 struct Map: View {
-    //this will make our MapView update if any @published value in location manager changes.
+    ///this will make our MapView update if any @published value in location manager changes.
     @StateObject var locationDataManager = LocationDataManager()
-    
-    // this variable is used to store the status of our mapview. it is bound to our MapView file
+    /// this variable is used to store the status of our mapview. it is bound to our MapView file
     @State var mapViewStatus: MapViewStatus = .idle
-    
-    //this variable is used to store the actions inputted by the user by tapping buttons or other gestures to mapView
+    ///this variable is used to store the actions inputted by the user by tapping buttons or other gestures to mapView
     @State var mapViewAction: MapViewAction = .idle
-    
-    //enum type variable declaration
+    ///enum type variable declaration
     @State var mapError: Errors = .noError
-    
-    //state variable for searchable text field to search for nearby locations in the map region
+    ///state variable for searchable text field to search for nearby locations in the map region
     @State var searchedLocationText: String = ""
     
     @State var isLocationSelected: Bool = false
-    
-    @FocusState var  enableSearchFieldFocus: Bool
     
     @StateObject var localSearch = LocalSearch()
     
@@ -54,26 +30,8 @@ struct Map: View {
     
     var body: some View {
             VStack {
-                //ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .padding(.horizontal, 10)
-                        .foregroundColor(.gray)
-                    TextField("Search for a location", text: $searchedLocationText)
-                        .padding(10)
-                        .focused($enableSearchFieldFocus)
-                        //when the text in a searchable field changes this method will be called and it will perform a method put inside perform parameter.
-                        .onChange(of: searchedLocationText, perform: handleLocationSearch)
-                        .onTapGesture(perform: prepareSearchfield)
-                    if enableSearchFieldFocus {
-                        Button("Cancel", action: clearSearchfield)
-                        .background(.clear)
-                    }
-                    
-                }
-                .padding(10)
-                .cornerRadius(40)
-              
+                SearchFieldView(searchedLocationText: $searchedLocationText, isSearchCancelled: $isSearchCancelled, isLocationSelected: $isLocationSelected, region: locationDataManager.region, localSearch: localSearch)
+                ///ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
                 ZStack {
                     ///grouping mapview and its associated buttons
                     Group() {
@@ -109,7 +67,7 @@ struct Map: View {
                     else if isMapViewWaiting(to: .idle) {
                         MapProgressView(alertMessage: "Stopping Tracking location! Please Wait...")
                     }
-                    if enableSearchFieldFocus {
+                    if !localSearch.searchedLocations.isEmpty {
                         ListView(localSearch: localSearch, searchedLocationText: $searchedLocationText, isLocationSelected: $isLocationSelected)
                     }
                 }
@@ -185,40 +143,8 @@ struct Map: View {
         }
     }
     
-    func handleLocationSearch(forUserInput text:String) {
-        ///if location is selected or search is cancelled
-        guard !isLocationSelected && !isSearchCancelled else {
-           ///un-focus the search field
-            enableSearchFieldFocus = false
-            ///stop the location search
-            localSearch.cancelLocationSearch()
-            ///and return from a function
-            return
-        }
-        ///if search is on then keep the search field in focus
-        enableSearchFieldFocus = true
-        ///keep calling the startLocalsearch() of observable object localSearch with its searchLocations array as observed property. this will update Map swiftUI view on every change in searchLocations.
-        localSearch.startLocalSearch(withSearchText: text, inRegion: locationDataManager.region)
-        print("called a function")
-    }
-    ///when searchfield is tapped this function will be executed.
-    func prepareSearchfield() {
-        ///location is not selected when we are starting a search.
-        isLocationSelected = false
-        ///this variable is a focusstate type, this is going to be passed to focus() modifier of our searchfield and is responsible to enable and disable the focus.
-        enableSearchFieldFocus = true
-        ///this variable shows and hides the cancel button
-        isSearchCancelled = false
-    }
-    ///when cancel button is tapped
-    func clearSearchfield() {
-        ///clear the text from searchfield
-        searchedLocationText = ""
-        ///cancel the search operations
-        isSearchCancelled = true
-        ///un-focus the search field.
-        enableSearchFieldFocus = false
-    }
+  
+   
 }
 
 
