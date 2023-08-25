@@ -33,7 +33,7 @@ struct ListView: View {
                 .onTapGesture {
                     searchedLocationText = (searchedLocationText == suggestion.name) ? (suggestion.name + " ") : suggestion.name
                     isLocationSelected = true
-                    localSearch.searchedLocations.removeAll()
+                   // localSearch.c.removeAll()
                     print("tapped list item")
                 }
             }

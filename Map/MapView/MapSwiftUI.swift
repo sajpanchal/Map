@@ -64,17 +64,9 @@ struct Map: View {
                         .focused($enableSearchFieldFocus)
                         //when the text in a searchable field changes this method will be called and it will perform a method put inside perform parameter.
                         .onChange(of: searchedLocationText, perform: handleLocationSearch)
-                        .onTapGesture {
-                            isLocationSelected = false
-                            enableSearchFieldFocus = true
-                            isSearchCancelled = false
-                        }
+                        .onTapGesture(perform: prepareSearchfield)
                     if enableSearchFieldFocus {
-                        Button("Cancel", action: {
-                            searchedLocationText = ""
-                            isSearchCancelled = true
-                            enableSearchFieldFocus = false
-                        })
+                        Button("Cancel", action: clearSearchfield)
                         .background(.clear)
                     }
                     
@@ -192,15 +184,40 @@ struct Map: View {
         
         }
     }
+    
     func handleLocationSearch(forUserInput text:String) {
+        ///if location is selected or search is cancelled
         guard !isLocationSelected && !isSearchCancelled else {
-            print("location selected")
+           ///un-focus the search field
             enableSearchFieldFocus = false
+            ///stop the location search
+            localSearch.cancelLocationSearch()
+            ///and return from a function
             return
         }
+        ///if search is on then keep the search field in focus
         enableSearchFieldFocus = true
+        ///keep calling the startLocalsearch() of observable object localSearch with its searchLocations array as observed property. this will update Map swiftUI view on every change in searchLocations.
         localSearch.startLocalSearch(withSearchText: text, inRegion: locationDataManager.region)
         print("called a function")
+    }
+    ///when searchfield is tapped this function will be executed.
+    func prepareSearchfield() {
+        ///location is not selected when we are starting a search.
+        isLocationSelected = false
+        ///this variable is a focusstate type, this is going to be passed to focus() modifier of our searchfield and is responsible to enable and disable the focus.
+        enableSearchFieldFocus = true
+        ///this variable shows and hides the cancel button
+        isSearchCancelled = false
+    }
+    ///when cancel button is tapped
+    func clearSearchfield() {
+        ///clear the text from searchfield
+        searchedLocationText = ""
+        ///cancel the search operations
+        isSearchCancelled = true
+        ///un-focus the search field.
+        enableSearchFieldFocus = false
     }
 }
 

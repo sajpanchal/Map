@@ -10,9 +10,9 @@ import MapKit
 @MainActor
 class LocalSearch: ObservableObject {
     @Published var searchedLocations: [SearchedLocation] = []
-    
+    var searchRequest = MKLocalSearch.Request()
      func startLocalSearch(withSearchText searchedLocationText: String, inRegion mapRegion: MKCoordinateRegion) {
-        let searchRequest = MKLocalSearch.Request()
+        
         
         searchRequest.region = mapRegion
         searchRequest.naturalLanguageQuery = searchedLocationText
@@ -27,6 +27,11 @@ class LocalSearch: ObservableObject {
                 self.searchedLocations = response.mapItems.map(SearchedLocation.init)
              //   print(self.searchedLocations)
             }
+    }
+    func cancelLocationSearch() {
+        let request = MKLocalSearch(request: searchRequest)
+        request.cancel()
+        self.searchedLocations.removeAll()
     }
 }
 struct SearchedLocation: Identifiable {
