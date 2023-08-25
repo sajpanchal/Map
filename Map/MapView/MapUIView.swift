@@ -116,18 +116,22 @@ struct MapView: UIViewRepresentable {
     switch mapViewAction {
     case .idle:
         MapViewAPI.resetLocationTracking(of: uiView)
+       // mapViewStatus = .idle
         break
     case .idleInNavigation:
+        mapViewStatus = .inNavigationNotCentered
         break
     case.centerToUserLocation:
             uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
         print("map is centered!")
+        mapViewStatus = .centeredToUserLocation
         break
     case .inNavigationCenterToUserLocation:
         if let heading = heading {
             //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
             //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
             MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: heading)
+            mapViewStatus = .inNavigationCentered
         }
        break
  

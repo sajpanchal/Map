@@ -7,32 +7,39 @@
 
 import Foundation
 import MapKit
-struct SearchedLocation: Identifiable {
-    var name: String
-    var subtitle: String
-    var id: UUID = UUID()
-    static func startLocalSearch(withSearchText searchedLocationText: String, inRegion mapRegion: MKCoordinateRegion) async -> [SearchedLocation] {
-        var searchedLocations = [Self]()
+@MainActor
+class LocalSearch: ObservableObject {
+    @Published var searchedLocations: [SearchedLocation] = []
+    
+     func startLocalSearch(withSearchText searchedLocationText: String, inRegion mapRegion: MKCoordinateRegion) {
         let searchRequest = MKLocalSearch.Request()
         
         searchRequest.region = mapRegion
         searchRequest.naturalLanguageQuery = searchedLocationText
         
         let request = MKLocalSearch(request: searchRequest)
-        do {
-            let response = try await request.start()
-            for item in response.mapItems {
-                if let name = item.name, let subtitle = item.placemark.title {
-                    searchedLocations.append(Self(name: name, subtitle: subtitle))
-                   
+        
+            request.start { (response, error) in
+                guard let response = response  else {
+                    print("search error:\(error?.localizedDescription ?? "n/a")")
+                    return
                 }
+                self.searchedLocations = response.mapItems.map(SearchedLocation.init)
+             //   print(self.searchedLocations)
             }
-        }
-        catch {
-            print("search error:\(error.localizedDescription)")
-        }
-      
-
-        return searchedLocations
     }
+}
+struct SearchedLocation: Identifiable {
+    var mapItem: MKMapItem
+    init(mapItem: MKMapItem) {
+        self.mapItem = mapItem
+    }
+    var name: String {
+        mapItem.name ?? "n/a"
+    }
+    var subtitle: String {
+        mapItem.placemark.title ?? "n/a"
+    }
+    var id: UUID = UUID()
+   
 }

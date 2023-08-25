@@ -8,30 +8,43 @@
 import SwiftUI
 
 struct ListView: View {
-    @Binding var searchedLocations: [SearchedLocation]
+   
+    
+    @StateObject var localSearch: LocalSearch
+    @Binding var searchedLocationText: String
+    @Binding var isLocationSelected: Bool
     var body: some View {
-        ForEach(searchedLocations) { suggestion in
-            VStack {
-                HStack {
-                    Text("\(suggestion.name)")
-                        .font(.body)
-                        .fontWeight(.bold)
-                    Spacer()
+        List {
+            ForEach(localSearch.searchedLocations, id:\.self.id) { suggestion in
+                VStack {
+                    HStack {
+                        Text("\(suggestion.name)")
+                            .font(.body)
+                            .fontWeight(.bold)
+                        Spacer()
+                    }
+                    HStack {
+                        Text(" \(suggestion.subtitle)")
+                            .font(.caption)
+                            .fontWeight(.ultraLight)
+                        Spacer()
+                    }
                 }
-                HStack {
-                    Text(" \(suggestion.subtitle)")
-                        .font(.caption)
-                        .fontWeight(.ultraLight)
-                    Spacer()
+                .onTapGesture {
+                    searchedLocationText = (searchedLocationText == suggestion.name) ? (suggestion.name + " ") : suggestion.name
+                    isLocationSelected = true
+                    localSearch.searchedLocations.removeAll()
+                    print("tapped list item")
                 }
-               
             }
         }
+     
+      
     }
 }
 
 struct ListView_Previews: PreviewProvider {
     static var previews: some View {
-        ListView(searchedLocations: .constant([]))
+        ListView(localSearch: LocalSearch(), searchedLocationText: .constant(""), isLocationSelected: .constant(false))
     }
 }
