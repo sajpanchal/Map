@@ -10,6 +10,7 @@ import MapKit
 @MainActor
 class LocalSearch: ObservableObject {
     @Published var searchedLocations: [SearchedLocation] = []
+    @Published var tappedLocation: MKAnnotation?
     var searchRequest = MKLocalSearch.Request()
      func startLocalSearch(withSearchText searchedLocationText: String, inRegion mapRegion: MKCoordinateRegion) {
         
@@ -31,6 +32,7 @@ class LocalSearch: ObservableObject {
     func cancelLocationSearch() {
         let request = MKLocalSearch(request: searchRequest)
         request.cancel()
+      //  self.tappedLocation = nil
         self.searchedLocations.removeAll()
     }
 }
@@ -44,6 +46,12 @@ struct SearchedLocation: Identifiable {
     }
     var subtitle: String {
         mapItem.placemark.title ?? "n/a"
+    }
+    var annotation: MKAnnotation {
+        let pointAnnotation = MKPointAnnotation()
+        pointAnnotation.coordinate = mapItem.placemark.coordinate
+        pointAnnotation.title = name + "\n" + subtitle
+        return pointAnnotation
     }
     var id: UUID = UUID()
    

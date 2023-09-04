@@ -40,6 +40,8 @@ struct SearchFieldView: View {
         guard !isLocationSelected && !isSearchCancelled else {
            ///un-focus the search field
             enableSearchFieldFocus = false
+            if isLocationSelected {
+            }
             ///stop the location search
             localSearch.cancelLocationSearch()
             ///and return from a function
@@ -49,7 +51,7 @@ struct SearchFieldView: View {
         enableSearchFieldFocus = true
         ///keep calling the startLocalsearch() of observable object localSearch with its searchLocations array as observed property. this will update Map swiftUI view on every change in searchLocations.
         localSearch.startLocalSearch(withSearchText: text, inRegion: region)
-        print("called a function")
+       
     }
     ///when searchfield is tapped this function will be executed.
     func prepareSearchfield() {
@@ -66,6 +68,8 @@ struct SearchFieldView: View {
         searchedLocationText = ""
         ///cancel the search operations
         isSearchCancelled = true
+        
+        isLocationSelected = false
         ///un-focus the search field.
         enableSearchFieldFocus = false
     }

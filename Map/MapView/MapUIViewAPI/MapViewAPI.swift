@@ -53,6 +53,14 @@ class MapViewAPI {
         }
     }
     
+    static func annotateLocation(in mapView: MKMapView ,at coordinates: CLLocationCoordinate2D, for annotation: MKAnnotation) {
+        mapView.addAnnotation(annotation)
+        if mapView.centerCoordinate.latitude != annotation.coordinate.latitude && mapView.centerCoordinate.longitude != annotation.coordinate.longitude {
+            mapView.animatedZoom(zoomRegion: MKCoordinateRegion(center: annotation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
+            print("centeredd to user location")
+        }
+    }
+    
     static func getNavigationDirections() {
     
     }

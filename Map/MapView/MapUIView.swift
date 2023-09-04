@@ -29,6 +29,9 @@ struct MapView: UIViewRepresentable {
     //this property is needed to set the map region centered to user's location when app is launched for the first time.
     @Binding var mapViewStatus: MapViewStatus
     
+    @Binding var isLocationSelected: Bool
+    @Binding var isSearchCancelled: Bool
+    @StateObject var localSearch: LocalSearch
     var region: MKCoordinateRegion?
     //this is the function that our MapView will execute the first time on its inception.
     //this function will instantiate the Coordinator class with a copy of its parent object.
@@ -60,7 +63,7 @@ struct MapView: UIViewRepresentable {
         //this is the delegate method that will be called whenever user location will update
         func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
             MapViewAPI.setRegionIn(mapView: mapView, centeredAt: userLocation, parent: &parent)
-             
+             print("location updated!")
             // if the track location button is tapped
             switch parent.mapViewAction {
                 case .idle:
@@ -113,25 +116,44 @@ struct MapView: UIViewRepresentable {
     //UIViewController will be updated when our swiftui view MapView will be updated.
     //Mapview will be updated when our @observedObject / @StateObject is updated.
     func updateUIView(_ uiView: MKMapView, context: Context) {
+        print("UIView updated!")
+       // let annotation = MKPointAnnotation()
     switch mapViewAction {
     case .idle:
+        if let searchedLocation = localSearch.tappedLocation {
+            if isLocationSelected {
+                print("location is selected")
+                MapViewAPI.annotateLocation(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
+                return
+            }
+            else if isSearchCancelled {
+                uiView.removeAnnotation(searchedLocation)
+            }
+        }
         MapViewAPI.resetLocationTracking(of: uiView)
-       // mapViewStatus = .idle
         break
     case .idleInNavigation:
-        mapViewStatus = .inNavigationNotCentered
+        //mapViewStatus = .inNavigationNotCentered
         break
     case.centerToUserLocation:
-            uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
-        print("map is centered!")
-        mapViewStatus = .centeredToUserLocation
+        if let searchedLocation = localSearch.tappedLocation {
+            if isLocationSelected {
+                print("location is selected")
+                MapViewAPI.annotateLocation(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
+                return
+            }
+            else if isSearchCancelled {
+                uiView.removeAnnotation(searchedLocation)
+            }
+        }
+        uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
         break
     case .inNavigationCenterToUserLocation:
         if let heading = heading {
             //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
             //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
             MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: heading)
-            mapViewStatus = .inNavigationCentered
+          //  mapViewStatus = .inNavigationCentered
         }
        break
  

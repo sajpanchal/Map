@@ -31,10 +31,12 @@ struct ListView: View {
                     }
                 }
                 .onTapGesture {
+                    localSearch.tappedLocation = suggestion.annotation
                     searchedLocationText = (searchedLocationText == suggestion.name) ? (suggestion.name + " ") : suggestion.name
                     isLocationSelected = true
                    // localSearch.c.removeAll()
                     print("tapped list item")
+               
                 }
             }
         }

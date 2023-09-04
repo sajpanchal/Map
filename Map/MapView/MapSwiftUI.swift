@@ -30,13 +30,16 @@ struct Map: View {
     
     var body: some View {
             VStack {
-                SearchFieldView(searchedLocationText: $searchedLocationText, isSearchCancelled: $isSearchCancelled, isLocationSelected: $isLocationSelected, region: locationDataManager.region, localSearch: localSearch)
+                if !isMapInNavigationMode().0 || isMapViewWaiting(to: .navigate) {
+                    SearchFieldView(searchedLocationText: $searchedLocationText, isSearchCancelled: $isSearchCancelled, isLocationSelected: $isLocationSelected, region: locationDataManager.region, localSearch: localSearch)
+                }
+               
                 ///ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
                 ZStack {
                     ///grouping mapview and its associated buttons
                     Group() {
                         ///calling our custom struct that will render UIView for us in swiftui. we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class. we are also passing the state variable called tapped that is bound to the MapView.when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix. we always declare a binding propery in a child component of the associated property from its parent.once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
-                        MapView(location: $locationDataManager.userlocation,mapViewAction: $mapViewAction, heading: $locationDataManager.userHeading, mapError: $mapError, mapViewStatus: $mapViewStatus)
+                        MapView(location: $locationDataManager.userlocation,mapViewAction: $mapViewAction, heading: $locationDataManager.userHeading, mapError: $mapError, mapViewStatus: $mapViewStatus, isLocationSelected: $isLocationSelected, isSearchCancelled: $isSearchCancelled, localSearch: localSearch)
                         ///disable the mapview when track location button is tapped but tracking is not on yet.
                             .disabled(isMapViewWaiting(to: .navigate))
                         ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged() action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag. we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
@@ -95,7 +98,9 @@ struct Map: View {
                 mapViewStatus = .notCentered
                 mapViewAction = .idle
             }
-            
+            if isLocationSelected {
+                isLocationSelected = false
+            }
         }
     }
     //a function to be called whenever the re-center icon on the mapView is tapped.
