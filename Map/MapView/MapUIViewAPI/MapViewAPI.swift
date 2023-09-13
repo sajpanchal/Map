@@ -61,8 +61,33 @@ class MapViewAPI {
         }
     }
     
-    static func getNavigationDirections() {
-    
+    static func getNavigationDirections(in uiView: MKMapView, from source: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D?) {
+        ///create an instance of MKDirections request to request the directions.
+        let request = MKDirections.Request()
+        ///if distination is not nil
+        if let destination = destination {
+            ///set the request source/destination property as a mapitem we get from source/destination location coorinates.
+            request.source = MKMapItem(placemark:  MKPlacemark(coordinate: source))
+            request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
+            ///create a directions object from our request now.
+            let directions = MKDirections(request: request)
+            ///async function to calculate the routes from information provided by request object of directions object.
+            directions.calculate(completionHandler: { (response, error) in
+                ///if response is received
+                if response != nil {
+                    ///get a polyline object from the first route.
+                    let polyline = response!.routes.first!.polyline
+                    ///add the polyline received from the route as an overlay to be displayed in mapview.
+                    uiView.addOverlay(polyline)
+                    
+                   
+                }
+                else {
+                    print(error!.localizedDescription)
+                }
+            })
+        }
+        
     }
 
 }

@@ -74,9 +74,12 @@ struct Map: View {
                         ListView(localSearch: localSearch, searchedLocationText: $searchedLocationText, isLocationSelected: $isLocationSelected)
                     }
                 }
-                //navigation mode button to switch between navigation modes.
-                Button(isMapInNavigationMode().0 ? "Stop location Tracking" : "Start Location Tracking", action: updateUserTracking)
-                .foregroundColor(isMapInNavigationMode().0 ? .red : .blue)
+                if localSearch.tappedLocation != nil {
+                    //navigation mode button to switch between navigation modes.
+                    Button(isMapInNavigationMode().0 ? "Stop location Tracking" : "Start Location Tracking", action: updateUserTracking)
+                    .foregroundColor(isMapInNavigationMode().0 ? .red : .blue)
+                }
+            
             }
     }
     ///custom function takes the DragGesture value. custom function we calculate the distance of the drag from 2D cooridinates of starting and ennding points. then we check if the distance is more than 10. if so, we undo the user-location re-center button tap.
@@ -118,6 +121,7 @@ struct Map: View {
     }
     
     func updateUserTracking() {
+        print("user navigation tracking is available.")
         ///set mapViewAction to idle mode if status is navigating when button is pressed set mapViewAction to nagivate if status is not navigating when button is pressed.
         switch mapViewStatus {
         case .idle, .notCentered, .centeredToUserLocation:

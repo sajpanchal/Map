@@ -68,10 +68,12 @@ struct SearchFieldView: View {
         searchedLocationText = ""
         ///cancel the search operations
         isSearchCancelled = true
-        
+       
         isLocationSelected = false
         ///un-focus the search field.
         enableSearchFieldFocus = false
+        
+     
     }
     
 }
