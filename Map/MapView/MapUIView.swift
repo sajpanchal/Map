@@ -14,6 +14,7 @@ import UIKit
 import MapKit
 
 
+
 ///create a custom struct called MapView and conform it to UIViewRepresentable. this class is only responsible to display map and its accessories.
 struct MapView: UIViewRepresentable {
     typealias UIViewType = MKMapView
@@ -34,20 +35,40 @@ struct MapView: UIViewRepresentable {
     ///this ist the state object of Map Swiftui view that is going to handle the location search
     @StateObject var localSearch: LocalSearch
     var region: MKCoordinateRegion?
+   
     ///this is the function that our MapView will execute the first time on its inception. this function will instantiate the Coordinator class with a copy of its parent object.
     func makeCoordinator() -> (Coordinator) {
         print("make coordinator")
         return Coordinator(self)
     }
     ///Coordinator is a class reponsible to communicate the behaviour of our UIKit/Appkit object and makes necessary changes to our swiftuiobjects. it enables us to do so by updating the properties of this class or executing UIKit/AppKit methods. here, we are making our cooridator a subclass of NSObject. We are also conforming to the MKMapViewDelegate protocol which enables us to use MKMapView methods that will be executed on updates to our MapView and CoreLocation data. Also, we are setting a property called parent as MapView type and setting its delegate as a coordinator object. So, when any of the event related to MapView occurs a delegator will detect those changes, a relevant function we have declared in the Delegator (Coordinator) will be executed. inside the methods, we make changes to our UIView based on the changes in associated data.
-    class Coordinator: NSObject, MKMapViewDelegate {
+    class Coordinator: NSObject, MKMapViewDelegate, UIGestureRecognizerDelegate {
         //setting MapView as its parent view
         var parent: MapView
-        
+        var mapView = MKMapView()
+        var tapGestureRecognizer = UITapGestureRecognizer()
+        var isOverlayTapped = false
         init(_ parent: MapView) {
             //setting a parent property as parent on initialization
             self.parent = parent
+            super.init()
+            self.tapGestureRecognizer.addTarget(self, action: #selector(handleTapGesture))
+            self.tapGestureRecognizer.delegate = self
         }
+    
+        @objc func handleTapGesture() {
+            let result = MapViewAPI.isOvarlayTapped(in: self.mapView, by: tapGestureRecognizer)
+            isOverlayTapped = result.0
+            let title = result.1
+            if !isOverlayTapped {
+                print("no overlays tapped")
+            }
+            else {
+                print("overlay tapped")
+                MapViewAPI.setTappedOverlay(in: self.mapView, having: title)
+            }
+        }
+        
         ///if mapView couldn't find the user location this function will be called.
         func mapView(_ mapView: MKMapView, didFailToLocateUserWithError error: Error) {
             ///we will handle the error by updating our enum type variable in Map SwiftUI. It will then print the error message in text field.
@@ -56,20 +77,49 @@ struct MapView: UIViewRepresentable {
         
        ///this function will be called once the overlay is added to the mapview object
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        
             let renderer = MKPolylineRenderer(overlay: overlay)
+            print("overlay renderer method")
             renderer.lineWidth = 10
-            renderer.strokeColor = .systemBlue
+            
+            print("mapview renderer:",mapView.renderer(for: overlay) ?? "not found")
+            print("renderer:",renderer)
+            
+            print("number of routes: \(mapView.overlays.count)")
+          //  print("\()")
+            
+            if renderer.polyline.subtitle == "fastest route" {
+                    renderer.strokeColor = .systemBlue
+                }
+                else {
+                    renderer.strokeColor = .systemGray
+                }
+            
             return renderer
         }
+     
         
         ///this is the delegate method that will be called whenever user location will update
-         func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
+        @MainActor func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
             MapViewAPI.setRegionIn(mapView: mapView, centeredAt: userLocation, parent: &parent)
-             print("location updated!")
+            // print("location updated!")
             // if the track location button is tapped
             switch parent.mapViewAction {
                 case .idle:
                     parent.mapViewStatus = .idle
+                if let searchedLocation = parent.localSearch.tappedLocation {
+                    if parent.isLocationSelected {
+                        print("location is selected")
+                        MapViewAPI.annotateLocation(in: mapView, at: searchedLocation.coordinate, for: searchedLocation)
+                        return
+                    }
+                    else if parent.isSearchCancelled {
+                        mapView.removeAnnotation(searchedLocation)
+                        mapView.removeOverlays(mapView.overlays)
+                        parent.localSearch.tappedLocation = nil
+                    }
+                }
+                MapViewAPI.resetLocationTracking(of: mapView)
                     break
                 case .idleInNavigation:
                     parent.mapViewStatus = .inNavigationNotCentered
@@ -81,6 +131,7 @@ struct MapView: UIViewRepresentable {
                     fallthrough
                 case .navigate:
                     MapViewAPI.setCameraRegion(of: mapView, centeredAt: userLocation, userHeading: parent.heading)
+                MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: parent.localSearch.tappedLocation?.coordinate)
                     ///if user heading is not nil
                     if parent.heading != nil {
                         parent.mapViewStatus = .navigating
@@ -92,6 +143,10 @@ struct MapView: UIViewRepresentable {
                     }
                 
                 break
+            case .showDirections:
+                MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: parent.localSearch.tappedLocation?.coordinate)
+                parent.mapViewAction = .idle
+                break
             }
         }
     }
@@ -101,18 +156,21 @@ struct MapView: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
         print("make map view")
         //create an instance of MKMapView.
-        let mapView = MKMapView()
+       // let mapView = MKMapView()
         ///setting our coordinator object as a delegate of mapView object. this will allow coordinator object to detect any changes in mapView object (data or view updates). based on these changes, any associated methods declared in coordinator will be executed. this way we can manipulate the data and deal with the user inteactions in mapviews.
-        mapView.delegate = context.coordinator
+        context.coordinator.mapView.delegate = context.coordinator
         ///this will show a blip where the user location is in the map. if we don't set this property, mapView won't be able to get location updates.
-        mapView.showsUserLocation = true
+        context.coordinator.mapView.showsUserLocation = true
+        context.coordinator.mapView.addGestureRecognizer(context.coordinator.tapGestureRecognizer)
         ///return the mapview object.
-        return mapView
+        return context.coordinator.mapView
     }
     
     ///this method will be executed whenever our UIViewController is going to be updated.UIViewController will be updated when our swiftui view MapView will be updated. Mapview will be updated when our @observedObject / @StateObject is updated.
     func updateUIView(_ uiView: MKMapView, context: Context) {
-        print("UIView updated!")
+       // print("UIView updated!")
+     
+        
        /// let annotation = MKPointAnnotation()
     switch mapViewAction {
         case .idle:
@@ -156,9 +214,9 @@ struct MapView: UIViewRepresentable {
               //  mapViewStatus = .inNavigationCentered
             }
            break
-     
         case .navigate:
-            MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: localSearch.tappedLocation?.coordinate)
+            break
+    case .showDirections:
             break
         }
     }

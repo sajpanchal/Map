@@ -76,8 +76,16 @@ struct Map: View {
                 }
                 if localSearch.tappedLocation != nil {
                     //navigation mode button to switch between navigation modes.
-                    Button(isMapInNavigationMode().0 ? "Stop location Tracking" : "Start Location Tracking", action: updateUserTracking)
-                    .foregroundColor(isMapInNavigationMode().0 ? .red : .blue)
+                    HStack {
+                        Button("Routes", action: {
+                            mapViewAction = .showDirections
+                        })
+                        Spacer()
+                        Button(isMapInNavigationMode().0 ? "Stop" : "Navigate", action: updateUserTracking)
+                        .foregroundColor(isMapInNavigationMode().0 ? .red : .blue)
+                    }
+               
+                  
                 }
             
             }
@@ -113,7 +121,7 @@ struct Map: View {
     
     func isMapInNavigationMode() -> (Bool,MapViewStatus) {
         switch mapViewStatus {
-        case .idle, .notCentered, .centeredToUserLocation:
+        case .idle, .notCentered, .centeredToUserLocation, .showingDirections:
             return (false,mapViewStatus)
         case .navigating, .inNavigationCentered, .inNavigationNotCentered:
             return (true,mapViewStatus)
@@ -124,7 +132,7 @@ struct Map: View {
         print("user navigation tracking is available.")
         ///set mapViewAction to idle mode if status is navigating when button is pressed set mapViewAction to nagivate if status is not navigating when button is pressed.
         switch mapViewStatus {
-        case .idle, .notCentered, .centeredToUserLocation:
+        case .idle, .notCentered, .centeredToUserLocation, .showingDirections:
             mapViewAction = .navigate
             ///UIApplocation is the class that has a centralized control over the app. it has a property called shared that is a singleton instance of UIApplication itself. this instance has a property called isIdleTimerDisabled. which will decide if we want to turn off the phone screen after certain amount of time of inactivity in the app. we will set it to true so it will keep the screen alive when user tracking is on.
             UIApplication.shared.isIdleTimerDisabled = true
@@ -148,6 +156,8 @@ struct Map: View {
             return (isMapInNavigationMode().0 && mapViewAction == .idle)
         case .idleInNavigation:
             return (mapViewStatus != .inNavigationNotCentered && mapViewAction == .idleInNavigation)
+        case .showDirections:
+            return (mapViewStatus != .showingDirections && mapViewAction == .showDirections)
         
         }
     }
