@@ -7,6 +7,8 @@
 
 import SwiftUI
 import MapKit
+import AudioToolbox
+import AVFoundation
 
 //this view will observe the LocationDataManager and updates the MapViewController if data in Location
 //Manager changes.
@@ -23,23 +25,53 @@ struct Map: View {
     @State var searchedLocationText: String = ""
     
     @State var isLocationSelected: Bool = false
-    
+    @State var instruction: String = ""
+    @State var nextStepLocation: CLLocation?
     @StateObject var localSearch = LocalSearch()
-    
+    @State var status: String = "-"
     @State var isSearchCancelled: Bool = false
-    
+    @State var nextStepDistance: String = ""
+    let synthesizer = AVSpeechSynthesizer()
     var body: some View {
             VStack {
                 if !isMapInNavigationMode().0 || isMapViewWaiting(to: .navigate) {
                     SearchFieldView(searchedLocationText: $searchedLocationText, isSearchCancelled: $isSearchCancelled, isLocationSelected: $isLocationSelected, region: locationDataManager.region, localSearch: localSearch)
                 }
-               
+                else if isMapInNavigationMode().0  {
+                    HStack {
+                        VStack {
+                            Image(systemName: getDirectionSign(for: instruction))
+                                .font(.title)
+                                .fontWeight(.black)
+                                .padding(.top, 5)
+                            Text("\(nextStepDistance)")
+                                .padding(.bottom, 5)
+                                .font(.title2)
+                                .fontWeight(.black)
+                        }
+                        Spacer()
+                        if #available(iOS 17.0, *) {
+                        Text(instruction)
+                            .padding(10)
+                            .font(.title3)
+                            .onAppear(perform: speech)
+                            .onChange(of: instruction, speech)
+                            } else {
+                                Text(instruction)
+                                    .padding(10)
+                                    .font(.title3)
+                            }
+                           
+                        Spacer()
+                    }
+                    Text(status)
+                }
                 ///ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
                 ZStack {
                     ///grouping mapview and its associated buttons
                     Group() {
                         ///calling our custom struct that will render UIView for us in swiftui. we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class. we are also passing the state variable called tapped that is bound to the MapView.when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix. we always declare a binding propery in a child component of the associated property from its parent.once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
-                        MapView(location: $locationDataManager.userlocation,mapViewAction: $mapViewAction, heading: $locationDataManager.userHeading, mapError: $mapError, mapViewStatus: $mapViewStatus, isLocationSelected: $isLocationSelected, isSearchCancelled: $isSearchCancelled, localSearch: localSearch)
+                        MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus, isLocationSelected: $isLocationSelected, isSearchCancelled: $isSearchCancelled, instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, status: $status)
                         ///disable the mapview when track location button is tapped but tracking is not on yet.
                             .disabled(isMapViewWaiting(to: .navigate))
                         ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged() action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag. we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
@@ -81,8 +113,11 @@ struct Map: View {
                             mapViewAction = .showDirections
                         })
                         Spacer()
-                        Button(isMapInNavigationMode().0 ? "Stop" : "Navigate", action: updateUserTracking)
-                        .foregroundColor(isMapInNavigationMode().0 ? .red : .blue)
+                        if mapViewStatus == .showingDirections || mapViewStatus == .navigating {
+                            Button(isMapInNavigationMode().0 ? "Stop" : "Navigate", action: updateUserTracking)
+                            .foregroundColor(isMapInNavigationMode().0 ? .red : .blue)
+                        }
+                      
                     }
                
                   
@@ -92,6 +127,7 @@ struct Map: View {
     }
     ///custom function takes the DragGesture value. custom function we calculate the distance of the drag from 2D cooridinates of starting and ennding points. then we check if the distance is more than 10. if so, we undo the user-location re-center button tap.
     func dragGestureAction(value: DragGesture.Value) {
+       
         ///get the distance of the user drag in x direction by measuring a difference between starting point and ending point in x direction
         let x = abs(value.location.x - value.startLocation.x)
         ///get the distance of the user drag in y direction by measuring a difference between starting point and ending point in y direction
@@ -113,6 +149,7 @@ struct Map: View {
                 isLocationSelected = false
             }
         }
+        print("map is out of center: \(mapViewStatus)")
     }
     //a function to be called whenever the re-center icon on the mapView is tapped.
     func centerMapToUserLocation() {
@@ -133,17 +170,70 @@ struct Map: View {
         ///set mapViewAction to idle mode if status is navigating when button is pressed set mapViewAction to nagivate if status is not navigating when button is pressed.
         switch mapViewStatus {
         case .idle, .notCentered, .centeredToUserLocation, .showingDirections:
+           
             mapViewAction = .navigate
             ///UIApplocation is the class that has a centralized control over the app. it has a property called shared that is a singleton instance of UIApplication itself. this instance has a property called isIdleTimerDisabled. which will decide if we want to turn off the phone screen after certain amount of time of inactivity in the app. we will set it to true so it will keep the screen alive when user tracking is on.
             UIApplication.shared.isIdleTimerDisabled = true
             break
         case .navigating, .inNavigationCentered, .inNavigationNotCentered:
             mapViewAction = .idle
+            instruction = ""
+            nextStepLocation = nil
             UIApplication.shared.isIdleTimerDisabled = false
             break
         }
     }
-    
+    func getDirectionSign(for: String) -> String {
+        let instruction = instruction.lowercased()
+        if instruction.contains("turn left") {
+            return "arrow.turn.up.left"
+        }
+        else if instruction.contains("turn right")
+        {
+            return "arrow.turn.up.right"
+        }
+        else if instruction.contains("slight left") {
+            return "arrow.turn.left.up"
+        }
+        else if instruction.contains("slight right") {
+            return "arrow.turn.right.up"
+        }
+        else if instruction.contains("keep right") {
+            return "rectangle.righthalf.inset.filled.arrow.right"
+        }
+        else if instruction.contains("keep left") {
+            return "rectangle.lefthalf.inset.filled.arrow.left"
+        }
+        else if instruction.contains("continue") {
+            return "arrow.up"
+        }
+        else if instruction.contains("first exit") {
+            return "arrow.turn.up.right"
+        }
+        else if instruction.contains("second exit") {
+            return "arrow.up"
+        }
+        else if instruction.contains("third exit") {
+            return "arrow.uturn.left"
+        }
+        else if instruction.contains("make a u-turn") || instruction.contains("fourth exit"){
+            return "arrow.uturn.down"
+        }
+        else if instruction.contains("exit") {
+            return "arrow.up.right"
+        }
+        else if instruction.contains("starting at")
+        {
+            return "location.north.line"
+        }
+        else if instruction.contains("arrive") || instruction.contains("arrived") {
+            return "mappin.and.ellipse"
+        }
+        else if instruction.contains("destination") {
+            return "mappin.and.ellipse"
+        }
+        return ""
+    }
     func isMapViewWaiting(to action: MapViewAction) -> Bool {
         switch action {
         case .navigate:
@@ -160,6 +250,18 @@ struct Map: View {
             return (mapViewStatus != .showingDirections && mapViewAction == .showDirections)
         
         }
+    }
+    func speech() {
+        if instruction.isEmpty {
+            return
+        }
+        let audioSession = AVAudioSession.sharedInstance()
+        try! audioSession.setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
+        
+        let speech = "in \(nextStepDistance)," + instruction
+        synthesizer.speak(AVSpeechUtterance(string: speech))
+   
+        AudioServicesPlayAlertSound(1013)
     }
     
   

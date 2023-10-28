@@ -19,11 +19,11 @@ import MapKit
 struct MapView: UIViewRepresentable {
     typealias UIViewType = MKMapView
     ///this property holds the location coordinate values accessed from core location. it is passed by Map SwiftUI.
-    @Binding var location: CLLocation?
+  //  @Binding var location: CLLocation?
     ///this property is bound to the tapped property of Map SwiftUI. it will be true when re-center button is pressed from Map SwiftUI.
     @Binding var mapViewAction: MapViewAction
     ///this property holds the user's current heading data accessed from core location. it is passed by Map SwiftUI
-    @Binding var heading: CLHeading?
+//    @Binding var heading: CLHeading?
     ///this property holds the error codes that we have defined in enum type in Map SwiftUI file.
     @Binding var mapError: Errors
     ///this property is needed to set the map region centered to user's location when app is launched for the first time.
@@ -33,9 +33,15 @@ struct MapView: UIViewRepresentable {
     ///this is the state property of the Map SwiftUI view that will be true when user has cleared the search field.
     @Binding var isSearchCancelled: Bool
     ///this ist the state object of Map Swiftui view that is going to handle the location search
+    @Binding var instruction: String
     @StateObject var localSearch: LocalSearch
+    @StateObject var locationDataManager: LocationDataManager
+    @Binding var nextStepLocation: CLLocation?
+    @Binding var nextStepDistance: String
+    @Binding var status: String
     var region: MKCoordinateRegion?
-   
+    var routes: [MKRoute]?
+    var enteredToRegion: Bool = false
     ///this is the function that our MapView will execute the first time on its inception. this function will instantiate the Coordinator class with a copy of its parent object.
     func makeCoordinator() -> (Coordinator) {
         print("make coordinator")
@@ -61,10 +67,9 @@ struct MapView: UIViewRepresentable {
             isOverlayTapped = result.0
             let title = result.1
             if !isOverlayTapped {
-                print("no overlays tapped")
+            print("not tapped")
             }
             else {
-                print("overlay tapped")
                 MapViewAPI.setTappedOverlay(in: self.mapView, having: title)
             }
         }
@@ -75,18 +80,22 @@ struct MapView: UIViewRepresentable {
             parent.mapError = Errors.locationNotFound
         }
         
+        
        ///this function will be called once the overlay is added to the mapview object
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        
-            let renderer = MKPolylineRenderer(overlay: overlay)
-            print("overlay renderer method")
+//            if overlay is MKPolyline {
+//
+//            }
+//            else {
+//                let renderer = MKCircleRenderer(overlay: overlay)
+//               // renderer.fillColor = .systemYellow
+//                renderer.lineWidth = 2
+//                renderer.strokeColor = .systemCyan
+//                return renderer
+//            }
+         let renderer = MKPolylineRenderer(overlay: overlay)
+            
             renderer.lineWidth = 10
-            
-            print("mapview renderer:",mapView.renderer(for: overlay) ?? "not found")
-            print("renderer:",renderer)
-            
-            print("number of routes: \(mapView.overlays.count)")
-          //  print("\()")
             
             if renderer.polyline.subtitle == "fastest route" {
                     renderer.strokeColor = .systemBlue
@@ -94,32 +103,39 @@ struct MapView: UIViewRepresentable {
                 else {
                     renderer.strokeColor = .systemGray
                 }
-            
             return renderer
+            
         }
      
         
         ///this is the delegate method that will be called whenever user location will update
         @MainActor func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
             MapViewAPI.setRegionIn(mapView: mapView, centeredAt: userLocation, parent: &parent)
+            
             // print("location updated!")
             // if the track location button is tapped
             switch parent.mapViewAction {
                 case .idle:
-                    parent.mapViewStatus = .idle
+               
                 if let searchedLocation = parent.localSearch.tappedLocation {
                     if parent.isLocationSelected {
                         print("location is selected")
                         MapViewAPI.annotateLocation(in: mapView, at: searchedLocation.coordinate, for: searchedLocation)
-                        return
+                       
+                       
                     }
                     else if parent.isSearchCancelled {
-                        mapView.removeAnnotation(searchedLocation)
+                        print("search is cancelled")
+                        mapView.removeAnnotations(mapView.annotations)
                         mapView.removeOverlays(mapView.overlays)
                         parent.localSearch.tappedLocation = nil
                     }
                 }
-                MapViewAPI.resetLocationTracking(of: mapView)
+                if parent.mapViewStatus == .idle {
+                //    break
+                }
+                MapViewAPI.resetLocationTracking(of: mapView, parent: &parent)
+                parent.mapViewStatus = .idle
                     break
                 case .idleInNavigation:
                     parent.mapViewStatus = .inNavigationNotCentered
@@ -130,10 +146,10 @@ struct MapView: UIViewRepresentable {
                 case .inNavigationCenterToUserLocation:
                     fallthrough
                 case .navigate:
-                    MapViewAPI.setCameraRegion(of: mapView, centeredAt: userLocation, userHeading: parent.heading)
-                MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: parent.localSearch.tappedLocation?.coordinate)
+                    MapViewAPI.setCameraRegion(of: mapView, centeredAt: userLocation, userHeading: parent.locationDataManager.userHeading)
+                    MapViewAPI.startNavigation(in: mapView, parent: &parent)
                     ///if user heading is not nil
-                    if parent.heading != nil {
+                if parent.locationDataManager.userHeading != nil {
                         parent.mapViewStatus = .navigating
                     }
                     ///if heading is found nil
@@ -144,8 +160,20 @@ struct MapView: UIViewRepresentable {
                 
                 break
             case .showDirections:
+                if parent.mapViewStatus == .showingDirections {
+                    break
+                }
                 MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: parent.localSearch.tappedLocation?.coordinate)
-                parent.mapViewAction = .idle
+                mapView.showAnnotations(mapView.annotations, animated: true)
+                if parent.isSearchCancelled {
+                   // mapView.removeAnnotations(mapView.annotations)
+                   // mapView.removeOverlays(mapView.overlays)
+                   // parent.localSearch.tappedLocation = nil
+                     parent.mapViewAction = .idle
+                }
+             
+               
+                parent.mapViewStatus = .showingDirections
                 break
             }
         }
@@ -174,24 +202,31 @@ struct MapView: UIViewRepresentable {
        /// let annotation = MKPointAnnotation()
     switch mapViewAction {
         case .idle:
+        print("search cancel status: \(isSearchCancelled)")
             if let searchedLocation = localSearch.tappedLocation {
+               
                 if isLocationSelected {
-                    print("location is selected")
+                    print("location is selected in uiView update")
                     MapViewAPI.annotateLocation(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
-                    return
+                  
                 }
                 else if isSearchCancelled {
-                    uiView.removeAnnotation(searchedLocation)
+                    print("search is cancelling in uiView update")
+                    uiView.removeAnnotations(uiView.annotations)
                     uiView.removeOverlays(uiView.overlays)
                     localSearch.tappedLocation = nil
                 }
             }
-            MapViewAPI.resetLocationTracking(of: uiView)
+        if mapViewStatus == .idle {
+            break
+        }
+        MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
             break
         case .idleInNavigation:
             //mapViewStatus = .inNavigationNotCentered
             break
         case.centerToUserLocation:
+        
             if let searchedLocation = localSearch.tappedLocation {
                 if isLocationSelected {
                     print("location is selected")
@@ -204,10 +239,14 @@ struct MapView: UIViewRepresentable {
                     localSearch.tappedLocation = nil
                 }
             }
+        if mapViewStatus == .centeredToUserLocation {
+            break
+        }
+        print("map is centering")
             uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
             break
         case .inNavigationCenterToUserLocation:
-            if let heading = heading {
+            if let heading = locationDataManager.userHeading {
                 //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
                 //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
                 MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: heading)
@@ -215,8 +254,18 @@ struct MapView: UIViewRepresentable {
             }
            break
         case .navigate:
+        if mapViewStatus != .navigating {
+            //MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: locationDataManager.userHeading)
+            //MapViewAPI.startNavigation(in: uiView, parent: &context.coordinator.parent)
+        }
+     
             break
     case .showDirections:
+      //  parent.mapViewStatus = .showingDirections
+            if mapViewStatus != .showingDirections {
+                MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: localSearch.tappedLocation?.coordinate)
+            }
+            uiView.showAnnotations(uiView.annotations, animated: true)
             break
         }
     }

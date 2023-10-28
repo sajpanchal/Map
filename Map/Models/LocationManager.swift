@@ -24,6 +24,10 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     @Published var userlocation: CLLocation?
     @Published var userHeading: CLHeading?
     @Published var region: MKCoordinateRegion = MKCoordinateRegion()
+    @Published var overlayRegion: CLRegion?
+    @Published var distance: CLLocationDistance = 0.0
+    @Published var speed: CLLocationSpeed = 0.0
+    @Published var throughfare: String?
     //overriding the initializer of NSObject class
     override init() {
         //execute the parent class initializer first
@@ -32,6 +36,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         //when we set This class object as a delegate to the locationManage object, if there are any change in CLLocationManager,
         //it will be reflected in LocationDataManager automatically.
         locationManager.delegate = self
+     
         
     }
     
@@ -69,13 +74,34 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                 break
         }
     }
+    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        print("User entered to region: \(region.identifier)")
+    }
+    
     //this method will be called whenever a new user location is available.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         //if locations array is not nil and has the first location of the user, get the first user location
+        
         if let lastUserLocation = locations.last {
             //update the userLocation property with the first user location accessed by CLLocationManager in locations array.
+            
             self.userlocation = lastUserLocation
+            
+            self.speed = self.userlocation!.speed * 3.6
+            
             region = MKCoordinateRegion(center: lastUserLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
+            if self.throughfare == nil {
+                CLGeocoder().reverseGeocodeLocation(self.userlocation!) { (placemarks, error) in
+                    guard error == nil else {
+                        return
+                    }
+                    if let placemark = placemarks?.first {
+                        self.throughfare = placemark.thoroughfare
+                    }
+                    
+                }
+            }
+            
         }
     }
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
