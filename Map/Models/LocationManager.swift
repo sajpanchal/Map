@@ -14,6 +14,7 @@ import MapKit
 //we have to do it as we as interfacing between structs and classes. structs are value types and classes are reference type
 
 //LocationDataManager is responsible to handle user location authorization, gather all the user location data and track user data.
+
 class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     
     //locationManager object is instantiated in a class

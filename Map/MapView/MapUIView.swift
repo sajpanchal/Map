@@ -40,8 +40,8 @@ struct MapView: UIViewRepresentable {
     @Binding var nextStepDistance: String
     @Binding var status: String
     var region: MKCoordinateRegion?
-    var routes: [MKRoute]?
-    var enteredToRegion: Bool = false
+
+
     ///this is the function that our MapView will execute the first time on its inception. this function will instantiate the Coordinator class with a copy of its parent object.
     func makeCoordinator() -> (Coordinator) {
         print("make coordinator")
@@ -118,21 +118,9 @@ struct MapView: UIViewRepresentable {
                 case .idle:
                
                 if let searchedLocation = parent.localSearch.tappedLocation {
-                    if parent.isLocationSelected {
-                        print("location is selected")
-                        MapViewAPI.annotateLocation(in: mapView, at: searchedLocation.coordinate, for: searchedLocation)
-                       
-                       
-                    }
-                    else if parent.isSearchCancelled {
-                        print("search is cancelled")
-                        mapView.removeAnnotations(mapView.annotations)
-                        mapView.removeOverlays(mapView.overlays)
+                    parent.searchLocationInterface(in: mapView, for: searchedLocation) {
                         parent.localSearch.tappedLocation = nil
                     }
-                }
-                if parent.mapViewStatus == .idle {
-                //    break
                 }
                 MapViewAPI.resetLocationTracking(of: mapView, parent: &parent)
                 parent.mapViewStatus = .idle
@@ -163,16 +151,17 @@ struct MapView: UIViewRepresentable {
                 if parent.mapViewStatus == .showingDirections {
                     break
                 }
+                
                 MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: parent.localSearch.tappedLocation?.coordinate)
                 mapView.showAnnotations(mapView.annotations, animated: true)
+                
                 if parent.isSearchCancelled {
-                   // mapView.removeAnnotations(mapView.annotations)
-                   // mapView.removeOverlays(mapView.overlays)
-                   // parent.localSearch.tappedLocation = nil
-                     parent.mapViewAction = .idle
+                    mapView.removeAnnotations(mapView.annotations)
+                    mapView.removeOverlays(mapView.overlays)
+                    parent.localSearch.tappedLocation = nil
+                    self.parent.mapViewAction = .idle
+                    print("idle mode is back")
                 }
-             
-               
                 parent.mapViewStatus = .showingDirections
                 break
             }
@@ -196,81 +185,90 @@ struct MapView: UIViewRepresentable {
     
     ///this method will be executed whenever our UIViewController is going to be updated.UIViewController will be updated when our swiftui view MapView will be updated. Mapview will be updated when our @observedObject / @StateObject is updated.
     func updateUIView(_ uiView: MKMapView, context: Context) {
-       // print("UIView updated!")
-     
-        
-       /// let annotation = MKPointAnnotation()
-    switch mapViewAction {
-        case .idle:
-        print("search cancel status: \(isSearchCancelled)")
-            if let searchedLocation = localSearch.tappedLocation {
-               
-                if isLocationSelected {
-                    print("location is selected in uiView update")
-                    MapViewAPI.annotateLocation(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
-                  
+        switch mapViewAction {
+            case .idle:
+            print("search cancel status....: \(isSearchCancelled)")
+                if let searchedLocation = localSearch.tappedLocation {
+                    searchLocationInterface(in: uiView, for: searchedLocation) {
+                        DispatchQueue.main.async {
+                            localSearch.tappedLocation = nil
+                        }
+                    }
                 }
-                else if isSearchCancelled {
-                    print("search is cancelling in uiView update")
+            DispatchQueue.main.async {
+                self.instruction = ""
+        ///reset the properties of this instance class
+                MapViewAPI.resetProps()
+        ///if the throghfare is not nil make it nil on reset.
+                if locationDataManager.throughfare != nil {
+                    locationDataManager.throughfare = nil
+                }
+        ///undoing user tracking to none.
+                uiView.setUserTrackingMode(.none, animated: true)
+            }
+            print("reset location tracking.")
+                break
+            case .idleInNavigation:
+                //mapViewStatus = .inNavigationNotCentered
+                break
+            case.centerToUserLocation:
+            
+                if let searchedLocation = localSearch.tappedLocation {
+                    searchLocationInterface(in: uiView, for: searchedLocation) {
+                        DispatchQueue.main.async {
+                            localSearch.tappedLocation = nil
+                        }
+                    }
+                }
+            print("map is centering")
+                uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
+                break
+            case .inNavigationCenterToUserLocation:
+                if let heading = locationDataManager.userHeading {
+                    //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
+                    //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
+                    MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: heading)
+                  //  mapViewStatus = .inNavigationCentered
+                }
+               break
+            case .navigate:
+                break
+            case .showDirections:
+              //  parent.mapViewStatus = .showingDirections
+                if isSearchCancelled {
+                    print("search cancelled....")
                     uiView.removeAnnotations(uiView.annotations)
                     uiView.removeOverlays(uiView.overlays)
-                    localSearch.tappedLocation = nil
+                   
+                   
+                     DispatchQueue.main.async {
+                         localSearch.tappedLocation = nil
+                         self.mapViewAction = .idle
+                     print("idle mode is back")
+                     }
+                    break
                 }
-            }
-        if mapViewStatus == .idle {
-            break
-        }
-        MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
-            break
-        case .idleInNavigation:
-            //mapViewStatus = .inNavigationNotCentered
-            break
-        case.centerToUserLocation:
-        
-            if let searchedLocation = localSearch.tappedLocation {
-                if isLocationSelected {
-                    print("location is selected")
-                    MapViewAPI.annotateLocation(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
-                    return
-                }
-                else if isSearchCancelled {
-                    uiView.removeAnnotation(searchedLocation)
-                    uiView.removeOverlays(uiView.overlays)
-                    localSearch.tappedLocation = nil
-                }
-            }
-        if mapViewStatus == .centeredToUserLocation {
-            break
-        }
-        print("map is centering")
-            uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
-            break
-        case .inNavigationCenterToUserLocation:
-            if let heading = locationDataManager.userHeading {
-                //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
-                //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
-                MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: heading)
-              //  mapViewStatus = .inNavigationCentered
-            }
-           break
-        case .navigate:
-        if mapViewStatus != .navigating {
-            //MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: locationDataManager.userHeading)
-            //MapViewAPI.startNavigation(in: uiView, parent: &context.coordinator.parent)
-        }
-     
-            break
-    case .showDirections:
-      //  parent.mapViewStatus = .showingDirections
-            if mapViewStatus != .showingDirections {
                 MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: localSearch.tappedLocation?.coordinate)
-            }
-            uiView.showAnnotations(uiView.annotations, animated: true)
-            break
+                uiView.showAnnotations(uiView.annotations, animated: true)
+                break
         }
     }
 }
 
+extension MapView {
+    func searchLocationInterface(in uiView: MKMapView, for searchedLocation: MKAnnotation, action: () -> ()) {
+        if self.isLocationSelected {
+            print("location is selected")
+            MapViewAPI.annotateLocation(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
+            return
+        }
+        else if isSearchCancelled {
+            uiView.removeAnnotations(uiView.annotations)
+            uiView.removeOverlays(uiView.overlays)
+            
+        }
+    }
+}
 
 extension MKMapView {
     func animatedZoom(zoomRegion:MKCoordinateRegion, duration:TimeInterval) {
@@ -278,4 +276,8 @@ extension MKMapView {
             self.setRegion(zoomRegion, animated: true)
             }, completion: nil)
     }
+    func searchLocationInterface() {
+        
+    }
+    
 }

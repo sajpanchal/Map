@@ -9,13 +9,19 @@ import Foundation
 import MapKit
 
 class MapViewAPI {
-  
+    ///static prop to extract an array of route received from directions request.
     static var routes: [MKRoute] = []
+    ///next index of the step in route's steps array elements
     static var nextIndex = 0
+    /// array to detect if the given step has points fetched by the function call or not.
     static var isStepPointsFetched: [Bool] = []
+    ///an array stores the MKMapPoints of each steps.
     static var points: [UnsafeMutablePointer<MKMapPoint>] = []
+    /// MKMapPoint of user location
     static var userPoint:MKMapPoint?
+    ///length of points array
     static var length: [Int] = []
+    ///points array of points
     static var pointsArray: [UnsafeBufferPointer<MKMapPoint>] = []
     
     ///this method will accept the mapView, userLocation class instances. here mapView struct instance as inout parameter. inout parameter allows us to make func parameter mutable i.e. we can change the value of the parameter in a function directly and changes will be reflected outside the function after execution.
@@ -52,36 +58,32 @@ class MapViewAPI {
     }
     ///function to untrack user location
     static func resetLocationTracking(of mapView: MKMapView, parent: inout MapView) {
-        parent.instruction = ""
-        isStepPointsFetched.removeAll()
-        points = []
-        userPoint = nil
-        length = []
-        pointsArray = []
-        nextIndex = 0
-//        for ovarlay in mapView.overlays {
-//            if ovarlay is MKCircle {
-//                mapView.removeOverlay(ovarlay)
-//            }
-//        }
+        ///clear the instruction field
+     
+            parent.instruction = ""
+        
+        ///reset the properties of this instance class
+        resetProps()
+
+        ///if the throghfare is not nil make it nil on reset.
         if parent.locationDataManager.throughfare != nil {
             parent.locationDataManager.throughfare = nil
         }
         
-        print("reseting tracking")
+     
         DispatchQueue.main.async {
-            //undoing user tracking to none.
-          
+            ///undoing user tracking to none.
             mapView.setUserTrackingMode(.none, animated: true)
         }
+        print("reset location tracking.")
     }
+   
     ///function to annotate a location the user has searched in the search bar.
     static func annotateLocation(in mapView: MKMapView ,at coordinates: CLLocationCoordinate2D, for annotation: MKAnnotation) {
         ///create a point annotation object.
         let userAnnotation = MKPointAnnotation()
         ///set its coordinate as userlocation coordinates.
         userAnnotation.coordinate = mapView.userLocation.coordinate
-      
         ///set its title as userlocation title.
         userAnnotation.title = mapView.userLocation.title!
         ///add user location as a first annotation in the mapview.
@@ -92,25 +94,12 @@ class MapViewAPI {
         if mapView.centerCoordinate.latitude != annotation.coordinate.latitude && mapView.centerCoordinate.longitude != annotation.coordinate.longitude {
             ///if not centred, centre the mapview to searched location.
             mapView.animatedZoom(zoomRegion: MKCoordinateRegion(center: annotation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
-            print("centered mapview to searched location")
+            print("map is centered to user location.")
         }
     }
     ///this function will send the route directions request between the two locations annotated in the mapview
     static func getNavigationDirections(in uiView: MKMapView, from source: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D?) {
         ///if there are no overlays associated with the mapview return the function call.
-//        points = nil
-//        stepsPoints = []
-        nextIndex = 0
-        isStepPointsFetched.removeAll()
-        points = []
-        userPoint = nil
-        length = []
-        pointsArray = []
-//        for ovarlay in uiView.overlays {
-//            if ovarlay is MKCircle {
-//                uiView.removeOverlay(ovarlay)
-//            }
-//        }
         if !uiView.overlays.isEmpty {
             return
         }
@@ -126,14 +115,11 @@ class MapViewAPI {
             request.requestsAlternateRoutes = true
             ///set the transport type as automobile as default.
             request.transportType = .automobile
-            
             ///create a directions object from our request now.
             let directions = MKDirections(request: request)
-            
             ///async function to calculate the routes from information provided by request object of directions object.
             directions.calculate(completionHandler: { (response, error) in
                 ///if response is received
-                print("Showing directions")
                 if let response = response {
                     ///remove all overalys from mapview.
                     uiView.removeOverlays(uiView.overlays)
@@ -154,156 +140,84 @@ class MapViewAPI {
                         if index == 0 {
                             ///set the polyline subtitle as fastest route to identify it in later uses.
                             polyline.subtitle = "fastest route"
-                            
                         }                                              
                         ///add the polyline received from the route as an overlay to be displayed in mapview.
                         uiView.addOverlay(polyline)
                     }
+                    print("showing routing directions on map.")
                 }
                 ///if the direction request doesn't get a response, handle the error.
                 else {
                     print(error!.localizedDescription)
                 }
             })
-           
         }
     }
     
-
-    static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
-        
-        mapView.removeOverlays(mapView.overlays.dropLast())
-        let renderer = MKPolylineRenderer(overlay: mapView.overlays.first(where: {$0 is MKPolyline})!)
-           
-        routes.removeAll(where: {
-            $0.polyline.title != renderer.polyline.title
-        })
-        
-        var instruction = ""
-       
- 
-        if parent.instruction.isEmpty {
-            parent.instruction = "Starting at \(parent.locationDataManager.throughfare ?? "your location") "
-        }
+     static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
         var index = 0
-        
-        if parent.nextStepLocation == nil && routes.first!.steps.count >= 2 {
-            parent.nextStepLocation = CLLocation(latitude: routes.first!.steps[0].polyline.coordinate.latitude, longitude: routes.first!.steps[0].polyline.coordinate.longitude)
-        }
-        
-        if routes.first == nil {
-            return
-        }
 
-        if isStepPointsFetched.isEmpty {
-            for _ in routes.first!.steps {
-                isStepPointsFetched.append(false)
-            }
-            print("buffer size is:\(isStepPointsFetched.count)")
+        ///if there are more than 1 overlays, find the one that is desired.
+        if mapView.overlays.count > 1 {
+            getDesiredRouteAndOvarlay(for: mapView)
         }
-        
-        
-        for step in routes.first!.steps {
-            //print(routes.first!.steps.firstIndex(of: step)!)
-            let stepIndex = routes.first!.steps.firstIndex(of: step)!
-            print("step index is:\(stepIndex)")
-//            print("Step #\(nextIndex) is coming up!")
-//            print("Step #\(nextIndex): \(step.instructions)")
-            var dist = 0.0
-            let stepLocation = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
-            ///calculate the distance from userlocation to current step
-            let stepDistance = mapView.userLocation.location!.distance(from: stepLocation)
-            let overlayRegion = MKCircle(center: step.polyline.coordinate, radius: 20)
+        if let route = routes.first {
             
-          
-            userPoint = MKMapPoint(mapView.userLocation.coordinate)
+            ///initiating props on first execution
+            initiateProps(route: route, parent: &parent)
             
-            if !isStepPointsFetched[stepIndex] {
-              
-                points.append(step.polyline.points())
-                length.append(step.polyline.pointCount)
-                pointsArray.append(UnsafeBufferPointer(start: points[stepIndex], count: length[stepIndex] < 5 ? length[stepIndex] : 5))
-                isStepPointsFetched[stepIndex] = true
-                print("isStepPointsFetched[\(stepIndex)] = \(isStepPointsFetched[stepIndex])")
+            ///iterate through the route steps
+            for step in route.steps {
+             
+                ///get the index of the given step and if it is found continue...
+                if let stepIndex = route.steps.firstIndex(of: step) {
+                    ///set the user location as user point to calculate distance from step polyline points.
+                    userPoint = MKMapPoint(mapView.userLocation.coordinate)
+                    ///if array isStepPointsFetched going out of index, add a new element to the last index.
+                    if isStepPointsFetched.count <= stepIndex {
+                        isStepPointsFetched.append(false)
+                    }
+                    ///if for the given step index, array element is FALSE (i.e. is not fetched) update the props of the class instance
+                    if !isStepPointsFetched[stepIndex] {
+                        ///update the props for a given step at a given index.
+                        updateProps(for: step, at: stepIndex, mapView: mapView)
+                    }
+                    ///if userpoint is not nil
+                    if let userPoint = userPoint {
+                        ///get the step location
+                        let stepLocation = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
+                        
+                        ///if the user location is 50 m or more from this step and yet it is not set exited and it is the starting point update to the step 1 instructions only
+                        if mapView.userLocation.location!.distance(from: stepLocation) > 50 && step.polyline.subtitle != "regionExited" && stepIndex == 0 {
+                            step.polyline.subtitle = "regionExited"
+                            updateStepInstructions(step: route.steps[1], instruction: route.steps[1].instructions, parent: &parent, stepIndex: 1)
+                        }
+                        ///if the user location is near 15 m of any of the given step points, update to that step instructions and make nextIndex set to the next step index.
+                        if nextIndex == stepIndex && pointsArray[stepIndex].contains(where: { $0.distance(to: userPoint) < 15})  {
+                            updateStepInstructions(step: step, instruction: (step.instructions == "" ? "Starting at \(parent.locationDataManager.throughfare ?? "your location")" : step.instructions), parent: &parent, stepIndex: stepIndex)
+                            break
+                            }
+                        index += 1
+                    }
+
+                }
                 
             }
             
-//            for point in pointsArray {
-//              
-//                let annotation = MKPointAnnotation()
-//                annotation.coordinate = point.coordinate
-//                mapView.addAnnotation(annotation)
-//            }
-           ///get the location coordinates of the current step
-           
-          
-//            if stepDistance < 50 && step.polyline.subtitle != "regionExited" {
-//                parent.status = "Step #\(nextIndex) is under 60 m."
-//                print("on step #\(nextIndex)")
-//                ///if the next index is less than the last index of steps array load the next step location and instruction
-//                if nextIndex <= routes.first!.steps.count - 1 {
-//                    ///set the local instruction variable as a next step's instruction
-//                    instruction = "Step #\(nextIndex) " + routes.first!.steps[nextIndex].instructions
-//                    print("NEXT STEP IS: \(instruction)")
-//                    ///get the next step location in a local variable once user has entered to the current step region
-//                }
-//                ///if this is the last step
-//                else {
-//                    ///set the instruction to indicate user has arrived
-//                    instruction = "you have arrived"
-//                }
-//                ///if user has entered to the step region within 20 meter radius
-//                if stepDistance < 20 {
-//                    ///set it as entered to the region
-//                    parent.status = "Step #\(nextIndex) entered"
-//                    step.polyline.subtitle = "enteredToRegion"
-//                    print("user entered to this region? : \(parent.enteredToRegion)")
-//                }
-//                ///if user has exited the step region of 20 meter radius and it was entered into it before
-//                if stepDistance > 20 && step.polyline.subtitle == "enteredToRegion" {
-//                    parent.status = "Step #\(nextIndex) exited"
-//                    parent.nextStepLocation = CLLocation(latitude: routes.first!.steps[nextIndex].polyline.coordinate.latitude, longitude: routes.first!.steps[nextIndex].polyline.coordinate.longitude)
-//                    ///update the swiftui instruction display with the latest instruction received from next step
-//                    parent.instruction = instruction
-//                    ///mark the step polyline subtitle as region exited.
-//                    step.polyline.subtitle = "regionExited"
-//                    print("user exited to this region")
-//                }
-//            }
-            ///if the user is out of step region but was inside the region before i.e. didn't exited even after the exit.
-            
-            if nextIndex == routes.first!.steps.firstIndex(of: step)! && pointsArray[stepIndex].contains(where: { dist = ($0.distance(to: userPoint!)); return $0.distance(to: userPoint!) < 15})  {
-
-              
-                instruction = (step.instructions == "" ? "Starting at \(parent.locationDataManager.throughfare ?? "your location")" : step.instructions)
-                parent.nextStepLocation = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
-                    ///update the swiftui instruction display with the latest instruction received from next step
-                parent.instruction = instruction
-                    ///mark the step polyline subtitle as region exited.
-                nextIndex = stepIndex + 1
-                parent.status = "Step #\(nextIndex) is next."
-                step.polyline.subtitle = "regionExited"
-                break
-                }
-            index += 1
+            ///now calculate the distance from the next step location to user location
+            if let nextStepLocation = parent.nextStepLocation, let userLocation = mapView.userLocation.location {
+                calculateDistance(from: nextStepLocation, to: userLocation, parent: &parent)
+            }
         }
-
-        ///now calculate the distance from the next step location to user location
-        if let nextStepLocation = parent.nextStepLocation {
-            let nextStepDistance = mapView.userLocation.location!.distance(from: nextStepLocation)
-            var intNextStepDistance = (Int(nextStepDistance)/10) * 10
-            ///if the distance is less than 15 then set it to 0.
-            intNextStepDistance = intNextStepDistance < 10 ? 0 : intNextStepDistance
-            parent.nextStepDistance = nextStepDistance < 1000 ? String(intNextStepDistance) + " m" : String(format:"%.1f",(nextStepDistance/1000)) + " km"
-        }
-
+        
+        print("map is in navigation mode.")
     }
         
     ///function that handles overlay tap events
     static func isOvarlayTapped(in mapView: MKMapView, by tapGestureRecognizer: UITapGestureRecognizer) -> (Bool,String) {
+        print("tapped on a mapview")
         let tapLocation = tapGestureRecognizer.location(in: mapView)
         var isOverlayTapped = false
-        print("tapped on a mapview")
         let tapCoordinates =  mapView.convert(tapLocation, toCoordinateFrom: mapView)
         print("tap coorindates: \(tapCoordinates)")
         var title = ""
@@ -311,7 +225,6 @@ class MapViewAPI {
             let renderer = mapView.renderer(for: overlay) as! MKPolylineRenderer
             let mapPoint = MKMapPoint(tapCoordinates)
             let rendererPoint = renderer.point(for: mapPoint)
-            print("title is : \(renderer.polyline.title!)")
             if renderer.path.contains(rendererPoint) {
                 title = renderer.polyline.title!
                 print("tap is on the polyline")
@@ -340,7 +253,83 @@ class MapViewAPI {
 }
 
 
-
+extension MapViewAPI {
+    static func resetProps() {
+        isStepPointsFetched.removeAll()
+        points = []
+        userPoint = nil
+        length = []
+        pointsArray = []
+        nextIndex = 0
+    }
+    
+    static func getDesiredRouteAndOvarlay(for mapView: MKMapView) {
+        if mapView.overlays.first != nil {
+            ///remove all exept the selected (i.e. first overlay) from map view
+            mapView.removeOverlays(mapView.overlays.dropLast())
+            ///get the renderer for the given overlay
+            let renderer = MKPolylineRenderer(overlay: mapView.overlays.last!)
+            
+            ///remove all routes where polyline title is not matching with the title of the renderer's polyline.
+            routes.removeAll(where: {
+                $0.polyline.title != renderer.polyline.title
+            })
+        }
+       
+    }
+    
+   static func initiateProps(route: MKRoute ,parent: inout MapView) {
+        ///if instruction field is empty, add the initial step instruction
+         if parent.instruction.isEmpty {
+             parent.instruction = "Starting at \(parent.locationDataManager.throughfare ?? "your location") "
+         }
+        ///if the nextStep location is not available, get the location of the first step.
+         if parent.nextStepLocation == nil {
+             if let firstStep = route.steps.first {
+                 parent.nextStepLocation = CLLocation(latitude: firstStep.polyline.coordinate.latitude, longitude: firstStep.polyline.coordinate.longitude)
+             }
+         }
+         ///if the array of stepPointsfetched is empty (i.e. there are no points fetched for any steps)
+         if isStepPointsFetched.isEmpty {
+             ///set all array element as false
+             for _ in route.steps {
+                 isStepPointsFetched.append(false)
+             }
+         }
+    }
+    static func updateProps(for step: MKRoute.Step, at stepIndex: Int, mapView: MKMapView) {
+        points.append(step.polyline.points())
+        length.append(step.polyline.pointCount)
+        print("points index:\(points.last)")
+        print("length index:\(length.last)")
+        if let point = points.last, let length = length.last {
+            pointsArray.append(UnsafeBufferPointer(start: point, count: length < 5 ? length : 5))
+            print("pointsArray count:\(pointsArray.count))")
+        }
+        
+//        pointsArray.append(UnsafeBufferPointer(start: points[stepIndex], count: length[stepIndex]))
+        isStepPointsFetched[stepIndex] = true
+    }
+    
+    static func updateStepInstructions(step: MKRoute.Step, instruction: String, parent: inout MapView, stepIndex: Int) {
+     //   let instruction = (step.instructions == "" ? "Starting at \(parent.locationDataManager.throughfare ?? "your location")" : step.instructions)
+        parent.nextStepLocation = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
+            ///update the swiftui instruction display with the latest instruction received from next step
+        parent.instruction = instruction
+            ///mark the step polyline subtitle as region exited.
+        nextIndex = stepIndex + 1
+        parent.status = "Step #\(nextIndex) is next."
+        step.polyline.subtitle = "regionExited"
+    }
+    
+    static func calculateDistance(from nextStepLocation:CLLocation, to userLocation: CLLocation, parent: inout MapView) {
+        let nextStepDistance = userLocation.distance(from: nextStepLocation)
+        var intNextStepDistance = (Int(nextStepDistance)/10) * 10
+        ///if the distance is less than 15 then set it to 0.
+        intNextStepDistance = intNextStepDistance < 10 ? 0 : intNextStepDistance
+        parent.nextStepDistance = nextStepDistance < 1000 ? String(intNextStepDistance) + " m" : String(format:"%.1f",(nextStepDistance/1000)) + " km"
+    }
+}
 
 
 ///prepare the first instruction with the value pointing to next step location
@@ -427,3 +416,49 @@ class MapViewAPI {
 //            }
 //            i += 1
 //        }
+
+
+//            for point in pointsArray {
+//
+//                let annotation = MKPointAnnotation()
+//                annotation.coordinate = point.coordinate
+//                mapView.addAnnotation(annotation)
+//            }
+           ///get the location coordinates of the current step
+           
+          
+//            if stepDistance < 50 && step.polyline.subtitle != "regionExited" {
+//                parent.status = "Step #\(nextIndex) is under 60 m."
+//                print("on step #\(nextIndex)")
+//                ///if the next index is less than the last index of steps array load the next step location and instruction
+//                if nextIndex <= routes.first!.steps.count - 1 {
+//                    ///set the local instruction variable as a next step's instruction
+//                    instruction = "Step #\(nextIndex) " + routes.first!.steps[nextIndex].instructions
+//                    print("NEXT STEP IS: \(instruction)")
+//                    ///get the next step location in a local variable once user has entered to the current step region
+//                }
+//                ///if this is the last step
+//                else {
+//                    ///set the instruction to indicate user has arrived
+//                    instruction = "you have arrived"
+//                }
+//                ///if user has entered to the step region within 20 meter radius
+//                if stepDistance < 20 {
+//                    ///set it as entered to the region
+//                    parent.status = "Step #\(nextIndex) entered"
+//                    step.polyline.subtitle = "enteredToRegion"
+//                    print("user entered to this region? : \(parent.enteredToRegion)")
+//                }
+//                ///if user has exited the step region of 20 meter radius and it was entered into it before
+//                if stepDistance > 20 && step.polyline.subtitle == "enteredToRegion" {
+//                    parent.status = "Step #\(nextIndex) exited"
+//                    parent.nextStepLocation = CLLocation(latitude: routes.first!.steps[nextIndex].polyline.coordinate.latitude, longitude: routes.first!.steps[nextIndex].polyline.coordinate.longitude)
+//                    ///update the swiftui instruction display with the latest instruction received from next step
+//                    parent.instruction = instruction
+//                    ///mark the step polyline subtitle as region exited.
+//                    step.polyline.subtitle = "regionExited"
+//                    print("user exited to this region")
+//                }
+//            }
+
+

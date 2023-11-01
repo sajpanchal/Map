@@ -7,7 +7,7 @@
 
 import Foundation
 import MapKit
-@MainActor
+
 class LocalSearch: ObservableObject {
     @Published var searchedLocations: [SearchedLocation] = []
     @Published var tappedLocation: MKAnnotation?

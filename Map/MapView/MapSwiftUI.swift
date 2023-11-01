@@ -48,6 +48,7 @@ struct Map: View {
                                 .padding(.bottom, 5)
                                 .font(.title2)
                                 .fontWeight(.black)
+                            
                         }
                         Spacer()
                         if #available(iOS 17.0, *) {
@@ -102,6 +103,9 @@ struct Map: View {
                     else if isMapViewWaiting(to: .idle) {
                         MapProgressView(alertMessage: "Stopping Tracking location! Please Wait...")
                     }
+                    else if isMapViewWaiting(to: .showDirections) {
+                        MapProgressView(alertMessage: "Routing directions! Please Wait...")
+                    }
                     if !localSearch.searchedLocations.isEmpty {
                         ListView(localSearch: localSearch, searchedLocationText: $searchedLocationText, isLocationSelected: $isLocationSelected)
                     }
@@ -109,9 +113,13 @@ struct Map: View {
                 if localSearch.tappedLocation != nil {
                     //navigation mode button to switch between navigation modes.
                     HStack {
-                        Button("Routes", action: {
-                            mapViewAction = .showDirections
-                        })
+                        if mapViewStatus != .navigating {
+                            Button("Routes", action: {
+                                mapViewAction = .showDirections
+                            })
+                        }
+                        
+                        
                         Spacer()
                         if mapViewStatus == .showingDirections || mapViewStatus == .navigating {
                             Button(isMapInNavigationMode().0 ? "Stop" : "Navigate", action: updateUserTracking)
@@ -208,16 +216,19 @@ struct Map: View {
             return "arrow.up"
         }
         else if instruction.contains("first exit") {
-            return "arrow.turn.up.right"
+            return "1.circle"
         }
         else if instruction.contains("second exit") {
-            return "arrow.up"
+            return "2.circle"
         }
         else if instruction.contains("third exit") {
-            return "arrow.uturn.left"
+            return "3.circle"
         }
-        else if instruction.contains("make a u-turn") || instruction.contains("fourth exit"){
+        else if instruction.contains("make a u-turn"){
             return "arrow.uturn.down"
+        }
+        else if instruction.contains("fourth exit") {
+         return "4.circle"
         }
         else if instruction.contains("exit") {
             return "arrow.up.right"
@@ -260,8 +271,6 @@ struct Map: View {
         
         let speech = "in \(nextStepDistance)," + instruction
         synthesizer.speak(AVSpeechUtterance(string: speech))
-   
-        AudioServicesPlayAlertSound(1013)
     }
     
   
