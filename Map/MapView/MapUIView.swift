@@ -39,6 +39,9 @@ struct MapView: UIViewRepresentable {
     @Binding var nextStepLocation: CLLocation?
     @Binding var nextStepDistance: String
     @Binding var status: String
+    @Binding var routeETA: String
+    @Binding var routeDistance: String
+    @Binding var distance: String
     var region: MKCoordinateRegion?
 
 
@@ -70,7 +73,7 @@ struct MapView: UIViewRepresentable {
             print("not tapped")
             }
             else {
-                MapViewAPI.setTappedOverlay(in: self.mapView, having: title)
+                MapViewAPI.setTappedOverlay(in: self.mapView, having: title, parent: &self.parent)
             }
         }
         
@@ -83,26 +86,23 @@ struct MapView: UIViewRepresentable {
         
        ///this function will be called once the overlay is added to the mapview object
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-//            if overlay is MKPolyline {
-//
-//            }
-//            else {
-//                let renderer = MKCircleRenderer(overlay: overlay)
-//               // renderer.fillColor = .systemYellow
-//                renderer.lineWidth = 2
-//                renderer.strokeColor = .systemCyan
-//                return renderer
-//            }
-         let renderer = MKPolylineRenderer(overlay: overlay)
+
+            let renderer = MKPolylineRenderer(overlay: overlay)
             
             renderer.lineWidth = 10
             
-            if renderer.polyline.subtitle == "fastest route" {
-                    renderer.strokeColor = .systemBlue
+                if renderer.polyline.subtitle == "fastest route" {
+                        renderer.strokeColor = .systemBlue
+                    renderer.alpha = 1
+                    let routeData = renderer.polyline.title?.split(separator: ", ") ?? []
+                    parent.routeETA = String(routeData.first ?? "") + " mins"
+                    parent.routeDistance = String(routeData.last ?? "") + " km"
                 }
                 else {
-                    renderer.strokeColor = .systemGray
+                        renderer.strokeColor = .systemGray
+                    renderer.alpha = 0.5
                 }
+            
             return renderer
             
         }
@@ -124,6 +124,8 @@ struct MapView: UIViewRepresentable {
                 }
                 MapViewAPI.resetLocationTracking(of: mapView, parent: &parent)
                 parent.mapViewStatus = .idle
+                parent.routeETA = ""
+                parent.routeDistance = ""
                     break
                 case .idleInNavigation:
                     parent.mapViewStatus = .inNavigationNotCentered
@@ -197,6 +199,8 @@ struct MapView: UIViewRepresentable {
                 }
             DispatchQueue.main.async {
                 self.instruction = ""
+                self.routeETA = ""
+                self.routeDistance = ""
         ///reset the properties of this instance class
                 MapViewAPI.resetProps()
         ///if the throghfare is not nil make it nil on reset.
@@ -275,9 +279,5 @@ extension MKMapView {
         MKMapView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 10, options: UIView.AnimationOptions.curveEaseIn, animations: {
             self.setRegion(zoomRegion, animated: true)
             }, completion: nil)
-    }
-    func searchLocationInterface() {
-        
-    }
-    
+    }    
 }

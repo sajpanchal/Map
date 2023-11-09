@@ -27,6 +27,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     @Published var region: MKCoordinateRegion = MKCoordinateRegion()
     @Published var overlayRegion: CLRegion?
     @Published var distance: CLLocationDistance = 0.0
+    var lastLocation: CLLocation?
     @Published var speed: CLLocationSpeed = 0.0
     @Published var throughfare: String?
     //overriding the initializer of NSObject class
@@ -81,19 +82,28 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     
     //this method will be called whenever a new user location is available.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if lastLocation == nil {
+            lastLocation = locations.first
+        }
+       
         //if locations array is not nil and has the first location of the user, get the first user location
-        
         if let lastUserLocation = locations.last {
             //update the userLocation property with the first user location accessed by CLLocationManager in locations array.
-            
+            if  lastLocation!.distance(from: lastUserLocation)/1000 >= 0.01 {
+                distance += lastLocation!.distance(from: lastUserLocation)
+                print("Distance: \(distance/1000)")
+                lastLocation = lastUserLocation
+            }
             self.userlocation = lastUserLocation
             
             self.speed = self.userlocation!.speed * 3.6
             
             region = MKCoordinateRegion(center: lastUserLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
             if self.throughfare == nil {
+             
                 CLGeocoder().reverseGeocodeLocation(self.userlocation!) { (placemarks, error) in
                     guard error == nil else {
+                        CLGeocoder().cancelGeocode()
                         return
                     }
                     if let placemark = placemarks?.first {

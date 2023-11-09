@@ -31,6 +31,9 @@ struct Map: View {
     @State var status: String = "-"
     @State var isSearchCancelled: Bool = false
     @State var nextStepDistance: String = ""
+    @State var routeETA: String = ""
+    @State var routeDistance: String = ""
+    @State var distance: String = ""
     let synthesizer = AVSpeechSynthesizer()
     var body: some View {
             VStack {
@@ -72,7 +75,7 @@ struct Map: View {
                     ///grouping mapview and its associated buttons
                     Group() {
                         ///calling our custom struct that will render UIView for us in swiftui. we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class. we are also passing the state variable called tapped that is bound to the MapView.when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix. we always declare a binding propery in a child component of the associated property from its parent.once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
-                        MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus, isLocationSelected: $isLocationSelected, isSearchCancelled: $isSearchCancelled, instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, status: $status)
+                        MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus, isLocationSelected: $isLocationSelected, isSearchCancelled: $isSearchCancelled, instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, status: $status, routeETA: $routeETA, routeDistance: $routeDistance, distance: $distance)
                         ///disable the mapview when track location button is tapped but tracking is not on yet.
                             .disabled(isMapViewWaiting(to: .navigate))
                         ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged() action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag. we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
@@ -118,8 +121,12 @@ struct Map: View {
                                 mapViewAction = .showDirections
                             })
                         }
-                        
-                        
+                        Spacer()
+                        VStack {
+                            Text(routeETA)
+                            Text(routeDistance)
+                            Text(distance)
+                        }
                         Spacer()
                         if mapViewStatus == .showingDirections || mapViewStatus == .navigating {
                             Button(isMapInNavigationMode().0 ? "Stop" : "Navigate", action: updateUserTracking)
@@ -178,7 +185,7 @@ struct Map: View {
         ///set mapViewAction to idle mode if status is navigating when button is pressed set mapViewAction to nagivate if status is not navigating when button is pressed.
         switch mapViewStatus {
         case .idle, .notCentered, .centeredToUserLocation, .showingDirections:
-           
+            locationDataManager.distance = 0.0
             mapViewAction = .navigate
             ///UIApplocation is the class that has a centralized control over the app. it has a property called shared that is a singleton instance of UIApplication itself. this instance has a property called isIdleTimerDisabled. which will decide if we want to turn off the phone screen after certain amount of time of inactivity in the app. we will set it to true so it will keep the screen alive when user tracking is on.
             UIApplication.shared.isIdleTimerDisabled = true
@@ -267,8 +274,14 @@ struct Map: View {
             return
         }
         let audioSession = AVAudioSession.sharedInstance()
-        try! audioSession.setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
+        do {
+            try audioSession.setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
         
+        }
+        catch {
+            print("error:\(error.localizedDescription)")
+        }
+            
         let speech = "in \(nextStepDistance)," + instruction
         synthesizer.speak(AVSpeechUtterance(string: speech))
     }
