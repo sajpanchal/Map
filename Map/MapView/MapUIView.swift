@@ -189,7 +189,7 @@ struct MapView: UIViewRepresentable {
     func updateUIView(_ uiView: MKMapView, context: Context) {
         switch mapViewAction {
             case .idle:
-            print("search cancel status....: \(isSearchCancelled)")
+          //  print("search cancel status....: \(isSearchCancelled)")
                 if let searchedLocation = localSearch.tappedLocation {
                     searchLocationInterface(in: uiView, for: searchedLocation) {
                         DispatchQueue.main.async {
@@ -203,14 +203,11 @@ struct MapView: UIViewRepresentable {
                 self.routeDistance = ""
         ///reset the properties of this instance class
                 MapViewAPI.resetProps()
-        ///if the throghfare is not nil make it nil on reset.
-                if locationDataManager.throughfare != nil {
-                    locationDataManager.throughfare = nil
-                }
+        
         ///undoing user tracking to none.
                 uiView.setUserTrackingMode(.none, animated: true)
             }
-            print("reset location tracking.")
+           // print("reset location tracking.")
                 break
             case .idleInNavigation:
                 //mapViewStatus = .inNavigationNotCentered

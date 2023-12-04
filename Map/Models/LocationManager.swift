@@ -30,6 +30,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     var lastLocation: CLLocation?
     @Published var speed: CLLocationSpeed = 0.0
     @Published var throughfare: String?
+    @Published var enableGeocoding = true
     //overriding the initializer of NSObject class
     override init() {
         //execute the parent class initializer first
@@ -99,19 +100,39 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
             self.speed = self.userlocation!.speed * 3.6
             
             region = MKCoordinateRegion(center: lastUserLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
-            if self.throughfare == nil {
-             
+            if self.throughfare == nil && self.userlocation != nil {
                 CLGeocoder().reverseGeocodeLocation(self.userlocation!) { (placemarks, error) in
                     guard error == nil else {
                         CLGeocoder().cancelGeocode()
                         return
                     }
                     if let placemark = placemarks?.first {
-                        self.throughfare = placemark.thoroughfare
+                      //  self.throughfare = placemark.thoroughfare
                     }
                     
                 }
             }
+            if self.userlocation != nil {
+                Timer.scheduledTimer(withTimeInterval: 30.0, repeats: true, block: {_ in
+                    print("geocoding")
+                        CLGeocoder().reverseGeocodeLocation(self.userlocation!) { (response, error) in
+                            guard let placemarks = response  else {
+                                CLGeocoder().cancelGeocode()
+                                return
+                            }
+                            
+                            if let placemark = placemarks.first {
+                                self.throughfare = placemark.thoroughfare
+                            }
+                            
+                        }
+                    
+                })
+            }
+               
+              
+               
+            
             
         }
     }

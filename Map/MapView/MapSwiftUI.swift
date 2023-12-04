@@ -34,7 +34,7 @@ struct Map: View {
     @State var routeETA: String = ""
     @State var routeDistance: String = ""
     @State var distance: String = ""
-    let synthesizer = AVSpeechSynthesizer()
+   // let synthesizer = AVSpeechSynthesizer()
     var body: some View {
             VStack {
                 if !isMapInNavigationMode().0 || isMapViewWaiting(to: .navigate) {
@@ -58,8 +58,8 @@ struct Map: View {
                         Text(instruction)
                             .padding(10)
                             .font(.title3)
-                            .onAppear(perform: speech)
-                            .onChange(of: instruction, speech)
+                          //  .onAppear(perform: speech)
+                           // .onChange(of: instruction, speech)
                             } else {
                                 Text(instruction)
                                     .padding(10)
@@ -269,22 +269,22 @@ struct Map: View {
         
         }
     }
-    func speech() {
-        if instruction.isEmpty {
-            return
-        }
-        let audioSession = AVAudioSession.sharedInstance()
-        do {
-            try audioSession.setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
-        
-        }
-        catch {
-            print("error:\(error.localizedDescription)")
-        }
-            
-        let speech = "in \(nextStepDistance)," + instruction
-        synthesizer.speak(AVSpeechUtterance(string: speech))
-    }
+//    func speech() {
+//        if instruction.isEmpty {
+//            return
+//        }
+//        let audioSession = AVAudioSession.sharedInstance()
+//        do {
+//            try audioSession.setCategory(AVAudioSession.Category.playback, options: AVAudioSession.CategoryOptions.mixWithOthers)
+//        
+//        }
+//        catch {
+//            print("error:\(error.localizedDescription)")
+//        }
+//            
+//        let speech = "in \(nextStepDistance)," + instruction
+//        synthesizer.speak(AVSpeechUtterance(string: speech))
+//    }
     
   
    

@@ -19,15 +19,18 @@ class LocalSearch: ObservableObject {
         searchRequest.naturalLanguageQuery = searchedLocationText
         
         let request = MKLocalSearch(request: searchRequest)
-        
-            request.start { (response, error) in
-                guard let response = response  else {
-                    print("search error:\(error?.localizedDescription ?? "n/a")")
-                    return
-                }
-                self.searchedLocations = response.mapItems.map(SearchedLocation.init)
-             //   print(self.searchedLocations)
-            }
+         if !request.isSearching {
+             request.start { (response, error) in
+                 guard let response = response  else {
+                     print("search error:\(error?.localizedDescription ?? "n/a")")
+                     request.cancel()
+                     return
+                 }
+                 self.searchedLocations = response.mapItems.map(SearchedLocation.init)
+              //   print(self.searchedLocations)
+             }
+         }
+           
     }
     func cancelLocationSearch() {
         let request = MKLocalSearch(request: searchRequest)

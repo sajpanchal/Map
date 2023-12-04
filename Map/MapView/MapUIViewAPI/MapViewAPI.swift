@@ -64,18 +64,12 @@ class MapViewAPI {
         
         ///reset the properties of this instance class
         resetProps()
-
-        ///if the throghfare is not nil make it nil on reset.
-        if parent.locationDataManager.throughfare != nil {
-            parent.locationDataManager.throughfare = nil
-        }
         
      
         DispatchQueue.main.async {
             ///undoing user tracking to none.
             mapView.setUserTrackingMode(.none, animated: true)
         }
-        print("reset location tracking.")
     }
    
     ///function to annotate a location the user has searched in the search bar.
@@ -85,7 +79,7 @@ class MapViewAPI {
         ///set its coordinate as userlocation coordinates.
         userAnnotation.coordinate = mapView.userLocation.coordinate
         ///set its title as userlocation title.
-        userAnnotation.title = mapView.userLocation.title!
+        userAnnotation.title = mapView.userLocation.title ?? ""
         ///add user location as a first annotation in the mapview.
         mapView.addAnnotation(userAnnotation)
         ///add the search location received from UIViewRepresentable (mapview) as a second mapview annotation.
@@ -154,7 +148,7 @@ class MapViewAPI {
                 }
                 ///if the direction request doesn't get a response, handle the error.
                 else {
-                    print(error!.localizedDescription)
+                    print(error?.localizedDescription ?? "")
                 }
             })
         }
@@ -211,7 +205,7 @@ class MapViewAPI {
                         ///if the user location is near 15 m of any of the given step points, update to that step instructions and make nextIndex set to the next step index.
                         if nextIndex == stepIndex && pointsArray[stepIndex].contains(where: { $0.distance(to: userPoint) < 15})  {
                             let via = route.polyline.title?.split(separator: ", ")
-                            print("via...",String(via![1]))
+                            print("via...",String(via?[1] ?? ""))
                             updateStepInstructions(step: step, instruction: (step.instructions == "" ? "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(String(via?[1] ?? ""))" : step.instructions), parent: &parent, stepIndex: stepIndex)
                             break
                             }
@@ -377,6 +371,7 @@ extension MapViewAPI {
         nextIndex = stepIndex + 1
         parent.status = "Step #\(nextIndex) is next."
         step.polyline.subtitle = "regionExited"
+        parent.locationDataManager.enableGeocoding = false
     }
     
     static func calculateDistance(from nextStepLocation:CLLocation, to userLocation: CLLocation, parent: inout MapView) {
