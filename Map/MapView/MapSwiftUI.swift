@@ -118,8 +118,8 @@ struct Map: View {
                 if localSearch.tappedLocation != nil {
                     //navigation mode button to switch between navigation modes.
                     VStack {
-                  
-                            if mapViewStatus == .navigating {
+                        if mapViewStatus == .navigating {
+                            if showSheet {
                                 HStack {
                                     VStack {
                                         Text("Heading to destination")
@@ -131,10 +131,23 @@ struct Map: View {
                                     }
                                    
                                 }
-                                .presentationDetents([.fraction(0.1), .medium])
+                                .onTapGesture {
+                                    showSheet.toggle()
+                                }
+                               
                             }
                         
-                     
+                        HStack {
+                            Spacer()
+                            Image(systemName: showSheet ? "chevron.down" : "chevron.up")
+                            Spacer()
+                        }
+                        .padding(5)
+                        .onTapGesture {
+                            showSheet.toggle()
+                        }
+                        }
+                          
                         HStack {
                             if mapViewStatus != .navigating {
                                 Button(action: { mapViewAction = .showDirections },
@@ -156,7 +169,10 @@ struct Map: View {
                                     Text(routeDistance)
                                 }
                                 else if mapViewStatus == .navigating {
-                                    Text(distance + " left")
+                                    Text(distance)
+                                        .font(.title2)
+                                        .fontWeight(.black)
+                                    Text("Remaining")
                                 }
                                 
                             }
@@ -176,7 +192,7 @@ struct Map: View {
                             }
                           
                         }
-                       
+                        
                       
                        
                     }

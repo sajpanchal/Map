@@ -180,7 +180,7 @@ class MapViewAPI {
             }
             else {
                 let destination = parent.localSearch.tappedLocation?.title
-                parent.distance = String(format:"%.1f", parent.locationDataManager.distance!) + " km."
+                parent.distance = String(format:"%.1f", parent.locationDataManager.distance!) + " km"
                 parent.destination = (destination ?? "") ?? ""
             }
             parent.routeDistance = String(format:"%.1f",Double(route.distance/1000.0)) + " km"
