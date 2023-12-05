@@ -61,7 +61,9 @@ class MapViewAPI {
         ///clear the instruction field
      
             parent.instruction = ""
-        
+        if parent.locationDataManager.distance != nil {
+            parent.locationDataManager.distance = nil
+        }
         ///reset the properties of this instance class
         resetProps()
         
@@ -156,7 +158,8 @@ class MapViewAPI {
     
      static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
         var index = 0
-         parent.distance = String(format:"%.1f", parent.locationDataManager.distance/1000) + " km"
+     //    parent.mapViewStatus = .navigating
+        
         ///if there are more than 1 overlays, find the one that is desired.
         if mapView.overlays.count > 1 {
             getDesiredRouteAndOvarlay(for: mapView)
@@ -169,6 +172,17 @@ class MapViewAPI {
                 print("step instruction: \(step.instructions)")
             }
             parent.routeETA = String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
+            if parent.locationDataManager.distance == nil {
+                parent.locationDataManager.distance = Double(route.distance/1000.0)
+                let destination = parent.localSearch.tappedLocation?.title
+                parent.distance = String(format:"%.1f", parent.locationDataManager.distance!) + " km"
+                parent.destination = (destination ?? "") ?? ""
+            }
+            else {
+                let destination = parent.localSearch.tappedLocation?.title
+                parent.distance = String(format:"%.1f", parent.locationDataManager.distance!) + " km."
+                parent.destination = (destination ?? "") ?? ""
+            }
             parent.routeDistance = String(format:"%.1f",Double(route.distance/1000.0)) + " km"
             ///initiating props on first execution
             initiateProps(route: route, parent: &parent)
@@ -382,135 +396,4 @@ extension MapViewAPI {
         parent.nextStepDistance = nextStepDistance < 1000 ? String(intNextStepDistance) + " m" : String(format:"%.1f",(nextStepDistance/1000)) + " km"
     }
 }
-
-
-///prepare the first instruction with the value pointing to next step location
-//       if  routes.first == nil {
- 
-//        if let route = routes.first!.steps.first(where: {!$0.instructions.isEmpty}) {
-//            let index = routes.first!.steps.firstIndex(where: {!$0.instructions.isEmpty})
-//                instruction = "Step #\(index!) " + route.instructions
-//                parent.instruction = instruction
-//            }
-//            if route.steps[0].instructions.isEmpty {
-//                parent.instruction = "Starting at \(parent.locationDataManager.throughfare!)"
-//                    print("instruction: ",instruction)
-//            }
-   
-//        }
-
-///get the step from routes where user location has entered to.
-//        let step = routes.first!.steps.first(where: { step in
-//            let location = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
-//            let distance = mapView.userLocation.location!.distance(from: location)
-//            if distance < 50 && step.polyline.subtitle != "regionExited" {
-//                return true
-//            }
-//            else {
-//                return false
-//            }
-//        })
-//        if let step = step {
-//            print("USER HAS ENTERED TO STEP: \(step.instructions)")
-//            let index = routes.first!.steps.firstIndex(of: step)
-//
-//            if let index = index {
-//                if (index + 1) < routes.first!.steps.count {
-//                    let nextStep = routes.first!.steps[index + 1]
-//                    instruction = nextStep.instructions
-//                    let nextLocation = CLLocation(latitude: nextStep.polyline.coordinate.latitude, longitude: nextStep.polyline.coordinate.longitude)
-//                    var regionDistance = mapView.userLocation.location!.distance(from: nextLocation)
-//                    regionDistance = regionDistance < 20 ? 0 : regionDistance
-//                    parent.regionDistance = regionDistance < 1000 ? String(Int(regionDistance)) + " m" : String(format:"%.1f",regionDistance/1000) + " km"
-//                }
-//                else {
-//                    instruction = "You have arrived!"
-//                }
-//            }
-//            let location = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
-//            let distance = mapView.userLocation.location!.distance(from: location)
-//
-//            print("Distance is \(parent.regionDistance)")
-//            if distance < 20 {
-//                parent.enteredToRegion = true
-//            }
-//            if distance > 20 && parent.enteredToRegion {
-//                parent.instruction = instruction
-//                parent.enteredToRegion = false
-//                routes.first!.steps[index!].polyline.subtitle = "regionExited"
-//            }
-//        }
-
-///create step points for each steps
-//        var i = 0
-//
-//        for step in routes.first!.steps {
-//            print("step#\(i) point counts: \(step.polyline.pointCount)")
-//            if userPoint == nil {
-//                userPoint = MKMapPoint(mapView.userLocation.coordinate)
-//            }
-//
-//
-//            if stepsPoints.count != routes.first!.steps.count {
-//                print("creating points for step#\(i)")
-//                points =  step.polyline.points()
-//
-//                let length = step.polyline.pointCount
-//
-//                stepsPoints.append(UnsafeBufferPointer(start: points, count: length < 10 ? length : 10))
-//
-//                for point in stepsPoints[i] {
-//                    print("step\(i) points:",point.coordinate)
-//                    let annotation = MKPointAnnotation()
-//                    annotation.coordinate = point.coordinate
-//                    mapView.addAnnotation(annotation)
-//                }
-//            }
-//            i += 1
-//        }
-
-
-//            for point in pointsArray {
-//
-//                let annotation = MKPointAnnotation()
-//                annotation.coordinate = point.coordinate
-//                mapView.addAnnotation(annotation)
-//            }
-           ///get the location coordinates of the current step
-           
-          
-//            if stepDistance < 50 && step.polyline.subtitle != "regionExited" {
-//                parent.status = "Step #\(nextIndex) is under 60 m."
-//                print("on step #\(nextIndex)")
-//                ///if the next index is less than the last index of steps array load the next step location and instruction
-//                if nextIndex <= routes.first!.steps.count - 1 {
-//                    ///set the local instruction variable as a next step's instruction
-//                    instruction = "Step #\(nextIndex) " + routes.first!.steps[nextIndex].instructions
-//                    print("NEXT STEP IS: \(instruction)")
-//                    ///get the next step location in a local variable once user has entered to the current step region
-//                }
-//                ///if this is the last step
-//                else {
-//                    ///set the instruction to indicate user has arrived
-//                    instruction = "you have arrived"
-//                }
-//                ///if user has entered to the step region within 20 meter radius
-//                if stepDistance < 20 {
-//                    ///set it as entered to the region
-//                    parent.status = "Step #\(nextIndex) entered"
-//                    step.polyline.subtitle = "enteredToRegion"
-//                    print("user entered to this region? : \(parent.enteredToRegion)")
-//                }
-//                ///if user has exited the step region of 20 meter radius and it was entered into it before
-//                if stepDistance > 20 && step.polyline.subtitle == "enteredToRegion" {
-//                    parent.status = "Step #\(nextIndex) exited"
-//                    parent.nextStepLocation = CLLocation(latitude: routes.first!.steps[nextIndex].polyline.coordinate.latitude, longitude: routes.first!.steps[nextIndex].polyline.coordinate.longitude)
-//                    ///update the swiftui instruction display with the latest instruction received from next step
-//                    parent.instruction = instruction
-//                    ///mark the step polyline subtitle as region exited.
-//                    step.polyline.subtitle = "regionExited"
-//                    print("user exited to this region")
-//                }
-//            }
-
 

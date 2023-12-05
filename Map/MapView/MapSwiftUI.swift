@@ -34,6 +34,8 @@ struct Map: View {
     @State var routeETA: String = ""
     @State var routeDistance: String = ""
     @State var distance: String = ""
+    @State var destination = ""
+    @State var showSheet = true
    // let synthesizer = AVSpeechSynthesizer()
     var body: some View {
             VStack {
@@ -68,14 +70,14 @@ struct Map: View {
                            
                         Spacer()
                     }
-                    Text(status)
+                  
                 }
                 ///ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
                 ZStack {
                     ///grouping mapview and its associated buttons
                     Group() {
                         ///calling our custom struct that will render UIView for us in swiftui. we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class. we are also passing the state variable called tapped that is bound to the MapView.when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix. we always declare a binding propery in a child component of the associated property from its parent.once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
-                        MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus, isLocationSelected: $isLocationSelected, isSearchCancelled: $isSearchCancelled, instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, status: $status, routeETA: $routeETA, routeDistance: $routeDistance, distance: $distance)
+                        MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus, isLocationSelected: $isLocationSelected, isSearchCancelled: $isSearchCancelled, instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, status: $status, routeETA: $routeETA, routeDistance: $routeDistance, distance: $distance, destination: $destination)
                         ///disable the mapview when track location button is tapped but tracking is not on yet.
                             .disabled(isMapViewWaiting(to: .navigate))
                         ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged() action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag. we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
@@ -95,7 +97,7 @@ struct Map: View {
                     
                     ///if mapview is not navigating but user has asked to navigate we will show a progessview to make user wait to complete the process.
                     if isMapViewWaiting(to: .navigate) {
-                        MapProgressView(alertMessage: "Starting Tracking location! Please Wait...")                       
+                       // MapProgressView(alertMessage: "Starting Tracking location! Please Wait...")                       
                     }
                     ///if mapview is waiting to center to the userlocation on button tap
                     else if isMapViewWaiting(to: .centerToUserLocation) {
@@ -115,25 +117,70 @@ struct Map: View {
                 }
                 if localSearch.tappedLocation != nil {
                     //navigation mode button to switch between navigation modes.
-                    HStack {
-                        if mapViewStatus != .navigating {
-                            Button("Routes", action: {
-                                mapViewAction = .showDirections
-                            })
+                    VStack {
+                  
+                            if mapViewStatus == .navigating {
+                                HStack {
+                                    VStack {
+                                        Text("Heading to destination")
+                                            .font(.caption2)
+                                            .fontWeight(.bold)
+                                        Text(destination)
+                                            .font(.caption2)
+                                            .multilineTextAlignment(.center)
+                                    }
+                                   
+                                }
+                                .presentationDetents([.fraction(0.1), .medium])
+                            }
+                        
+                     
+                        HStack {
+                            if mapViewStatus != .navigating {
+                                Button(action: { mapViewAction = .showDirections },
+                                       label: {
+                                                Text("Routes")
+                                                    .frame(height: 60)
+                                                   
+                                                    .foregroundStyle(.white)
+                                        }
+                                )
+                               
+                                .background(Color.blue)
+                                .cornerRadius(10)
+                            }
+                            Spacer()
+                            VStack {
+                                if mapViewStatus == .showingDirections {
+                                    Text(routeETA)
+                                    Text(routeDistance)
+                                }
+                                else if mapViewStatus == .navigating {
+                                    Text(distance + " left")
+                                }
+                                
+                            }
+                            Spacer()
+                            if mapViewStatus == .showingDirections || mapViewStatus == .navigating {
+                                Button(action: updateUserTracking, label: {
+                                    isMapInNavigationMode().0 ? 
+                                        Text("Stop")
+                                            .frame(height: 60)
+                                            .foregroundStyle(.white) : 
+                                        Text("Navigate")
+                                            .frame(height: 60)
+                                            .foregroundStyle(.white)
+                                })
+                                .background(isMapInNavigationMode().0 ? .red : .blue)
+                                .cornerRadius(10)
+                            }
+                          
                         }
-                        Spacer()
-                        VStack {
-                            Text(routeETA)
-                            Text(routeDistance)
-                            Text(distance)
-                        }
-                        Spacer()
-                        if mapViewStatus == .showingDirections || mapViewStatus == .navigating {
-                            Button(isMapInNavigationMode().0 ? "Stop" : "Navigate", action: updateUserTracking)
-                            .foregroundColor(isMapInNavigationMode().0 ? .red : .blue)
-                        }
+                       
                       
+                       
                     }
+                 
                
                   
                 }

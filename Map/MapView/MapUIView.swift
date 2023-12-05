@@ -42,6 +42,7 @@ struct MapView: UIViewRepresentable {
     @Binding var routeETA: String
     @Binding var routeDistance: String
     @Binding var distance: String
+    @Binding var destination: String
     var region: MKCoordinateRegion?
 
 
@@ -233,6 +234,10 @@ struct MapView: UIViewRepresentable {
                 }
                break
             case .navigate:
+            if mapViewStatus != .navigating {
+//                MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: self.locationDataManager.userHeading)
+//                MapViewAPI.startNavigation(in: uiView, parent: &context.coordinator.parent)
+            }
                 break
             case .showDirections:
               //  parent.mapViewStatus = .showingDirections
