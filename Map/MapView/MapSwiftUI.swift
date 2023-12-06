@@ -35,7 +35,7 @@ struct Map: View {
     @State var routeDistance: String = ""
     @State var distance: String = ""
     @State var destination = ""
-    @State var showSheet = true
+    @State var showSheet = false
    // let synthesizer = AVSpeechSynthesizer()
     var body: some View {
             VStack {
@@ -119,6 +119,21 @@ struct Map: View {
                     //navigation mode button to switch between navigation modes.
                     VStack {
                         if mapViewStatus == .navigating {
+                            HStack {
+                                Spacer()
+                                Rectangle()
+                                    .frame(width: 60, height: 5)
+                                    .cornerRadius(5)
+                                Spacer()
+                            }
+                            .padding(1)
+                            
+                            .onTapGesture {
+                                withAnimation {
+                                    showSheet.toggle()
+                                }
+                                
+                            }
                             if showSheet {
                                 HStack {
                                     VStack {
@@ -132,25 +147,20 @@ struct Map: View {
                                    
                                 }
                                 .onTapGesture {
-                                    showSheet.toggle()
+                                    withAnimation {
+                                        showSheet.toggle()
+                                    }
+                                    
                                 }
                                
                             }
                         
-                        HStack {
-                            Spacer()
-                            Image(systemName: showSheet ? "chevron.down" : "chevron.up")
-                            Spacer()
-                        }
-                        .padding(5)
-                        .onTapGesture {
-                            showSheet.toggle()
-                        }
+                       
                         }
                           
                         HStack {
                             if mapViewStatus != .navigating {
-                                Button(action: { mapViewAction = .showDirections },
+                                Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
                                        label: {
                                                 Text("Routes")
                                                     .frame(height: 60)

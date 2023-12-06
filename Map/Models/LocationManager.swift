@@ -83,15 +83,31 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     
     //this method will be called whenever a new user location is available.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        print("location udpated...")
         if lastLocation == nil {
             lastLocation = locations.first
         }
-       
+        self.userlocation =  locations.last
+        if self.throughfare == nil && self.userlocation != nil {
+            print("geocoding first time")
+            CLGeocoder().reverseGeocodeLocation(self.userlocation!) { (response, error) in
+                guard let placemarks = response else {
+                    CLGeocoder().cancelGeocode()
+                    print("error occurs")
+                    return
+                }
+                if let placemark = placemarks.first {
+                                               self.throughfare = placemark.thoroughfare
+                    print("through fare is:\(self.throughfare)")
+                                           }
+                
+            }
+        }
         //if locations array is not nil and has the first location of the user, get the first user location
         if let lastUserLocation = locations.last, var distance = distance {
             //update the userLocation property with the first user location accessed by CLLocationManager in locations array.
             if  lastLocation!.distance(from: lastUserLocation)/1000 >= 0.01 && distance > 0.0 {
-                self.distance = self.distance! - lastLocation!.distance(from: lastUserLocation)
+                self.distance = self.distance! - (lastLocation!.distance(from: lastUserLocation)/1000)
                 print("Distance: \(self.distance!/1000)")
                 lastLocation = lastUserLocation
             }
@@ -103,40 +119,10 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
             self.speed = self.userlocation!.speed * 3.6
             
             region = MKCoordinateRegion(center: lastUserLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
-            if self.throughfare == nil && self.userlocation != nil {
-//                CLGeocoder().reverseGeocodeLocation(self.userlocation!) { (placemarks, error) in
-//                    guard error == nil else {
-//                        CLGeocoder().cancelGeocode()
-//                        return
-//                    }
-//                    
-//                    
-//                }
-            }
-            if self.userlocation != nil {
-                Timer.scheduledTimer(withTimeInterval: 30.0, repeats: true, block: {_ in
-                    print("geocoding")
-//                        CLGeocoder().reverseGeocodeLocation(self.userlocation!) { (response, error) in
-//                            guard let placemarks = response  else {
-//                                CLGeocoder().cancelGeocode()
-//                                return
-//                            }
-//                            
-//                            if let placemark = placemarks.first {
-//                                self.throughfare = placemark.thoroughfare
-//                            }
-//                            
-//                        }
-                    
-                })
-            }
-               
-              
-               
-            
             
         }
     }
+    
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         self.userHeading = newHeading
     }
