@@ -89,19 +89,21 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         }
         self.userlocation =  locations.last
         if self.throughfare == nil && self.userlocation != nil {
-            print("geocoding first time")
-            CLGeocoder().reverseGeocodeLocation(self.userlocation!) { (response, error) in
-                guard let placemarks = response else {
-                    CLGeocoder().cancelGeocode()
-                    print("error occurs")
-                    return
-                }
-                if let placemark = placemarks.first {
-                                               self.throughfare = placemark.thoroughfare
-                    print("through fare is:\(self.throughfare)")
-                                           }
+            ///task is a struck type of swift that allows execution of the code asynchronously
+            Task(operation: {
+                print("geocoding first time")
+                    if let placemarks = try? await CLGeocoder().reverseGeocodeLocation(self.userlocation!) {
+                        if let placemark = placemarks.first {
+                            DispatchQueue.main.async {
+                                self.throughfare = placemark.thoroughfare
+                            }
+                            print("through fare is:\(self.throughfare ?? "")")
+                        }
+                    }
                 
-            }
+                
+            })
+          
         }
         //if locations array is not nil and has the first location of the user, get the first user location
         if let lastUserLocation = locations.last, var distance = distance {

@@ -88,7 +88,7 @@ struct Map: View {
                                 .gesture(TapGesture().onEnded(centerMapToUserLocation))
                         }
                         ///if map is not navigating show the circle button to center the map to user location whenever tapped.
-                        if !isMapInNavigationMode().0 {
+                        if !isMapInNavigationMode().0 && mapViewStatus != .showingDirections {
                             MapViewButton(imageName: mapViewStatus == .centeredToUserLocation ? "circle.fill" : "circle")
                                 .gesture(TapGesture().onEnded(centerMapToUserLocation))
                         }
@@ -215,7 +215,9 @@ struct Map: View {
     }
     ///custom function takes the DragGesture value. custom function we calculate the distance of the drag from 2D cooridinates of starting and ennding points. then we check if the distance is more than 10. if so, we undo the user-location re-center button tap.
     func dragGestureAction(value: DragGesture.Value) {
-       
+        if mapViewStatus == .showingDirections {
+            return
+        }
         ///get the distance of the user drag in x direction by measuring a difference between starting point and ending point in x direction
         let x = abs(value.location.x - value.startLocation.x)
         ///get the distance of the user drag in y direction by measuring a difference between starting point and ending point in y direction
