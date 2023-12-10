@@ -15,6 +15,7 @@ struct ListView: View {
     @Binding var isLocationSelected: Bool
     var body: some View {
         List {
+            Spacer()
             ForEach(localSearch.searchedLocations, id:\.self.id) { suggestion in
                 VStack {
                     HStack {

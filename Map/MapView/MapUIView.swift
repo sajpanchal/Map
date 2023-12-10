@@ -43,6 +43,7 @@ struct MapView: UIViewRepresentable {
     @Binding var routeDistance: String
     @Binding var distance: String
     @Binding var destination: String
+    @Binding var stepInstructions: [(String, Double)]
     var region: MKCoordinateRegion?
 
 
@@ -181,6 +182,7 @@ struct MapView: UIViewRepresentable {
         context.coordinator.mapView.delegate = context.coordinator
         ///this will show a blip where the user location is in the map. if we don't set this property, mapView won't be able to get location updates.
         context.coordinator.mapView.showsUserLocation = true
+        
         context.coordinator.mapView.addGestureRecognizer(context.coordinator.tapGestureRecognizer)
         ///return the mapview object.
         return context.coordinator.mapView
@@ -270,10 +272,10 @@ extension MapView {
         }
         else if isSearchCancelled {
             uiView.removeAnnotations(uiView.annotations)
-          
+            uiView.removeOverlays(uiView.overlays)
             
         }
-        uiView.removeOverlays(uiView.overlays)
+   
     }
 }
 

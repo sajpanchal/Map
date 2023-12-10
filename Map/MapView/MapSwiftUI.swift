@@ -7,8 +7,8 @@
 
 import SwiftUI
 import MapKit
-import AudioToolbox
-import AVFoundation
+//import AudioToolbox
+//import AVFoundation
 
 //this view will observe the LocationDataManager and updates the MapViewController if data in Location
 //Manager changes.
@@ -36,142 +36,180 @@ struct Map: View {
     @State var distance: String = ""
     @State var destination = ""
     @State var showSheet = false
+    @State var showDirectionsList = false
+    @State var stepInstructions: [(String, Double)] = []
    // let synthesizer = AVSpeechSynthesizer()
     var body: some View {
+        VStack {
+                ///ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
+            if !isMapInNavigationMode().0 || isMapViewWaiting(to: .navigate) {
+            SearchFieldView(searchedLocationText: $searchedLocationText, isSearchCancelled: $isSearchCancelled, isLocationSelected: $isLocationSelected, region: locationDataManager.region, localSearch: localSearch)
+                .background(.black)
+            Spacer()
+        }
+        else if isMapInNavigationMode().0  {
             VStack {
-                if !isMapInNavigationMode().0 || isMapViewWaiting(to: .navigate) {
-                    SearchFieldView(searchedLocationText: $searchedLocationText, isSearchCancelled: $isSearchCancelled, isLocationSelected: $isLocationSelected, region: locationDataManager.region, localSearch: localSearch)
-                }
-                else if isMapInNavigationMode().0  {
-                    HStack {
-                        VStack {
-                            Image(systemName: getDirectionSign(for: instruction))
-                                .font(.title)
-                                .fontWeight(.black)
-                                .padding(.top, 5)
-                            Text("\(nextStepDistance)")
-                                .padding(.bottom, 5)
-                                .font(.title2)
-                                .fontWeight(.black)
-                            
-                        }
-                        Spacer()
-                        if #available(iOS 17.0, *) {
+                HStack {
+                    VStack {
+                        Image(systemName: getDirectionSign(for: instruction))
+                            .font(.title)
+                            .fontWeight(.black)
+                            .padding(.top, 5)
+                        Text("\(nextStepDistance)")
+                            .padding(.bottom, 5)
+                            .font(.title2)
+                            .fontWeight(.black)
+                        
+                    }
+                   
+                    Spacer()
+                    if #available(iOS 17.0, *) {
                         Text(instruction)
                             .padding(10)
                             .font(.title3)
-                          //  .onAppear(perform: speech)
-                           // .onChange(of: instruction, speech)
-                            } else {
-                                Text(instruction)
-                                    .padding(10)
-                                    .font(.title3)
-                            }
-                           
-                        Spacer()
+                            .background(.black)
+                        //  .onAppear(perform: speech)
+                        // .onChange(of: instruction, speech)
+                    } else {
+                        Text(instruction)
+                            .padding(10)
+                            .font(.title3)
                     }
+                    
                   
                 }
-                ///ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
-                ZStack {
-                    ///grouping mapview and its associated buttons
-                    Group() {
-                        ///calling our custom struct that will render UIView for us in swiftui. we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class. we are also passing the state variable called tapped that is bound to the MapView.when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix. we always declare a binding propery in a child component of the associated property from its parent.once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
-                        MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus, isLocationSelected: $isLocationSelected, isSearchCancelled: $isSearchCancelled, instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, status: $status, routeETA: $routeETA, routeDistance: $routeDistance, distance: $distance, destination: $destination)
-                        ///disable the mapview when track location button is tapped but tracking is not on yet.
-                            .disabled(isMapViewWaiting(to: .navigate))
-                        ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged() action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag. we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
-                            .gesture(DragGesture().onChanged(dragGestureAction))
-                        ///custom buttons that is floating on our mapview. if map is navigating but it is not centered to user location show the location button to center it on tap.
-                        if isMapInNavigationMode().0 && isMapInNavigationMode().1 == .inNavigationNotCentered {
-                            MapViewButton(imageName: "location.fill")
-                                .gesture(TapGesture().onEnded(centerMapToUserLocation))
-                        }
-                        ///if map is not navigating show the circle button to center the map to user location whenever tapped.
-                        if !isMapInNavigationMode().0 && mapViewStatus != .showingDirections {
-                            MapViewButton(imageName: mapViewStatus == .centeredToUserLocation ? "circle.fill" : "circle")
-                                .gesture(TapGesture().onEnded(centerMapToUserLocation))
-                        }
-                    }
-                    .opacity(isMapViewWaiting(to: .navigate) ? 0.3 : 1.0)
-                    
-                    ///if mapview is not navigating but user has asked to navigate we will show a progessview to make user wait to complete the process.
-                    if isMapViewWaiting(to: .navigate) {
-                       // MapProgressView(alertMessage: "Starting Tracking location! Please Wait...")                       
-                    }
-                    ///if mapview is waiting to center to the userlocation on button tap
-                    else if isMapViewWaiting(to: .centerToUserLocation) {
-                        ///show the progressview with a given string message
-                        MapProgressView(alertMessage: "Centering Map to your location! Please Wait...")
-                    }
-                    ///if the mapview is waiting to get in idle mode
-                    else if isMapViewWaiting(to: .idle) {
-                        MapProgressView(alertMessage: "Stopping Tracking location! Please Wait...")
-                    }
-                    else if isMapViewWaiting(to: .showDirections) {
-                        MapProgressView(alertMessage: "Routing directions! Please Wait...")
-                    }
-                    if !localSearch.searchedLocations.isEmpty {
-                        ListView(localSearch: localSearch, searchedLocationText: $searchedLocationText, isLocationSelected: $isLocationSelected)
+                .background(.black)
+                .onTapGesture {
+                    withAnimation {
+                        showDirectionsList.toggle()
                     }
                 }
-                if localSearch.tappedLocation != nil {
-                    //navigation mode button to switch between navigation modes.
-                    VStack {
-                        if mapViewStatus == .navigating {
+                if !showDirectionsList {
+                    HStack {
+                        Spacer()
+                        Rectangle()
+                            .frame(width: 30, height: 5)
+                            .cornerRadius(5)
+                        Spacer()
+                    }
+                    .padding(5)
+                    .background(.black)
+                    .onTapGesture {
+                        withAnimation {
+                            showDirectionsList.toggle()
+                        }
+                    }
+              
+                }
+               
+               
+            }
+            .background(.black)
+            Spacer()
+        }
+            
+        ZStack {
+            ///grouping mapview and its associated buttons
+            Group() {
+                ///calling our custom struct that will render UIView for us in swiftui. we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class. we are also passing the state variable called tapped that is bound to the MapView.when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix. we always declare a binding propery in a child component of the associated property from its parent.once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
+                MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus, isLocationSelected: $isLocationSelected, isSearchCancelled: $isSearchCancelled, instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, status: $status, routeETA: $routeETA, routeDistance: $routeDistance, distance: $distance, destination: $destination, stepInstructions: $stepInstructions)
+                ///disable the mapview when track location button is tapped but tracking is not on yet.
+                    .disabled(isMapViewWaiting(to: .navigate))
+                        
+                    
+                ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged() action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag. we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
+                    .gesture(DragGesture().onChanged(dragGestureAction))
+              
+            }
+            .opacity(isMapViewWaiting(to: .navigate) ? 0.3 : 1.0)
+            ///if mapview is not navigating but user has asked to navigate we will show a progessview to make user wait to complete the process.
+            if isMapViewWaiting(to: .navigate) {
+                 MapProgressView(alertMessage: "Starting Tracking location! Please Wait...")
+            }
+            ///if mapview is waiting to center to the userlocation on button tap
+            else if isMapViewWaiting(to: .centerToUserLocation) {
+                ///show the progressview with a given string message
+                MapProgressView(alertMessage: "Centering Map to your location! Please Wait...")
+            }
+            ///if the mapview is waiting to get in idle mode
+            else if isMapViewWaiting(to: .idle) {
+                MapProgressView(alertMessage: "Stopping Tracking location! Please Wait...")
+            }
+            else if isMapViewWaiting(to: .showDirections) {
+                MapProgressView(alertMessage: "Routing directions! Please Wait...")
+            }
+            if !localSearch.searchedLocations.isEmpty {
+                ListView(localSearch: localSearch, searchedLocationText: $searchedLocationText, isLocationSelected: $isLocationSelected)
+                    
+            }
+            if localSearch.tappedLocation != nil {
+                //navigation mode button to switch between navigation modes.
+              
+                VStack(spacing: 0) {
+                    Spacer()
+                    ///custom buttons that is floating on our mapview. if map is navigating but it is not centered to user location show the location button to center it on tap.
+                    if isMapInNavigationMode().0 && isMapInNavigationMode().1 == .inNavigationNotCentered {
+                        MapViewButton(imageName: "location.fill")
+                            .gesture(TapGesture().onEnded(centerMapToUserLocation))
+                    }
+                    ///if map is not navigating show the circle button to center the map to user location whenever tapped.
+                    if !isMapInNavigationMode().0 && mapViewStatus != .showingDirections {
+                        MapViewButton(imageName: mapViewStatus == .centeredToUserLocation ? "circle.fill" : "circle")
+                            .gesture(TapGesture().onEnded(centerMapToUserLocation))
+                    }
+                    if mapViewStatus == .navigating {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            Rectangle()
+                                .frame(width: 30, height: 5)
+                                .cornerRadius(5)
+                            Spacer()
+                        }
+                        .padding(5)
+                        
+                        .background(.black)
+                        .onTapGesture {
+                            withAnimation {
+                                showSheet.toggle()
+                            }
+                            
+                        }
+                        if showSheet {
                             HStack {
                                 Spacer()
-                                Rectangle()
-                                    .frame(width: 60, height: 5)
-                                    .cornerRadius(5)
+                                VStack {
+                                    Text("Heading to destination")
+                                        .font(.caption2)
+                                        .fontWeight(.bold)
+                                    Text(destination)
+                                        .font(.caption2)
+                                        .multilineTextAlignment(.center)
+                                }
                                 Spacer()
                             }
-                            .padding(1)
-                            
+                            .background(.black)
                             .onTapGesture {
                                 withAnimation {
                                     showSheet.toggle()
                                 }
-                                
                             }
-                            if showSheet {
-                                HStack {
-                                    VStack {
-                                        Text("Heading to destination")
-                                            .font(.caption2)
-                                            .fontWeight(.bold)
-                                        Text(destination)
-                                            .font(.caption2)
-                                            .multilineTextAlignment(.center)
-                                    }
-                                   
-                                }
-                                .onTapGesture {
-                                    withAnimation {
-                                        showSheet.toggle()
-                                    }
-                                    
-                                }
-                               
-                            }
-                        
-                       
                         }
-                          
-                        HStack {
-                            if mapViewStatus != .navigating {
-                                Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
-                                       label: {
-                                                Text("Routes")
-                                                    .frame(height: 60)
-                                                   
-                                                    .foregroundStyle(.white)
-                                        }
-                                )
-                               
-                                .background(Color.blue)
-                                .cornerRadius(10)
-                            }
+                    }
+                    HStack {
+                        if mapViewStatus != .navigating {
+                            Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
+                                   label: {
+                                            Text("Routes")
+                                                .frame(height: 60)
+                                                .foregroundStyle(.white)
+                                    }
+                            )
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                            .padding(10)
+                        }
+                        Group {
                             Spacer()
                             VStack {
                                 if mapViewStatus == .showingDirections {
@@ -187,25 +225,91 @@ struct Map: View {
                                 
                             }
                             Spacer()
-                            if mapViewStatus == .showingDirections || mapViewStatus == .navigating {
-                                Button(action: updateUserTracking, label: {
-                                    isMapInNavigationMode().0 ? 
-                                        Text("Stop")
-                                            .frame(height: 60)
-                                            .foregroundStyle(.white) : 
-                                        Text("Navigate")
-                                            .frame(height: 60)
-                                            .foregroundStyle(.white)
-                                })
-                                .background(isMapInNavigationMode().0 ? .red : .blue)
-                                .cornerRadius(10)
+                        }
+                        .onTapGesture {
+                            withAnimation {
+                                showSheet.toggle()
                             }
+                        }
+                       
+                        if mapViewStatus == .showingDirections || mapViewStatus == .navigating {
+                            Button(action: updateUserTracking, label: {
+                                isMapInNavigationMode().0 ?
+                                    Text("Stop")
+                                        .frame(height: 60)
+                                        .foregroundStyle(.white) :
+                                    Text("Navigate")
+                                        .frame(height: 60)
+                                        .foregroundStyle(.white)
+                            })
+                            .background(isMapInNavigationMode().0 ? .red : .blue)
+                            .cornerRadius(10)
+                            .padding(10)
+                        }
+                      
+                    }
+                    .background(.black)
+                   
+                  
+                   
+                }//
+                if showDirectionsList {
+                    VStack {
+                        HStack {
                           
+                            List(content: {
+                              
+                                ForEach(stepInstructions,id:\.self.0, content: { stepInstruction in
+                                    HStack {
+                                        VStack {
+                                            Image(systemName: getDirectionSign(for: stepInstruction.0))
+                                                .font(.title)
+                                                .fontWeight(.black)
+                                                .padding(.top, 5)
+                                            Text(convertToString(from: stepInstruction.1))
+                                                .padding(.bottom, 5)
+                                                .font(.title2)
+                                                .fontWeight(.black)
+                                        }
+                                       
+                                        Spacer()
+                                        Text(stepInstruction.0)
+                                            .padding(10)
+                                            .font(.title3)
+                                        Spacer()
+                                    }
+                                    
+                                })
+                            })
+                            .onTapGesture {
+                                withAnimation {
+                                    showDirectionsList.toggle()
+                                }
+                            }
+                           
                         }
                         
-                      
                        
+                        HStack {
+                            Spacer()
+                            Rectangle()
+                                .frame(width: 30, height: 5)
+                                .cornerRadius(5)
+                            Spacer()
+                        }
+                        .padding(5)
+                    
+                        .onTapGesture {
+                            withAnimation {
+                                showDirectionsList.toggle()
+                            }
+                        }
                     }
+                    .background(.black)
+                }
+
+        }
+                
                  
                
                   
@@ -216,7 +320,7 @@ struct Map: View {
     ///custom function takes the DragGesture value. custom function we calculate the distance of the drag from 2D cooridinates of starting and ennding points. then we check if the distance is more than 10. if so, we undo the user-location re-center button tap.
     func dragGestureAction(value: DragGesture.Value) {
         if mapViewStatus == .showingDirections {
-            return
+         //return
         }
         ///get the distance of the user drag in x direction by measuring a difference between starting point and ending point in x direction
         let x = abs(value.location.x - value.startLocation.x)
@@ -273,8 +377,9 @@ struct Map: View {
             break
         }
     }
-    func getDirectionSign(for: String) -> String {
-        let instruction = instruction.lowercased()
+    func getDirectionSign(for step: String) -> String {
+        let instruction = step.lowercased()
+        print("instruction is: \(instruction)")
         if instruction.contains("turn left") {
             return "arrow.turn.up.left"
         }
@@ -342,6 +447,17 @@ struct Map: View {
         case .showDirections:
             return (mapViewStatus != .showingDirections && mapViewAction == .showDirections)
         
+        }
+    }
+    func convertToString(from number: Double) -> String {
+        var number = number
+        if number > 1000 {
+           number = number/1000
+            return String(format:"%.1f", number) + " km"
+        }
+        else {
+           let num = Int(number)
+            return String(num) + " m"
         }
     }
 //    func speech() {

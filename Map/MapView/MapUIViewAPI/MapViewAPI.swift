@@ -33,6 +33,7 @@ class MapViewAPI {
             DispatchQueue.main.async {
                 //set the mapView region centered to user location with 1000 meters of visible region around it.
                 mapView.region = MKCoordinateRegion(center: userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
+   
             }
                 //assign this region to our parent region.
                 parent.region = mapView.region
@@ -51,6 +52,7 @@ class MapViewAPI {
             DispatchQueue.main.async {
                 //set the mapview camera to our defined object.
                 mapView.setCamera(camera, animated: true)
+                
             }
             return
         }
@@ -61,12 +63,13 @@ class MapViewAPI {
         ///clear the instruction field
      
             parent.instruction = ""
+        parent.stepInstructions.removeAll()
         if parent.locationDataManager.distance != nil {
             parent.locationDataManager.distance = nil
         }
         ///reset the properties of this instance class
         resetProps()
-        
+      
      
         DispatchQueue.main.async {
             ///undoing user tracking to none.
@@ -99,6 +102,7 @@ class MapViewAPI {
         if !uiView.overlays.isEmpty {
             return
         }
+     
         ///create an instance of MKDirections request to request the directions.
         let request = MKDirections.Request()
         ///if distination is not nil
@@ -166,11 +170,17 @@ class MapViewAPI {
            
         }
         if let route = routes.first {
-            
+           
             print("selected route is: \(route.polyline.title ?? "")")
-            for step in route.steps {
-                print("step instruction: \(step.instructions)")
+            if parent.stepInstructions.isEmpty {
+                for step in route.steps {
+                    print("step instruction: \(step.instructions)")
+                    if !step.instructions.isEmpty {
+                        parent.stepInstructions.append((step.instructions, step.distance))
+                    }
+                }
             }
+            
             parent.routeETA = String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
             if parent.locationDataManager.distance == nil {
                 parent.locationDataManager.distance = Double(route.distance/1000.0)
@@ -305,6 +315,7 @@ extension MapViewAPI {
         length = []
         pointsArray = []
         nextIndex = 0
+    
     }
     
     static func getDesiredRouteAndOvarlay(for mapView: MKMapView) {
@@ -381,6 +392,7 @@ extension MapViewAPI {
         parent.nextStepLocation = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
             ///update the swiftui instruction display with the latest instruction received from next step
         parent.instruction = instruction
+        parent.stepInstructions.removeAll(where: { $0.0 == instruction})
             ///mark the step polyline subtitle as region exited.
         nextIndex = stepIndex + 1
         parent.status = "Step #\(nextIndex) is next."
