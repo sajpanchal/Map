@@ -106,7 +106,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
           
         }
         //if locations array is not nil and has the first location of the user, get the first user location
-        if let lastUserLocation = locations.last, var distance = distance {
+        if let lastUserLocation = locations.last, let distance = distance {
             //update the userLocation property with the first user location accessed by CLLocationManager in locations array.
             if  lastLocation!.distance(from: lastUserLocation)/1000 >= 0.01 && distance > 0.0 {
                 self.distance = self.distance! - (lastLocation!.distance(from: lastUserLocation)/1000)

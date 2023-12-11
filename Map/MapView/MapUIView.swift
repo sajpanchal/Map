@@ -268,12 +268,13 @@ extension MapView {
         if self.isLocationSelected {
             print("location is selected")
             MapViewAPI.annotateLocation(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
-        
+            uiView.removeOverlays(uiView.overlays)
+            
         }
         else if isSearchCancelled {
             uiView.removeAnnotations(uiView.annotations)
             uiView.removeOverlays(uiView.overlays)
-            
+          
         }
    
     }
