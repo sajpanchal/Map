@@ -75,4 +75,29 @@ func convertToString(from number: Double) -> String {
     }
 }
 
+func isMapViewWaiting(to action: MapViewAction, for status: MapViewStatus, in actualAction: MapViewAction) -> Bool {
+    switch action {
+    case .navigate:
+        return (status != .navigating && actualAction == .navigate)
+    case .centerToUserLocation:
+        return (status != .centeredToUserLocation && actualAction == .centerToUserLocation)
+    case .inNavigationCenterToUserLocation:
+        return (status != .inNavigationCentered && actualAction == .inNavigationCenterToUserLocation)
+    case .idle:
+        return (isMapInNavigationMode(for: status).0 && actualAction == .idle)
+    case .idleInNavigation:
+        return (status != .inNavigationNotCentered && actualAction == .idleInNavigation)
+    case .showDirections:
+        return (status != .showingDirections && actualAction == .showDirections)
+    
+    }
+}
 
+func isMapInNavigationMode(for status: MapViewStatus) -> (Bool,MapViewStatus) {
+    switch status {
+    case .idle, .notCentered, .centeredToUserLocation, .showingDirections:
+        return (false,status)
+    case .navigating, .inNavigationCentered, .inNavigationNotCentered:
+        return (true,status)
+    }
+}
