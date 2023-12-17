@@ -17,7 +17,7 @@ struct ExpandViewSymbol: View {
             Spacer()
         }
         .padding(5)
-        .background(.black)
+       // .background(.black)
     }
 }
 #Preview {

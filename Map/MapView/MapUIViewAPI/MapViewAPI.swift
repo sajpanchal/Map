@@ -79,15 +79,8 @@ class MapViewAPI {
    
     ///function to annotate a location the user has searched in the search bar.
     static func annotateLocation(in mapView: MKMapView ,at coordinates: CLLocationCoordinate2D, for annotation: MKAnnotation) {
-        ///create a point annotation object.
-        let userAnnotation = MKPointAnnotation()
-        ///set its coordinate as userlocation coordinates.
-        userAnnotation.coordinate = mapView.userLocation.coordinate
-        ///set its title as userlocation title.
-        userAnnotation.title = mapView.userLocation.title ?? ""
-        ///add user location as a first annotation in the mapview.
-        mapView.addAnnotation(userAnnotation)
-        ///add the search location received from UIViewRepresentable (mapview) as a second mapview annotation.
+        
+        ///add the search location received from UIViewRepresentable (mapview) as a second mapview annotation.       
         mapView.addAnnotation(annotation)
         ///check if the mapview centered to the searched location or not
         if mapView.centerCoordinate.latitude != annotation.coordinate.latitude && mapView.centerCoordinate.longitude != annotation.coordinate.longitude {
@@ -122,7 +115,7 @@ class MapViewAPI {
                 ///if response is received
                 if let response = response {
                     ///remove all overalys from mapview.
-                    uiView.removeOverlays(uiView.overlays)
+                     uiView.removeOverlays(uiView.overlays)
                     ///sort the routes recieved from the response with longer travel time first.
                     let sortedRoutes = response.routes.sorted(by: {
                         $0.expectedTravelTime > $1.expectedTravelTime
@@ -148,7 +141,7 @@ class MapViewAPI {
                             
                         }
                         ///add the polyline received from the route as an overlay to be displayed in mapview.
-                        uiView.addOverlay(polyline)
+                       uiView.addOverlay(polyline)
                     }
                     print("showing routing directions on map.")
                 }
@@ -157,6 +150,9 @@ class MapViewAPI {
                     print(error?.localizedDescription ?? "")
                 }
             })
+//            directions.calculate(completionHandler: { (response, error) in
+//      
+            
         }
     }
     

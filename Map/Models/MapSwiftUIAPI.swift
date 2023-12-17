@@ -64,10 +64,10 @@ func getDirectionSign(for step: String) -> String {
 }
 
 func convertToString(from number: Double) -> String {
-    var number = number
-    if number > 1000 {
-       number = number/1000
-        return String(format:"%.1f", number) + " km"
+    var num = number
+    if num >= 1000 {
+       num = number/1000
+        return String(format:"%.1f", num) + " km"
     }
     else {
        let num = Int(number)
@@ -89,15 +89,19 @@ func isMapViewWaiting(to action: MapViewAction, for status: MapViewStatus, in ac
         return (status != .inNavigationNotCentered && actualAction == .idleInNavigation)
     case .showDirections:
         return (status != .showingDirections && actualAction == .showDirections)
+    case .idleInshowDirections:
+        return (status != .showingDirectionsNotCentered && actualAction == .idleInshowDirections)
     
     }
 }
 
 func isMapInNavigationMode(for status: MapViewStatus) -> (Bool,MapViewStatus) {
     switch status {
-    case .idle, .notCentered, .centeredToUserLocation, .showingDirections:
+    case .idle, .notCentered, .centeredToUserLocation, .showingDirections, .showingDirectionsNotCentered:
         return (false,status)
     case .navigating, .inNavigationCentered, .inNavigationNotCentered:
         return (true,status)
     }
 }
+
+

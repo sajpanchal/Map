@@ -19,15 +19,22 @@ struct MapViewButton: View {
                 Spacer()
                 ZStack {
                     Rectangle()
-                        .frame(width: 60, height: 60)
-                        .foregroundColor(.gray)
+                        .frame(width: 50, height: 50)
+                        .foregroundStyle(Color.white.gradient)
                         .cornerRadius(10)
+                    if imageName == "circle" || imageName == "circle.fill" {
+                        Circle()
+                            .frame(width: 30, height: 30)
+                            .foregroundStyle(Color.gray.gradient)
+                    }
+                    
                     Image(systemName: imageName)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 35, height: 35)
-                        .foregroundColor(.white)
+                        .frame(width: 25, height: 25)
+                        .foregroundStyle(imageName == "circle.fill" ? Color.blue.gradient : Color.gray.gradient)
                 }
+                
                 
             }
             .padding(10)

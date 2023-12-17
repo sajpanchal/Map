@@ -49,7 +49,7 @@ struct ExpandedDirectionsView: View {
                 }
             }
         }
-        .background(.black)
+        .background(.black.gradient)
     }
     
    

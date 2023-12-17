@@ -85,6 +85,21 @@ struct MapView: UIViewRepresentable {
             parent.mapError = Errors.locationNotFound
         }
         
+//        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+//            if annotation is MKPointAnnotation {
+//            
+//                let view = MKAnnotationView(annotation: annotation, reuseIdentifier: "user")
+//                view.image = UIImage(systemName: "house")
+//                view.backgroundColor = UIColor.blue
+//                return view
+//            }
+//            else {
+//                let view = MKAnnotationView(annotation: annotation, reuseIdentifier: "user")
+//                view.image = UIImage(systemName: "mappin")
+//                view.backgroundColor = UIColor.red
+//                return view
+//            }
+//        }
         
        ///this function will be called once the overlay is added to the mapview object
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
@@ -118,17 +133,24 @@ struct MapView: UIViewRepresentable {
             // if the track location button is tapped
             switch parent.mapViewAction {
                 case .idle:
+                print("idle mode")
                
                 if let searchedLocation = parent.localSearch.tappedLocation {
                     parent.searchLocationInterface(in: mapView, for: searchedLocation) {
-                        parent.localSearch.tappedLocation = nil
+                     
                     }
+                }
+                else {
+                    mapView.removeAnnotations(mapView.annotations)
                 }
                 MapViewAPI.resetLocationTracking(of: mapView, parent: &parent)
                 parent.mapViewStatus = .idle
                 parent.routeETA = ""
                 parent.routeDistance = ""
+                
                     break
+                case .idleInshowDirections:
+                    mapView.setUserTrackingMode(.none, animated: true)
                 case .idleInNavigation:
                     parent.mapViewStatus = .inNavigationNotCentered
                     break
@@ -155,9 +177,7 @@ struct MapView: UIViewRepresentable {
                 if parent.mapViewStatus == .showingDirections {
                     break
                 }
-                
-                MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: parent.localSearch.tappedLocation?.coordinate)
-                mapView.showAnnotations(mapView.annotations, animated: true)
+               
                 
                 if parent.isSearchCancelled {
                     mapView.removeAnnotations(mapView.annotations)
@@ -165,6 +185,11 @@ struct MapView: UIViewRepresentable {
                     parent.localSearch.tappedLocation = nil
                     self.parent.mapViewAction = .idle
                     print("idle mode is back")
+                }
+                else {
+                    mapView.showAnnotations(mapView.annotations, animated: true)
+                    MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: parent.localSearch.tappedLocation?.coordinate)
+                   
                 }
                 parent.mapViewStatus = .showingDirections
                 break
@@ -195,11 +220,14 @@ struct MapView: UIViewRepresentable {
           //  print("search cancel status....: \(isSearchCancelled)")
                 if let searchedLocation = localSearch.tappedLocation {
                     searchLocationInterface(in: uiView, for: searchedLocation) {
-                        DispatchQueue.main.async {
-                            localSearch.tappedLocation = nil
-                        }
+                        
                     }
                 }
+            else {
+                DispatchQueue.main.async {
+                    uiView.removeAnnotations(uiView.annotations)
+                }
+            }
             DispatchQueue.main.async {
                 self.instruction = ""
                 self.routeETA = ""
@@ -212,6 +240,9 @@ struct MapView: UIViewRepresentable {
             }
            // print("reset location tracking.")
                 break
+            case .idleInshowDirections:
+                uiView.setUserTrackingMode(.none, animated: true)
+            break
             case .idleInNavigation:
                 //mapViewStatus = .inNavigationNotCentered
                 break
@@ -220,12 +251,18 @@ struct MapView: UIViewRepresentable {
                 if let searchedLocation = localSearch.tappedLocation {
                     searchLocationInterface(in: uiView, for: searchedLocation) {
                         DispatchQueue.main.async {
-                            localSearch.tappedLocation = nil
+                          
                         }
                     }
                 }
-            print("map is centering")
-                uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
+            else {
+                DispatchQueue.main.async {
+                    uiView.removeAnnotations(uiView.annotations)
+                    uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
+                }
+            }
+         //   print("map is centering")
+              
                 break
             case .inNavigationCenterToUserLocation:
                 if let heading = locationDataManager.userHeading {
@@ -256,8 +293,16 @@ struct MapView: UIViewRepresentable {
                      }
                     break
                 }
-                MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: localSearch.tappedLocation?.coordinate)
-                uiView.showAnnotations(uiView.annotations, animated: true)
+                else {
+                    DispatchQueue.main.async {
+                        self.isLocationSelected = true
+                    }
+                   
+                    MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: localSearch.tappedLocation?.coordinate)
+                    uiView.showAnnotations(uiView.annotations, animated: true)
+                }
+         
+              
                 break
         }
     }
@@ -268,12 +313,20 @@ extension MapView {
         if self.isLocationSelected {
             print("location is selected")
             MapViewAPI.annotateLocation(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
-            uiView.removeOverlays(uiView.overlays)
+            DispatchQueue.main.async {
+                uiView.removeOverlays(uiView.overlays)
+                self.isLocationSelected = false
+            }
+           
             
         }
         else if isSearchCancelled {
-            uiView.removeAnnotations(uiView.annotations)
-            uiView.removeOverlays(uiView.overlays)
+            print("location cancelled")
+            DispatchQueue.main.async {
+                uiView.removeAnnotations(uiView.annotations)
+                uiView.removeOverlays(uiView.overlays)
+            }
+           
           
         }
    

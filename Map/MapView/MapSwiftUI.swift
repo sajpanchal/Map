@@ -43,12 +43,14 @@ struct Map: View {
         ///ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
             if !isMapInNavigationMode(for: mapViewStatus).0 || isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction) {
                 SearchFieldView(searchedLocationText: $searchedLocationText, isSearchCancelled: $isSearchCancelled, isLocationSelected: $isLocationSelected, region: locationDataManager.region, localSearch: localSearch)
-                .background(.black)
+                    .padding(.top, 10)
+                    .background(.black)
                 Spacer()
             }
             else if isMapInNavigationMode(for: mapViewStatus).0  {
                 DirectionsView(directionSign: getDirectionSign(for: instruction), nextStepDistance: nextStepDistance, instruction: instruction, showDirectionsList: $showDirectionsList)
-                Spacer()
+                  
+                //Spacer()
             }
             ZStack {
             ///grouping mapview and its associated buttons
@@ -77,14 +79,14 @@ struct Map: View {
                 else if isMapViewWaiting(to: .showDirections, for: mapViewStatus, in: mapViewAction) {
                     MapProgressView(alertMessage: "Routing directions! Please Wait...")
                 }
-              
-                if localSearch.tappedLocation != nil {
+                
+              //  if localSearch.tappedLocation != nil {
                 //navigation mode button to switch between navigation modes.
-                    MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showSheet: $showSheet, locationDataManager: locationDataManager, destination: destination, routeETA: routeETA, routeDistance: routeDistance, distance: distance, instruction: $instruction, nextStepLocation: $nextStepLocation)
+                MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showSheet: $showSheet, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeETA: routeETA, routeDistance: routeDistance, distance: distance, instruction: $instruction, nextStepLocation: $nextStepLocation)
                     if showDirectionsList {
                         ExpandedDirectionsView(stepInstructions: stepInstructions,  showDirectionsList: $showDirectionsList)
                     }
-                }
+             //   }
                 
                 if !localSearch.searchedLocations.isEmpty {
                     ListView(localSearch: localSearch, searchedLocationText: $searchedLocationText, isLocationSelected: $isLocationSelected)
@@ -94,9 +96,6 @@ struct Map: View {
 }
     ///custom function takes the DragGesture value. custom function we calculate the distance of the drag from 2D cooridinates of starting and ennding points. then we check if the distance is more than 10. if so, we undo the user-location re-center button tap.
     func dragGestureAction(value: DragGesture.Value) {
-        if mapViewStatus == .showingDirections {
-         //return
-        }
         ///get the distance of the user drag in x direction by measuring a difference between starting point and ending point in x direction
         let x = abs(value.location.x - value.startLocation.x)
         ///get the distance of the user drag in y direction by measuring a difference between starting point and ending point in y direction
@@ -110,6 +109,9 @@ struct Map: View {
                 mapViewStatus = .inNavigationNotCentered
                 mapViewAction = .idleInNavigation
             }
+            else if mapViewStatus == .showingDirections || mapViewStatus == .showingDirectionsNotCentered {
+                mapViewAction = .idleInshowDirections
+               }
             else {
                 mapViewStatus = .notCentered
                 mapViewAction = .idle
@@ -121,17 +123,7 @@ struct Map: View {
         print("map is out of center: \(mapViewStatus)")
     }
         
-    func convertToString(from number: Double) -> String {
-        var number = number
-        if number > 1000 {
-           number = number/1000
-            return String(format:"%.1f", number) + " km"
-        }
-        else {
-           let num = Int(number)
-            return String(num) + " m"
-        }
-    }
+  
 //    func speech() {
 //        if instruction.isEmpty {
 //            return
@@ -148,14 +140,7 @@ struct Map: View {
 //        let speech = "in \(nextStepDistance)," + instruction
 //        synthesizer.speak(AVSpeechUtterance(string: speech))
 //    }
-    
-  
-   
 }
-
-
-
-
 
 struct Map_Previews: PreviewProvider {
     static var previews: some View {

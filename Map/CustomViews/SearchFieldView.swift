@@ -17,23 +17,35 @@ struct SearchFieldView: View {
     @StateObject var localSearch: LocalSearch
     var body: some View {
         HStack {
-            Image(systemName: "magnifyingglass")
-                .padding(.horizontal, 10)
-                .foregroundColor(.gray)
-            TextField("Search for a location", text: $searchedLocationText)
-                .padding(10)
-                .focused($enableSearchFieldFocus)
-                //when the text in a searchable field changes this method will be called and it will perform a method put inside perform parameter.
-                .onChange(of: searchedLocationText, perform: handleLocationSearch)
-                .onTapGesture(perform: prepareSearchfield)
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .padding(.leading, 5)
+                TextField("Search for a location", text: $searchedLocationText)
+                    .focused($enableSearchFieldFocus)
+                    //when the text in a searchable field changes this method will be called and it will perform a method put inside perform parameter.
+                    .onChange(of: searchedLocationText, perform: handleLocationSearch)
+                    .onTapGesture(perform: prepareSearchfield)
+            }
+            .frame(height: 40)
+            .background(.ultraThinMaterial)
+            .cornerRadius(5)
+            .padding(5)
             if enableSearchFieldFocus {
                 Button("Cancel", action: clearSearchfield)
                 .background(.clear)
+                .disabled(false)
             }
-            
+            else {
+                Button("Cancel", action: clearSearchfield)
+                .background(.clear)
+                .hidden()
+                .disabled(/*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+            }
+                          
         }
-        .padding(10)
-        .cornerRadius(40)
+       
+        
+      //  .border(Color.red, width: 5.0)
     }
     func handleLocationSearch(forUserInput text:String) {
         ///if location is selected or search is cancelled
@@ -68,7 +80,7 @@ struct SearchFieldView: View {
         searchedLocationText = ""
         ///cancel the search operations
         isSearchCancelled = true
-       
+        localSearch.tappedLocation = nil
         isLocationSelected = false
         ///un-focus the search field.
         enableSearchFieldFocus = false

@@ -31,19 +31,19 @@ struct DirectionsView: View {
                     Text(instruction)
                         .padding(10)
                         .font(.title3)
-                        .background(.black)
+                     //   .background(.black)
                     //  .onAppear(perform: speech)
                     // .onChange(of: instruction, speech)
                 } else {
                     Text(instruction)
                         .padding(10)
                         .font(.title3)
-                        .background(.black)
+                    //    .background(.black)
                 }
                 
-              
+                Spacer()
             }
-            .background(.black)
+           // .background(.black.gradient)
             .onTapGesture {
                 withAnimation {
                     showDirectionsList.toggle()
@@ -61,7 +61,8 @@ struct DirectionsView: View {
            
            
         }
-        .background(.black)
+        .padding(.horizontal,10)
+        .background(Color.black.gradient)
     }
 }
 

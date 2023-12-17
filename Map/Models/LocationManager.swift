@@ -83,7 +83,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     
     //this method will be called whenever a new user location is available.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print("location udpated...")
+    //    print("location udpated...")
         if lastLocation == nil {
             lastLocation = locations.first
         }
@@ -91,13 +91,13 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         if self.throughfare == nil && self.userlocation != nil {
             ///task is a struck type of swift that allows execution of the code asynchronously
             Task(operation: {
-                print("geocoding first time")
+               // print("geocoding first time")
                     if let placemarks = try? await CLGeocoder().reverseGeocodeLocation(self.userlocation!) {
                         if let placemark = placemarks.first {
                             DispatchQueue.main.async {
                                 self.throughfare = placemark.thoroughfare
                             }
-                            print("through fare is:\(self.throughfare ?? "")")
+                          //  print("through fare is:\(self.throughfare ?? "")")
                         }
                     }
                 
