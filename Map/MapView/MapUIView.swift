@@ -85,22 +85,6 @@ struct MapView: UIViewRepresentable {
             parent.mapError = Errors.locationNotFound
         }
         
-//        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-//            if annotation is MKPointAnnotation {
-//            
-//                let view = MKAnnotationView(annotation: annotation, reuseIdentifier: "user")
-//                view.image = UIImage(systemName: "house")
-//                view.backgroundColor = UIColor.blue
-//                return view
-//            }
-//            else {
-//                let view = MKAnnotationView(annotation: annotation, reuseIdentifier: "user")
-//                view.image = UIImage(systemName: "mappin")
-//                view.backgroundColor = UIColor.red
-//                return view
-//            }
-//        }
-        
        ///this function will be called once the overlay is added to the mapview object
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
 
@@ -133,21 +117,23 @@ struct MapView: UIViewRepresentable {
             // if the track location button is tapped
             switch parent.mapViewAction {
                 case .idle:
-                print("idle mode")
                
                 if let searchedLocation = parent.localSearch.tappedLocation {
                     parent.searchLocationInterface(in: mapView, for: searchedLocation) {
-                     
                     }
                 }
                 else {
-                    mapView.removeAnnotations(mapView.annotations)
+                    if !mapView.annotations.isEmpty {
+                        mapView.removeAnnotations(mapView.annotations)
+                    }
                 }
-                MapViewAPI.resetLocationTracking(of: mapView, parent: &parent)
-                parent.mapViewStatus = .idle
-                parent.routeETA = ""
-                parent.routeDistance = ""
-                
+                if parent.mapViewStatus != .idle {
+                    MapViewAPI.resetLocationTracking(of: mapView, parent: &parent)
+                    parent.routeETA = ""
+                    parent.routeDistance = ""
+                    parent.mapViewStatus = .idle
+                }
+               
                     break
                 case .idleInshowDirections:
                     mapView.setUserTrackingMode(.none, animated: true)
@@ -225,20 +211,25 @@ struct MapView: UIViewRepresentable {
                 }
             else {
                 DispatchQueue.main.async {
-                    uiView.removeAnnotations(uiView.annotations)
+                    if !uiView.annotations.isEmpty {
+                        uiView.removeAnnotations(uiView.annotations)
+                    }
                 }
             }
-            DispatchQueue.main.async {
-                self.instruction = ""
-                self.routeETA = ""
-                self.routeDistance = ""
-        ///reset the properties of this instance class
-                MapViewAPI.resetProps()
-        
-        ///undoing user tracking to none.
-                uiView.setUserTrackingMode(.none, animated: true)
+            if self.mapViewStatus != .idle {
+                DispatchQueue.main.async {
+                   
+            ///reset the properties of this instance class
+                    MapViewAPI.resetProps()
+            
+            ///undoing user tracking to none.
+                    uiView.setUserTrackingMode(.none, animated: true)
+                    self.instruction = ""
+                    self.routeETA = ""
+                    self.routeDistance = ""
+                    self.mapViewStatus = .idle
+                }
             }
-           // print("reset location tracking.")
                 break
             case .idleInshowDirections:
                 uiView.setUserTrackingMode(.none, animated: true)
@@ -257,10 +248,21 @@ struct MapView: UIViewRepresentable {
                 }
             else {
                 DispatchQueue.main.async {
-                    uiView.removeAnnotations(uiView.annotations)
-                    uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
+                    if uiView.annotations.isEmpty {
+                        uiView.removeAnnotations(uiView.annotations)
+                    }
+                   
                 }
             }
+            if self.mapViewStatus != .centeredToUserLocation {
+                DispatchQueue.main.async {
+                    uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
+                    self.mapViewStatus = .centeredToUserLocation
+                }
+            }
+            
+     
+            
          //   print("map is centering")
               
                 break
@@ -274,8 +276,8 @@ struct MapView: UIViewRepresentable {
                break
             case .navigate:
             if mapViewStatus != .navigating {
-//                MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: self.locationDataManager.userHeading)
-//                MapViewAPI.startNavigation(in: uiView, parent: &context.coordinator.parent)
+                MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: self.locationDataManager.userHeading)
+                MapViewAPI.startNavigation(in: uiView, parent: &context.coordinator.parent)
             }
                 break
             case .showDirections:
