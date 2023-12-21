@@ -82,7 +82,7 @@ struct Map: View {
                 
               //  if localSearch.tappedLocation != nil {
                 //navigation mode button to switch between navigation modes.
-                MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showSheet: $showSheet, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeETA: routeETA, routeDistance: routeDistance, distance: distance, instruction: $instruction, nextStepLocation: $nextStepLocation)
+                MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showSheet: $showSheet, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeETA: routeETA, routeDistance: routeDistance, distance: distance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions)
                     if showDirectionsList {
                         ExpandedDirectionsView(stepInstructions: stepInstructions,  showDirectionsList: $showDirectionsList)
                     }

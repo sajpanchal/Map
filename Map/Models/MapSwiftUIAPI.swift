@@ -9,7 +9,7 @@ import Foundation
 
 func getDirectionSign(for step: String) -> String {
     let instruction = step.lowercased()
-    print("instruction is: \(instruction)")
+
     if instruction.contains("turn left") {
         return "arrow.turn.up.left"
     }

@@ -62,7 +62,7 @@ class MapViewAPI {
     static func resetLocationTracking(of mapView: MKMapView, parent: inout MapView) {
         ///clear the instruction field
      
-            parent.instruction = ""
+        parent.instruction = ""
         parent.stepInstructions.removeAll()
         if parent.locationDataManager.distance != nil {
             parent.locationDataManager.distance = nil
@@ -86,7 +86,7 @@ class MapViewAPI {
         if mapView.centerCoordinate.latitude != annotation.coordinate.latitude && mapView.centerCoordinate.longitude != annotation.coordinate.longitude {
             ///if not centred, centre the mapview to searched location.
             mapView.animatedZoom(zoomRegion: MKCoordinateRegion(center: annotation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
-            print("map is centered to user location.")
+        
         }
     }
     ///this function will send the route directions request between the two locations annotated in the mapview
@@ -143,7 +143,7 @@ class MapViewAPI {
                         ///add the polyline received from the route as an overlay to be displayed in mapview.
                        uiView.addOverlay(polyline)
                     }
-                    print("showing routing directions on map.")
+                  
                 }
                 ///if the direction request doesn't get a response, handle the error.
                 else {
@@ -158,8 +158,8 @@ class MapViewAPI {
     
      static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
         var index = 0
-     //    parent.mapViewStatus = .navigating
-        
+         parent.mapViewStatus = .navigating
+        print("starting navigation")
         ///if there are more than 1 overlays, find the one that is desired.
         if mapView.overlays.count > 1 {
             getDesiredRouteAndOvarlay(for: mapView)
@@ -167,12 +167,16 @@ class MapViewAPI {
         }
         if let route = routes.first {
            
-            print("selected route is: \(route.polyline.title ?? "")")
+          
             if parent.stepInstructions.isEmpty {
                 for step in route.steps {
                     print("step instruction: \(step.instructions)")
                     if !step.instructions.isEmpty {
-                        parent.stepInstructions.append((step.instructions, step.distance))
+                        
+                            parent.stepInstructions.append((step.instructions, step.distance))
+                      //  print("list step instruction: \(parent.stepInstructions.last)")
+                        
+                      
                     }
                 }
             }
@@ -225,7 +229,7 @@ class MapViewAPI {
                         ///if the user location is near 15 m of any of the given step points, update to that step instructions and make nextIndex set to the next step index.
                         if nextIndex == stepIndex && pointsArray[stepIndex].contains(where: { $0.distance(to: userPoint) < 15})  {
                             let via = route.polyline.title?.split(separator: ", ")
-                            print("via...",String(via?[1] ?? ""))
+                         
                             updateStepInstructions(step: step, instruction: (step.instructions == "" ? "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(String(via?[1] ?? ""))" : step.instructions), parent: &parent, stepIndex: stepIndex)
                             break
                             }
@@ -241,12 +245,12 @@ class MapViewAPI {
                 calculateDistance(from: nextStepLocation, to: userLocation, parent: &parent)
             }
         }
-        print("map is in navigation mode.")
+   
     }
         
     ///function that handles overlay tap events
     static func isOvarlayTapped(in mapView: MKMapView, by tapGestureRecognizer: UITapGestureRecognizer) -> (Bool,String) {
-        print("tapped on a mapview")
+ 
         ///get the tapped location in the mapview as CGPoint format
         let tapLocation = tapGestureRecognizer.location(in: mapView)
         ///initiate the tap flag to false
@@ -267,7 +271,7 @@ class MapViewAPI {
             if renderer.path.contains(rendererPoint) {
                 ///if yes, set the title as render polyline title.
                 title = renderer.polyline.title ?? ""
-                print("tap is on the polyline")
+              
             }
         }
         ///if title is not empty set the flag
@@ -332,9 +336,7 @@ extension MapViewAPI {
             if let overlay = mapView.overlays.first {
                 let renderer = MKPolylineRenderer(overlay: overlay)
                 routes.removeAll(where: {
-                    print("is route and renderer polyline same? ", $0.polyline.isEqual(renderer.polyline))
-                    print("route description: \($0.polyline.debugDescription)")
-                    print("route title is:\($0.polyline.title ?? ""), \n render title is:\(renderer.polyline.title ?? "")")
+                 
                     return !$0.polyline.isEqual(renderer.polyline)
                     
                 })
@@ -375,7 +377,7 @@ extension MapViewAPI {
         
         if let point = points.last, let length = length.last {
             pointsArray.append(UnsafeBufferPointer(start: point, count: length < 5 ? length : 5))
-            print("pointsArray count:\(pointsArray.count))")
+ 
         }
        
             isStepPointsFetched[stepIndex] = true

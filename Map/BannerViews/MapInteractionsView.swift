@@ -19,6 +19,7 @@ struct MapInteractionsView: View {
     var distance: String
     @Binding var instruction: String
     @Binding var nextStepLocation: CLLocation?
+    @Binding var stepInstructions: [(String, Double)]
     var body: some View {
         VStack(spacing: 0) {
            Spacer()
@@ -168,6 +169,7 @@ struct MapInteractionsView: View {
             break
         case .navigating, .inNavigationCentered, .inNavigationNotCentered:
             mapViewAction = .idle
+            stepInstructions.removeAll()
             instruction = ""
             nextStepLocation = nil
            
@@ -186,5 +188,5 @@ struct MapInteractionsView: View {
 }
 
 #Preview {
-    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showSheet: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeETA: "", routeDistance: "", distance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()))
+    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showSheet: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeETA: "", routeDistance: "", distance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]))
 }

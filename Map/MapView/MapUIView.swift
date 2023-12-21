@@ -146,11 +146,12 @@ struct MapView: UIViewRepresentable {
                 case .inNavigationCenterToUserLocation:
                     fallthrough
                 case .navigate:
+               // parent.mapViewStatus = .navigating
                     MapViewAPI.setCameraRegion(of: mapView, centeredAt: userLocation, userHeading: parent.locationDataManager.userHeading)
                     MapViewAPI.startNavigation(in: mapView, parent: &parent)
                     ///if user heading is not nil
                 if parent.locationDataManager.userHeading != nil {
-                        parent.mapViewStatus = .navigating
+                       
                     }
                     ///if heading is found nil
                     else {
@@ -271,17 +272,25 @@ struct MapView: UIViewRepresentable {
                     //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
                     //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
                     MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: heading)
-                  //  mapViewStatus = .inNavigationCentered
                 }
                break
             case .navigate:
             if mapViewStatus != .navigating {
+                
+              
+                print("navigating from update UIView.")
                 MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: self.locationDataManager.userHeading)
-                MapViewAPI.startNavigation(in: uiView, parent: &context.coordinator.parent)
+                DispatchQueue.main.async {
+                    MapViewAPI.startNavigation(in: uiView, parent: &context.coordinator.parent)
+                }
+              
+                
+             
             }
                 break
             case .showDirections:
               //  parent.mapViewStatus = .showingDirections
+            print("show directions status")
                 if isSearchCancelled {
                     print("search cancelled....")
                     uiView.removeAnnotations(uiView.annotations)
