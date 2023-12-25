@@ -122,16 +122,18 @@ struct MapView: UIViewRepresentable {
                     parent.mapViewStatus = .idle
                 }
                 guard let searchedLocation = parent.localSearch.tappedLocation else {
+                    print("searchedLocation is available")
                     if !mapView.overlays.isEmpty {
                         print("removing overlays")
                         mapView.removeOverlays(mapView.overlays)
                     }
-                    if !mapView.annotations.isEmpty && parent.localSearch.searchableText.isEmpty {
+                    if !mapView.annotations.isEmpty {
                         print("removing annotations!")
                         mapView.removeAnnotations(mapView.annotations)
                     }
                     return
                 }
+                print("isseachcancelled? ", parent.isSearchCancelled)
                 parent.searchLocationInterface(in: mapView, for: searchedLocation.first!) {
                 }
                
@@ -228,7 +230,7 @@ struct MapView: UIViewRepresentable {
                         print("removing overlays")
                         uiView.removeOverlays(uiView.overlays)
                     }
-                    if !uiView.annotations.isEmpty && self.localSearch.searchableText.isEmpty {
+                    if !uiView.annotations.isEmpty  {
                         print("removing annotations!")
                         uiView.removeAnnotations(uiView.annotations)
                     }
@@ -336,8 +338,6 @@ extension MapView {
                 uiView.removeOverlays(uiView.overlays)
                 self.isLocationSelected = false
             }
-           
-            
         }
         else if isSearchCancelled {
             print("location cancelled")

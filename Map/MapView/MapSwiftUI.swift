@@ -116,9 +116,7 @@ struct Map: View {
                 mapViewStatus = .notCentered
                 mapViewAction = .idle
             }
-            if isLocationSelected {
-                isLocationSelected = false
-            }
+            
         }
         print("map is out of center: \(mapViewStatus)")
     }
