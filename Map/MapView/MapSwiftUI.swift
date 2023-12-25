@@ -88,7 +88,7 @@ struct Map: View {
                     }
              //   }
                 
-                if !localSearch.searchedLocations.isEmpty {
+                if !$localSearch.results.isEmpty {
                     ListView(localSearch: localSearch, searchedLocationText: $searchedLocationText, isLocationSelected: $isLocationSelected)
                 }
         }

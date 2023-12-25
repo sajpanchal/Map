@@ -119,12 +119,15 @@ struct MapView: UIViewRepresentable {
                 case .idle:
                
                 if let searchedLocation = parent.localSearch.tappedLocation {
-                    parent.searchLocationInterface(in: mapView, for: searchedLocation) {
+                    parent.searchLocationInterface(in: mapView, for: searchedLocation.first!) {
                     }
                 }
                 else {
                     if !mapView.annotations.isEmpty {
                         mapView.removeAnnotations(mapView.annotations)
+                    }
+                    if !mapView.overlays.isEmpty {
+                        mapView.removeOverlays(mapView.overlays)
                     }
                 }
                 if parent.mapViewStatus != .idle {
@@ -175,7 +178,7 @@ struct MapView: UIViewRepresentable {
                 }
                 else {
                     mapView.showAnnotations(mapView.annotations, animated: true)
-                    MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: parent.localSearch.tappedLocation?.coordinate)
+                    MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: parent.localSearch.tappedLocation?.first?.coordinate)
                    
                 }
                 parent.mapViewStatus = .showingDirections
@@ -205,8 +208,8 @@ struct MapView: UIViewRepresentable {
         switch mapViewAction {
             case .idle:
           //  print("search cancel status....: \(isSearchCancelled)")
-                if let searchedLocation = localSearch.tappedLocation {
-                    searchLocationInterface(in: uiView, for: searchedLocation) {
+            if let searchedLocation = localSearch.tappedLocation {
+                searchLocationInterface(in: uiView, for: searchedLocation.first!) {
                         
                     }
                 }
@@ -214,6 +217,9 @@ struct MapView: UIViewRepresentable {
                 DispatchQueue.main.async {
                     if !uiView.annotations.isEmpty {
                         uiView.removeAnnotations(uiView.annotations)
+                    }
+                    if !uiView.overlays.isEmpty {
+                        uiView.removeOverlays(uiView.overlays)
                     }
                 }
             }
@@ -240,8 +246,8 @@ struct MapView: UIViewRepresentable {
                 break
             case.centerToUserLocation:
             
-                if let searchedLocation = localSearch.tappedLocation {
-                    searchLocationInterface(in: uiView, for: searchedLocation) {
+            if let searchedLocation = localSearch.tappedLocation {
+                searchLocationInterface(in: uiView, for: searchedLocation.first!) {
                         DispatchQueue.main.async {
                           
                         }
@@ -251,6 +257,9 @@ struct MapView: UIViewRepresentable {
                 DispatchQueue.main.async {
                     if uiView.annotations.isEmpty {
                         uiView.removeAnnotations(uiView.annotations)
+                    }
+                    if !uiView.overlays.isEmpty {
+                        uiView.removeOverlays(uiView.overlays)
                     }
                    
                 }
@@ -309,7 +318,7 @@ struct MapView: UIViewRepresentable {
                         self.isLocationSelected = true
                     }
                    
-                    MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: localSearch.tappedLocation?.coordinate)
+                    MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: localSearch.tappedLocation?.first?.coordinate)
                     uiView.showAnnotations(uiView.annotations, animated: true)
                 }
          

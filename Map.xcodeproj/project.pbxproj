@@ -7,11 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		72053A852A9510AA00B1D3FC /* SearchedLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72053A842A9510AA00B1D3FC /* SearchedLocation.swift */; };
 		72053A872A951D5000B1D3FC /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72053A862A951D5000B1D3FC /* ListView.swift */; };
 		7223439C2A8FD61F00DC7120 /* MapViewButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7223439B2A8FD61E00DC7120 /* MapViewButton.swift */; };
 		7223439E2A8FD6ED00DC7120 /* MapProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7223439D2A8FD6ED00DC7120 /* MapProgressView.swift */; };
-		725EF4E02A91089B000FB0E1 /* MapViewAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725EF4DF2A91089B000FB0E1 /* MapViewAPI.swift */; };
+		725EF4E02A91089B000FB0E1 /* MapUIViewAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725EF4DF2A91089B000FB0E1 /* MapUIViewAPI.swift */; };
 		726754232A7C004000CE6F46 /* MapApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 726754222A7C004000CE6F46 /* MapApp.swift */; };
 		726754252A7C004000CE6F46 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 726754242A7C004000CE6F46 /* ContentView.swift */; };
 		726754272A7C004200CE6F46 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 726754262A7C004200CE6F46 /* Assets.xcassets */; };
@@ -22,6 +21,8 @@
 		7267544E2A7C051500CE6F46 /* MapUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267544D2A7C051500CE6F46 /* MapUIView.swift */; };
 		726754502A7C077500CE6F46 /* MapSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267544F2A7C077500CE6F46 /* MapSwiftUI.swift */; };
 		7271514D2A7D53B200B20767 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7271514C2A7D53B200B20767 /* LocationManager.swift */; };
+		727F5E072B34C748000ECCB7 /* LocalSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727F5E062B34C748000ECCB7 /* LocalSearch.swift */; };
+		727F5E092B34C7C8000ECCB7 /* AddressResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727F5E082B34C7C8000ECCB7 /* AddressResult.swift */; };
 		72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */; };
 		72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A62A9911FC0073CCC5 /* Enums.swift */; };
 		72EDE4142B2631D800578B8A /* DirectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EDE4132B2631D800578B8A /* DirectionsView.swift */; };
@@ -49,11 +50,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		72053A842A9510AA00B1D3FC /* SearchedLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchedLocation.swift; sourceTree = "<group>"; };
 		72053A862A951D5000B1D3FC /* ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListView.swift; sourceTree = "<group>"; };
 		7223439B2A8FD61E00DC7120 /* MapViewButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewButton.swift; sourceTree = "<group>"; };
 		7223439D2A8FD6ED00DC7120 /* MapProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapProgressView.swift; sourceTree = "<group>"; };
-		725EF4DF2A91089B000FB0E1 /* MapViewAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewAPI.swift; sourceTree = "<group>"; };
+		725EF4DF2A91089B000FB0E1 /* MapUIViewAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapUIViewAPI.swift; sourceTree = "<group>"; };
 		7267541F2A7C004000CE6F46 /* Map.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Map.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		726754222A7C004000CE6F46 /* MapApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapApp.swift; sourceTree = "<group>"; };
 		726754242A7C004000CE6F46 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -67,6 +67,8 @@
 		7267544D2A7C051500CE6F46 /* MapUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapUIView.swift; sourceTree = "<group>"; };
 		7267544F2A7C077500CE6F46 /* MapSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSwiftUI.swift; sourceTree = "<group>"; };
 		7271514C2A7D53B200B20767 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		727F5E062B34C748000ECCB7 /* LocalSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocalSearch.swift; path = ../MapView/LocalSearch.swift; sourceTree = "<group>"; };
+		727F5E082B34C7C8000ECCB7 /* AddressResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressResult.swift; sourceTree = "<group>"; };
 		72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFieldView.swift; sourceTree = "<group>"; };
 		72C3D8A62A9911FC0073CCC5 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		72D68E2E2B1199DF00756253 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -106,9 +108,9 @@
 			isa = PBXGroup;
 			children = (
 				7271514C2A7D53B200B20767 /* LocationManager.swift */,
-				72053A842A9510AA00B1D3FC /* SearchedLocation.swift */,
+				727F5E062B34C748000ECCB7 /* LocalSearch.swift */,
+				727F5E082B34C7C8000ECCB7 /* AddressResult.swift */,
 				72C3D8A62A9911FC0073CCC5 /* Enums.swift */,
-				72EDE41C2B26457A00578B8A /* MapSwiftUIAPI.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -116,6 +118,8 @@
 		7223439A2A8FD57500DC7120 /* CustomViews */ = {
 			isa = PBXGroup;
 			children = (
+				72EDE4132B2631D800578B8A /* DirectionsView.swift */,
+				72EDE4182B26372D00578B8A /* MapInteractionsView.swift */,
 				7223439B2A8FD61E00DC7120 /* MapViewButton.swift */,
 				7223439D2A8FD6ED00DC7120 /* MapProgressView.swift */,
 				72053A862A951D5000B1D3FC /* ListView.swift */,
@@ -124,14 +128,6 @@
 				72EDE41A2B26408A00578B8A /* ExpandedDirectionsView.swift */,
 			);
 			path = CustomViews;
-			sourceTree = "<group>";
-		};
-		725EF4DE2A910861000FB0E1 /* MapUIViewAPI */ = {
-			isa = PBXGroup;
-			children = (
-				725EF4DF2A91089B000FB0E1 /* MapViewAPI.swift */,
-			);
-			path = MapUIViewAPI;
 			sourceTree = "<group>";
 		};
 		726754162A7C004000CE6F46 = {
@@ -157,7 +153,7 @@
 		726754212A7C004000CE6F46 /* Map */ = {
 			isa = PBXGroup;
 			children = (
-				72EDE4172B2633E400578B8A /* BannerViews */,
+				72C5E9A32B36072600B8C0E4 /* APIs */,
 				72053A832A95107500B1D3FC /* Models */,
 				7223439A2A8FD57500DC7120 /* CustomViews */,
 				7267544C2A7C04E300CE6F46 /* MapView */,
@@ -198,20 +194,19 @@
 		7267544C2A7C04E300CE6F46 /* MapView */ = {
 			isa = PBXGroup;
 			children = (
-				725EF4DE2A910861000FB0E1 /* MapUIViewAPI */,
 				7267544D2A7C051500CE6F46 /* MapUIView.swift */,
 				7267544F2A7C077500CE6F46 /* MapSwiftUI.swift */,
 			);
 			path = MapView;
 			sourceTree = "<group>";
 		};
-		72EDE4172B2633E400578B8A /* BannerViews */ = {
+		72C5E9A32B36072600B8C0E4 /* APIs */ = {
 			isa = PBXGroup;
 			children = (
-				72EDE4132B2631D800578B8A /* DirectionsView.swift */,
-				72EDE4182B26372D00578B8A /* MapInteractionsView.swift */,
+				725EF4DF2A91089B000FB0E1 /* MapUIViewAPI.swift */,
+				72EDE41C2B26457A00578B8A /* MapSwiftUIAPI.swift */,
 			);
-			path = BannerViews;
+			path = APIs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -350,13 +345,14 @@
 				72053A872A951D5000B1D3FC /* ListView.swift in Sources */,
 				726754502A7C077500CE6F46 /* MapSwiftUI.swift in Sources */,
 				7271514D2A7D53B200B20767 /* LocationManager.swift in Sources */,
+				727F5E072B34C748000ECCB7 /* LocalSearch.swift in Sources */,
 				72EDE4162B26334E00578B8A /* ExpandViewSymbol.swift in Sources */,
 				7267544E2A7C051500CE6F46 /* MapUIView.swift in Sources */,
 				72EDE4192B26372D00578B8A /* MapInteractionsView.swift in Sources */,
 				7223439C2A8FD61F00DC7120 /* MapViewButton.swift in Sources */,
-				725EF4E02A91089B000FB0E1 /* MapViewAPI.swift in Sources */,
+				725EF4E02A91089B000FB0E1 /* MapUIViewAPI.swift in Sources */,
 				726754232A7C004000CE6F46 /* MapApp.swift in Sources */,
-				72053A852A9510AA00B1D3FC /* SearchedLocation.swift in Sources */,
+				727F5E092B34C7C8000ECCB7 /* AddressResult.swift in Sources */,
 				72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */,
 				72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */,
 				72EDE41D2B26457A00578B8A /* MapSwiftUIAPI.swift in Sources */,
@@ -531,13 +527,17 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MyMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -564,13 +564,17 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MyMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;

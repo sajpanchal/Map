@@ -15,10 +15,10 @@ struct ListView: View {
     @Binding var isLocationSelected: Bool
     var body: some View {
         List {
-            ForEach(localSearch.searchedLocations, id:\.self.id) { suggestion in
+            ForEach(localSearch.results, id:\.self.id) { suggestion in
                 VStack {
                     HStack {
-                        Text("\(suggestion.name)")
+                        Text("\(suggestion.title)")
                             .font(.body)
                             .fontWeight(.bold)
                         Spacer()
@@ -31,10 +31,9 @@ struct ListView: View {
                     }
                 }
                 .onTapGesture {
-                    localSearch.tappedLocation = suggestion.annotation
-                    searchedLocationText = (searchedLocationText == suggestion.name) ? (suggestion.name + " ") : suggestion.name
+                    localSearch.getPlace(from: suggestion)
+                    searchedLocationText = (searchedLocationText == suggestion.title) ? (suggestion.title + " ") : suggestion.title
                     isLocationSelected = true
-                   // localSearch.c.removeAll()
                     print("tapped list item")
                
                 }

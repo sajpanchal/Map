@@ -184,12 +184,12 @@ class MapViewAPI {
             parent.routeETA = String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
             if parent.locationDataManager.distance == nil {
                 parent.locationDataManager.distance = Double(route.distance/1000.0)
-                let destination = parent.localSearch.tappedLocation?.title
+                let destination = parent.localSearch.tappedLocation?.first?.title
                 parent.distance = String(format:"%.1f", parent.locationDataManager.distance!) + " km"
                 parent.destination = (destination ?? "") ?? ""
             }
             else {
-                let destination = parent.localSearch.tappedLocation?.title
+                let destination = parent.localSearch.tappedLocation?.first?.title
                 parent.distance = String(format:"%.1f", parent.locationDataManager.distance!) + " km"
                 parent.destination = (destination ?? "") ?? ""
             }
