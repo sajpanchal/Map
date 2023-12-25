@@ -159,7 +159,8 @@ class MapViewAPI {
      static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
         var index = 0
          parent.mapViewStatus = .navigating
-        print("starting navigation")
+         parent.isLocationSelected = true
+         print("starting navigation \(parent.isLocationSelected), \(parent.isSearchCancelled)")
         ///if there are more than 1 overlays, find the one that is desired.
         if mapView.overlays.count > 1 {
             getDesiredRouteAndOvarlay(for: mapView)

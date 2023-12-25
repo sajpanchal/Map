@@ -23,7 +23,9 @@ struct SearchFieldView: View {
                 TextField("Search for a location", text: $searchedLocationText)
                     .focused($enableSearchFieldFocus)
                     //when the text in a searchable field changes this method will be called and it will perform a method put inside perform parameter.
-                    .onChange(of: searchedLocationText, perform: handleLocationSearch)
+                    .onChange(of: searchedLocationText) {
+                        handleLocationSearch(forUserInput: searchedLocationText)
+                    }
                     .onTapGesture(perform: prepareSearchfield)
             }
             .frame(height: 40)

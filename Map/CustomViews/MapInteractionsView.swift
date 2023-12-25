@@ -169,6 +169,7 @@ struct MapInteractionsView: View {
             break
         case .navigating, .inNavigationCentered, .inNavigationNotCentered:
             mapViewAction = .idle
+         
             stepInstructions.removeAll()
             instruction = ""
             nextStepLocation = nil
