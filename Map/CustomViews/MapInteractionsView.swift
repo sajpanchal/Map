@@ -14,9 +14,9 @@ struct MapInteractionsView: View {
     @StateObject var locationDataManager: LocationDataManager
     @StateObject var localSearch: LocalSearch
     var destination: String
-    var routeETA: String
-    var routeDistance: String
-    var distance: String
+    @Binding var routeETA: String
+    @Binding var routeDistance: String
+    var remainingDistance: String
     @Binding var instruction: String
     @Binding var nextStepLocation: CLLocation?
     @Binding var stepInstructions: [(String, Double)]
@@ -33,7 +33,7 @@ struct MapInteractionsView: View {
                 MapViewButton(imageName: mapViewStatus == .centeredToUserLocation ? "circle" : "circle.fill")
                     .gesture(TapGesture().onEnded(centerMapToUserLocation))
             }
-            if localSearch.tappedLocation != nil {
+            if localSearch.suggestedLocations != nil {
                 VStack {
                     if mapViewStatus == .navigating {
                   
@@ -97,7 +97,7 @@ struct MapInteractionsView: View {
                                     Text(routeDistance)
                                 }
                                 else if mapViewStatus == .navigating {
-                                    Text(distance)
+                                    Text(remainingDistance)
                                         .font(.title2)
                                         .fontWeight(.black)
                                     Text("Remaining")
@@ -169,7 +169,8 @@ struct MapInteractionsView: View {
             break
         case .navigating, .inNavigationCentered, .inNavigationNotCentered:
             mapViewAction = .idle
-         
+            self.routeETA = ""
+            routeDistance = ""
             stepInstructions.removeAll()
             instruction = ""
             nextStepLocation = nil
@@ -189,5 +190,5 @@ struct MapInteractionsView: View {
 }
 
 #Preview {
-    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showSheet: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeETA: "", routeDistance: "", distance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]))
+    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showSheet: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeETA: .constant(""), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]))
 }

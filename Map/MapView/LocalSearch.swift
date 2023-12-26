@@ -11,7 +11,7 @@ import MapKit
 class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
     @Published var results: [AddressResult] = []
     @Published var searchableText = ""
-    @Published var tappedLocation: [MKAnnotation]?
+    @Published var suggestedLocations: [MKAnnotation]?
     let request = MKLocalSearch.Request()
     
    private lazy var locationSearchCompleter: MKLocalSearchCompleter = {
@@ -41,7 +41,7 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
     func cancelLocationSearch() {
            let request = MKLocalSearch(request: request)
             request.cancel()
-           self.tappedLocation = nil
+           self.suggestedLocations = nil
            self.results.removeAll()
        }
     func getPlace(from address: AddressResult) {
@@ -55,7 +55,7 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
         Task {
             let response = try await MKLocalSearch(request: request).start()
             await MainActor.run {
-                self.tappedLocation = response.mapItems.map {
+                self.suggestedLocations = response.mapItems.map {
                     let annotation = MKPointAnnotation()
                     annotation.coordinate = $0.placemark.coordinate
                     if let title = $0.placemark.title, let name = $0.name {

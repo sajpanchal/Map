@@ -23,7 +23,7 @@ struct Map: View {
     @State var mapError: Errors = .noError
     ///state variable for searchable text field to search for nearby locations in the map region
     @State var searchedLocationText: String = ""
-    @State var isLocationSelected: Bool = false
+    @State var isDestinationSelected: Bool = false
     @State var instruction: String = ""
     @State var nextStepLocation: CLLocation?
     @StateObject var localSearch = LocalSearch()
@@ -32,7 +32,7 @@ struct Map: View {
     @State var nextStepDistance: String = ""
     @State var routeETA: String = ""
     @State var routeDistance: String = ""
-    @State var distance: String = ""
+    @State var remainingDistance: String = ""
     @State var destination = ""
     @State var showSheet = false
     @State var showDirectionsList = false
@@ -42,7 +42,7 @@ struct Map: View {
         VStack {
         ///ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
             if !isMapInNavigationMode(for: mapViewStatus).0 || isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction) {
-                SearchFieldView(searchedLocationText: $searchedLocationText, isSearchCancelled: $isSearchCancelled, isLocationSelected: $isLocationSelected, region: locationDataManager.region, localSearch: localSearch)
+                SearchFieldView(searchedLocationText: $searchedLocationText, isSearchCancelled: $isSearchCancelled, isDestinationSelected: $isDestinationSelected, region: locationDataManager.region, localSearch: localSearch)
                     .padding(.top, 10)
                     .background(.black)
                 Spacer()
@@ -56,7 +56,7 @@ struct Map: View {
             ///grouping mapview and its associated buttons
                 Group() {
                 ///calling our custom struct that will render UIView for us in swiftui. we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class. we are also passing the state variable called tapped that is bound to the MapView.when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix. we always declare a binding propery in a child component of the associated property from its parent.once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
-                    MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus, isLocationSelected: $isLocationSelected, isSearchCancelled: $isSearchCancelled, instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, status: $status, routeETA: $routeETA, routeDistance: $routeDistance, distance: $distance, destination: $destination, stepInstructions: $stepInstructions)
+                    MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus, isDestinationSelected: $isDestinationSelected, isSearchCancelled: $isSearchCancelled, instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, routeETA: $routeETA, routeDistance: $routeDistance, remainingDistance: $remainingDistance, destination: $destination, stepInstructions: $stepInstructions)
                 ///disable the mapview when track location button is tapped but tracking is not on yet.
                         .disabled(isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction))
                 ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged() action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag. we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
@@ -82,14 +82,14 @@ struct Map: View {
                 
               //  if localSearch.tappedLocation != nil {
                 //navigation mode button to switch between navigation modes.
-                MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showSheet: $showSheet, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeETA: routeETA, routeDistance: routeDistance, distance: distance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions)
+                MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showSheet: $showSheet, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeETA: $routeETA, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions)
                     if showDirectionsList {
                         ExpandedDirectionsView(stepInstructions: stepInstructions,  showDirectionsList: $showDirectionsList)
                     }
              //   }
                 
                 if !$localSearch.results.isEmpty {
-                    ListView(localSearch: localSearch, searchedLocationText: $searchedLocationText, isLocationSelected: $isLocationSelected)
+                    ListView(localSearch: localSearch, searchedLocationText: $searchedLocationText, isDestinationSelected: $isDestinationSelected)
                 }
         }
     }

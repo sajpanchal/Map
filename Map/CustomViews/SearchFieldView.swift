@@ -11,7 +11,7 @@ struct SearchFieldView: View {
     @Binding var searchedLocationText: String
     @FocusState var enableSearchFieldFocus: Bool
     @Binding var isSearchCancelled: Bool
-    @Binding var isLocationSelected: Bool
+    @Binding var isDestinationSelected: Bool
    
     var region: MKCoordinateRegion
     @StateObject var localSearch: LocalSearch
@@ -51,10 +51,10 @@ struct SearchFieldView: View {
     }
     func handleLocationSearch(forUserInput text:String) {
         ///if location is selected or search is cancelled
-        guard !isLocationSelected && !isSearchCancelled else {
+        guard !isDestinationSelected && !isSearchCancelled else {
            ///un-focus the search field
             enableSearchFieldFocus = false
-            if isLocationSelected {
+            if isDestinationSelected {
             }
             ///stop the location search
             localSearch.cancelLocationSearch()
@@ -70,7 +70,7 @@ struct SearchFieldView: View {
     ///when searchfield is tapped this function will be executed.
     func prepareSearchfield() {
         ///location is not selected when we are starting a search.
-        isLocationSelected = false
+        isDestinationSelected = false
         ///this variable is a focusstate type, this is going to be passed to focus() modifier of our searchfield and is responsible to enable and disable the focus.
         enableSearchFieldFocus = true
         ///this variable shows and hides the cancel button
@@ -82,8 +82,8 @@ struct SearchFieldView: View {
         searchedLocationText = ""
         ///cancel the search operations
         isSearchCancelled = true
-        localSearch.tappedLocation = nil
-        isLocationSelected = false
+        localSearch.suggestedLocations = nil
+        isDestinationSelected = false
         ///un-focus the search field.
         enableSearchFieldFocus = false
         
@@ -94,6 +94,6 @@ struct SearchFieldView: View {
 
 struct SearchFieldView_Previews: PreviewProvider {
     static var previews: some View {
-        SearchFieldView(searchedLocationText: .constant(""), isSearchCancelled: .constant(false), isLocationSelected: .constant(false), region: MKCoordinateRegion(), localSearch: LocalSearch())
+        SearchFieldView(searchedLocationText: .constant(""), isSearchCancelled: .constant(false), isDestinationSelected: .constant(false), region: MKCoordinateRegion(), localSearch: LocalSearch())
     }
 }

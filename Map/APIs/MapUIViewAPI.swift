@@ -44,17 +44,17 @@ class MapViewAPI {
     }
     
     static func setCameraRegion(of mapView: MKMapView, centeredAt userLocation: MKUserLocation, userHeading: CLHeading?) {
-        guard userHeading == nil else {
+        guard let heading = userHeading else {
             //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
             //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
-            let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 500, pitch: 0, heading: userHeading!.magneticHeading)
-            
-            DispatchQueue.main.async {
-                //set the mapview camera to our defined object.
-                mapView.setCamera(camera, animated: true)
-                
-            }
             return
+        }
+        let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 500, pitch: 0, heading: heading.magneticHeading)
+        
+        DispatchQueue.main.async {
+            //set the mapview camera to our defined object.
+            mapView.setCamera(camera, animated: true)
+            
         }
         
     }
@@ -160,7 +160,7 @@ class MapViewAPI {
         var index = 0
          parent.mapViewStatus = .navigating
         
-         print("starting navigation \(parent.isLocationSelected), \(parent.isSearchCancelled)")
+         print("starting navigation \(parent.isDestinationSelected), \(parent.isSearchCancelled)")
         ///if there are more than 1 overlays, find the one that is desired.
         if mapView.overlays.count > 1 {
             getDesiredRouteAndOvarlay(for: mapView)
@@ -185,13 +185,13 @@ class MapViewAPI {
             parent.routeETA = String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
             if parent.locationDataManager.distance == nil {
                 parent.locationDataManager.distance = Double(route.distance/1000.0)
-                let destination = parent.localSearch.tappedLocation?.first?.title
-                parent.distance = String(format:"%.1f", parent.locationDataManager.distance!) + " km"
+                let destination = parent.localSearch.suggestedLocations?.first?.title
+                parent.remainingDistance = String(format:"%.1f", parent.locationDataManager.distance!) + " km"
                 parent.destination = (destination ?? "") ?? ""
             }
             else {
-                let destination = parent.localSearch.tappedLocation?.first?.title
-                parent.distance = String(format:"%.1f", parent.locationDataManager.distance!) + " km"
+                let destination = parent.localSearch.suggestedLocations?.first?.title
+                parent.remainingDistance = String(format:"%.1f", parent.locationDataManager.distance!) + " km"
                 parent.destination = (destination ?? "") ?? ""
             }
             parent.routeDistance = String(format:"%.1f",Double(route.distance/1000.0)) + " km"
@@ -394,7 +394,6 @@ extension MapViewAPI {
         parent.stepInstructions.removeAll(where: { $0.0 == instruction})
             ///mark the step polyline subtitle as region exited.
         nextIndex = stepIndex + 1
-        parent.status = "Step #\(nextIndex) is next."
         step.polyline.subtitle = "regionExited"
         parent.locationDataManager.enableGeocoding = false
     }
