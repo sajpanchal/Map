@@ -250,16 +250,15 @@ class MapViewAPI {
     }
         
     ///function that handles overlay tap events
-    static func isOvarlayTapped(in mapView: MKMapView, by tapGestureRecognizer: UITapGestureRecognizer) -> (Bool,String) {
+    static func getTappedOvarlay(in mapView: MKMapView, by tapGestureRecognizer: UITapGestureRecognizer) -> String? {
  
         ///get the tapped location in the mapview as CGPoint format
         let tapLocation = tapGestureRecognizer.location(in: mapView)
-        ///initiate the tap flag to false
-        var isOverlayTapped = false
+
         ///canvert the tapped CGPoint to 2D coordinates.
         let tapCoordinates =  mapView.convert(tapLocation, toCoordinateFrom: mapView)
         ///a variable storing the title of the polyline
-        var title = ""
+        var title: String?
         ///interate through the overlays
         for overlay in mapView.overlays.reversed() {
             ///get the renderer of a given overaly
@@ -271,13 +270,11 @@ class MapViewAPI {
             ///check if the tapped point falls into the render points
             if renderer.path.contains(rendererPoint) {
                 ///if yes, set the title as render polyline title.
-                title = renderer.polyline.title ?? ""
+                title = renderer.polyline.title
               
             }
         }
-        ///if title is not empty set the flag
-        isOverlayTapped = (title == "") ? false : true
-        return (isOverlayTapped, title)
+        return title
     }
     static func setTappedOverlay(in mapView: MKMapView, having title: String, parent: inout MapView) {
         var index = 0

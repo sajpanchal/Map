@@ -82,16 +82,14 @@ struct MapView: UIViewRepresentable {
         }
     
         @objc func handleTapGesture() {
-            ///get the result on tap of mapview
-            let result = MapViewAPI.isOvarlayTapped(in: self.mapView, by: tapGestureRecognizer)
-            ///get the result whether the overlay was tapped or not.
-            isOverlayTapped = result.0
-            ///get the title of the tapped route to identify it from all.
-            let title = result.1
-            ///if the overlay is tapped set the overlay appearance to stand out from other overlays.
-            if isOverlayTapped {
-                MapViewAPI.setTappedOverlay(in: self.mapView, having: title, parent: &self.parent)
+            ///get the given route title on tap of mapview that route
+            guard let title = MapViewAPI.getTappedOvarlay(in: self.mapView, by: tapGestureRecognizer)
+            else {
+                return
             }
+            ///hightlight the tapped overlay
+            MapViewAPI.setTappedOverlay(in: self.mapView, having: title, parent: &self.parent)
+            
         }
         
         ///if mapView couldn't find the user location this function will be called.
