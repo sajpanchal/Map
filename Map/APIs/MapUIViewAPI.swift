@@ -33,7 +33,6 @@ class MapViewAPI {
             DispatchQueue.main.async {
                 //set the mapView region centered to user location with 1000 meters of visible region around it.
                 mapView.region = MKCoordinateRegion(center: userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
-   
             }
                 //assign this region to our parent region.
                 parent.region = mapView.region
@@ -95,7 +94,7 @@ class MapViewAPI {
         if !uiView.overlays.isEmpty {
             return
         }
-     
+       
         ///create an instance of MKDirections request to request the directions.
         let request = MKDirections.Request()
         ///if distination is not nil
@@ -143,6 +142,7 @@ class MapViewAPI {
                         ///add the polyline received from the route as an overlay to be displayed in mapview.
                        uiView.addOverlay(polyline)
                     }
+                    uiView.setVisibleMapRect(uiView.overlays.first!.boundingMapRect, edgePadding: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5), animated: true)
                   
                 }
                 ///if the direction request doesn't get a response, handle the error.
@@ -160,7 +160,7 @@ class MapViewAPI {
         var index = 0
          parent.mapViewStatus = .navigating
         
-         print("starting navigation \(parent.isDestinationSelected), \(parent.isSearchCancelled)")
+         print("starting navigation \(parent.localSearch.isDestinationSelected), \(parent.localSearch.isSearchCancelled)")
         ///if there are more than 1 overlays, find the one that is desired.
         if mapView.overlays.count > 1 {
             getDesiredRouteAndOvarlay(for: mapView)
@@ -175,7 +175,7 @@ class MapViewAPI {
                     if !step.instructions.isEmpty {
                         
                             parent.stepInstructions.append((step.instructions, step.distance))
-                      //  print("list step instruction: \(parent.stepInstructions.last)")
+                 
                         
                       
                     }

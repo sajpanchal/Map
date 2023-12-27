@@ -10,11 +10,10 @@ import MapKit
 struct SearchFieldView: View {
     @Binding var searchedLocationText: String
     @FocusState var enableSearchFieldFocus: Bool
-    @Binding var isSearchCancelled: Bool
-    @Binding var isDestinationSelected: Bool
-   
     var region: MKCoordinateRegion
     @StateObject var localSearch: LocalSearch
+   
+   
     var body: some View {
         HStack {
             HStack {
@@ -41,20 +40,17 @@ struct SearchFieldView: View {
                 Button("Cancel", action: clearSearchfield)
                 .background(.clear)
                 .hidden()
-                .disabled(/*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                .disabled(true)
             }
-                          
         }
-       
-        
-      //  .border(Color.red, width: 5.0)
     }
+    
     func handleLocationSearch(forUserInput text:String) {
         ///if location is selected or search is cancelled
-        guard !isDestinationSelected && !isSearchCancelled else {
+        guard !localSearch.isDestinationSelected && !localSearch.isSearchCancelled else {
            ///un-focus the search field
             enableSearchFieldFocus = false
-            if isDestinationSelected {
+            if localSearch.isDestinationSelected {
             }
             ///stop the location search
             localSearch.cancelLocationSearch()
@@ -70,30 +66,27 @@ struct SearchFieldView: View {
     ///when searchfield is tapped this function will be executed.
     func prepareSearchfield() {
         ///location is not selected when we are starting a search.
-        isDestinationSelected = false
+        localSearch.isDestinationSelected = false
         ///this variable is a focusstate type, this is going to be passed to focus() modifier of our searchfield and is responsible to enable and disable the focus.
         enableSearchFieldFocus = true
         ///this variable shows and hides the cancel button
-        isSearchCancelled = false
+        localSearch.isSearchCancelled = false
     }
     ///when cancel button is tapped
     func clearSearchfield() {
         ///clear the text from searchfield
         searchedLocationText = ""
         ///cancel the search operations
-        isSearchCancelled = true
+        localSearch.isSearchCancelled = true
         localSearch.suggestedLocations = nil
-        isDestinationSelected = false
+        localSearch.isDestinationSelected = false
         ///un-focus the search field.
         enableSearchFieldFocus = false
-        
-     
-    }
-    
+    }    
 }
 
 struct SearchFieldView_Previews: PreviewProvider {
     static var previews: some View {
-        SearchFieldView(searchedLocationText: .constant(""), isSearchCancelled: .constant(false), isDestinationSelected: .constant(false), region: MKCoordinateRegion(), localSearch: LocalSearch())
+        SearchFieldView(searchedLocationText: .constant(""), region: MKCoordinateRegion(), localSearch: LocalSearch())
     }
 }

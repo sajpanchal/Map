@@ -11,6 +11,8 @@ import MapKit
 class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
     @Published var results: [AddressResult] = []
     @Published var searchableText = ""
+    @Published var isSearchCancelled = false
+    @Published var isDestinationSelected = false
     @Published var suggestedLocations: [MKAnnotation]?
     let request = MKLocalSearch.Request()
     

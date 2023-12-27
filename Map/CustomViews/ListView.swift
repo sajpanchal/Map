@@ -12,7 +12,7 @@ struct ListView: View {
     
     @StateObject var localSearch: LocalSearch
     @Binding var searchedLocationText: String
-    @Binding var isDestinationSelected: Bool
+   
     var body: some View {
         List {
             ForEach(localSearch.results, id:\.self.id) { suggestion in
@@ -33,7 +33,7 @@ struct ListView: View {
                 .onTapGesture {
                     localSearch.getPlace(from: suggestion)
                     searchedLocationText = (searchedLocationText == suggestion.title) ? (suggestion.title + " ") : suggestion.title
-                    isDestinationSelected = true
+                    localSearch.isDestinationSelected = true
                     print("tapped list item")
                
                 }
@@ -46,6 +46,6 @@ struct ListView: View {
 
 struct ListView_Previews: PreviewProvider {
     static var previews: some View {
-        ListView(localSearch: LocalSearch(), searchedLocationText: .constant(""), isDestinationSelected: .constant(false))
+        ListView(localSearch: LocalSearch(), searchedLocationText: .constant(""))
     }
 }

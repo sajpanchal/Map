@@ -171,6 +171,7 @@ struct MapInteractionsView: View {
             mapViewAction = .idle
             self.routeETA = ""
             routeDistance = ""
+            localSearch.isDestinationSelected = true
             stepInstructions.removeAll()
             instruction = ""
             nextStepLocation = nil

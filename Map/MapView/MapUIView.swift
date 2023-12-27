@@ -28,10 +28,6 @@ struct MapView: UIViewRepresentable {
     @Binding var mapError: Errors
     ///this property is needed to set the map region centered to user's location when app is launched for the first time.
     @Binding var mapViewStatus: MapViewStatus
-    ///this is the state property of Map SwiftUI view that will be true when user has tapped to a destination in a search field results.
-    @Binding var isDestinationSelected: Bool
-    ///this is the state property of the Map SwiftUI view that will be true when user has cleared the search field.
-    @Binding var isSearchCancelled: Bool
     ///this ist the state object of Map Swiftui view that is going to handle the location search
     @Binding var instruction: String
     ///localSearch struct that is responsible for address/location search start, update or cancellation.
@@ -185,27 +181,21 @@ struct MapView: UIViewRepresentable {
                 ///show directions mode.
                 case .showDirections:
                     print("showDirections!")
-                ///if status is already updated skip this case.
+                    ///if status is already updated skip this case.
                     if parent.mapViewStatus == .showingDirections {
                         break
                     }
-                ///if search is cancelled
-                    if parent.isSearchCancelled {
+                    guard let suggestedLocations = parent.localSearch.suggestedLocations else {
                         ///clear all entities from mapview.
                         parent.clearEntities(from: mapView)
-                        ///set the suggestedLocations array to empty
-                        parent.localSearch.suggestedLocations = nil
                         ///make the mapview to go in idle mode.
                         self.parent.mapViewAction = .idle
                         print("idle mode is back")
+                        return
                     }
-                ///if not cancelled
-                    else {
-                        ///show the annotations for the search locations
-                        mapView.showAnnotations(mapView.annotations, animated: true)
-                        ///get the navigation directions laid out from overlay renderer to map between user location and destination.
-                        MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: parent.localSearch.suggestedLocations?.first?.coordinate)
-                    }
+                    ///get the navigation directions laid out from overlay renderer to map between user location and destination.
+                    MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: suggestedLocations.first?.coordinate)
+                    
                     parent.mapViewStatus = .showingDirections
                     break
             }
@@ -275,18 +265,16 @@ struct MapView: UIViewRepresentable {
                         self.mapViewStatus = .centeredToUserLocation
                     }
                 }
-                ///if the suggestedLocations are not nil
-                if let searchedLocation = localSearch.suggestedLocations {
-                    ///handle the searchLocationInterface if there are any actions prompted by thr user.
-                    searchLocationInterface(in: uiView, for: searchedLocation.first!)
-                }
-                ///if it is nil
-                else {
+                ///check if the localsearch object has a list of tappedLocations
+                guard let searchedLocation = self.localSearch.suggestedLocations else {
                     DispatchQueue.main.async {
-                        ///clear all the entities from mapview.
+                        ///clear entities from mapview
                         self.clearEntities(from: uiView)
                     }
+                    return
                 }
+                ///check if there is any action from searchfield and make necessary updates.
+                    self.searchLocationInterface(in: uiView, for: searchedLocation.first!)
                 break
             
             ///in navigation mode center map to userlocation
@@ -317,30 +305,19 @@ struct MapView: UIViewRepresentable {
             ///show directions mode
             case .showDirections:
                 print("showdirections")
-                /// if search is cancelled.
-                if isSearchCancelled {
-                     DispatchQueue.main.async {
-                         ///clear the entities from mapview
-                         self.clearEntities(from: uiView)
-                         ///make the suggestedLocations nil
-                         localSearch.suggestedLocations = nil
-                         ///make the map view to go in idle mode
-                         self.mapViewAction = .idle
-                         print("idle mode is back")
-                     }
-                    break
-                }
-                /// if seach is not cancelled
-                else {
+                ///show the directions for a given destination by drawing overlays.
+                guard let suggestedLocations = localSearch.suggestedLocations else {
                     DispatchQueue.main.async {
-                        ///set the flag to indicate a given destination is selected.
-                        self.isDestinationSelected = true
+                        ///clear the entities from mapview
+                        self.clearEntities(from: uiView)
+                        ///make the map view to go in idle mode
+                        self.mapViewAction = .idle
+                        print("idle mode is back")
                     }
-                   ///show the directions for a given destination by drawing overlays.
-                    MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: localSearch.suggestedLocations?.first?.coordinate)
-                    ///show the annotations for a given destination
-                    uiView.showAnnotations(uiView.annotations, animated: true)
+                    return
                 }
+                 MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: suggestedLocations.first?.coordinate)
+               
                 break
         }
     }
@@ -350,7 +327,7 @@ extension MapView {
     ///method to handle location search interface,
     func searchLocationInterface(in uiView: MKMapView, for searchedLocation: MKAnnotation) {
         ///if the destination is selected
-        if self.isDestinationSelected {
+        if self.localSearch.isDestinationSelected {
             print("location is selected")
             ///annotate the location on the map and center the map to it.
             MapViewAPI.annotateLocation(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
@@ -359,11 +336,11 @@ extension MapView {
                 ///make sure there are no overlays while only destination is selected yet and not the directions requested.
                 uiView.removeOverlays(uiView.overlays)
                 ///reset the flag.
-                self.isDestinationSelected = false
+                self.localSearch.isDestinationSelected = false
             }
         }
         ///if search is cancelled.
-        else if isSearchCancelled {
+        else if localSearch.isSearchCancelled {
             print("location cancelled")
             DispatchQueue.main.async {
                 ///remove the annotations
