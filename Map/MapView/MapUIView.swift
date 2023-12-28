@@ -39,7 +39,7 @@ struct MapView: UIViewRepresentable {
     ///distance of the next step from current user location
     @Binding var nextStepDistance: String
     ///travel time for a given route
-    @Binding var routeETA: String
+    @Binding var routeTravelTime: String
     ///travel distance for a given route
     @Binding var routeDistance: String
     ///remaining distance from the destination during navigation
@@ -109,7 +109,7 @@ struct MapView: UIViewRepresentable {
                 ///extract the route data from renderer title
                 let routeData = renderer.polyline.title?.split(separator: ", ") ?? []
                 ///set the travel time
-                parent.routeETA = String(routeData.first ?? "") + " mins"
+                parent.routeTravelTime = String(routeData.first ?? "") + " mins"
                 ///set the distance
                 parent.routeDistance = String(routeData.last ?? "") + " km"
             }

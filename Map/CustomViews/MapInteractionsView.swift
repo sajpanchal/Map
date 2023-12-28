@@ -14,7 +14,7 @@ struct MapInteractionsView: View {
     @StateObject var locationDataManager: LocationDataManager
     @StateObject var localSearch: LocalSearch
     var destination: String
-    @Binding var routeETA: String
+    @Binding var routeTravelTime: String
     @Binding var routeDistance: String
     var remainingDistance: String
     @Binding var instruction: String
@@ -93,7 +93,7 @@ struct MapInteractionsView: View {
                             Spacer()
                             VStack {
                                 if mapViewStatus == .showingDirections {
-                                    Text(routeETA)
+                                    Text(routeTravelTime)
                                     Text(routeDistance)
                                 }
                                 else if mapViewStatus == .navigating {
@@ -162,14 +162,14 @@ struct MapInteractionsView: View {
         ///set mapViewAction to idle mode if status is navigating when button is pressed set mapViewAction to nagivate if status is not navigating when button is pressed.
         switch mapViewStatus {
         case .idle, .notCentered, .centeredToUserLocation, .showingDirections:
-            locationDataManager.distance = 0.0
+            locationDataManager.remainingDistance = 0.0
             mapViewAction = .navigate
             ///UIApplocation is the class that has a centralized control over the app. it has a property called shared that is a singleton instance of UIApplication itself. this instance has a property called isIdleTimerDisabled. which will decide if we want to turn off the phone screen after certain amount of time of inactivity in the app. we will set it to true so it will keep the screen alive when user tracking is on.
             UIApplication.shared.isIdleTimerDisabled = true
             break
         case .navigating, .inNavigationCentered, .inNavigationNotCentered:
             mapViewAction = .idle
-            self.routeETA = ""
+            self.routeTravelTime = ""
             routeDistance = ""
             localSearch.isDestinationSelected = true
             stepInstructions.removeAll()
@@ -191,5 +191,5 @@ struct MapInteractionsView: View {
 }
 
 #Preview {
-    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showSheet: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeETA: .constant(""), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]))
+    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showSheet: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]))
 }

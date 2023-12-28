@@ -39,32 +39,64 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "BBC6193B-E5FC-4CC6-B611-58EA2C5A216B"
+            uuid = "895BC942-80A1-4A43-9031-E2042B1B4EFF"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Map/MapView/MapUIView.swift"
+            filePath = "Map/APIs/MapUIViewAPI.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "328"
-            endingLineNumber = "328"
-            landmarkName = "searchLocationInterface(in:for:)"
+            startingLineNumber = "334"
+            endingLineNumber = "334"
+            landmarkName = "getDesiredRouteAndOvarlay(for:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5ECBE7D9-71F7-4A43-AD1D-DAA5BBC2CAD5"
+            uuid = "045632D3-DB4C-4228-B85F-A2BD88D703B9"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Map/MapView/MapUIView.swift"
+            filePath = "Map/APIs/MapUIViewAPI.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "188"
-            endingLineNumber = "188"
-            landmarkName = "mapView(_:didUpdate:)"
+            startingLineNumber = "200"
+            endingLineNumber = "200"
+            landmarkName = "startNavigation(in:parent:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "04C79405-4E2C-49D5-B880-F32D89629A47"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Map/APIs/MapUIViewAPI.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "219"
+            endingLineNumber = "219"
+            landmarkName = "startNavigation(in:parent:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F99F12BC-5710-436F-B1C2-FDE41B9A7D99"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Map/APIs/MapUIViewAPI.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "366"
+            endingLineNumber = "366"
+            landmarkName = "initiateProps(route:parent:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

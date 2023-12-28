@@ -26,7 +26,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     @Published var userHeading: CLHeading?
     @Published var region: MKCoordinateRegion = MKCoordinateRegion()
     @Published var overlayRegion: CLRegion?
-    @Published var distance: CLLocationDistance?
+    @Published var remainingDistance: CLLocationDistance?
     var lastLocation: CLLocation?
     @Published var speed: CLLocationSpeed = 0.0
     @Published var throughfare: String?
@@ -106,15 +106,15 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
           
         }
         //if locations array is not nil and has the first location of the user, get the first user location
-        if let lastUserLocation = locations.last, let distance = distance {
+        if let lastUserLocation = locations.last, let distance = remainingDistance {
             //update the userLocation property with the first user location accessed by CLLocationManager in locations array.
             if  lastLocation!.distance(from: lastUserLocation)/1000 >= 0.01 && distance > 0.0 {
-                self.distance = self.distance! - (lastLocation!.distance(from: lastUserLocation)/1000)
-                print("Distance: \(self.distance!/1000)")
+                remainingDistance = distance - (lastLocation!.distance(from: lastUserLocation)/1000)
+                print("Distance: \(remainingDistance!/1000)")
                 lastLocation = lastUserLocation
             }
             else if distance == 0.0 {
-                self.distance = nil
+                remainingDistance = nil
             }
             self.userlocation = lastUserLocation
             
