@@ -19,10 +19,12 @@ struct ExpandedDirectionsView: View {
                     ForEach(stepInstructions,id:\.self.0, content: { stepInstruction in
                         HStack {
                             VStack {
-                                Image(systemName: getDirectionSign(for: stepInstruction.0))
-                                    .font(.title)
-                                    .fontWeight(.black)
-                                    .padding(.top, 5)
+                                if let image = getDirectionSign(for: stepInstruction.0) {
+                                    Image(systemName: image)
+                                        .font(.title)
+                                        .fontWeight(.black)
+                                        .padding(.top, 5)
+                                }
                                 Text(convertToString(from:stepInstruction.1))
                                     .padding(.bottom, 5)
                                     .font(.title2)

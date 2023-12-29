@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DirectionsView: View {
-    var directionSign: String
+    var directionSign: String?
     var nextStepDistance: String
     var instruction: String
     @Binding var showDirectionsList: Bool
@@ -16,15 +16,16 @@ struct DirectionsView: View {
         VStack {
             HStack {
                 VStack {
-                    Image(systemName: directionSign)
-                        .font(.title)
-                        .fontWeight(.black)
-                        .padding(.top, 5)
+                    if let directionSign = directionSign {
+                        Image(systemName: directionSign)
+                            .font(.title)
+                            .fontWeight(.black)
+                            .padding(.top, 5)
+                    }
                     Text("\(nextStepDistance)")
                         .padding(.bottom, 5)
                         .font(.title2)
                         .fontWeight(.black)
-                    
                 }
                 Spacer()
                 if #available(iOS 17.0, *) {
