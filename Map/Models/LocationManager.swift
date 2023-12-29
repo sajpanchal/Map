@@ -96,9 +96,11 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         ///if locations array is not nil and has the first location of the user, get the last user location, also check if the remainingDistance is not nil
         if let lastUserLocation = userlocation, let distance = remainingDistance {
          ///check if the distance updated is greater than 0.05 meters and make sure distance is greater than 0.
-            if  lastLocation!.distance(from: lastUserLocation)/1000 >= 0.05 && distance > 0.0 {
+            if  lastLocation!.distance(from: lastUserLocation)/1000 >= 0.01 && distance > 0.0 {
                 ///subtract the remaining distance from it self by the distance travelled by the user.
                 remainingDistance! -= (lastLocation!.distance(from: lastUserLocation)/1000)
+                print("distance updated: \(lastLocation!.distance(from: lastUserLocation)/1000)")
+                print("remaining distance: \(remainingDistance!)")
                 ///update the lastLocation variable with the latest user location recevied by location manager.
                 lastLocation = lastUserLocation
             }
@@ -108,7 +110,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                 remainingDistance = nil
             }
             ///if distance is less than 0
-            else {
+            else if distance < 0.0 {
                 ///keep the distance 0.0
                 remainingDistance = 0.0
             }

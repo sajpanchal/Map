@@ -171,8 +171,8 @@ class MapViewAPI {
         }
          /// set routeETA field with expected travel time extracted from a given route.
         parent.routeTravelTime = String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
-         ///get the initial distance remaining to destination from user location. that is route distance.
-        parent.locationDataManager.remainingDistance = Double(route.distance/1000.0)
+         ///initiating props on first execution
+         initiateProps(route: route, parent: &parent)
          ///get the address of the destination
         let destination = parent.localSearch.suggestedLocations?.first?.title
          ///format the remaining distance to be displayed in km
@@ -181,8 +181,7 @@ class MapViewAPI {
         parent.destination = (destination ?? "") ?? ""
          ///setting the routeDistance property with km format for display
         parent.routeDistance = String(format:"%.1f",Double(route.distance/1000.0)) + " km"
-        ///initiating props on first execution
-        initiateProps(route: route, parent: &parent)
+        
          ///iterate through the route steps
          for step in route.steps {
              ///get the index of the given step and if it is found continue...
@@ -347,6 +346,10 @@ extension MapViewAPI {
              let via = route.polyline.title?.split(separator: ", ")
              ///initate the instruction for the first step to be displayed with the current location street name and the next one.
              parent.instruction = "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(via?[1] ?? "")"
+         }
+        ///get the initial distance remaining to destination from user location. that is route distance.
+         if parent.locationDataManager.remainingDistance == nil {
+               parent.locationDataManager.remainingDistance = Double(route.distance/1000.0)
          }
         ///if the nextStep location is not available, get the location of the first step.
          if parent.nextStepLocation == nil {
