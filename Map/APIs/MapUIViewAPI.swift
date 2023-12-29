@@ -70,8 +70,6 @@ class MapViewAPI {
         }
         ///reset the properties of this instance class
         resetProps()
-      
-     
         DispatchQueue.main.async {
             ///undoing user tracking to none.
             mapView.setUserTrackingMode(.none, animated: true)
@@ -80,7 +78,6 @@ class MapViewAPI {
    
     ///function to annotate a location the user has searched in the search bar.
     static func annotateLocation(in mapView: MKMapView ,at coordinates: CLLocationCoordinate2D, for annotation: MKAnnotation) {
-        
         ///add the search location received from UIViewRepresentable (mapview) as a second mapview annotation.       
         mapView.addAnnotation(annotation)
         ///check if the mapview centered to the searched location or not
@@ -96,65 +93,63 @@ class MapViewAPI {
         if !uiView.overlays.isEmpty {
             return
         }
-       
         ///create an instance of MKDirections request to request the directions.
         let request = MKDirections.Request()
         ///if distination is not nil
-        if let destination = destination {
-            ///set the source point of request as a placemark of user location
-            request.source = MKMapItem(placemark: MKPlacemark(coordinate: source))
-            ///set the destination of the request as a placemark of searched location
-            request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
-            ///set the request for alternate routes between 2 places to true to get more than one routes.
-            request.requestsAlternateRoutes = true
-            ///set the transport type as automobile as default.
-            request.transportType = .automobile
-            ///create a directions object from our request now.
-            let directions = MKDirections(request: request)
-            ///async function to calculate the routes from information provided by request object of directions object.
-            directions.calculate(completionHandler: { (response, error) in
-                ///if response is received
-                if let response = response {
-                    ///remove all overalys from mapview.
-                     uiView.removeOverlays(uiView.overlays)
-                    ///sort the routes recieved from the response with longer travel time first.
-                    let sortedRoutes = response.routes.sorted(by: {
-                        $0.expectedTravelTime > $1.expectedTravelTime
-                    })
-                    ///set the routes property of MapViewAPI with sorted routes
-                    routes = sortedRoutes
-                    ///create a variable to store the array size.
-                    var index = sortedRoutes.count
-                    ///iterate through the sorted routes.
-                    for route in sortedRoutes {
-                        ///get the polyline object from current route
-                        let polyline = route.polyline
-                        index -= 1
-                        let title = polyline.title
-                        polyline.title = "\(Int(route.expectedTravelTime/60)), \(title ?? "n/a"), \(UUID()), \(String(format:"%.1f",route.distance/1000.0))"
-                        ///if this is the last route it must be having a shortest travel time
-                        if index == 0 {
-                            ///set the polyline subtitle as fastest route to identify it in later uses.
-                            polyline.subtitle = "fastest route"
-                        }
-                        ///add the polyline received from the route as an overlay to be displayed in mapview.
-                       uiView.addOverlay(polyline)
-                    }
-                    uiView.setVisibleMapRect(uiView.overlays.first!.boundingMapRect, edgePadding: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5), animated: true)
-                }
-                ///if the direction request doesn't get a response, handle the error.
-                else {
-                    print(error?.localizedDescription ?? "")
-                }
-            })
+        guard let destination = destination else {
+        return
         }
+        ///set the source point of request as a placemark of user location
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: source))
+        ///set the destination of the request as a placemark of searched location
+        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
+        ///set the request for alternate routes between 2 places to true to get more than one routes.
+        request.requestsAlternateRoutes = true
+        ///set the transport type as automobile as default.
+        request.transportType = .automobile
+        ///create a directions object from our request now.
+        let directions = MKDirections(request: request)
+        ///async function to calculate the routes from information provided by request object of directions object.
+        directions.calculate(completionHandler: { (response, error) in
+            ///if response is received
+            guard let response = response else {
+                print(error?.localizedDescription ?? "")
+                return
+            }
+            ///remove all overalys from mapview.
+             uiView.removeOverlays(uiView.overlays)
+            ///sort the routes recieved from the response with longer travel time first.
+            let sortedRoutes = response.routes.sorted(by: {
+                $0.expectedTravelTime > $1.expectedTravelTime
+            })
+            ///set the routes property of MapViewAPI with sorted routes
+            routes = sortedRoutes
+            ///create a variable to store the array size.
+            var index = sortedRoutes.count
+            ///iterate through the sorted routes.
+            for route in sortedRoutes {
+                ///get the polyline object from current route
+                let polyline = route.polyline
+                index -= 1
+                let title = polyline.title
+                polyline.title = "\(Int(route.expectedTravelTime/60)), \(title ?? "n/a"), \(UUID()), \(String(format:"%.1f",route.distance/1000.0))"
+                ///if this is the last route it must be having a shortest travel time
+                if index == 0 {
+                    ///set the polyline subtitle as fastest route to identify it in later uses.
+                    polyline.subtitle = "fastest route"
+                }
+                ///add the polyline received from the route as an overlay to be displayed in mapview.
+               uiView.addOverlay(polyline)
+            }
+            uiView.setVisibleMapRect(uiView.overlays.first!.boundingMapRect, edgePadding: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5), animated: true)
+        })
+        
     }
     
     ///method used for starting map navigation and updating the related components based on location updates.
      static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
       ///redundantly setting up mapview status to navigating mode to make sure no misteps.
          parent.mapViewStatus = .navigating
-        
         ///if there are more than 1 overlays, find the one that is desired.
         if mapView.overlays.count > 1 {
             getDesiredRouteAndOvarlay(for: mapView)
@@ -176,26 +171,14 @@ class MapViewAPI {
         }
          /// set routeETA field with expected travel time extracted from a given route.
         parent.routeTravelTime = String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
-         ///if the remaining distance field is nil
-        if parent.locationDataManager.remainingDistance == nil {
-            ///get the initial distance remaining to destination from user location. that is route distance.
-            parent.locationDataManager.remainingDistance = Double(route.distance/1000.0)
-            ///get the address of the destination
-            let destination = parent.localSearch.suggestedLocations?.first?.title
-            ///format the remaining distance to be displayed in km
-            parent.remainingDistance = String(format:"%.1f", parent.locationDataManager.remainingDistance!) + " km"
-            ///set the destination field of mapview struct
-            parent.destination = (destination ?? "") ?? ""
-        }
-         ///if distance is already set.
-        else {
-            ///get the address of the destination
-            let destination = parent.localSearch.suggestedLocations?.first?.title
-            ///format the remaining distance to be displayed in km
-            parent.remainingDistance = String(format:"%.1f", parent.locationDataManager.remainingDistance!) + " km"
-            ///set the destination field of mapview struct
-            parent.destination = (destination ?? "") ?? ""
-        }
+         ///get the initial distance remaining to destination from user location. that is route distance.
+        parent.locationDataManager.remainingDistance = Double(route.distance/1000.0)
+         ///get the address of the destination
+        let destination = parent.localSearch.suggestedLocations?.first?.title
+         ///format the remaining distance to be displayed in km
+        parent.remainingDistance = String(format:"%.1f", parent.locationDataManager.remainingDistance ?? Double(route.distance/1000.0)) + " km"
+         ///set the destination field of mapview struct
+        parent.destination = (destination ?? "") ?? ""
          ///setting the routeDistance property with km format for display
         parent.routeDistance = String(format:"%.1f",Double(route.distance/1000.0)) + " km"
         ///initiating props on first execution
@@ -203,43 +186,46 @@ class MapViewAPI {
          ///iterate through the route steps
          for step in route.steps {
              ///get the index of the given step and if it is found continue...
-             if let stepIndex = route.steps.firstIndex(of: step) {
-                 ///set the user location as user point to calculate distance from step polyline points.
-                 userPoint = MKMapPoint(mapView.userLocation.coordinate)
-                 ///if array isStepPointsFetched going out of index, add a new element to the last index.
-                 while isStepPointsFetched.count <= stepIndex {
-                     isStepPointsFetched.append(false)
-                 }
-                 ///if for the given step index, array element is FALSE (i.e. is not fetched) update the props of the class instance
-                 if !isStepPointsFetched[stepIndex] && isStepPointsFetched.count > stepIndex {
-                     ///update the props for a given step at a given index.
-                     updateProps(for: step, at: stepIndex, mapView: mapView)
-                 }
-                 ///if userpoint is not nil
-                 if let userPoint = userPoint, let userLocation = mapView.userLocation.location {
-                     ///get the step location
-                     let stepLocation = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
-                     
-                     ///if the user location is 50 m or more from this step and yet it is not set exited and it is the starting point update to the step 1 instructions only
-                     if userLocation.distance(from: stepLocation) > 50 && step.polyline.subtitle != "regionExited" && stepIndex == 0 {
-                         ///label the current step as exited by user.
-                         step.polyline.subtitle = "regionExited"
-                         ///get the first step and its index
-                         if let firstStep = route.steps.first(where: {!$0.instructions.isEmpty}), let firstIndex = route.steps.firstIndex(of: firstStep) {
-                             ///update the step instructions
-                             updateStepInstructions(step: firstStep, instruction: firstStep.instructions, parent: &parent, stepIndex: firstIndex)
-                         }
-                     }
-                     ///if the user location is near 15 m of any of the given step points, update to that step instructions and make nextIndex set to the next step index.
-                     if nextIndex == stepIndex && pointsArray[stepIndex].contains(where: { $0.distance(to: userPoint) < 15})  {
-                         ///this is the variable that will help user navigating by getting advanced hint to start over.
-                         let via = route.polyline.title?.split(separator: ", ")
-                         ///update the step instructions for display
-                         updateStepInstructions(step: step, instruction: (step.instructions == "" ? "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(String(via?[1] ?? ""))" : step.instructions), parent: &parent, stepIndex: stepIndex)
-                         break
-                         }
+             guard let stepIndex = route.steps.firstIndex(of: step) else {
+                 return
+             }
+             ///set the user location as user point to calculate distance from step polyline points.
+             userPoint = MKMapPoint(mapView.userLocation.coordinate)
+             ///if array isStepPointsFetched going out of index, add a new element to the last index.
+             while isStepPointsFetched.count <= stepIndex {
+                 isStepPointsFetched.append(false)
+             }
+             ///if for the given step index, array element is FALSE (i.e. is not fetched) update the props of the class instance
+             if !isStepPointsFetched[stepIndex] && isStepPointsFetched.count > stepIndex {
+                 ///update the props for a given step at a given index.
+                 updateProps(for: step, at: stepIndex, mapView: mapView)
+             }
+             ///if userpoint is not nil
+             guard let userPoint = userPoint, let userLocation = mapView.userLocation.location else {
+                 return
+             }
+             ///get the step location
+             let stepLocation = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
+             ///if the user location is 50 m or more from this step and yet it is not set exited and it is the starting point update to the step 1 instructions only
+             if userLocation.distance(from: stepLocation) > 50 && step.polyline.subtitle != "regionExited" && stepIndex == 0 {
+                 ///label the current step as exited by user.
+                 step.polyline.subtitle = "regionExited"
+                 ///get the first step and its index
+                 if let firstStep = route.steps.first(where: {!$0.instructions.isEmpty}), let firstIndex = route.steps.firstIndex(of: firstStep) {
+                     ///update the step instructions
+                     updateStepInstructions(step: firstStep, instruction: firstStep.instructions, parent: &parent, stepIndex: firstIndex)
                  }
              }
+             ///if the user location is near 15 m of any of the given step points, update to that step instructions and make nextIndex set to the next step index.
+             if nextIndex == stepIndex && pointsArray[stepIndex].contains(where: { $0.distance(to: userPoint) < 15})  {
+                 ///this is the variable that will help user navigating by getting advanced hint to start over.
+                 let via = route.polyline.title?.split(separator: ", ")
+                 ///update the step instructions for display
+                 updateStepInstructions(step: step, instruction: (step.instructions == "" ? "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(String(via?[1] ?? ""))" : step.instructions), parent: &parent, stepIndex: stepIndex)
+                 break
+                 }
+             
+             
          }
          ///now calculate the distance from the next step location to user location
          if let nextStepLocation = parent.nextStepLocation, let userLocation = mapView.userLocation.location {
@@ -248,13 +234,11 @@ class MapViewAPI {
     }
         
     ///function that handles overlay tap events
-    static func getTappedOvarlay(in mapView: MKMapView, by tapGestureRecognizer: UITapGestureRecognizer) -> String? {
+    static func getTappedOvarlay(in mapView: MKMapView, by tapGestureRecognizer: UITapGestureRecognizer) -> MKOverlay? {
         ///get the tapped location in the mapview as CGPoint format
         let tapLocation = tapGestureRecognizer.location(in: mapView)
         ///canvert the tapped CGPoint to 2D coordinates.
         let tapCoordinates =  mapView.convert(tapLocation, toCoordinateFrom: mapView)
-        ///a variable storing the title of the polyline
-        var title: String?
         ///interate through the overlays
         for overlay in mapView.overlays.reversed() {
             ///get the renderer of a given overaly
@@ -266,26 +250,26 @@ class MapViewAPI {
             ///check if the tapped point falls into the render points
             if renderer.path.contains(rendererPoint) {
                 ///if yes, set the title as render polyline title.
-                title = renderer.polyline.title
+               return overlay
             }
         }
-        return title
+        return nil
     }
     
     ///method to sort the tapped overlay/route from mapview overlays.
-    static func setTappedOverlay(in mapView: MKMapView, having title: String, parent: inout MapView) {
+    static func setTappedOverlay(in mapView: MKMapView, having overlay: MKOverlay, parent: inout MapView) {
         ///index of the overlay in mapview overlays array
         var index = 0
         ///counter that will count the iterations of for loop
         var counter = 0
         ///iterate through overlays of mapview
-        for overlay in mapView.overlays {
+        for thisOverlay in mapView.overlays {
             ///get the renderer object for a given overlay of mapview.
-            let renderer = mapView.renderer(for: overlay) as? MKPolylineRenderer
+            let renderer = mapView.renderer(for: thisOverlay) as? MKPolylineRenderer
             ///make sure renderer object is not nil
             if let renderer = renderer {
                 ///get the title of the render polyline object
-                if title == renderer.polyline.title {
+                if overlay.isEqual(thisOverlay) {
                     ///set the stroke color to blue
                     renderer.strokeColor = .systemBlue
                     ///set the transperancy to lowest
@@ -327,7 +311,6 @@ extension MapViewAPI {
         length = []
         pointsArray = []
         nextIndex = 0
-    
     }
     
     ///method to get the overlay that has been set or tapped.

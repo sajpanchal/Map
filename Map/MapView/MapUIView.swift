@@ -79,12 +79,12 @@ struct MapView: UIViewRepresentable {
     
         @objc func handleTapGesture() {
             ///get the given route title on tap of mapview that route
-            guard let title = MapViewAPI.getTappedOvarlay(in: self.mapView, by: tapGestureRecognizer)
+            guard let overlay = MapViewAPI.getTappedOvarlay(in: self.mapView, by: tapGestureRecognizer)
             else {
                 return
             }
             ///hightlight the tapped overlay
-            MapViewAPI.setTappedOverlay(in: self.mapView, having: title, parent: &self.parent)
+            MapViewAPI.setTappedOverlay(in: self.mapView, having: overlay, parent: &self.parent)
             
         }
         

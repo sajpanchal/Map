@@ -109,12 +109,15 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         if let lastUserLocation = locations.last, let distance = remainingDistance {
             //update the userLocation property with the first user location accessed by CLLocationManager in locations array.
             if  lastLocation!.distance(from: lastUserLocation)/1000 >= 0.01 && distance > 0.0 {
-                remainingDistance = distance - (lastLocation!.distance(from: lastUserLocation)/1000)
+                remainingDistance! -= (lastLocation!.distance(from: lastUserLocation)/1000)
                 print("Distance: \(remainingDistance!/1000)")
                 lastLocation = lastUserLocation
             }
             else if distance == 0.0 {
                 remainingDistance = nil
+            }
+            else {
+                remainingDistance = 0.0
             }
             self.userlocation = lastUserLocation
             
