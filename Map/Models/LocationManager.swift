@@ -22,8 +22,6 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     @Published var region: MKCoordinateRegion = MKCoordinateRegion()
     ///remaining distance from the userlocation to the destination while in navigation
     @Published var remainingDistance: CLLocationDistance?
-    ///last location of the user tracked by location manager.
-    var lastLocation: CLLocation?
     ///speed of the user
     @Published var speed: CLLocationSpeed = 0.0
     ///throughfare i.e. street name of the current location received by reverse geocoding.
@@ -71,11 +69,9 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     ///this method will be called whenever a new user location is available.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         ///if the lastlocation is nil assign it the last user location
-        if lastLocation == nil {
-            lastLocation = locations.last
+        if userlocation == nil {
+            userlocation = locations.last
         }
-        ///set the userlocation property with the latest coordinates received by location manager.
-        self.userlocation =  locations.last
         ///if the troughfare is nil and user location is available
         if self.throughfare == nil && self.userlocation != nil {
             ///task is a struct type of swift that allows execution of the code asynchronously
@@ -94,15 +90,13 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         }
         
         ///if locations array is not nil and has the first location of the user, get the last user location, also check if the remainingDistance is not nil
-        if let lastUserLocation = userlocation, let distance = remainingDistance {
+        if let lastUserLocation = locations.last, let distance = remainingDistance {
          ///check if the distance updated is greater than 0.05 meters and make sure distance is greater than 0.
-            if  lastLocation!.distance(from: lastUserLocation)/1000 >= 0.01 && distance > 0.0 {
+            if  self.userlocation!.distance(from: lastUserLocation)/1000 >= 0.01 && distance > 0.0 {
                 ///subtract the remaining distance from it self by the distance travelled by the user.
-                remainingDistance! -= (lastLocation!.distance(from: lastUserLocation)/1000)
-                print("distance updated: \(lastLocation!.distance(from: lastUserLocation)/1000)")
-                print("remaining distance: \(remainingDistance!)")
+                remainingDistance! -= (userlocation!.distance(from: lastUserLocation)/1000)
                 ///update the lastLocation variable with the latest user location recevied by location manager.
-                lastLocation = lastUserLocation
+                userlocation = lastUserLocation
             }
             ///if distance is 0
             else if distance == 0.0 {
