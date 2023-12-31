@@ -200,7 +200,6 @@ struct MapInteractionsView: View {
         switch mapViewStatus {
         ///set mapViewAction to navigate mode if status is not related to navigation when button is pressed.
         case .idle, .notCentered, .centeredToUserLocation, .showingDirections:
-            locationDataManager.remainingDistance = 0.0
             ///make map to start navigation
             mapViewAction = .navigate
             ///UIApplocation is the class that has a centralized control over the app. it has a property called shared that is a singleton instance of UIApplication itself. this instance has a property called isIdleTimerDisabled. which will decide if we want to turn off the phone screen after certain amount of time of inactivity in the app. we will set it to true so it will keep the screen alive when user tracking is on.
