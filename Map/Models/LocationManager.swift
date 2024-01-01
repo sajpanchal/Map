@@ -97,13 +97,8 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                 ///update the lastLocation variable with the latest user location recevied by location manager.
                 userlocation = lastUserLocation
             }
-            ///if distance is 0
-            else if distance == 0.0 {
-                ///make variable nil
-                remainingDistance = nil
-            }
             ///if distance is less than 0
-            else if distance < 0.0 {
+            else if distance <= 0.0 {
                 ///keep the distance 0.0
                 remainingDistance = 0.0
             }
