@@ -7,8 +7,11 @@
 
 import SwiftUI
 
+///this swiftui view is responsible for showing the alert with a message when any session of the app is processing to start.
 struct MapProgressView: View {
+    ///variable that carries a alert text to be displayed.
     var alertMessage: String = ""
+    
     var body: some View {
         VStack {
             //indefinite progress view
@@ -20,8 +23,6 @@ struct MapProgressView: View {
                 .padding(5)
                 .background(.thinMaterial)
                 .cornerRadius(4)
-              
-            
         }
     }
 }
