@@ -7,36 +7,49 @@
 
 import SwiftUI
 import MapKit
+
+///swiftui view that gets the location search input from the user
 struct SearchFieldView: View {
+    ///bounded variable that gets the string input from the search field
     @Binding var searchedLocationText: String
+    ///this is the variable that will be updated when the search field is typed or tapped.
     @FocusState var enableSearchFieldFocus: Bool
+    ///setting the region boundry of the map for search
     var region: MKCoordinateRegion
+    ///state object for handling local search events
     @StateObject var localSearch: LocalSearch
    
-   
     var body: some View {
+        ///
         HStack {
+            ///search sign and textfield enclosed in a stack.
             HStack {
                 Image(systemName: "magnifyingglass")
                     .padding(.leading, 5)
+                ///this is the text field where user types the location search string
                 TextField("Search for a location", text: $searchedLocationText)
                     .focused($enableSearchFieldFocus)
-                    //when the text in a searchable field changes this method will be called and it will perform a method put inside perform parameter.
+                    ///when the text in a searchable field changes this method will be called and it will perform a method put inside perform parameter.
                     .onChange(of: searchedLocationText) {
+                        ///this method will initiate or terminate the location search.
                         handleLocationSearch(forUserInput: searchedLocationText)
                     }
+                ///on tap it will call a method to prepare searchfield.
                     .onTapGesture(perform: prepareSearchfield)
             }
             .frame(height: 40)
             .background(.ultraThinMaterial)
             .cornerRadius(5)
             .padding(5)
+            ///if the search field is focused.
             if enableSearchFieldFocus {
+                ///show the cancel button for user to cancel the search.
                 Button("Cancel", action: clearSearchfield)
                 .background(.clear)
                 .disabled(false)
             }
             else {
+                ///if not focus keep it hidden and disabled.
                 Button("Cancel", action: clearSearchfield)
                 .background(.clear)
                 .hidden()
@@ -45,13 +58,12 @@ struct SearchFieldView: View {
         }
     }
     
+    ///method to start or stp the location search
     func handleLocationSearch(forUserInput text:String) {
         ///if location is selected or search is cancelled
         guard !localSearch.isDestinationSelected && !localSearch.isSearchCancelled else {
            ///un-focus the search field
             enableSearchFieldFocus = false
-            if localSearch.isDestinationSelected {
-            }
             ///stop the location search
             localSearch.cancelLocationSearch()
             ///and return from a function
@@ -78,7 +90,9 @@ struct SearchFieldView: View {
         searchedLocationText = ""
         ///cancel the search operations
         localSearch.isSearchCancelled = true
+        ///make the locations array nil
         localSearch.suggestedLocations = nil
+        ///set flag to false to indicate the destination is not selected.
         localSearch.isDestinationSelected = false
         ///un-focus the search field.
         enableSearchFieldFocus = false
