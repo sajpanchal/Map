@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+///this swiftuiview is responsible to show the expand symbol/sign
 struct ExpandViewSymbol: View {
     var body: some View {
         HStack {
@@ -17,9 +18,9 @@ struct ExpandViewSymbol: View {
             Spacer()
         }
         .padding(5)
-       // .background(.black)
     }
 }
+
 #Preview {
     ExpandViewSymbol()
 }
