@@ -10,8 +10,7 @@ import MapKit
 //import AudioToolbox
 //import AVFoundation
 
-//this view will observe the LocationDataManager and updates the MapViewController if data in Location
-//Manager changes.
+///this view will observe the LocationDataManager and updates the MapViewController if data in Location Manager changes.
 struct Map: View {
     ///this will make our MapView update if any @published value in location manager changes.
     @StateObject var locationDataManager = LocationDataManager()
@@ -23,33 +22,44 @@ struct Map: View {
     @State var mapError: Errors = .noError
     ///state variable for searchable text field to search for nearby locations in the map region
     @State var searchedLocationText: String = ""
+    ///state variable to store the current instruction to display in the directions view.
     @State var instruction: String = ""
+    ///sending this variable to other swiftui views such as MapView and MapInterationView.
     @State var nextStepLocation: CLLocation?
+    ///localSearch object is instantiated on rendering this view.
     @StateObject var localSearch = LocalSearch()
-    @State var status: String = "-"
+    //state variable storing the next step distance to be displayed in the directions view.
     @State var nextStepDistance: String = ""
+    ///variable to show the selected route's travel time.
     @State var routeTravelTime: String = ""
+    ///variable to show the selected route's distance.
     @State var routeDistance: String = ""
+    ///variable to show the distance remaining from the destination while in navigation.
     @State var remainingDistance: String = ""
+    ///variable to show the destination address in the expanded view.
     @State var destination = ""
+    ///flag to show/hide the destination info view,
     @State var showSheet = false
+    ///flag to show/hide the directions list view.
     @State var showDirectionsList = false
+    ///binding this variable of array type to ExpendedDirectionsView.
     @State var stepInstructions: [(String, Double)] = []
    // let synthesizer = AVSpeechSynthesizer()
     var body: some View {
+        ///enclose the header stack and Zstack with mapview and bottom stack in Vstack.
         VStack {
-        ///ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
+            ///if map is not navigating or map is waiting to navigate yet show the searchTextField to allow user to search for the locations in the map.
             if !isMapInNavigationMode(for: mapViewStatus).0 || isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction) {
                 SearchFieldView(searchedLocationText: $searchedLocationText, region: locationDataManager.region, localSearch: localSearch)
                     .padding(.top, 10)
                     .background(.black)
                 Spacer()
             }
+            ///otherwise if map is in navigation mode, replace that view with the directions stack view to show the user navigation directions.
             else if isMapInNavigationMode(for: mapViewStatus).0  {
                 DirectionsView(directionSign: getDirectionSign(for: instruction), nextStepDistance: nextStepDistance, instruction: instruction, showDirectionsList: $showDirectionsList)
-                  
-                //Spacer()
             }
+            ///ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
             ZStack {
             ///grouping mapview and its associated buttons
                 Group() {
@@ -77,15 +87,13 @@ struct Map: View {
                 else if isMapViewWaiting(to: .showDirections, for: mapViewStatus, in: mapViewAction) {
                     MapProgressView(alertMessage: "Routing directions! Please Wait...")
                 }
-                
-              //  if localSearch.tappedLocation != nil {
-                //navigation mode button to switch between navigation modes.
+                ///this view is reponsible to show the map interation buttons and the bottom stack with route info and navigation related buttons on top of MapView.
                 MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showSheet: $showSheet, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeTravelTime: $routeTravelTime, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions)
-                    if showDirectionsList {
-                        ExpandedDirectionsView(stepInstructions: stepInstructions,  showDirectionsList: $showDirectionsList)
-                    }
-             //   }
-                
+                ///if this flag is true show the expanded view with a list of directions on top of mapInteration view.
+                if showDirectionsList {
+                    ExpandedDirectionsView(stepInstructions: stepInstructions, showDirectionsList: $showDirectionsList)
+                }
+                ///if search results are avialable, show them in the listview on top of everything in zstack view.
                 if !$localSearch.results.isEmpty {
                     ListView(localSearch: localSearch, searchedLocationText: $searchedLocationText)
                 }
@@ -104,17 +112,23 @@ struct Map: View {
         if distance > 10 {
             ///if map navigation is on and user dragged mapview
             if isMapInNavigationMode(for: mapViewStatus).0 {
+                ///set the status that map is not centered in navigation mode.
                 mapViewStatus = .inNavigationNotCentered
+                ///make map to perform idleInNavigation action.
                 mapViewAction = .idleInNavigation
             }
+            ///if map is showing directions and if map is not centered.
             else if mapViewStatus == .showingDirections || mapViewStatus == .showingDirectionsNotCentered {
+                ///keep the map be in idle while showing directions
                 mapViewAction = .idleInshowDirections
-               }
+            }
+            ///if map is not navigating or showing directions
             else {
+                ///set the status to not centered
                 mapViewStatus = .notCentered
+                ///make map to go in idle mode
                 mapViewAction = .idle
             }
-            
         }
         print("map is out of center: \(mapViewStatus)")
     }
