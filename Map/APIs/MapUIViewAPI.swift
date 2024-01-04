@@ -150,12 +150,8 @@ class MapViewAPI {
      static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
       ///redundantly setting up mapview status to navigating mode to make sure no misteps.
          parent.mapViewStatus = .navigating
-        ///if there are more than 1 overlays, find the one that is desired.
-        if mapView.overlays.count > 1 {
-            getDesiredRouteAndOvarlay(for: mapView)
-        }
          ///if there is any route available then get the first one otherwise exit the fuction.
-         guard let route = routes.first else {
+         guard let route = getSelectedRoute(for: mapView) else {
              return
         }
          ///if stepinstructions array is empty
@@ -313,29 +309,29 @@ extension MapViewAPI {
     }
     
     ///method to get the overlay that has been set or tapped.
-    static func getDesiredRouteAndOvarlay(for mapView: MKMapView) {
-        ///make sure the mapview overlays array has atleast one overlay
-        if mapView.overlays.first != nil {
-            ///remove all exept the selected (i.e. first overlay) from map view
-            mapView.removeOverlays(mapView.overlays.filter({
-                ///filter the array with only those overlays with renderer having 50% transperancy.
-                if let renderer = mapView.renderer(for: $0) {
-                    return renderer.alpha != 1
-                }
-                else {
-                    return false
-                }
-            }))
-            ///get the renderer for the given overlay
-            if let overlay = mapView.overlays.first {
-                ///get the renderer for a given overlay
-                let renderer = MKPolylineRenderer(overlay: overlay)
-                ///remove all overlays where the polyline object of the renderer is not the one that the tapped/set route has.
-                routes.removeAll(where: {
-                     !$0.polyline.isEqual(renderer.polyline)
-                })
+    static func getSelectedRoute(for mapView: MKMapView) -> MKRoute? {
+        ///remove all exept the selected (i.e. first overlay) from map view
+        mapView.removeOverlays(mapView.overlays.filter({
+            ///filter the array with only those overlays with renderer having 50% transperancy.
+            if let renderer = mapView.renderer(for: $0) {
+                return renderer.alpha != 1
             }
+            else {
+                return false
+            }
+        }))
+        ///get the renderer for the given overlay
+        guard let overlay = mapView.overlays.first else {
+            return nil
         }
+        ///get the renderer for a given overlay
+        let renderer = MKPolylineRenderer(overlay: overlay)
+        ///remove all overlays where the polyline object of the renderer is not the one that the tapped/set route has.
+        routes.removeAll(where: {
+             !$0.polyline.isEqual(renderer.polyline)
+        })
+        return routes.first
+        
     }
     
     ///method to set the initial values to the properties of MapViewAPI
