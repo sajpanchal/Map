@@ -39,7 +39,7 @@ struct Map: View {
     ///variable to show the destination address in the expanded view.
     @State var destination = ""
     ///flag to show/hide the destination info view,
-    @State var showSheet = false
+    @State var showAddressView = false
     ///flag to show/hide the directions list view.
     @State var showDirectionsList = false
     ///binding this variable of array type to ExpendedDirectionsView.
@@ -88,7 +88,7 @@ struct Map: View {
                     MapProgressView(alertMessage: "Routing directions! Please Wait...")
                 }
                 ///this view is reponsible to show the map interation buttons and the bottom stack with route info and navigation related buttons on top of MapView.
-                MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showSheet: $showSheet, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeTravelTime: $routeTravelTime, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions)
+                MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showAddressView: $showAddressView, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeTravelTime: $routeTravelTime, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions)
                 ///if this flag is true show the expanded view with a list of directions on top of mapInteration view.
                 if showDirectionsList {
                     ExpandedDirectionsView(stepInstructions: stepInstructions, showDirectionsList: $showDirectionsList)

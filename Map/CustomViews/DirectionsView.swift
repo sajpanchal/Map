@@ -39,17 +39,10 @@ struct DirectionsView: View {
                 }
                 ///add a space between directions and instruction stacks.
                 Spacer()
-                ///make sure the os is 17.0 atleast
-                if #available(iOS 17.0, *) {
                     ///showing the instruction in a text format
                     Text(instruction)
                         .padding(10)
                         .font(.title3)
-                } else {
-                    Text(instruction)
-                        .padding(10)
-                        .font(.title3)
-                }
                 ///add a spacer to the right of the instruction view.
                 Spacer()
             }

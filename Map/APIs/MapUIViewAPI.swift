@@ -219,8 +219,6 @@ class MapViewAPI {
                  updateStepInstructions(step: step, instruction: (step.instructions == "" ? "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(String(via?[1] ?? ""))" : step.instructions), parent: &parent, stepIndex: stepIndex)
                  break
                  }
-             
-             
          }
          ///now calculate the distance from the next step location to user location
          if let nextStepLocation = parent.nextStepLocation, let userLocation = mapView.userLocation.location {

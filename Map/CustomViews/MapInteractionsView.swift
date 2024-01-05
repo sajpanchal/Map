@@ -16,7 +16,7 @@ struct MapInteractionsView: View {
     ///bounded property to store map action to be performed
     @Binding var mapViewAction: MapViewAction
     ///bounded property to show or hide the footer expanded view
-    @Binding var showSheet: Bool
+    @Binding var showAddressView: Bool
     ///state object of Location manager to show the distance remaining from destination
     @StateObject var locationDataManager: LocationDataManager
     ///state object of local search to check if the destination location has been selected or not
@@ -62,11 +62,11 @@ struct MapInteractionsView: View {
                             .onTapGesture {
                                 ///on tap of it toggle to flag to show/hide the expandedview.
                                 withAnimation {
-                                    showSheet.toggle()
+                                    showAddressView.toggle()
                                 }
                             }
                         ///if flag is true
-                        if showSheet {
+                        if showAddressView {
                             ///show the hstack that is displaying the expanded view with the destination address and title.
                             HStack {
                                 Spacer()
@@ -84,7 +84,7 @@ struct MapInteractionsView: View {
                             .onTapGesture {
                                 ///if user taps on the expandedview itself, show/hide it.
                                 withAnimation {
-                                    showSheet.toggle()
+                                    showAddressView.toggle()
                                 }
                             }
                         }
@@ -95,21 +95,7 @@ struct MapInteractionsView: View {
                         if mapViewStatus != .navigating {
                             ///routes button. On tap of it change the map action to show directions and make the throughfare nil for it to update it when starting a navigation
                             Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
-                                   label: {
-                                ///button appearance
-                                VStack {
-                                    ///show image on top of the text with font styles and background set.
-                                    Image(systemName: "arrow.triangle.swap")
-                                        .font(.title)
-                                        .fontWeight(.black)
-                                        .foregroundStyle(Color.white)
-                                    Text("Routes")
-                                        .foregroundStyle(.white)
-                                        .font(.caption2)
-                                        .fontWeight(.bold)
-                                }
-                                .frame(width: 65, height: 65)
-                            })
+                                   label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
                             .background(.blue.gradient)
                             .cornerRadius(15)
                             .padding(5)
@@ -136,7 +122,7 @@ struct MapInteractionsView: View {
                         }
                         .onTapGesture {
                             withAnimation {
-                                showSheet.toggle()
+                                showAddressView.toggle()
                             }
                         }
                         ///if map is showing directions or is already navigating, show the button to start/stop the navigation. ///button appearance will be changed based on whether the map is navigating or not
@@ -146,29 +132,9 @@ struct MapInteractionsView: View {
                                 ///if map is navigating
                                 isMapInNavigationMode().0 ?
                                 ///change the button appearance with stop text and xmark symbol
-                                VStack {
-                                    Image(systemName: "xmark")
-                                        .font(.title)
-                                        .fontWeight(.black)
-                                        .foregroundStyle(Color.white)
-                                    Text("Stop")
-                                        .foregroundStyle(.white)
-                                        .font(.caption2)
-                                        .fontWeight(.bold)
-                                }
-                                .frame(width: 65, height: 65):
+                                NavigationButton(imageName: "xmark", title: "Stop") :
                                 ///if it is not navigating then change the text with navigate and arrows symbol with blue background.
-                                VStack {
-                                    Image(systemName: "arrow.up.and.down.and.arrow.left.and.right")
-                                        .font(.title)
-                                        .fontWeight(.black)
-                                        .foregroundStyle(Color.white)
-                                    Text("Navigate")
-                                        .foregroundStyle(.white)
-                                        .font(.caption2)
-                                        .fontWeight(.bold)
-                                }
-                                .frame(width: 65, height: 65)
+                                NavigationButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", title: "Navigate")
                             })                           
                             .background(isMapInNavigationMode().0 ? Color.red.gradient : Color.blue.gradient)
                             .cornerRadius(15)
@@ -240,5 +206,5 @@ struct MapInteractionsView: View {
 }
 
 #Preview {
-    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showSheet: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]))
+    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]))
 }
