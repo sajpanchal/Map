@@ -35,7 +35,7 @@ struct MapInteractionsView: View {
     @Binding var nextStepLocation: CLLocation?
     ///bounded property stores an array of tuples with a list of instructions and its distances by each step.
     @Binding var stepInstructions: [(String, Double)]
-    
+    @Binding var ETA: String
     
     var body: some View {
         ///enclose the map interaction views in a vstack and move them to the bottom of the screen.
@@ -112,10 +112,31 @@ struct MapInteractionsView: View {
                                 }
                                 ///if map is navigating then show the remaining distance from the current location to the destination.
                                 else if mapViewStatus == .navigating {
-                                    Text(remainingDistance)
-                                        .font(.title2)
-                                        .fontWeight(.black)
-                                    Text("Remaining")
+                                    ///enclose the ETA texts in HStack
+                                    HStack {
+                                        ///add as spacer on left side of the hstack
+                                        Spacer()
+                                        ///enclose the remaining Distance text with its subtitle in VStack.
+                                        VStack {
+                                            Text(remainingDistance)
+                                                .font(.title2)
+                                                .fontWeight(.black)
+                                            Text("Remains")
+                                                .foregroundStyle(.gray)
+                                        }
+                                        ///add a spacer after the vstack
+                                        Spacer()
+                                        ///enclose the ETA text with its subtitle in VStack
+                                        VStack {
+                                            Text(ETA)
+                                                .font(.title2)
+                                                .fontWeight(.black)
+                                            Text("Arrival")
+                                                .foregroundStyle(.gray)
+                                        }
+                                        ///add a spacer after the vstack
+                                        Spacer()
+                                    }
                                 }
                             }
                             Spacer()
@@ -206,5 +227,5 @@ struct MapInteractionsView: View {
 }
 
 #Preview {
-    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]))
+    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""))
 }

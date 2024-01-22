@@ -89,19 +89,20 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
             })
         }
         ///if locations array is not nil and has the first location of the user, get the last user location, also check if the remainingDistance is not nil
-        if let lastUserLocation = locations.last, let distance = remainingDistance {
+        if let lastUserLocation = locations.last {
          ///check if the distance updated is greater than 0.01 meters and make sure distance is greater than 0.
-            if  self.userlocation!.distance(from: lastUserLocation)/1000 >= 0.01 && distance > 0.0 {
+            if  self.userlocation!.distance(from: lastUserLocation)/1000 >= 0.01 {
                 ///subtract the remaining distance from it self by the distance travelled by the user.
-                remainingDistance! -= (userlocation!.distance(from: lastUserLocation)/1000)
+///                remainingDistance! -= (userlocation!.distance(from: lastUserLocation)/1000)
                 ///update the lastLocation variable with the latest user location recevied by location manager.
                 userlocation = lastUserLocation
+                print("location Updated: \(String(describing: userlocation))")
             }
             ///if distance is less than 0
-            else if distance <= 0.0 {
-                ///keep the distance 0.0
-                remainingDistance = 0.0
-            }
+//            else if distance <= 0.0 {
+//                ///keep the distance 0.0
+/////                remainingDistance = 0.0
+//            }
             ///calculate the speed of the user
             self.speed = self.userlocation!.speed * 3.6
             ///set the region of the map with a center at last user coordinates and zoomed to 1000 meters.

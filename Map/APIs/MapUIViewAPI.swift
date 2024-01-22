@@ -13,16 +13,20 @@ class MapViewAPI {
     static var routes: [MKRoute] = []
     ///next index of the step in route's steps array elements
     static var nextIndex = 0
-    /// array to detect if the given step has points fetched by the function call or not.
+    ///array to detect if the given step has points fetched by the function call or not.
     static var isStepPointsFetched: [Bool] = []
     ///an array stores the MKMapPoints of each steps.
     static var points: [UnsafeMutablePointer<MKMapPoint>] = []
-    /// MKMapPoint of user location
+    ///MKMapPoint of user location
     static var userPoint:MKMapPoint?
     ///length of points array
     static var length: [Int] = []
     ///points array of points
     static var pointsArray: [UnsafeBufferPointer<MKMapPoint>] = []
+    ///variable that stores Estimated Time of Arrival in a string format
+    static var ETA: String?
+    ///variable that stores the remaining distance from the destination
+    static var remainingDistance: CLLocationDistance?
     
     ///this method will accept the mapView, userLocation class instances. here mapView struct instance as inout parameter. inout parameter allows us to make func parameter mutable i.e. we can change the value of the parameter in a function directly and changes will be reflected outside the function after execution.
     static func setRegionIn(mapView: MKMapView, centeredAt userLocation: MKUserLocation, parent: inout MapView) {
@@ -38,9 +42,8 @@ class MapViewAPI {
                 parent.region = mapView.region
             return
         }
-       
-       
     }
+    
     ///this method is used for instantiating map camera and configuring the same
     static func setCameraRegion(of mapView: MKMapView, centeredAt userLocation: MKUserLocation, userHeading: CLHeading?) {
         guard let heading = userHeading else {
@@ -54,10 +57,9 @@ class MapViewAPI {
         DispatchQueue.main.async {
             //set the mapview camera to our defined object.
             mapView.setCamera(camera, animated: true)
-            
         }
-        
     }
+    
     ///function to untrack user location
     static func resetLocationTracking(of mapView: MKMapView, parent: inout MapView) {
         ///clear the instruction field that displays next step instruction on the DirectionsView.
@@ -84,9 +86,9 @@ class MapViewAPI {
         if mapView.centerCoordinate.latitude != annotation.coordinate.latitude && mapView.centerCoordinate.longitude != annotation.coordinate.longitude {
             ///if not centred, centre the mapview to searched location.
             mapView.animatedZoom(zoomRegion: MKCoordinateRegion(center: annotation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
-        
         }
     }
+    
     ///this function will send the route directions request between the two locations annotated in the mapview
     static func getNavigationDirections(in uiView: MKMapView, from source: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D?) {
         ///if there are no overlays associated with the mapview return the function call.
@@ -143,13 +145,15 @@ class MapViewAPI {
             }
             uiView.setVisibleMapRect(uiView.overlays.first!.boundingMapRect, edgePadding: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5), animated: true)
         })
-        
     }
     
     ///method used for starting map navigation and updating the related components based on location updates.
-     static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
+    static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
       ///redundantly setting up mapview status to navigating mode to make sure no misteps.
          parent.mapViewStatus = .navigating
+        print("navigate!")
+        ///method that will get the ETA to the given destintion coordinates.
+         getETA(to: parent.localSearch.suggestedLocations!.first!.coordinate, in: &parent)
          ///if there is any route available then get the first one otherwise exit the fuction.
          guard let route = getSelectedRoute(for: mapView) else {
              return
@@ -177,7 +181,6 @@ class MapViewAPI {
         parent.destination = (destination ?? "") ?? ""
          ///setting the routeDistance property with km format for display
         parent.routeDistance = String(format:"%.1f",Double(route.distance/1000.0)) + " km"
-        
          ///iterate through the route steps
          for step in route.steps {
              ///get the index of the given step and if it is found continue...
@@ -212,18 +215,29 @@ class MapViewAPI {
                  }
              }
              ///if the user location is near 15 m of any of the given step points, update to that step instructions and make nextIndex set to the next step index.
-             if nextIndex == stepIndex && pointsArray[stepIndex].contains(where: { $0.distance(to: userPoint) < 15})  {
+             if nextIndex == stepIndex && pointsArray[stepIndex].contains(where: { $0.distance(to: userPoint) < 10})  {
                  ///this is the variable that will help user navigating by getting advanced hint to start over.
                  let via = route.polyline.title?.split(separator: ", ")
                  ///update the step instructions for display
                  updateStepInstructions(step: step, instruction: (step.instructions == "" ? "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(String(via?[1] ?? ""))" : step.instructions), parent: &parent, stepIndex: stepIndex)
                  break
-                 }
+             }
+             ///if the expected next step is not found nearby but there is a step point found to be nearby and it wasn't marked as exited
+             else if pointsArray[stepIndex].contains(where: {$0.distance(to: userPoint) < 15}) && step.polyline.subtitle != "regionExited" {
+                 let via = route.polyline.title?.split(separator: ", ")
+                 ///update the step instructions for display
+                 updateStepInstructions(step: step, instruction: (step.instructions == "" ? "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(String(via?[1] ?? ""))" : step.instructions), parent: &parent, stepIndex: stepIndex)
+                 break
+             }
          }
          ///now calculate the distance from the next step location to user location
          if let nextStepLocation = parent.nextStepLocation, let userLocation = mapView.userLocation.location {
              calculateDistance(from: nextStepLocation, to: userLocation, parent: &parent)
          }
+        ///transfer the ETA string to parent that is MapView for the display.
+        parent.ETA = self.ETA ?? ""
+        ///update the remainingDistance prop of locationDataManager instance with the latest change.
+        parent.locationDataManager.remainingDistance = (remainingDistance ?? route.distance)/1000
     }
         
     ///function that handles overlay tap events
@@ -371,7 +385,7 @@ extension MapViewAPI {
         ///get the last set of points from points array and the length of the same.
         if let point = points.last, let length = length.last {
             ///append the set the point and length of the set to points array
-            pointsArray.append(UnsafeBufferPointer(start: point, count: length < 5 ? length : 5))
+            pointsArray.append(UnsafeBufferPointer(start: point, count: length < 20 ? length : 20))
         }
         ///set the flag in the array to indicate the points for a given step is already fetched.
         isStepPointsFetched[stepIndex] = true
@@ -403,6 +417,55 @@ extension MapViewAPI {
         intNextStepDistance = intNextStepDistance < 10 ? 0 : intNextStepDistance
         ///format the distance in meters if less than 1000 or in km otherwise.
         parent.nextStepDistance = nextStepDistance < 1000 ? String(intNextStepDistance) + " m" : String(format:"%.1f",(nextStepDistance/1000)) + " km"
+    }
+    
+    ///method that will get the ETA to the given destination
+    static func getETA(to destination: CLLocationCoordinate2D, in parent: inout MapView) {
+        ///create an instance of Request that is a property of MKDirections Object.
+        let request = MKDirections.Request()
+        ///set the source of the request as the current userlocation
+        request.source =  MKMapItem(placemark: MKPlacemark(coordinate: parent.locationDataManager.userlocation!.coordinate))
+        ///set the destination of the request as the destination set by the user
+        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
+        ///set the transport type as automobile
+        request.transportType = .automobile
+        ///create an instance of MKDirections with the configured request object
+        let directions = MKDirections(request: request)
+        ///async task will execute the code non-sequentially. so if the code inside is taking time if will execute the other code and when the code is having a response it will be executed at that time.
+        Task {
+            ///call the async method of directions called calculateETA to get the ETA for our request and if response is found store it in reponse constant otherwise return the function call.
+            guard let response = try? await directions.calculateETA() else {
+                return                
+            }
+            ///the following code is enclosed in MainActor.run method which will execute the code in mainactor's (locationmanager(didupdate:) method) thread.
+            await MainActor.run {
+                ///get the distance from current user location to the destination and store it in remainingDistance
+                remainingDistance = response.distance
+                print("remaining Distance: \(remainingDistance ?? 0)")
+                ///get the expectedArrivalDate to the destination
+                let ETA = response.expectedArrivalDate
+                ///create a current user's calender object
+                let calender = Calendar.current
+                ///call the component method with hour component to return hour component from arrival date object.
+                let hour = calender.component(.hour, from: ETA)
+                ///format the hour from 24 hr to 12 hr and convert it to string
+                var hourStr = hour <= 12 ? String(hour) : String(hour - 12)
+                ///if hour is 0 with 12.
+                if hour == 0 {
+                    ///replace 0 iw
+                    hourStr = "12"
+                }
+                ///call the calender component mehod to get minute component from arrival date.
+                let minutes = calender.component(.minute, from: ETA)
+                ///format the minutes in  string with 2 digits  number.
+                let minutesStr = minutes > 9 ? String(minutes) : "0" + String(minutes)
+                ///set the period constant pm if hour is past 11 in the morning otherwise am.
+                let period = hour > 11 ? " pm" : " am"
+                print("eta is :\(hour):\(minutesStr)")
+                ///now store the eta in standard 12 hr time format in ETA string.
+                self.ETA = hourStr + ":" + minutesStr + period
+            }
+        }
     }
 }
 

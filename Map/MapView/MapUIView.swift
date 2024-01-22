@@ -50,6 +50,8 @@ struct MapView: UIViewRepresentable {
     @Binding var stepInstructions: [(String, Double)]
     ///temportily storing the region instance
     var region: MKCoordinateRegion?
+    ///string to display the ETA for a given destination
+    @Binding var ETA: String
 
 
     ///this is the function that our MapView will execute the first time on its inception. this function will instantiate the Coordinator class with a copy of its parent object.
@@ -171,7 +173,7 @@ struct MapView: UIViewRepresentable {
                 
                 ///navigation mode.
                 case .navigate:
-                    print("navigate!")
+                   // print("navigate!")
                 ///set the camera region centered at user location and follow it with megnatic heading
                     MapViewAPI.setCameraRegion(of: mapView, centeredAt: userLocation, userHeading: parent.locationDataManager.userHeading)
                 ///start navigate the user to destination
@@ -289,7 +291,7 @@ struct MapView: UIViewRepresentable {
             
             ///start navigation
             case .navigate:
-                print("navigate")
+                //print("navigate")
                 ///if navigation is not updated.
                 if mapViewStatus != .navigating {
                     print("navigating from update UIView.")
