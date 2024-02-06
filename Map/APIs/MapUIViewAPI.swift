@@ -27,7 +27,15 @@ class MapViewAPI {
     static var ETA: String?
     ///variable that stores the remaining distance from the destination
     static var remainingDistance: CLLocationDistance?
-    
+    ///change in distance travelled by user towards the next Step Location
+    static var changeInStepDistance: Double?
+    ///previously recoded distance from next step location
+    static var previousStepDistance: Double?
+    ///storing thoroughfare in text format
+    static var instructionText: String = ""
+    ///flag to determine if user is out of route or not.
+    static var isUserOutofRoute: Bool = false
+
     ///this method will accept the mapView, userLocation class instances. here mapView struct instance as inout parameter. inout parameter allows us to make func parameter mutable i.e. we can change the value of the parameter in a function directly and changes will be reflected outside the function after execution.
     static func setRegionIn(mapView: MKMapView, centeredAt userLocation: MKUserLocation, parent: inout MapView) {
         ///when this function will be called for the very first time, the region property of our mapView struct will be nil.
@@ -47,15 +55,14 @@ class MapViewAPI {
     ///this method is used for instantiating map camera and configuring the same
     static func setCameraRegion(of mapView: MKMapView, centeredAt userLocation: MKUserLocation, userHeading: CLHeading?) {
         guard let heading = userHeading else {
-            //instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
-            //pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
+            ///instantiate the MKMapCamera object with center as user location, distance (camera zooming to center), pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
             return
         }
         ///instantiate the camera with center to user location and following its heading directions.
         let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 500, pitch: 0, heading: heading.magneticHeading)
         
         DispatchQueue.main.async {
-            //set the mapview camera to our defined object.
+            ///set the mapview camera to our defined object.
             mapView.setCamera(camera, animated: true)
         }
     }
@@ -151,9 +158,8 @@ class MapViewAPI {
     static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
       ///redundantly setting up mapview status to navigating mode to make sure no misteps.
          parent.mapViewStatus = .navigating
-        print("navigate!")
         ///method that will get the ETA to the given destintion coordinates.
-         getETA(to: parent.localSearch.suggestedLocations!.first!.coordinate, in: &parent)
+        getETA(to: parent.localSearch.suggestedLocations!.first!.coordinate, in: &parent, with: mapView)
          ///if there is any route available then get the first one otherwise exit the fuction.
          guard let route = getSelectedRoute(for: mapView) else {
              return
@@ -234,6 +240,15 @@ class MapViewAPI {
          if let nextStepLocation = parent.nextStepLocation, let userLocation = mapView.userLocation.location {
              calculateDistance(from: nextStepLocation, to: userLocation, parent: &parent)
          }
+        ///method that will determine if user is out or route or not.
+        isUserLocationOutOfRoute(in: parent)
+        /// if user is out of route
+        if isUserOutofRoute {
+            ///set the instruction set to be displayed with a warning text.
+            parent.instruction = "Please wait while re-routing to your destination!"
+            ///method to perform re-routing to the current destination.
+            reRoutetoDestination(in: mapView, from: parent.locationDataManager.userlocation!.coordinate, to: parent.localSearch.suggestedLocations!.first!.coordinate, parent: &parent)
+        }
         ///transfer the ETA string to parent that is MapView for the display.
         parent.ETA = self.ETA ?? ""
         ///update the remainingDistance prop of locationDataManager instance with the latest change.
@@ -318,6 +333,8 @@ extension MapViewAPI {
         length = []
         pointsArray = []
         nextIndex = 0
+        previousStepDistance = nil
+        changeInStepDistance = nil
     }
     
     ///method to get the overlay that has been set or tapped.
@@ -353,6 +370,7 @@ extension MapViewAPI {
              ///get the title of the route polyline separated in an array. title is actully the street name from where the route is starting towards destination.
              let via = route.polyline.title?.split(separator: ", ")
              ///initate the instruction for the first step to be displayed with the current location street name and the next one.
+             instructionText = "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(via?[1] ?? "")"
              parent.instruction = "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(via?[1] ?? "")"
          }
         ///get the initial distance remaining to destination from user location. that is route distance.
@@ -385,7 +403,7 @@ extension MapViewAPI {
         ///get the last set of points from points array and the length of the same.
         if let point = points.last, let length = length.last {
             ///append the set the point and length of the set to points array
-            pointsArray.append(UnsafeBufferPointer(start: point, count: length < 20 ? length : 20))
+            pointsArray.append(UnsafeBufferPointer(start: point, count: length))
         }
         ///set the flag in the array to indicate the points for a given step is already fetched.
         isStepPointsFetched[stepIndex] = true
@@ -393,6 +411,7 @@ extension MapViewAPI {
     
     ///method used for updating the step instructons on change of step.
     static func updateStepInstructions(step: MKRoute.Step, instruction: String, parent: inout MapView, stepIndex: Int) {
+        previousStepDistance = nil
         ///get the next step location
         parent.nextStepLocation = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
         ///update the swiftui instruction display with the latest instruction received from next step
@@ -420,7 +439,7 @@ extension MapViewAPI {
     }
     
     ///method that will get the ETA to the given destination
-    static func getETA(to destination: CLLocationCoordinate2D, in parent: inout MapView) {
+    static func getETA(to destination: CLLocationCoordinate2D, in parent: inout MapView, with mapView: MKMapView) {
         ///create an instance of Request that is a property of MKDirections Object.
         let request = MKDirections.Request()
         ///set the source of the request as the current userlocation
@@ -437,9 +456,20 @@ extension MapViewAPI {
             guard let response = try? await directions.calculateETA() else {
                 return                
             }
+            guard let placemarks = try? await CLGeocoder().reverseGeocodeLocation(mapView.userLocation.location!) else {
+                instructionText = "n/a"
+                return
+            }
             ///the following code is enclosed in MainActor.run method which will execute the code in mainactor's (locationmanager(didupdate:) method) thread.
             await MainActor.run {
                 ///get the distance from current user location to the destination and store it in remainingDistance
+                if let thoroughfare = placemarks.first?.thoroughfare {
+                    instructionText = thoroughfare
+                }
+                else {
+                    instructionText = "not found"
+                }
+               
                 remainingDistance = response.distance
                 print("remaining Distance: \(remainingDistance ?? 0)")
                 ///get the expectedArrivalDate to the destination
@@ -464,6 +494,112 @@ extension MapViewAPI {
                 print("eta is :\(hour):\(minutesStr)")
                 ///now store the eta in standard 12 hr time format in ETA string.
                 self.ETA = hourStr + ":" + minutesStr + period
+            }
+        }
+    }
+    
+    ///method to determine if user is out of its set route
+    static func isUserLocationOutOfRoute(in parent: MapView) {
+        ///extract the sub string that is holding the next step distance from the nextStepDistance variable.
+        guard let latestStepDistanceString = parent.nextStepDistance.split(separator: " ").first else {
+            ///if it is not found set the flag false and return function call.
+            isUserOutofRoute = false
+            return
+        }
+        ///convert the string to double and if it is found store it in a latestStepDistance variable
+        guard var latestStepDistance = Double(latestStepDistanceString) else {
+            ///if it is not found set the flag false and return function call.
+            isUserOutofRoute = false
+            return
+        }
+        ///if step distance is in km format, convert it to meters format.
+        latestStepDistance = parent.nextStepDistance.split(separator: " ").last == "km" ? (latestStepDistance * 1000) :  latestStepDistance
+        ///if previously recorded step distance is nil
+        if previousStepDistance == nil {
+            ///set the latest available step distance as previous step distance.
+            previousStepDistance = latestStepDistance
+            ///set change in step distance to 0.
+            changeInStepDistance = 0
+            ///set the flag to false.
+            isUserOutofRoute = false
+        }
+        ///if previous distance is not nil
+        else {
+            ///calculate the change in step distance
+            changeInStepDistance = latestStepDistance - previousStepDistance!
+            ///if the change in distance is +-50 or more update the previusStepDistance with latest one.
+            if abs(changeInStepDistance!) >= 50 {
+                previousStepDistance = latestStepDistance
+            }
+            ///if the distance from the next step is in km.
+            if parent.nextStepDistance.contains("km") {
+                ///set the user out of route flag to true if change is 150 m or more.
+                isUserOutofRoute = (changeInStepDistance! >= 150) ? true : false
+            }
+            ///if distance is in meters.
+            else {
+                ///set the user out of route flag to true if change is 40  m or more.
+                isUserOutofRoute = (changeInStepDistance! >= 40) ? true : false
+            }
+        }
+        return
+    }
+    
+    ///method to perform re-routing operation
+    static func reRoutetoDestination(in uiView: MKMapView, from source: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D?, parent: inout MapView) {
+       ///set nextIndex to 0.
+        nextIndex = 0
+        ///reset all static properties of the given class.
+        resetProps()
+        ///remove all the step instructions to be displayed in expandable list view.
+        parent.stepInstructions.removeAll()
+        ///create an instance of MKDirections request to request the directions.
+        let request = MKDirections.Request()
+        ///if distination is not nil
+        guard let destination = destination else {
+        return
+        }
+        ///set the source point of request as a placemark of user location
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: source))
+        ///set the destination of the request as a placemark of searched location
+        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
+        ///set the request for alternate routes between 2 places to true to get more than one routes.
+        request.requestsAlternateRoutes = false
+        ///set the transport type as automobile as default.
+        request.transportType = .automobile
+        ///create a directions object from our request now.
+        let directions = MKDirections(request: request)
+        parent.stepInstructions.removeAll()
+        ///async function to calculate the routes from information provided by request object of directions object.
+        Task {
+            ///calculate the route for a given directions object and check if there is a response
+            guard let response = try? await directions.calculate() else {
+                return
+            }
+            ///if response is there check if there is atleast one route available in the response object.
+            guard let route = response.routes.first else {
+                return
+            }
+            ///remove all previously fetched routes from the routes array
+            routes.removeAll()
+            ///add the latest route to the first index of an array.
+            routes.append(route)
+            ///iterate through the sorted routes.
+            if let route = self.routes.first {
+                ///get the polyline object from current route
+                let polyline = route.polyline
+                let title = polyline.title
+                polyline.title = "\(Int(route.expectedTravelTime/60)), \(title ?? "n/a"), \(UUID()), \(String(format:"%.1f",route.distance/1000.0))"
+                ///if this is the last route it must be having a shortest travel time
+                ///set the polyline subtitle as fastest route to identify it in later uses.
+                polyline.subtitle = "fastest route"
+                ///add the polyline received from the route as an overlay to be displayed in mapview.
+                await MainActor.run {
+                    ///remove all overalys from mapview.
+                    uiView.removeOverlays(uiView.overlays)
+                    ///sort the routes recieved from the response with longer travel time first.
+                    uiView.addOverlay(polyline)
+                }
             }
         }
     }

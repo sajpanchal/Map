@@ -72,6 +72,7 @@ struct MapInteractionsView: View {
                                 Spacer()
                                 ///showing the title and destination address and its name.
                                 VStack {
+                                    Text("ThoroughFare: \(MapViewAPI.instructionText)")
                                     Text("Heading to destination")
                                         .font(.caption2)
                                         .fontWeight(.bold)
