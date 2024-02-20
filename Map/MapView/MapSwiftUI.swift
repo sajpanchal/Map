@@ -132,7 +132,6 @@ struct Map: View {
                 mapViewAction = .idle
             }
         }
-        print("map is out of center: \(mapViewStatus)")
     }
         
   

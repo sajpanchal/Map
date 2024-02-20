@@ -32,10 +32,13 @@ struct DirectionsView: View {
                             .padding(.top, 5)
                     }
                     ///show the distance from next step
-                    Text("\(nextStepDistance)")
-                        .padding(.bottom, 5)
-                        .font(.title2)
-                        .fontWeight(.black)
+                    if !instruction.contains("Re-calculating the route...") {
+                        Text("\(nextStepDistance)")
+                            .padding(.bottom, 5)
+                            .font(.title2)
+                            .fontWeight(.black)
+                    }
+                    
                 }
                 ///add a space between directions and instruction stacks.
                 Spacer()

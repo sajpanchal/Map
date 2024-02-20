@@ -23,7 +23,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     ///remaining distance from the userlocation to the destination while in navigation
     @Published var remainingDistance: CLLocationDistance?
     ///speed of the user
-    @Published var speed: CLLocationSpeed = 0.0
+    @Published var speed: Int = 0
     ///throughfare i.e. street name of the current location received by reverse geocoding.
     @Published var throughfare: String?
     ///flag to be used for enabling and disabling the reverse geocoding
@@ -81,7 +81,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                     ///get the first placemark from an array
                     if let placemark = placemarks.first {
                         ///retrieve the thoroughfare for that placemark. which will be a street name.
-                        DispatchQueue.main.async {
+                        await MainActor.run {
                             self.throughfare = placemark.thoroughfare
                         }
                     }
@@ -96,15 +96,9 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
 ///                remainingDistance! -= (userlocation!.distance(from: lastUserLocation)/1000)
                 ///update the lastLocation variable with the latest user location recevied by location manager.
                 userlocation = lastUserLocation
-                print("location Updated: \(String(describing: userlocation))")
             }
-            ///if distance is less than 0
-//            else if distance <= 0.0 {
-//                ///keep the distance 0.0
-/////                remainingDistance = 0.0
-//            }
             ///calculate the speed of the user
-            self.speed = self.userlocation!.speed * 3.6
+            self.speed = Int(self.userlocation!.speed * 3.6)
             ///set the region of the map with a center at last user coordinates and zoomed to 1000 meters.
             region = MKCoordinateRegion(center: lastUserLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
         }

@@ -56,7 +56,6 @@ struct MapView: UIViewRepresentable {
 
     ///this is the function that our MapView will execute the first time on its inception. this function will instantiate the Coordinator class with a copy of its parent object.
     func makeCoordinator() -> (Coordinator) {
-        print("make coordinator")
         return Coordinator(self)
     }
     ///Coordinator is a class reponsible to communicate the behaviour of our UIKit/Appkit object and makes necessary changes to our swiftuiobjects. it enables us to do so by updating the properties of this class or executing UIKit/AppKit methods. here, we are making our cooridator a subclass of NSObject. We are also conforming to the MKMapViewDelegate protocol which enables us to use MKMapView methods that will be executed on updates to our MapView and CoreLocation data. Also, we are setting a property called parent as MapView type and setting its delegate as a coordinator object. So, when any of the event related to MapView occurs a delegator will detect those changes, a relevant function we have declared in the Delegator (Coordinator) will be executed. inside the methods, we make changes to our UIView based on the changes in associated data.
@@ -150,39 +149,29 @@ struct MapView: UIViewRepresentable {
                 
                 ///idle in showdirections  mode.
                 case .idleInshowDirections:
-                    print("idleInshowDirections!")
                     ///reset the user tracking.
                     mapView.setUserTrackingMode(.none, animated: true)
                 
                 ///idle in navigation mode.
                 case .idleInNavigation:
-                    print("idleInNavigation!")
                     parent.mapViewStatus = .inNavigationNotCentered
                     break
-                
                 ///center to user location mode
                 case.centerToUserLocation:
-                print("centerToUserLocation!")
                     parent.mapViewStatus = .centeredToUserLocation
                     break
-                
                 ///in navigation mode, center to user location
                 case .inNavigationCenterToUserLocation:
-                    print("inNavigationCenterToUserLocation!")
                     fallthrough
-                
                 ///navigation mode.
                 case .navigate:
-                   // print("navigate!")
                 ///set the camera region centered at user location and follow it with megnatic heading
                     MapViewAPI.setCameraRegion(of: mapView, centeredAt: userLocation, userHeading: parent.locationDataManager.userHeading)
                 ///start navigate the user to destination
                     MapViewAPI.startNavigation(in: mapView, parent: &parent)
                 break
-                
                 ///show directions mode.
                 case .showDirections:
-                    print("showDirections!")
                     ///if status is already updated skip this case.
                     if parent.mapViewStatus == .showingDirections {
                         break
@@ -192,12 +181,10 @@ struct MapView: UIViewRepresentable {
                         parent.clearEntities(from: mapView)
                         ///make the mapview to go in idle mode.
                         self.parent.mapViewAction = .idle
-                        print("idle mode is back")
                         return
                     }
                     ///get the navigation directions laid out from overlay renderer to map between user location and destination.
                     MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: suggestedLocations.first?.coordinate)
-                    
                     parent.mapViewStatus = .showingDirections
                     break
             }
@@ -207,7 +194,6 @@ struct MapView: UIViewRepresentable {
     ///this function needs to be declared to be able to conform to UIViewRepresentable protocol
     ///this function will be called by SwiftUI when swiftUI is ready to display the MapView.
     func makeUIView(context: Context) -> MKMapView {
-        print("make map view")
         ///setting our coordinator object as a delegate of mapView object. this will allow coordinator object to detect any changes in mapView object (data or view updates). based on these changes, any associated methods declared in coordinator will be executed. this way we can manipulate the data and deal with the user inteactions in mapviews.
         context.coordinator.mapView.delegate = context.coordinator
         ///this will show a blip where the user location is in the map. if we don't set this property, mapView won't be able to get location updates.
@@ -246,20 +232,17 @@ struct MapView: UIViewRepresentable {
             
             ///idle in showdirections  mode.
             case .idleInshowDirections:
-                print("idleInshowDirections")
                 ///reset the user tracking.
                 uiView.setUserTrackingMode(.none, animated: true)
             break
             
             ///idle in navigation mode.
             case .idleInNavigation:
-                print("idleInNavigation")
                 break
             
             ///center to user location mode
             case.centerToUserLocation:
-                print("centerToUserLocation")
-                ///if the status is not updated
+                 ///if the status is not updated
                 if self.mapViewStatus != .centeredToUserLocation {
                     DispatchQueue.main.async {
                         ///zoom the map to user location
@@ -281,21 +264,18 @@ struct MapView: UIViewRepresentable {
             
             ///in navigation mode center map to userlocation
             case .inNavigationCenterToUserLocation:
-                print("inNavigationCenterToUserLocation")
                 if let heading = locationDataManager.userHeading {
                     ///instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
                     ///pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
                     MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: heading)
                 }
-               break
+              break
             
             ///start navigation
             case .navigate:
-                //print("navigate")
                 ///if navigation is not updated.
                 if mapViewStatus != .navigating {
-                    print("navigating from update UIView.")
-                    ///set the camera region centered to user location and follow it using heading updated.
+                     ///set the camera region centered to user location and follow it using heading updated.
                     MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: self.locationDataManager.userHeading)
                     DispatchQueue.main.async {
                         ///navigate to the destination.
@@ -306,7 +286,6 @@ struct MapView: UIViewRepresentable {
             
             ///show directions mode
             case .showDirections:
-                print("showdirections")
                 ///show the directions for a given destination by drawing overlays.
                 guard let suggestedLocations = localSearch.suggestedLocations else {
                     DispatchQueue.main.async {
@@ -314,8 +293,7 @@ struct MapView: UIViewRepresentable {
                         self.clearEntities(from: uiView)
                         ///make the map view to go in idle mode
                         self.mapViewAction = .idle
-                        print("idle mode is back")
-                    }
+                     }
                     return
                 }
                  MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: suggestedLocations.first?.coordinate)
@@ -330,8 +308,7 @@ extension MapView {
     func searchLocationInterface(in uiView: MKMapView, for searchedLocation: MKAnnotation) {
         ///if the destination is selected
         if self.localSearch.isDestinationSelected {
-            print("location is selected")
-            ///annotate the location on the map and center the map to it.
+             ///annotate the location on the map and center the map to it.
             MapViewAPI.annotateLocation(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
             
             DispatchQueue.main.async {
@@ -343,8 +320,7 @@ extension MapView {
         }
         ///if search is cancelled.
         else if localSearch.isSearchCancelled {
-            print("location cancelled")
-            DispatchQueue.main.async {
+             DispatchQueue.main.async {
                 ///remove the annotations
                 uiView.removeAnnotations(uiView.annotations)
                 ///remove the overlays
@@ -356,13 +332,11 @@ extension MapView {
     func clearEntities(from mapView: MKMapView) {
         ///if overlays are present in the mapview
         if !mapView.overlays.isEmpty {
-            print("removing overlays")
-            ///remove the overlays
+              ///remove the overlays
             mapView.removeOverlays(mapView.overlays)
         }
         ///if annotations are present in the mapview
         if !mapView.annotations.isEmpty  {
-            print("removing annotations!")
             ///remove the annotations.
             mapView.removeAnnotations(mapView.annotations)
         }

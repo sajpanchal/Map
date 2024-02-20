@@ -72,7 +72,7 @@ struct MapInteractionsView: View {
                                 Spacer()
                                 ///showing the title and destination address and its name.
                                 VStack {
-                                    Text("ThoroughFare: \(MapViewAPI.instructionText)")
+                                    Text("\(String(MapViewAPI.isUserOutofThoroughFare)) \(MapViewAPI.thoroughfare) \(MapViewAPI.time) \(String(MapViewAPI.isTimerOn)), index:\(MapViewAPI.i)")
                                     Text("Heading to destination")
                                         .font(.caption2)
                                         .fontWeight(.bold)
@@ -184,7 +184,6 @@ struct MapInteractionsView: View {
     
     ///update the user location tracking
     func updateLocationTracking() {
-        print("user navigation tracking is available.")
         switch mapViewStatus {
         ///set mapViewAction to navigate mode if status is not related to navigation when button is pressed.
         case .idle, .notCentered, .centeredToUserLocation, .showingDirections:

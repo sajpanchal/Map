@@ -32,9 +32,20 @@ class MapViewAPI {
     ///previously recoded distance from next step location
     static var previousStepDistance: Double?
     ///storing thoroughfare in text format
-    static var instructionText: String = ""
+    static var thoroughfare: String = ""
     ///flag to determine if user is out of route or not.
     static var isUserOutofRoute: Bool = false
+    ///flag to determine if user is out of thoroughfare or not
+    static var isUserOutofThoroughFare: Bool = false
+    ///flag to determine if timer is ON or OFF.
+    static var isTimerOn = false
+    ///variable to store the timer occurances in 1 sec interval.
+    static var time = 0
+    ///timer instance.
+    static var timer: Timer?
+    ///flag to determine if path is out of camera of the map.
+    static var isUserOutofPath: Bool = false
+    static var i = ""
 
     ///this method will accept the mapView, userLocation class instances. here mapView struct instance as inout parameter. inout parameter allows us to make func parameter mutable i.e. we can change the value of the parameter in a function directly and changes will be reflected outside the function after execution.
     static func setRegionIn(mapView: MKMapView, centeredAt userLocation: MKUserLocation, parent: inout MapView) {
@@ -59,11 +70,12 @@ class MapViewAPI {
             return
         }
         ///instantiate the camera with center to user location and following its heading directions.
-        let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 500, pitch: 0, heading: heading.magneticHeading)
+        let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 600, pitch: 40, heading: heading.magneticHeading)
         
         DispatchQueue.main.async {
             ///set the mapview camera to our defined object.
             mapView.setCamera(camera, animated: true)
+            mapView.showsScale = true
         }
     }
     
@@ -122,7 +134,6 @@ class MapViewAPI {
         directions.calculate(completionHandler: { (response, error) in
             ///if response is received
             guard let response = response else {
-                print(error?.localizedDescription ?? "")
                 return
             }
             ///remove all overalys from mapview.
@@ -193,6 +204,7 @@ class MapViewAPI {
              guard let stepIndex = route.steps.firstIndex(of: step) else {
                  return
              }
+            
              ///set the user location as user point to calculate distance from step polyline points.
              userPoint = MKMapPoint(mapView.userLocation.coordinate)
              ///if array isStepPointsFetched going out of index, add a new element to the last index.
@@ -242,15 +254,18 @@ class MapViewAPI {
          }
         ///method that will determine if user is out or route or not.
         isUserLocationOutOfRoute(in: parent)
-        /// if user is out of route
-        if isUserOutofRoute {
+        ///method that will determine if user is out of thoroughfare or not.
+        isUserOutOfThoroghfare(for: route, parent: &parent, in: mapView)
+        /// if user is out of route or thoroughfare
+        if isUserOutofRoute || isUserOutofThoroughFare || isPathOutofMapCamera(in: route, of: mapView, at: nextIndex, parent: parent) {
             ///set the instruction set to be displayed with a warning text.
-            parent.instruction = "Please wait while re-routing to your destination!"
+            parent.instruction = "Re-calculating the route..."
+            parent.locationDataManager.throughfare = nil
             ///method to perform re-routing to the current destination.
             reRoutetoDestination(in: mapView, from: parent.locationDataManager.userlocation!.coordinate, to: parent.localSearch.suggestedLocations!.first!.coordinate, parent: &parent)
         }
         ///transfer the ETA string to parent that is MapView for the display.
-        parent.ETA = self.ETA ?? ""
+        parent.ETA = self.ETA ?? "--"
         ///update the remainingDistance prop of locationDataManager instance with the latest change.
         parent.locationDataManager.remainingDistance = (remainingDistance ?? route.distance)/1000
     }
@@ -335,6 +350,11 @@ extension MapViewAPI {
         nextIndex = 0
         previousStepDistance = nil
         changeInStepDistance = nil
+        isTimerOn = false
+        time = 0
+        isUserOutofPath = false
+        isUserOutofRoute = false
+        isUserOutofThoroughFare = false
     }
     
     ///method to get the overlay that has been set or tapped.
@@ -370,7 +390,7 @@ extension MapViewAPI {
              ///get the title of the route polyline separated in an array. title is actully the street name from where the route is starting towards destination.
              let via = route.polyline.title?.split(separator: ", ")
              ///initate the instruction for the first step to be displayed with the current location street name and the next one.
-             instructionText = "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(via?[1] ?? "")"
+             thoroughfare = "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(via?[1] ?? "")"
              parent.instruction = "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(via?[1] ?? "")"
          }
         ///get the initial distance remaining to destination from user location. that is route distance.
@@ -457,21 +477,19 @@ extension MapViewAPI {
                 return                
             }
             guard let placemarks = try? await CLGeocoder().reverseGeocodeLocation(mapView.userLocation.location!) else {
-                instructionText = "n/a"
+                thoroughfare = "n/a"
                 return
             }
             ///the following code is enclosed in MainActor.run method which will execute the code in mainactor's (locationmanager(didupdate:) method) thread.
             await MainActor.run {
                 ///get the distance from current user location to the destination and store it in remainingDistance
                 if let thoroughfare = placemarks.first?.thoroughfare {
-                    instructionText = thoroughfare
+                    self.thoroughfare = thoroughfare
                 }
                 else {
-                    instructionText = "not found"
+                    thoroughfare = "not found"
                 }
-               
                 remainingDistance = response.distance
-                print("remaining Distance: \(remainingDistance ?? 0)")
                 ///get the expectedArrivalDate to the destination
                 let ETA = response.expectedArrivalDate
                 ///create a current user's calender object
@@ -491,7 +509,6 @@ extension MapViewAPI {
                 let minutesStr = minutes > 9 ? String(minutes) : "0" + String(minutes)
                 ///set the period constant pm if hour is past 11 in the morning otherwise am.
                 let period = hour > 11 ? " pm" : " am"
-                print("eta is :\(hour):\(minutesStr)")
                 ///now store the eta in standard 12 hr time format in ETA string.
                 self.ETA = hourStr + ":" + minutesStr + period
             }
@@ -525,22 +542,16 @@ extension MapViewAPI {
         }
         ///if previous distance is not nil
         else {
+            ///get the change in distance preset number from a function based on user speed.
+            let changePreset = setChangePreset(parent: parent)
             ///calculate the change in step distance
             changeInStepDistance = latestStepDistance - previousStepDistance!
-            ///if the change in distance is +-50 or more update the previusStepDistance with latest one.
-            if abs(changeInStepDistance!) >= 50 {
+            ///if the change in distance is equal to greater than preset update the previusStepDistance with latest one.
+            if abs(changeInStepDistance!) >= changePreset {
                 previousStepDistance = latestStepDistance
             }
-            ///if the distance from the next step is in km.
-            if parent.nextStepDistance.contains("km") {
-                ///set the user out of route flag to true if change is 150 m or more.
-                isUserOutofRoute = (changeInStepDistance! >= 150) ? true : false
-            }
-            ///if distance is in meters.
-            else {
-                ///set the user out of route flag to true if change is 40  m or more.
-                isUserOutofRoute = (changeInStepDistance! >= 40) ? true : false
-            }
+            ///if the change in distance is more than or equal to change preset, flag the userOutOfRoute to true.
+            isUserOutofRoute = (changeInStepDistance! >= changePreset) ? true : false
         }
         return
     }
@@ -569,6 +580,7 @@ extension MapViewAPI {
         request.transportType = .automobile
         ///create a directions object from our request now.
         let directions = MKDirections(request: request)
+        ///remove all entries from stepInstructions array
         parent.stepInstructions.removeAll()
         ///async function to calculate the routes from information provided by request object of directions object.
         Task {
@@ -601,6 +613,149 @@ extension MapViewAPI {
                     uiView.addOverlay(polyline)
                 }
             }
+        }
+    }
+    
+    ///method to check if the user is out of thoroghfare
+    static func isUserOutOfThoroghfare(for route: MKRoute, parent: inout MapView, in mapView: MKMapView) {
+        ///instantiate the variable to store the current stepIndex
+        var stepIndex = 0
+        if thoroughfare == "n/a" || thoroughfare == "not found" {
+            stopTimer()
+            return
+        }
+        ///find the index of the step from steps array where current instruction on display matches with its instruction.
+        if let index = route.steps.firstIndex(where: {
+            $0.instructions == parent.instruction
+        }) {
+            ///deduct the index by 1 so we get the instruction belongs to the current thoroghfare of the user location.
+             stepIndex = index - 1
+            ///if the instruction contains the thoroughfare
+            if route.steps[stepIndex].instructions.contains(thoroughfare)  {
+                ///stop the timer
+                stopTimer()
+                i = "instruction text matches with last instruction at --> \(stepIndex)"
+                ///return the function call.
+                return
+            }
+            ///if the instruction at the given stepIndex is found empty in steps array of a given route
+            else if route.steps[stepIndex].instructions.isEmpty {
+                ///get the title of the route polyline separated in an array. title is actully the street name from where the route is starting towards destination.
+                let via = route.polyline.title?.split(separator: ", ")
+                ///create a string with initial instruction for the starting point of the route.
+                let initialInstruction = "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(via?[1] ?? "")"
+                ///if the initial instruction has the given thoroughfare
+                if initialInstruction.contains(thoroughfare) {
+                    i = "instruction text matches with the empty display --> \(stepIndex)"
+                    //stop the timer and return the function call
+                    stopTimer()
+                    return
+                }
+                ///if no conditions were met, continue
+                else {
+                    
+                }
+            }
+        }
+        ///if no index is found, check if the instruction is the first one where user is starting the journey.
+        else if parent.instruction.contains(thoroughfare) {
+            i = "instruction text matches with the display --> \(stepIndex)"
+            ///stop the timer and return the function call
+            stopTimer()
+            return
+        }
+        ///if instruction doesn't have a current thoroughfare and speed is more than 25
+        if parent.locationDataManager.speed >= 25 {
+            i = "instruction didn't match --> \(stepIndex)"
+            ///if time is not on
+            if !self.isTimerOn {
+                ///start the timer and continue
+                startTimer()
+            }
+            
+        }
+        ///once time gets past 5secs
+        if self.time > 5  {
+            ///set the flag to true to indicate user is out of thoroughfare.
+            isUserOutofThoroughFare = true
+        }
+        
+    }
+    
+    static func isPathOutofMapCamera(in route: MKRoute, of mapView: MKMapView, at nextIndex: Int, parent: MapView) -> Bool {
+        ///if mapview is not centered to userlocation set the out of path flag to false
+        if parent.mapViewStatus == .inNavigationNotCentered {
+            isUserOutofPath = false
+            return isUserOutofPath
+        }
+        var stepIndex = 0
+        ///if nextIndex is less than 1
+        if nextIndex < 1 {
+            ///set the stepIndex to 0.
+            stepIndex = 0
+        }
+        ///otherwise set the stepIndex to the one before nextIndex
+        else {
+            stepIndex = nextIndex - 1
+        }
+        ///if the stepPoints are fetched for current step
+        if isStepPointsFetched[stepIndex] {
+            ///iterate over all points in a given points of step
+            for point in pointsArray[stepIndex] {
+                ///if the given point is within the visible map rectangle.
+                if mapView.visibleMapRect.contains(point) {
+                    isUserOutofPath = false
+                    return isUserOutofPath
+                }
+            }
+            ///if loop is exited with no matches return the true flag.
+            isUserOutofPath = true
+        }
+         ///if no points are fetched yet, return false
+        return isUserOutofPath
+    }
+    
+    ///start timer function
+    static func startTimer() {
+        ///instantiate scheduled timer with 1sec repeating interval  and a block of code to set timer flag and increment time
+        DispatchQueue.main.async {
+            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { timer in
+                   isTimerOn = true
+                   time += 1
+               })
+        }
+    }
+    
+    ///stop timer function
+    static func stopTimer() {
+        ///if timer is not nil
+        if timer != nil {
+            ///invalidate timet
+            self.timer!.invalidate()
+        }
+        ///make timer nil.
+        self.timer = nil
+        ///reset the falg
+        isUserOutofThoroughFare = false
+        ///reset the timer
+        time = 0
+        ///flag timer on to false
+        isTimerOn = false
+    }
+    
+    ///method to set the distance change preset based on user speed.
+    static func setChangePreset(parent: MapView) -> Double {
+        switch parent.locationDataManager.speed {
+        case 0...30:
+            return 20
+        case 31...50:
+            return 30
+        case 51...70:
+            return 50
+        case 71...2000:
+            return 120
+        default:
+            return 20
         }
     }
 }
