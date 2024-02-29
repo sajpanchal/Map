@@ -167,6 +167,29 @@ class MapViewAPI {
     
     ///method used for starting map navigation and updating the related components based on location updates.
     static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
+        if parent.instruction.contains("destination") {
+            if let userLocation = mapView.userLocation.location, let stepLocation = parent.nextStepLocation {
+                if userLocation.distance(from: stepLocation) <= 20 {
+                        print("arrived")
+                        parent.localSearch.suggestedLocations = nil
+                        parent.mapViewAction = .idle
+                    ///keep the destination selected pinned to map.
+                    parent.localSearch.isDestinationSelected = true
+                    ///remove all the instructions from the array that shows them in a listview.
+                    parent.stepInstructions.removeAll()
+                    ///clear the instruction text
+                    parent.instruction = ""
+                    ///make the next step location nil
+                    parent.nextStepLocation = nil
+                    ///reseting the remainingDistance to nil
+                    parent.locationDataManager.remainingDistance = nil
+                    UIApplication.shared.isIdleTimerDisabled = false
+                    parent.mapViewAction = .centerToUserLocation
+                    resetLocationTracking(of: mapView, parent: &parent)
+                    return
+                }
+            }
+        }
       ///redundantly setting up mapview status to navigating mode to make sure no misteps.
          parent.mapViewStatus = .navigating
         ///method that will get the ETA to the given destintion coordinates.
@@ -651,9 +674,17 @@ extension MapViewAPI {
                     stopTimer()
                     return
                 }
+                
+                }
                 ///if no conditions were met, continue
                 else {
-                    
+                    if let point = userPoint {
+                        if pointsArray[stepIndex].contains(where: {$0.distance(to: point) <= 10}) {
+                            i = "point is nearby --> \(stepIndex)"
+                             stopTimer()
+                             return
+                    }
+                  
                 }
             }
         }
@@ -664,6 +695,17 @@ extension MapViewAPI {
             stopTimer()
             return
         }
+        else {
+            if let point = userPoint {
+                if pointsArray[stepIndex].contains(where: {$0.distance(to: point) <= 10}) {
+                    i = "point is nearby --> \(stepIndex)"
+                    stopTimer()
+                    return
+                }
+            }
+            
+        }
+       
         ///if instruction doesn't have a current thoroughfare and speed is more than 25
         if parent.locationDataManager.speed >= 25 {
             i = "instruction didn't match --> \(stepIndex)"

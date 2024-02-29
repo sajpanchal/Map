@@ -212,6 +212,7 @@ struct MapView: UIViewRepresentable {
                 ///if status is not updated
                 if self.mapViewStatus != .idle {
                     DispatchQueue.main.async {
+                        print("reseting tracking")
                         ///reset the location tracking
                         MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
                         ///set the status to idle
@@ -222,7 +223,9 @@ struct MapView: UIViewRepresentable {
                 guard let searchedLocation = self.localSearch.suggestedLocations else {
                     DispatchQueue.main.async {
                         ///clear entities from mapview
+                        print("clearing entries")
                         self.clearEntities(from: uiView)
+                    //    MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
                     }
                     return
                 }
