@@ -24,6 +24,7 @@
 		7271514D2A7D53B200B20767 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7271514C2A7D53B200B20767 /* LocationManager.swift */; };
 		727F5E072B34C748000ECCB7 /* LocalSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727F5E062B34C748000ECCB7 /* LocalSearch.swift */; };
 		727F5E092B34C7C8000ECCB7 /* AddressResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727F5E082B34C7C8000ECCB7 /* AddressResult.swift */; };
+		728A7CA62B90F282003AA218 /* GreetingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728A7CA52B90F282003AA218 /* GreetingsView.swift */; };
 		72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */; };
 		72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A62A9911FC0073CCC5 /* Enums.swift */; };
 		72EDE4142B2631D800578B8A /* DirectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EDE4132B2631D800578B8A /* DirectionsView.swift */; };
@@ -71,6 +72,7 @@
 		7271514C2A7D53B200B20767 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		727F5E062B34C748000ECCB7 /* LocalSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocalSearch.swift; path = ../MapView/LocalSearch.swift; sourceTree = "<group>"; };
 		727F5E082B34C7C8000ECCB7 /* AddressResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressResult.swift; sourceTree = "<group>"; };
+		728A7CA52B90F282003AA218 /* GreetingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreetingsView.swift; sourceTree = "<group>"; };
 		72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFieldView.swift; sourceTree = "<group>"; };
 		72C3D8A62A9911FC0073CCC5 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		72D68E2E2B1199DF00756253 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -129,6 +131,7 @@
 				72EDE4152B26334E00578B8A /* ExpandViewSymbol.swift */,
 				72EDE41A2B26408A00578B8A /* ExpandedDirectionsView.swift */,
 				726A77D92B486ABE0095B047 /* NavigationButton.swift */,
+				728A7CA52B90F282003AA218 /* GreetingsView.swift */,
 			);
 			path = CustomViews;
 			sourceTree = "<group>";
@@ -359,6 +362,7 @@
 				727F5E092B34C7C8000ECCB7 /* AddressResult.swift in Sources */,
 				72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */,
 				72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */,
+				728A7CA62B90F282003AA218 /* GreetingsView.swift in Sources */,
 				72EDE41D2B26457A00578B8A /* MapSwiftUIAPI.swift in Sources */,
 				72EDE41B2B26408A00578B8A /* ExpandedDirectionsView.swift in Sources */,
 			);

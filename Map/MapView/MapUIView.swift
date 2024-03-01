@@ -52,7 +52,7 @@ struct MapView: UIViewRepresentable {
     var region: MKCoordinateRegion?
     ///string to display the ETA for a given destination
     @Binding var ETA: String
-
+    @Binding var showGreetings: Bool
 
     ///this is the function that our MapView will execute the first time on its inception. this function will instantiate the Coordinator class with a copy of its parent object.
     func makeCoordinator() -> (Coordinator) {

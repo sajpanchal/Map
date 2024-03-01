@@ -170,9 +170,10 @@ class MapViewAPI {
         if parent.instruction.contains("destination") {
             if let userLocation = mapView.userLocation.location, let stepLocation = parent.nextStepLocation {
                 if userLocation.distance(from: stepLocation) <= 20 {
-                        print("arrived")
-                        parent.localSearch.suggestedLocations = nil
-                        parent.mapViewAction = .idle
+                    print("arrived")
+                    parent.showGreetings = true
+                    parent.localSearch.suggestedLocations = nil
+                    parent.mapViewAction = .idle
                     ///keep the destination selected pinned to map.
                     parent.localSearch.isDestinationSelected = true
                     ///remove all the instructions from the array that shows them in a listview.
