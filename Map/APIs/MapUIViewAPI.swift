@@ -169,8 +169,7 @@ class MapViewAPI {
     static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
         if parent.instruction.contains("destination") {
             if let userLocation = mapView.userLocation.location, let stepLocation = parent.nextStepLocation {
-                if userLocation.distance(from: stepLocation) <= 20 {
-                    print("arrived")
+                if userLocation.distance(from: stepLocation) <= 10 {
                     parent.showGreetings = true
                     parent.localSearch.suggestedLocations = nil
                     parent.mapViewAction = .idle
@@ -213,7 +212,7 @@ class MapViewAPI {
          /// set routeETA field with expected travel time extracted from a given route.
         parent.routeTravelTime = String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
          ///initiating props on first execution
-         initiateProps(route: route, parent: &parent)
+        initiateProps(route: route, parent: &parent)
          ///get the address of the destination
         let destination = parent.localSearch.suggestedLocations?.first?.title
          ///format the remaining distance to be displayed in km
@@ -301,7 +300,7 @@ class MapViewAPI {
         ///canvert the tapped CGPoint to 2D coordinates.
         let tapCoordinates =  mapView.convert(tapLocation, toCoordinateFrom: mapView)
         ///interate through the overlays
-        for overlay in mapView.overlays.reversed() {
+        for overlay in mapView.overlays.shuffled() {
             ///get the renderer of a given overaly
             let renderer = mapView.renderer(for: overlay) as! MKPolylineRenderer
             ///convert the tapped coordinates into MKMapPoint format
@@ -675,17 +674,15 @@ extension MapViewAPI {
                     stopTimer()
                     return
                 }
-                
-                }
+            }
                 ///if no conditions were met, continue
-                else {
-                    if let point = userPoint {
-                        if pointsArray[stepIndex].contains(where: {$0.distance(to: point) <= 10}) {
-                            i = "point is nearby --> \(stepIndex)"
-                             stopTimer()
-                             return
+            else {
+                if let point = userPoint {
+                    if pointsArray[stepIndex].contains(where: {$0.distance(to: point) <= 20}) {
+                        i = "point is nearby --> \(stepIndex)"
+                         stopTimer()
+                         return
                     }
-                  
                 }
             }
         }
@@ -698,15 +695,13 @@ extension MapViewAPI {
         }
         else {
             if let point = userPoint {
-                if pointsArray[stepIndex].contains(where: {$0.distance(to: point) <= 10}) {
+                if pointsArray[stepIndex].contains(where: {$0.distance(to: point) <= 20}) {
                     i = "point is nearby --> \(stepIndex)"
                     stopTimer()
                     return
                 }
             }
-            
         }
-       
         ///if instruction doesn't have a current thoroughfare and speed is more than 25
         if parent.locationDataManager.speed >= 25 {
             i = "instruction didn't match --> \(stepIndex)"
@@ -715,14 +710,16 @@ extension MapViewAPI {
                 ///start the timer and continue
                 startTimer()
             }
-            
+        }
+        else {
+            stopTimer()
+            return
         }
         ///once time gets past 5secs
-        if self.time > 5  {
+        if self.time > 7  {
             ///set the flag to true to indicate user is out of thoroughfare.
             isUserOutofThoroughFare = true
         }
-        
     }
     
     static func isPathOutofMapCamera(in route: MKRoute, of mapView: MKMapView, at nextIndex: Int, parent: MapView) -> Bool {

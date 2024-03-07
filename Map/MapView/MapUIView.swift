@@ -150,6 +150,13 @@ struct MapView: UIViewRepresentable {
                 ///idle in showdirections  mode.
                 case .idleInshowDirections:
                     ///reset the user tracking.
+                guard let suggestedLocations = parent.localSearch.suggestedLocations else {
+                    ///clear the entities from mapview
+                    parent.clearEntities(from: mapView)
+                    ///make the map view to go in idle mode
+                    parent.mapViewAction = .idle
+                    return
+                }
                     mapView.setUserTrackingMode(.none, animated: true)
                 
                 ///idle in navigation mode.
@@ -237,6 +244,15 @@ struct MapView: UIViewRepresentable {
             case .idleInshowDirections:
                 ///reset the user tracking.
                 uiView.setUserTrackingMode(.none, animated: true)
+            guard let suggestedLocations = localSearch.suggestedLocations else {
+                DispatchQueue.main.async {
+                    ///clear the entities from mapview
+                    self.clearEntities(from: uiView)
+                    ///make the map view to go in idle mode
+                    self.mapViewAction = .idle
+                 }
+                return
+            }
             break
             
             ///idle in navigation mode.
