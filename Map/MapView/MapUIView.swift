@@ -150,7 +150,7 @@ struct MapView: UIViewRepresentable {
                 ///idle in showdirections  mode.
                 case .idleInshowDirections:
                     ///reset the user tracking.
-                guard let suggestedLocations = parent.localSearch.suggestedLocations else {
+                guard parent.localSearch.suggestedLocations != nil else {
                     ///clear the entities from mapview
                     parent.clearEntities(from: mapView)
                     ///make the map view to go in idle mode
@@ -230,7 +230,6 @@ struct MapView: UIViewRepresentable {
                 guard let searchedLocation = self.localSearch.suggestedLocations else {
                     DispatchQueue.main.async {
                         ///clear entities from mapview
-                        print("clearing entries")
                         self.clearEntities(from: uiView)
                     //    MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
                     }
@@ -244,7 +243,7 @@ struct MapView: UIViewRepresentable {
             case .idleInshowDirections:
                 ///reset the user tracking.
                 uiView.setUserTrackingMode(.none, animated: true)
-            guard let suggestedLocations = localSearch.suggestedLocations else {
+            guard localSearch.suggestedLocations != nil else {
                 DispatchQueue.main.async {
                     ///clear the entities from mapview
                     self.clearEntities(from: uiView)

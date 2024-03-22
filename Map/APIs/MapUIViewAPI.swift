@@ -45,7 +45,6 @@ class MapViewAPI {
     static var timer: Timer?
     ///flag to determine if path is out of camera of the map.
     static var isUserOutofPath: Bool = false
-    static var i = ""
 
     ///this method will accept the mapView, userLocation class instances. here mapView struct instance as inout parameter. inout parameter allows us to make func parameter mutable i.e. we can change the value of the parameter in a function directly and changes will be reflected outside the function after execution.
     static func setRegionIn(mapView: MKMapView, centeredAt userLocation: MKUserLocation, parent: inout MapView) {
@@ -280,7 +279,7 @@ class MapViewAPI {
         ///method that will determine if user is out of thoroughfare or not.
         isUserOutOfThoroghfare(for: route, parent: &parent, in: mapView)
         /// if user is out of route or thoroughfare
-        if isUserOutofRoute || isUserOutofThoroughFare || isPathOutofMapCamera(in: route, of: mapView, at: nextIndex, parent: parent) {
+        if isUserOutofRoute || isUserOutofThoroughFare /*|| isPathOutofMapCamera(in: route, of: mapView, at: nextIndex, parent: parent) */{
             ///set the instruction set to be displayed with a warning text.
             parent.instruction = "Re-calculating the route..."
             parent.locationDataManager.throughfare = nil
@@ -366,6 +365,7 @@ extension MapViewAPI {
     ///reset the properties of MapViewAPI
     static func resetProps() {
         isStepPointsFetched.removeAll()
+        stopTimer()
         points = []
         userPoint = nil
         length = []
@@ -657,7 +657,6 @@ extension MapViewAPI {
             if route.steps[stepIndex].instructions.contains(thoroughfare)  {
                 ///stop the timer
                 stopTimer()
-                i = "instruction text matches with last instruction at --> \(stepIndex)"
                 ///return the function call.
                 return
             }
@@ -669,7 +668,6 @@ extension MapViewAPI {
                 let initialInstruction = "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(via?[1] ?? "")"
                 ///if the initial instruction has the given thoroughfare
                 if initialInstruction.contains(thoroughfare) {
-                    i = "instruction text matches with the empty display --> \(stepIndex)"
                     //stop the timer and return the function call
                     stopTimer()
                     return
@@ -679,7 +677,6 @@ extension MapViewAPI {
             else {
                 if let point = userPoint {
                     if pointsArray[stepIndex].contains(where: {$0.distance(to: point) <= 20}) {
-                        i = "point is nearby --> \(stepIndex)"
                          stopTimer()
                          return
                     }
@@ -688,7 +685,6 @@ extension MapViewAPI {
         }
         ///if no index is found, check if the instruction is the first one where user is starting the journey.
         else if parent.instruction.contains(thoroughfare) {
-            i = "instruction text matches with the display --> \(stepIndex)"
             ///stop the timer and return the function call
             stopTimer()
             return
@@ -696,7 +692,6 @@ extension MapViewAPI {
         else {
             if let point = userPoint {
                 if pointsArray[stepIndex].contains(where: {$0.distance(to: point) <= 20}) {
-                    i = "point is nearby --> \(stepIndex)"
                     stopTimer()
                     return
                 }
@@ -704,7 +699,6 @@ extension MapViewAPI {
         }
         ///if instruction doesn't have a current thoroughfare and speed is more than 25
         if parent.locationDataManager.speed >= 25 {
-            i = "instruction didn't match --> \(stepIndex)"
             ///if time is not on
             if !self.isTimerOn {
                 ///start the timer and continue
@@ -716,7 +710,7 @@ extension MapViewAPI {
             return
         }
         ///once time gets past 5secs
-        if self.time > 7  {
+        if self.time > 20  {
             ///set the flag to true to indicate user is out of thoroughfare.
             isUserOutofThoroughFare = true
         }

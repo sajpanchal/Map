@@ -72,7 +72,7 @@ struct MapInteractionsView: View {
                                 Spacer()
                                 ///showing the title and destination address and its name.
                                 VStack {
-                                    Text("\(String(MapViewAPI.isUserOutofThoroughFare)) \(MapViewAPI.thoroughfare) \(MapViewAPI.time) \(String(MapViewAPI.isTimerOn)), index:\(MapViewAPI.i)")
+                                    Text("\(String(MapViewAPI.isUserOutofThoroughFare)) \(MapViewAPI.thoroughfare) \(MapViewAPI.time) \(String(MapViewAPI.isTimerOn))")
                                     Text("Heading to destination")
                                         .font(.caption2)
                                         .fontWeight(.bold)
