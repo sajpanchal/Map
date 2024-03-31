@@ -10,7 +10,8 @@ import CoreLocation
 
 ///this view is responsible to show and update the mapview buttons, alerts, and footer view with buttons.
 struct MapInteractionsView: View {
-    
+    ///environment variable to get the color mode of the phone
+    @Environment (\.colorScheme) var bgMode: ColorScheme
     ///bounded property to store map status
     @Binding var mapViewStatus: MapViewStatus
     ///bounded property to store map action to be performed
@@ -25,8 +26,10 @@ struct MapInteractionsView: View {
     var destination: String
     ///bounded property to display the travel time of the selected route
     @Binding var routeTravelTime: String
+    @Binding var routeData: [RouteData]
     ///bounded property to display the travel distance of the selected route
     @Binding var routeDistance: String
+
     ///variable that stores and displayes the distance remaining from the current location to destination
     var remainingDistance: String
     ///bounded property shows the latest instruction to head to the next step towards destination
@@ -36,7 +39,7 @@ struct MapInteractionsView: View {
     ///bounded property stores an array of tuples with a list of instructions and its distances by each step.
     @Binding var stepInstructions: [(String, Double)]
     @Binding var ETA: String
-    
+    @Binding var isRouteSelectTapped: Bool
     var body: some View {
         ///enclose the map interaction views in a vstack and move them to the bottom of the screen.
         VStack(spacing: 0) {
@@ -93,7 +96,7 @@ struct MapInteractionsView: View {
                   ///footer view with buttons and distance and time information
                     HStack {
                         ///if map is not navigating but location is pinned i.e. selected by the user show the footer with only the button to find routes to the destination
-                        if mapViewStatus != .navigating {
+                        if mapViewStatus != .navigating && mapViewStatus != .showingDirections {
                             ///routes button. On tap of it change the map action to show directions and make the throughfare nil for it to update it when starting a navigation
                             Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
                                    label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
@@ -108,8 +111,80 @@ struct MapInteractionsView: View {
                             VStack {
                                 ///if routes are showing up then show the travel time and distance for the selected route.
                                 if mapViewStatus == .showingDirections {
-                                    Text(routeTravelTime)
-                                    Text(routeDistance)
+                                    ///for each routeData element create a HStack showing the route travel time, distance, title and navigate button
+                                        ForEach(routeData.reversed(), id: \.id) { route in
+                                            ///enclose the content in HStack
+                                            HStack {
+                                                Spacer()
+                                                ///enclose the Text and HStack in VStack
+                                                VStack {
+                                                    ///show the travel time at the top
+                                                    Text(route.travelTime)
+                                                        .fontWeight(.semibold)
+                                                        .font(.title3)
+                                                    ///show the distane and title at the bottom enclosed in HStack
+                                                    HStack {
+                                                        Text(route.distance)
+                                                            .fontWeight(.light)
+                                                            .font(.footnote)
+                                                        Text("Via " + route.title)
+                                                            .fontWeight(.light)
+                                                            .font(.footnote)
+                                                    }
+                                                }
+                                                Spacer()
+                                                ///if the route is tapped show the button at the right space in the HStack
+                                                if route.tapped {
+                                                    ///on tap of the button updateUserTracking method will be called. its background will change based on whether it is navigating or not.
+                                                    Button(action: updateLocationTracking, label: {
+                                                        ///if map is navigating
+                                                        isMapInNavigationMode().0 ?
+                                                        ///change the button appearance with stop text and xmark symbol
+                                                        NavigationButton(imageName: "xmark", title: "Stop") :
+                                                        ///if it is not navigating then change the text with navigate and arrows symbol with blue background.
+                                                        NavigationButton(imageName: "steeringwheel", title: "Go")
+                                                        
+                                                    })
+                                                    .background(isMapInNavigationMode().0 ? Color.red.gradient : Color.blue.gradient)
+                                                    .cornerRadius(15)
+                                                    .padding(5)
+                                                    
+                                                }
+                                                ///else hide it.
+                                                else {
+                                                    ///on tap of the button updateUserTracking method will be called. its background will change based on whether it is navigating or not.
+                                                    Button(action: updateLocationTracking, label: {
+                                                        ///if map is navigating
+                                                        isMapInNavigationMode().0 ?
+                                                        ///change the button appearance with stop text and xmark symbol
+                                                        NavigationButton(imageName: "xmark", title: "Stop") :
+                                                        ///if it is not navigating then change the text with navigate and arrows symbol with blue background.
+                                                        NavigationButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", title: "Navigate")
+                                                        
+                                                    })
+                                                    .background(isMapInNavigationMode().0 ? Color.red.gradient : Color.blue.gradient)
+                                                    .cornerRadius(15)
+                                                    .padding(5)
+                                                    .disabled(true)
+                                                    .hidden()
+                                                }
+                                               
+                                              
+                                            }
+                                            .background(route.tapped ? Color.gray.gradient : (bgMode == .dark ? Color.black.gradient : Color.white.gradient))
+                                            .overlay(Divider().background(bgMode == .dark ? Color.white : Color.black), alignment: .bottom)
+                                            .cornerRadius(10)
+                                           
+                                            .onTapGesture(perform: {
+                                                updateRouteData(for: route)
+                                                isRouteSelectTapped = true
+                                            })
+                                           
+                                        }
+                                    
+                                  
+                                    
+                                  
                                 }
                                 ///if map is navigating then show the remaining distance from the current location to the destination.
                                 else if mapViewStatus == .navigating {
@@ -148,7 +223,7 @@ struct MapInteractionsView: View {
                             }
                         }
                         ///if map is showing directions or is already navigating, show the button to start/stop the navigation. ///button appearance will be changed based on whether the map is navigating or not
-                        if mapViewStatus == .showingDirections || mapViewStatus == .navigating {
+                        if mapViewStatus == .navigating {
                             ///on tap of the button updateUserTracking method will be called. its background will change based on whether it is navigating or not.
                             Button(action: updateLocationTracking, label: {
                                 ///if map is navigating
@@ -162,9 +237,10 @@ struct MapInteractionsView: View {
                             .cornerRadius(15)
                             .padding(5)
                         }
+                      
                     }
                 }
-                .background(.black.gradient)
+                .background(bgMode == .dark ? Color.black.gradient : Color.white.gradient)
             }
         }
     }
@@ -222,10 +298,38 @@ struct MapInteractionsView: View {
         ///based on the map's status (navigating or not) center to the user location in that mode.
         mapViewAction = isMapInNavigationMode().0 ? .inNavigationCenterToUserLocation : .centerToUserLocation
     }
-   
- 
+    ///method to update the routeData by setting/resetting  a tapped prop of each element based on the user selection of route
+    func updateRouteData(for route: RouteData) {
+        ///get the index of the given route that is selected by the user
+        guard let indexOfSelectedRoute = routeData.firstIndex(of: route) else {
+            return
+        }
+        ///get the index of the route that was previously selected
+        if let indexOfPrevSelectedRoute = routeData.firstIndex(where: {$0.tapped}) {
+            ///reset the tapped property of the given route.
+            routeData[indexOfPrevSelectedRoute].tapped = false
+        }
+        ///set the tapped prop of a currenty selected route.
+        routeData[indexOfSelectedRoute].tapped = true
+    }
 }
 
 #Preview {
-    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""))
+    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false))
 }
+
+
+/*
+ List {
+     ForEach(routeData, id: \.id) {_ in
+         Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
+                label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
+         .background(.blue.gradient)
+         .cornerRadius(15)
+         .padding(5)
+     }
+    
+ }
+ */
+
+

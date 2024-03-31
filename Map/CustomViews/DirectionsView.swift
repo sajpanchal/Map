@@ -9,6 +9,8 @@ import SwiftUI
 
 ///a view responsible to show the direction signs along with the instruction text on top of the screen while navigating.
 struct DirectionsView: View {
+    ///environment variable to get the color mode of the phone
+    @Environment (\.colorScheme) var bgMode: ColorScheme
     ///variable that stores the image name for various direction signs.
     var directionSign: String?
     ///stores distance from the next step in string format.
@@ -69,7 +71,7 @@ struct DirectionsView: View {
         }
         .padding(.horizontal,10)
         ///apply the black gradient to entire view.
-        .background(Color.black.gradient)
+        .background(bgMode == .dark ? Color.black.gradient : Color.white.gradient)
     }
 }
 

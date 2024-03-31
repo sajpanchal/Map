@@ -17,6 +17,8 @@ import MapKit
 
 ///create a custom struct called MapView and conform it to UIViewRepresentable. this class is only responsible to display map and its accessories.
 struct MapView: UIViewRepresentable {
+    
+    
     typealias UIViewType = MKMapView
     ///this property holds the location coordinate values accessed from core location. it is passed by Map SwiftUI.
   //  @Binding var location: CLLocation?
@@ -40,6 +42,8 @@ struct MapView: UIViewRepresentable {
     @Binding var nextStepDistance: String
     ///travel time for a given route
     @Binding var routeTravelTime: String
+    ///routeData is an array of RouteData struct type having MKRoute details
+    @Binding var routeData: [RouteData]
     ///travel distance for a given route
     @Binding var routeDistance: String
     ///remaining distance from the destination during navigation
@@ -52,7 +56,10 @@ struct MapView: UIViewRepresentable {
     var region: MKCoordinateRegion?
     ///string to display the ETA for a given destination
     @Binding var ETA: String
+    ///flag used to show/hide greetings view.
     @Binding var showGreetings: Bool
+    ///flag used to determine if the routeSelection is tapped or not.
+    @Binding var isRouteSelectTapped: Bool
 
     ///this is the function that our MapView will execute the first time on its inception. this function will instantiate the Coordinator class with a copy of its parent object.
     func makeCoordinator() -> (Coordinator) {
@@ -158,6 +165,17 @@ struct MapView: UIViewRepresentable {
                     return
                 }
                     mapView.setUserTrackingMode(.none, animated: true)
+                ///if the route is tapped
+                if parent.isRouteSelectTapped {
+                 ///set the seleted route from the mapView and get the string from a given route with route travel time and distance info
+                    let str = MapViewAPI.setSelectedRoute(for:mapView, with: parent.routeData) {
+                        }
+                        ///format the travel time and store it in routeTravelTime
+                    parent.routeTravelTime = str.0
+                        ///format the route distance and store it in routeDistance
+                    parent.routeDistance = str.1
+                    }
+                parent.isRouteSelectTapped = false
                 
                 ///idle in navigation mode.
                 case .idleInNavigation:
@@ -190,9 +208,31 @@ struct MapView: UIViewRepresentable {
                         self.parent.mapViewAction = .idle
                         return
                     }
-                    ///get the navigation directions laid out from overlay renderer to map between user location and destination.
-                    MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: suggestedLocations.first?.coordinate)
-                    parent.mapViewStatus = .showingDirections
+                ///get the navigation directions laid out from overlay renderer to map between user location and destination.
+                MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: suggestedLocations.first?.coordinate)
+                parent.mapViewStatus = .showingDirections
+                ///if the routeData is empty and routes are laid upon the mapVIew.
+                if parent.routeData.isEmpty && MapViewAPI.isRoutesrequestProcessed {
+                    ///iterate through the routes
+                    for route in MapViewAPI.routes {
+                        ///extract the route travel time, distance, name and a uniue string from routes and append it to routeData along with unique id and tapped flag set/reset.
+                        parent.routeData.append(RouteData(id: UUID(),travelTime: String(format:"%.0f",(route.expectedTravelTime/60)) + " mins", distance: String(format:"%.1f",Double(route.distance/1000.0)) + " km", title: route.name , tapped: MapViewAPI.routes.firstIndex(of: route) == (MapViewAPI.routes.count - 1) ? true : false, uniqueString: route.polyline.title ?? "n/a"))
+                    }
+                }
+                if parent.isRouteSelectTapped {
+                    DispatchQueue.main.async { [self] in
+                        let str = MapViewAPI.setSelectedRoute(for: mapView, with: parent.routeData, action: {})
+                        ///format the travel time and store it in routeTravelTime
+                        parent.routeTravelTime = str.0
+                        ///format the route distance and store it in routeDistance
+                        parent.routeDistance = str.1
+                    }
+                   
+                    parent.isRouteSelectTapped = false
+                }
+         
+                
+                 
                     break
             }
         }
@@ -212,7 +252,7 @@ struct MapView: UIViewRepresentable {
     }
     
     ///this method will be executed whenever our UIViewController is going to be updated.UIViewController will be updated when our swiftui view MapView will be updated. Mapview will be updated when our @observedObject / @StateObject is updated.
-    func updateUIView(_ uiView: MKMapView, context: Context) {
+     func updateUIView(_ uiView: MKMapView, context: Context) {
         switch mapViewAction {
             ///map in idle mode.
             case .idle:
@@ -252,12 +292,21 @@ struct MapView: UIViewRepresentable {
                  }
                 return
             }
+            ///if the route is tapped
+            if isRouteSelectTapped {
+                ///set the seleted route from the mapView and get the string from a given route with route travel time and distance info
+                let str = MapViewAPI.setSelectedRoute(for: uiView, with: routeData) {
+                }
+                ///format the travel time and store it in routeTravelTime
+                routeTravelTime = str.0
+                ///format the route distance and store it in routeDistance
+                routeDistance = str.1
+            }
+            isRouteSelectTapped = false
             break
-            
             ///idle in navigation mode.
             case .idleInNavigation:
                 break
-            
             ///center to user location mode
             case.centerToUserLocation:
                  ///if the status is not updated
@@ -314,9 +363,30 @@ struct MapView: UIViewRepresentable {
                      }
                     return
                 }
-                 MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: suggestedLocations.first?.coordinate)
-               
-                break
+            ///get the navigation directions laid out from overlay renderer to map between user location and destination.
+            MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: suggestedLocations.first?.coordinate)
+            DispatchQueue.main.async { [self] in
+                ///if the routeData is empty and routes are laid upon the mapVIew.
+                if routeData.isEmpty && MapViewAPI.isRoutesrequestProcessed  {
+                ///iterate through the routes
+                for route in MapViewAPI.routes {
+                    ///extract the route travel time, distance, name and a uniue string from routes and append it to routeData along with unique id and tapped flag set/reset.
+                    routeData.append(RouteData(id: UUID(),travelTime: String(format:"%.0f",(route.expectedTravelTime/60)) + " mins", distance: String(format:"%.1f",Double(route.distance/1000.0)) + " km", title: route.name, tapped: MapViewAPI.routes.firstIndex(of: route) == (MapViewAPI.routes.count - 1) ? true : false, uniqueString: route.polyline.title ?? "n/a"))
+                }
+            }
+            ///if the route is tapped
+                if isRouteSelectTapped {
+                    let str = MapViewAPI.setSelectedRoute(for: uiView, with: routeData) {
+                        
+                    }
+                    ///format the travel time and store it in routeTravelTime
+                    routeTravelTime = str.0
+                    ///format the route distance and store it in routeDistance
+                    routeDistance = str.1
+                    }
+                isRouteSelectTapped = false
+            }
+            break
         }
     }
 }

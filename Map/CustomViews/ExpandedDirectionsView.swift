@@ -9,6 +9,8 @@ import SwiftUI
 
 ///this swiftui view is responsible for showing the expanded list view with next steps instructions.
 struct ExpandedDirectionsView: View {
+    ///environment variable to get the current color mode of the phone
+    @Environment (\.colorScheme) var bgMode: ColorScheme
     ///a variable stores an array of tuple types with each pair having a step instructions and distance from current step.
     var stepInstructions: [(String, Double)]
     ///bounded property that is used to show or hide this view.
@@ -64,7 +66,7 @@ struct ExpandedDirectionsView: View {
                 }
             }
         }
-        .background(.black.gradient)
+        .background(bgMode == .dark ? Color.black.gradient : Color.white.gradient)
     }
 }
 

@@ -45,6 +45,8 @@ class MapViewAPI {
     static var timer: Timer?
     ///flag to determine if path is out of camera of the map.
     static var isUserOutofPath: Bool = false
+    ///flag to determine if the MKDirections request is completed successully with overlays rendered in the map.
+    static var isRoutesrequestProcessed: Bool = false
 
     ///this method will accept the mapView, userLocation class instances. here mapView struct instance as inout parameter. inout parameter allows us to make func parameter mutable i.e. we can change the value of the parameter in a function directly and changes will be reflected outside the function after execution.
     static func setRegionIn(mapView: MKMapView, centeredAt userLocation: MKUserLocation, parent: inout MapView) {
@@ -82,6 +84,8 @@ class MapViewAPI {
     static func resetLocationTracking(of mapView: MKMapView, parent: inout MapView) {
         ///clear the instruction field that displays next step instruction on the DirectionsView.
         parent.instruction = ""
+        ///empty out the routeData array.
+        parent.routeData = []
         ///empty the array that displays entire list of step instructions in the DirectionsView's expanded view
         parent.stepInstructions.removeAll()
         ///set the distance prop on locationdatamanager to nil on reset. distance field is used to showing remaining distance
@@ -113,6 +117,8 @@ class MapViewAPI {
         if !uiView.overlays.isEmpty {
             return
         }
+        ///initially set the flag to false before requesting the directions
+        isRoutesrequestProcessed = false
         ///create an instance of MKDirections request to request the directions.
         let request = MKDirections.Request()
         ///if distination is not nil
@@ -161,11 +167,17 @@ class MapViewAPI {
                uiView.addOverlay(polyline)
             }
             uiView.setVisibleMapRect(uiView.overlays.first!.boundingMapRect, edgePadding: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5), animated: true)
+        ///set the flag at the end of the request executions
+          isRoutesrequestProcessed = true
         })
     }
     
     ///method used for starting map navigation and updating the related components based on location updates.
-    static func startNavigation(in mapView:MKMapView, parent: inout MapView)   {
+    static func startNavigation(in mapView: MKMapView, parent: inout MapView)   {
+        ///empty out the routeData array.
+        parent.routeData = []
+        ///set the flag being used to determine if the any of the routes were tapped.
+        parent.isRouteSelectTapped = false
         if parent.instruction.contains("destination") {
             if let userLocation = mapView.userLocation.location, let stepLocation = parent.nextStepLocation {
                 if userLocation.distance(from: stepLocation) <= 10 {
@@ -182,8 +194,11 @@ class MapViewAPI {
                     parent.nextStepLocation = nil
                     ///reseting the remainingDistance to nil
                     parent.locationDataManager.remainingDistance = nil
+                    ///enable the idelTimer used to trigger the screen sleep time once user has arrived to the destination
                     UIApplication.shared.isIdleTimerDisabled = false
+                    ///make sure that map action is to center to the userlocation to exit the navigation mod.e
                     parent.mapViewAction = .centerToUserLocation
+                    ///execute the resetLocationTracking method to peform the idle mode.
                     resetLocationTracking(of: mapView, parent: &parent)
                     return
                 }
@@ -791,6 +806,67 @@ extension MapViewAPI {
         default:
             return 20
         }
+    }
+    ///method to set the selected route from the rendered overlays when user taps on one of the stacks corrosponding the that route.
+    static func setSelectedRoute(for mapView: MKMapView, with routeData: [RouteData], action: () -> Void) -> (String, String) {
+        ///routeTravelTime string used to store the travel time in minutes.
+        var routeTravelTime = ""
+        ///format the route distance and store it in routeDistance
+        var routeDistance = ""
+        ///get the first element from routeData array where the element is tapped and return the uniqueString from that element.
+        guard let title = routeData.first(where: {$0.tapped})?.uniqueString else {
+            return ("", "")
+        }
+        ///split the unique string seperated by comma and create an array of strings
+        let titleArray = title.split(separator: ", ")
+        ///get the overlay from the mapView overlays array where the UUID rendered from the routeData element is matching in the string content.
+        guard let overlay = mapView.overlays.first(where: {$0.title!!.contains(titleArray[1])}) else {
+            return ("", "")
+        }
+   
+        ///counter that will count the iterations of for loop
+        var counter = 0
+       // let renderer = MKPolylineRenderer(overlay: overlay)
+        for thisOverlay in mapView.overlays {
+            ///get the renderer object for a given overlay of mapview.
+            let renderer = mapView.renderer(for: thisOverlay) as? MKPolylineRenderer
+            ///make sure renderer object is not nil
+            if let renderer = renderer {
+                print("renderer")
+                ///get the title of the render polyline object
+                if overlay.title == thisOverlay.title {
+                  
+                    ///set the stroke color to blue
+                    DispatchQueue.main.async {
+                        renderer.strokeColor = .systemBlue
+                        ///set the transperancy to lowest
+                        renderer.alpha = 1
+                    }
+                  
+                    ///title of the polyline was set before with route distance and estimated travel time. here routedata will be extracting them and put them separately in an array.
+                    let routeData = renderer.polyline.title?.split(separator: ", ") ?? []
+                    routeTravelTime = String(routeData.first!) + " mins"
+                    ///format the route distance and store it in routeDistance
+                    routeDistance = String(routeData.last!) + " km"
+                    ///get the index of a given route
+                  
+                }
+                ///if title of the render is not matching with a requested title
+                else {
+                    DispatchQueue.main.async {
+                        ///make the stroke color gray
+                        renderer.strokeColor = .systemGray
+                        ///keep the trasparency to 50%
+                        renderer.alpha = 0.5
+                    }
+                  
+                }
+                ///increment the counter
+                counter += 1
+            }
+        }
+        ///return the routeDistance and routeTravelTime string to the method.
+        return (routeTravelTime, routeDistance)
     }
 }
 

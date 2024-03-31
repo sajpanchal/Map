@@ -24,7 +24,7 @@ struct NavigationButton: View {
                 .font(.caption2)
                 .fontWeight(.bold)
         }
-        .frame(width: 65, height: 65)
+        .frame(width: 50, height: 50)
     }
 }
 

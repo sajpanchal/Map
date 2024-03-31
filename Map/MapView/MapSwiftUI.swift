@@ -12,6 +12,8 @@ import MapKit
 
 ///this view will observe the LocationDataManager and updates the MapViewController if data in Location Manager changes.
 struct Map: View {
+    ////environment variable to get the color mode of the phone
+    @Environment (\.colorScheme) var bgMode: ColorScheme
     ///this will make our MapView update if any @published value in location manager changes.
     @StateObject var locationDataManager = LocationDataManager()
     /// this variable is used to store the status of our mapview. it is bound to our MapView file
@@ -32,6 +34,8 @@ struct Map: View {
     @State var nextStepDistance: String = ""
     ///variable to show the selected route's travel time.
     @State var routeTravelTime: String = ""
+    ///array of RouteData
+    @State var routeData: [RouteData] = []
     ///variable to show the selected route's distance.
     @State var routeDistance: String = ""
     ///variable to show the distance remaining from the destination while in navigation.
@@ -46,7 +50,10 @@ struct Map: View {
     @State var stepInstructions: [(String, Double)] = []
     ///binding thi variable that diplays the arrival time to the destination.
     @State var ETA: String = ""
+    ///flag used to show/hide greetings view.
     @State var showGreetings: Bool = false
+    ///flag used to determine if the routeSelection is tapped or not.
+    @State var isRouteSelectTapped: Bool = false
    // let synthesizer = AVSpeechSynthesizer()
     var body: some View {
         ///enclose the header stack and Zstack with mapview and bottom stack in Vstack.
@@ -55,7 +62,7 @@ struct Map: View {
             if !isMapInNavigationMode(for: mapViewStatus).0 || isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction) {
                 SearchFieldView(searchedLocationText: $searchedLocationText, region: locationDataManager.region, localSearch: localSearch)
                     .padding(.top, 10)
-                    .background(.black)
+                    .background(bgMode == .dark ? Color.black : Color.white)
                 Spacer()
             }
             ///otherwise if map is in navigation mode, replace that view with the directions stack view to show the user navigation directions.
@@ -67,7 +74,7 @@ struct Map: View {
             ///grouping mapview and its associated buttons
                 Group() {
                 ///calling our custom struct that will render UIView for us in swiftui. we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class. we are also passing the state variable called tapped that is bound to the MapView.when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix. we always declare a binding propery in a child component of the associated property from its parent.once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
-                    MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus,  instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, routeTravelTime: $routeTravelTime, routeDistance: $routeDistance, remainingDistance: $remainingDistance, destination: $destination, stepInstructions: $stepInstructions, ETA: $ETA, showGreetings: $showGreetings)
+                    MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus,  instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, routeTravelTime: $routeTravelTime, routeData: $routeData,  routeDistance: $routeDistance, remainingDistance: $remainingDistance, destination: $destination, stepInstructions: $stepInstructions, ETA: $ETA, showGreetings: $showGreetings, isRouteSelectTapped: $isRouteSelectTapped)
                 ///disable the mapview when track location button is tapped but tracking is not on yet.
                         .disabled(isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction))
                 ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged() action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag. we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
@@ -94,7 +101,7 @@ struct Map: View {
                     MapProgressView(alertMessage: "Routing directions! Please Wait...")
                 }
                 ///this view is reponsible to show the map interation buttons and the bottom stack with route info and navigation related buttons on top of MapView.
-                MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showAddressView: $showAddressView, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeTravelTime: $routeTravelTime, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions, ETA: $ETA)
+                MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showAddressView: $showAddressView, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeTravelTime: $routeTravelTime, routeData: $routeData, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions, ETA: $ETA, isRouteSelectTapped: $isRouteSelectTapped)
                 ///if this flag is true show the expanded view with a list of directions on top of mapInteration view.
                 if showDirectionsList {
                     ExpandedDirectionsView(stepInstructions: stepInstructions, showDirectionsList: $showDirectionsList)
