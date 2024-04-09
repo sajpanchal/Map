@@ -260,7 +260,7 @@ class MapViewAPI {
              ///get the step location
              let stepLocation = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
              ///if the user location is 50 m or more from this step and yet it is not set exited and it is the starting point update to the step 1 instructions only
-             if userLocation.distance(from: stepLocation) > 50 && step.polyline.subtitle != "regionExited" && stepIndex == 0 {
+             if userLocation.distance(from: stepLocation) >= 20 && step.polyline.subtitle != "regionExited" && stepIndex == 0 {
                  ///label the current step as exited by user.
                  step.polyline.subtitle = "regionExited"
                  ///get the first step and its index
@@ -867,6 +867,16 @@ extension MapViewAPI {
         }
         ///return the routeDistance and routeTravelTime string to the method.
         return (routeTravelTime, routeDistance)
+    }
+    static func getUUIDString(from text: String??) -> String {
+        guard let str = text else {
+            return ""
+        }
+        guard let s = str else {
+          return ""
+        }
+        let id = s.split(separator: ", ")
+      return String(id[1])
     }
 }
 

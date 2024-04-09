@@ -94,6 +94,19 @@ struct MapView: UIViewRepresentable {
             ///hightlight the tapped overlay
             MapViewAPI.setTappedOverlay(in: self.mapView, having: overlay, parent: &self.parent)
             
+            let uuidText = MapViewAPI.getUUIDString(from: overlay.title)
+        
+            guard let indexOfSelectedRoute = parent.routeData.firstIndex(where: { $0.uniqueString.contains(uuidText) }) else {
+                return
+            }
+            ///get the index of the route that was previously selected
+            if let indexOfPrevSelectedRoute = parent.routeData.firstIndex(where: {$0.tapped}) {
+                ///reset the tapped property of the given route.
+                parent.routeData[indexOfPrevSelectedRoute].tapped = false
+            }
+            ///set the tapped prop of a currenty selected route.
+            parent.routeData[indexOfSelectedRoute].tapped = true
+            
         }
         
         ///if mapView couldn't find the user location this function will be called.

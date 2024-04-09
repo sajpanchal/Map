@@ -171,7 +171,7 @@ struct MapInteractionsView: View {
                                                
                                               
                                             }
-                                            .background(route.tapped ? Color.gray.gradient : (bgMode == .dark ? Color.black.gradient : Color.white.gradient))
+                                            .background(bgMode == .dark ? Color.black.gradient : Color.white.gradient)
                                             .overlay(Divider().background(bgMode == .dark ? Color.white : Color.black), alignment: .bottom)
                                             .cornerRadius(10)
                                            
