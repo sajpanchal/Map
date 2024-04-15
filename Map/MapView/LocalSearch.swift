@@ -83,6 +83,7 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
             await MainActor.run {
                 ///response will be having mapItems which is having placemarks for each locations matched by location title and subtitle
                 self.suggestedLocations = response.mapItems.map {
+                    
                     ///create an annotation object
                     let annotation = MKPointAnnotation()
                     ///assign the annotation object the coordinates of the mapitem placemark
@@ -91,9 +92,12 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
                     if let title = $0.placemark.title, let name = $0.name {
                         annotation.title = title.contains(name) ?  title : (name + "\n" + title)
                     }
+                  
+                          
                     ///return the annotation object and append it to suggestedLocations array. (Usually for each response there will be only one mapItem matching with the title and subtitle.)
                     return annotation
                 }
+             
             }
         }
     }

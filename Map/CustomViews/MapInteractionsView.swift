@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreLocation
+import MapKit
 
 ///this view is responsible to show and update the mapview buttons, alerts, and footer view with buttons.
 struct MapInteractionsView: View {
@@ -40,6 +41,7 @@ struct MapInteractionsView: View {
     @Binding var stepInstructions: [(String, Double)]
     @Binding var ETA: String
     @Binding var isRouteSelectTapped: Bool
+    @Binding var tappedAnnotation: MKAnnotation?
     var body: some View {
         ///enclose the map interaction views in a vstack and move them to the bottom of the screen.
         VStack(spacing: 0) {
@@ -96,7 +98,7 @@ struct MapInteractionsView: View {
                   ///footer view with buttons and distance and time information
                     HStack {
                         ///if map is not navigating but location is pinned i.e. selected by the user show the footer with only the button to find routes to the destination
-                        if mapViewStatus != .navigating && mapViewStatus != .showingDirections {
+                        if mapViewStatus != .navigating && mapViewStatus != .showingDirections && localSearch.suggestedLocations!.count <= 2 {
                             ///routes button. On tap of it change the map action to show directions and make the throughfare nil for it to update it when starting a navigation
                             Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
                                    label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
@@ -108,7 +110,7 @@ struct MapInteractionsView: View {
                         Group {
                             Spacer()
                             ///enclose the text in vstack
-                            VStack {
+                            VStack(spacing: 0) {
                                 ///if routes are showing up then show the travel time and distance for the selected route.
                                 if mapViewStatus == .showingDirections {
                                     ///for each routeData element create a HStack showing the route travel time, distance, title and navigate button
@@ -146,8 +148,8 @@ struct MapInteractionsView: View {
                                                         
                                                     })
                                                     .background(isMapInNavigationMode().0 ? Color.red.gradient : Color.blue.gradient)
-                                                    .cornerRadius(15)
-                                                    .padding(5)
+                                                    .cornerRadius(10)
+                                                    .padding(0)
                                                     
                                                 }
                                                 ///else hide it.
@@ -163,16 +165,16 @@ struct MapInteractionsView: View {
                                                         
                                                     })
                                                     .background(isMapInNavigationMode().0 ? Color.red.gradient : Color.blue.gradient)
-                                                    .cornerRadius(15)
-                                                    .padding(5)
+                                                    .cornerRadius(10)
+                                                    .padding(0)
                                                     .disabled(true)
                                                     .hidden()
                                                 }
                                                
                                               
                                             }
-                                            .background(bgMode == .dark ? Color.black.gradient : Color.white.gradient)
-                                            .overlay(Divider().background(bgMode == .dark ? Color.white : Color.black), alignment: .bottom)
+                                            .background(bgMode == .dark ? Color(.darkGray) : Color(.lightGray))
+                                            .overlay(Divider().background(bgMode == .dark ? Color(.lightGray) : Color(.darkGray)), alignment: .bottom)
                                             .cornerRadius(10)
                                            
                                             .onTapGesture(perform: {
@@ -213,6 +215,39 @@ struct MapInteractionsView: View {
                                         ///add a spacer after the vstack
                                         Spacer()
                                     }
+                                }
+                              else if localSearch.suggestedLocations!.count > 2 {
+                                    List {
+                                        ForEach(localSearch.suggestedLocations!, id: \.title) { suggestion in
+                                            HStack {
+                                                VStack {
+                                                    HStack {
+                                                        Text(suggestion.title!!.split(separator: "\n").first!)
+                                                            .font(.caption)
+                                                            .fontWeight(.black)
+                                                        Spacer()
+                                                    }
+                                                  
+                                                    Text(suggestion.title!!.split(separator: "\n").last!)
+                                                        .font(.caption2)
+                                                        .foregroundStyle(.gray)
+                                                }
+                                                    .onTapGesture(perform: {
+                                                     tappedAnnotation = suggestion
+                                                     //   mapViewAction = .showDirections; locationDataManager.throughfare = nil
+                                                    })
+                                                Spacer()
+                                                Button(action: { tappedAnnotation = suggestion; mapViewAction = .showDirections; locationDataManager.throughfare = nil },
+                                                       label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
+                                                .buttonStyle(.plain)
+                                                .background(.blue.gradient)
+                                                .cornerRadius(10)
+                                               // .padding(5)
+                                            }
+                                        }
+                                       
+                                    }
+                                    .frame(height: 200)
                                 }
                             }
                             Spacer()
@@ -315,7 +350,7 @@ struct MapInteractionsView: View {
 }
 
 #Preview {
-    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false))
+    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation()))
 }
 
 

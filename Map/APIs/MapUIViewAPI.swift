@@ -86,6 +86,7 @@ class MapViewAPI {
         parent.instruction = ""
         ///empty out the routeData array.
         parent.routeData = []
+        parent.tappedAnnotation = nil
         ///empty the array that displays entire list of step instructions in the DirectionsView's expanded view
         parent.stepInstructions.removeAll()
         ///set the distance prop on locationdatamanager to nil on reset. distance field is used to showing remaining distance
@@ -109,6 +110,14 @@ class MapViewAPI {
             ///if not centred, centre the mapview to searched location.
             mapView.animatedZoom(zoomRegion: MKCoordinateRegion(center: annotation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
         }
+    }
+    static func annotateLocations(in mapView: MKMapView ,at coordinates: CLLocationCoordinate2D, for annotation: MKAnnotation) {
+        ///add the search location received from UIViewRepresentable (mapview) as a second mapview annotation.
+        mapView.addAnnotation(annotation)
+        ///check if the mapview centered to the searched location or not
+        
+        mapView.animatedZoom(zoomRegion: MKCoordinateRegion(center: mapView.userLocation.coordinate, latitudinalMeters: 10000, longitudinalMeters: 10000), duration: TimeInterval(0.1))
+        
     }
     
     ///this function will send the route directions request between the two locations annotated in the mapview
