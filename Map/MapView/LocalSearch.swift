@@ -73,9 +73,15 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
         let title = address.title
         ///get the address subtitle
         let subTitle = address.subtitle
-        ///set the natural language query to search for a location using its title and subtitle
-        request.naturalLanguageQuery = subTitle.contains(title)
-        ? subTitle : title + ", " + subTitle
+        if subTitle == "Search Nearby" {
+            request.naturalLanguageQuery = title
+        }
+        else {
+            ///set the natural language query to search for a location using its title and subtitle
+            request.naturalLanguageQuery = subTitle.contains(title)
+            ? subTitle : title + ", " + subTitle
+        }
+       
         ///asnc task
         Task {
             ///start the location search and get the response

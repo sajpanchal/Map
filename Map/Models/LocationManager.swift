@@ -73,7 +73,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
             userlocation = locations.first
         }
         ///if the troughfare is nil and user location is available
-        if self.throughfare == nil && self.userlocation != nil {
+        if (self.throughfare == nil && self.userlocation != nil) || enableGeocoding {
             ///task is a struct type of swift that allows execution of the code asynchronously
             Task(operation: {
                 ///request the reverse geocoding for current location and it will return the placemarks for this location

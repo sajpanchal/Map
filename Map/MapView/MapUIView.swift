@@ -232,7 +232,8 @@ struct MapView: UIViewRepresentable {
                         self.parent.mapViewAction = .idle
                         return
                     }
-                if parent.tappedAnnotation != nil {
+                parent.locationDataManager.enableGeocoding = true
+                if suggestedLocations.count > 2 {
                     mapView.removeAnnotations(mapView.annotations)
                     mapView.addAnnotation(parent.tappedAnnotation!)
                     ///get the navigation directions laid out from overlay renderer to map between user location and destination.
@@ -302,12 +303,14 @@ struct MapView: UIViewRepresentable {
                 ///check if the localsearch object has a list of tappedLocations
                 guard let searchedLocation = self.localSearch.suggestedLocations else {
                     DispatchQueue.main.async {
+                       
                         ///clear entities from mapview
                         self.clearEntities(from: uiView)
                     //    MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
                     }
                     return
                 }
+            
                 ///check if there is any action from searchfield and make necessary updates.
                 if searchedLocation.count <= 2 {
                     self.searchLocationInterface(in: uiView, for: searchedLocation.first!)
@@ -413,7 +416,11 @@ struct MapView: UIViewRepresentable {
                      }
                     return
                 }
-            if self.tappedAnnotation != nil {
+            DispatchQueue.main.async {
+                self.locationDataManager.enableGeocoding = true
+            }
+          
+            if suggestedLocations.count > 2 {
                 uiView.removeAnnotations(uiView.annotations)
                 uiView.addAnnotation(self.tappedAnnotation!)
                 ///get the navigation directions laid out from overlay renderer to map between user location and destination.

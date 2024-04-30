@@ -21,10 +21,16 @@ func getDirectionSign(for step: String) -> String? {
         return "arrow.turn.up.right"
     }
     else if instruction.contains("slight left") {
-        return "arrow.turn.left.up"
+        return "arrow.up.left"
     }
     else if instruction.contains("slight right") {
-        return "arrow.turn.right.up"
+        return "arrow.up.right"
+    }
+    else if instruction.contains("sharp left") {
+        return "arrow.down.left"
+    }
+    else if instruction.contains("sharp right") {
+        return "arrow.down.right"
     }
     else if instruction.contains("keep right") {
         return "rectangle.righthalf.inset.filled.arrow.right"
@@ -55,7 +61,7 @@ func getDirectionSign(for step: String) -> String? {
     }
     else if instruction.contains("starting at")
     {
-        return "location.north.line"
+        return "car.rear.road.lane.dashed"
     }
     else if instruction.contains("arrive") || instruction.contains("arrived") {
         return "mappin.and.ellipse"
