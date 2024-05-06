@@ -69,7 +69,7 @@ class MapViewAPI {
     }
     
     ///this method is used for instantiating map camera and configuring the same
-    static func setCameraRegion(of mapView: MKMapView, centeredAt userLocation: MKUserLocation, userHeading: CLHeading?) {
+    static func setCameraRegion(of mapView: MKMapView, centeredAt userLocation: MKUserLocation, userHeading: CLHeading?, animated: Bool) {
         guard let heading = userHeading else {
             ///instantiate the MKMapCamera object with center as user location, distance (camera zooming to center), pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
             return
@@ -79,7 +79,7 @@ class MapViewAPI {
         
         DispatchQueue.main.async {
             ///set the mapview camera to our defined object.
-            mapView.setCamera(camera, animated: true)
+            mapView.setCamera(camera, animated: animated)
             mapView.showsScale = true
         }
     }
@@ -227,7 +227,7 @@ class MapViewAPI {
         ///redundantly setting up mapview status to navigating mode to make sure no misteps.
         parent.mapViewStatus = .navigating
         ///method that will get the ETA to the given destintion coordinates.
-        guard let targetLocation = parent.localSearch.suggestedLocations!.count > 2 ? parent.tappedAnnotation : parent.localSearch.suggestedLocations?.first else {
+        guard let targetLocation = parent.localSearch.suggestedLocations!.count > 1 ? parent.tappedAnnotation : parent.localSearch.suggestedLocations?.first else {
           return
         }
         getETA(to: targetLocation.coordinate, in: &parent, with: mapView)
@@ -319,7 +319,7 @@ class MapViewAPI {
         ///method that will determine if user is out of thoroughfare or not.
         //isUserOutOfThoroghfare(for: route, parent: &parent, in: mapView)
         /// if user is out of route or thoroughfare
-        if isUserOutofRoute /*|| isUserOutofThoroughFare || isPathOutofMapCamera(in: route, of: mapView, at: nextIndex, parent: parent) */{
+        if isUserOutofRoute   /*|| isUserOutofThoroughFare || isPathOutofMapCamera(in: route, of: mapView, at: nextIndex, parent: parent) */{
             ///set the instruction set to be displayed with a warning text.
             parent.instruction = "Re-calculating the route..."
             ///make throroughfare nil
@@ -754,39 +754,6 @@ extension MapViewAPI {
 //        }
 //    }
     
-//    static func isPathOutofMapCamera(in route: MKRoute, of mapView: MKMapView, at nextIndex: Int, parent: MapView) -> Bool {
-//        ///if mapview is not centered to userlocation set the out of path flag to false
-//        if parent.mapViewStatus == .inNavigationNotCentered {
-//            isUserOutofPath = false
-//            return isUserOutofPath
-//        }
-//        var stepIndex = 0
-//        ///if nextIndex is less than 1
-//        if nextIndex < 1 {
-//            ///set the stepIndex to 0.
-//            stepIndex = 0
-//        }
-//        ///otherwise set the stepIndex to the one before nextIndex
-//        else {
-//            stepIndex = nextIndex - 1
-//        }
-//        ///if the stepPoints are fetched for current step
-//        if isStepPointsFetched[stepIndex] {
-//            ///iterate over all points in a given points of step
-//            for point in pointsArray[stepIndex] {
-//                ///if the given point is within the visible map rectangle.
-//                if mapView.visibleMapRect.contains(point) {
-//                    isUserOutofPath = false
-//                    return isUserOutofPath
-//                }
-//            }
-//            ///if loop is exited with no matches return the true flag.
-//            isUserOutofPath = true
-//        }
-//         ///if no points are fetched yet, return false
-//        return isUserOutofPath
-//    }
-    
 //    ///start timer function
 //    static func startTimer() {
 //        ///instantiate scheduled timer with 1sec repeating interval  and a block of code to set timer flag and increment time
@@ -921,12 +888,17 @@ extension MapViewAPI {
     }
     
     static func performUserTrackCheck(in mapView : MKMapView, for currentStep: Int, with parent: inout MapView) {
-        let exitPreset = setPreset(parent: parent).0
-        let rangePreset = setPreset(parent: parent).1
-        let diffPreset = setPreset(parent: parent).2
-        
+       
+      
         ///if the user point and pointsarray is available and curent step 0 or above.
-        if let userPoint = userPoint, currentStep >= 0, !pointsArray.isEmpty {
+        if let userPoint = userPoint, currentStep >= 0, !pointsArray.isEmpty, let stepDistance = pointsArray[currentStep].sorted(by: {$0.distance(to: userPoint) > $1.distance(to: userPoint)}).first {
+            ///set the range preset for a given point in route overlay to detect the exit from it by the user.
+            let exitPreset = setPreset(parent: parent, stepDistance: stepDistance.distance(to: userPoint), size: pointsArray[currentStep].count).0
+            ///set the range preset for a given point in route overlay to check for user entry/exit once user enters into its range.
+            let rangePreset = setPreset(parent: parent, stepDistance: stepDistance.distance(to: userPoint), size: pointsArray[currentStep].count).1
+            ///set the preset for the change in distance from userlocation to a point of interest. this preset is used to determine if the user is getting close-to/away-from the point.
+            let changeInDistancePreset = setPreset(parent: parent, stepDistance: stepDistance.distance(to: userPoint), size: pointsArray[currentStep].count).2
+                      
             ///if the polylinePoints array is empty.
             if polylinePoints.isEmpty {
                 ///iterate through the annotations
@@ -946,36 +918,73 @@ extension MapViewAPI {
                 ///create a varaible to store point index
                 var pointIndex = 0.0
                 ///get the divider number for a given lenght of the pointsarray at a current step
-                let divider = getDivider(for: pointsArray[currentStep].count)
-                ///iterate through the points for the current step.
-                for point in pointsArray[currentStep] {
-                   
-                    ///if the index is divided by a divider, add it to polylinePoints array otherwise delete it.
-                    if pointIndex.truncatingRemainder(dividingBy: divider) == 0 {
-                        print("Step #\(currentStep) ", point.distance(to: userPoint))
-                        ///append the point to an array
-                        polylinePoints.append(PolylinePoint(point: point))
-                      
-                        ///if current step is the last step
-                        if pointsArray.count - 1 == currentStep {
-                            if pointsArray[currentStep].count - 1 == Int(pointIndex) {
-                                break
+//                let divider = getDivider(for: pointsArray[currentStep].count)
+//                ///iterate through the points for the current step.
+//                for point in pointsArray[currentStep] {
+//                   
+//                    ///if the index is divided by a divider, add it to polylinePoints array otherwise delete it.
+//                    if pointIndex.truncatingRemainder(dividingBy: divider) == 0 {
+//                        print("Step #\(currentStep) ", point.distance(to: userPoint))
+//                        ///append the point to an array
+//                        polylinePoints.append(PolylinePoint(point: point))
+//                      
+//                        ///if current step is the last step
+//                        if pointsArray.count - 1 == currentStep {
+//                            if pointsArray[currentStep].count - 1 == Int(pointIndex) {
+//                                break
+//                            }
+//                        }
+//                        ///create an annotation object
+//                        let annotation = MKPointAnnotation()
+//                        ///set its coordinate to point's coordinate
+//                        annotation.coordinate = point.coordinate
+//                        ///set its title to pointIndex of it.
+//                        annotation.title = String(Int(pointIndex))
+//                        ///now add this annotation to mapview so it will be display in map.
+//                        mapView.addAnnotation(annotation)
+//                    }
+//                    ///increase the index by 1.
+//                    pointIndex += 1
+//                }
+                
+                ///iterate through the points in a pointsArray in a given step index
+                for element in pointsArray[currentStep] {
+                    ///move all points to PolylinePoints array type.
+                    polylinePoints.append(PolylinePoint(point: element))
+                }
+                ///an array of deleted polyline points.
+                var deletedPoints: [PolylinePoint] = []
+                ///iterate through the polylinePoints.
+                for element in polylinePoints {
+                    ///filter all the points from polylinePoints where they are within preset distance/range from a given point.
+                    let pointsWithinPresetRange = polylinePoints.filter({$0.point.distance(to: element.point) != 0  && (abs($0.point.distance(to: userPoint) - element.point.distance(to: userPoint)) <= rangePreset)})
+                    ///check if the deletedPoints array contains an element of interest. if not execute the code inside.
+                    if !deletedPoints.contains(where: {$0.point.distance(to: element.point) == 0}) {
+                        ///for all points found within a preset range.
+                            for p in pointsWithinPresetRange {
+                                ///remove points from polyline points which are found in a given array
+                                polylinePoints.removeAll(where: {$0.point.distance(to: userPoint) == p.point.distance(to: userPoint) && $0.point.distance(to: element.point) != 0})
                             }
+                        ///move the deleted Points in a deletedPoints array.
+                            deletedPoints = pointsWithinPresetRange
                         }
-                        ///create an annotation object
-                        let annotation = MKPointAnnotation()
-                        ///set its coordinate to point's coordinate
-                        annotation.coordinate = point.coordinate
-                        ///set its title to pointIndex of it.
-                        annotation.title = String(Int(pointIndex))
-                        ///now add this annotation to mapview so it will be display in map.
-                        mapView.addAnnotation(annotation)
-                    }
-                    ///increase the index by 1.
+                }
+                ///remove all points from polylinePoints array where distance from userPoint is within rangePreset.
+                polylinePoints.removeAll(where: {$0.point.distance(to: userPoint) <= rangePreset})
+                for element in polylinePoints {
+                    print("step point #\(pointIndex): \(element.point.distance(to: userPoint))")
+                    ///create an annotation object
+                    let annotation = MKPointAnnotation()
+                    ///set its coordinate to point's coordinate
+                    annotation.coordinate = element.point.coordinate
+                    ///set its title to pointIndex of it.
+                    annotation.title = String(Int(pointIndex))
+                    ///now add this annotation to mapview so it will be display in map.
+                    mapView.addAnnotation(annotation)
                     pointIndex += 1
                 }
                 ///if the step number is 0 or 1.
-                if currentStep <= 1 {
+                /*if currentStep <= 1 {
                     ///remove first 4 polyline points
                     for i in 0...3 {
                         ///get the first annotation where coordinates are matching with the first element of the polyline points.
@@ -1004,7 +1013,11 @@ extension MapViewAPI {
                 }
                 else {
                     polylinePoints.removeFirst()
-                }
+                    if let annotation = mapView.annotations.first(where: {$0.title == "0"}) {
+                        mapView.removeAnnotation(annotation)
+                    }
+                   
+                }*/
                 comment = "Step #\(currentStep) | pts fetched | \(polylinePoints.count)"
             }
             ///if array is not empty
@@ -1039,7 +1052,7 @@ extension MapViewAPI {
                         ///if current distance and previous distance is available.
                         if let currentDist = polylinePoints[index].currentDistance, let prevDist = polylinePoints[index].prevDistance {
                             ///check if the diffrence is above preset and is positive, then re-route
-                            if currentDist - prevDist >= Int(diffPreset)  {
+                            if currentDist - prevDist >= Int(changeInDistancePreset)  {
                                 ///
                                 comment = "re-route"
                                 ///clear instructions
@@ -1054,7 +1067,7 @@ extension MapViewAPI {
                             }
                             comment = "Step #\(currentStep) | dist = \(currentDist - prevDist)) | \(polylinePoints.count)"
                             ///if the absolute difference between current and previous distance is more than preset
-                            if abs(currentDist - prevDist) >= Int(diffPreset) {
+                            if abs(currentDist - prevDist) >= Int(changeInDistancePreset) {
                                 ///transfer the current distance to prev distance
                                 polylinePoints[index].prevDistance = currentDist
                             }
@@ -1069,14 +1082,27 @@ extension MapViewAPI {
             }
         }
     }
-    static func setPreset(parent: MapView) -> (Double, Double, Double) {
-        switch parent.locationDataManager.speed {
-        case 0...70:
-            return (20, 60, 20)
-        case 71...200:
-            return (60, 100, 40)
+    static func setPreset(parent: MapView, stepDistance: Double, size: Int) -> (Double, Double, Double) {
+        switch abs(parent.locationDataManager.speed) {
+        case 0...60:
+            switch stepDistance {
+            case 0...50:
+                return (10, 20, 10)
+            case 51...100:
+                return size > 8 ? (15, 30, 15) : (10, 20, 10)
+            case 101...200:
+                return size > 10 ? (20, 50, 20) : (20, 30, 20)
+            case 201...400:
+                return size > 15 ? (25, 60, 25): (20, 50, 20)
+            case 401...1000:
+                return size > 30 ? (25, 80, 25) : (25, 60, 25)
+            default:
+                return (60, 120, 40)
+            }
+        case 61...200:
+            return (60, 120, 40)
         default:
-            return (60, 100, 40)
+            return (60, 120, 40)
         }
     }
 }
