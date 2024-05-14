@@ -109,6 +109,9 @@ class MapViewAPI {
     ///function to annotate a location the user has searched in the search bar.
     static func annotateLocation(in mapView: MKMapView ,at coordinates: CLLocationCoordinate2D, for annotation: MKAnnotation) {
         ///add the search location received from UIViewRepresentable (mapview) as a second mapview annotation.       
+        guard mapView.annotations.contains(where: {$0.coordinate.latitude != annotation.coordinate.latitude && $0.coordinate.longitude != annotation.coordinate.longitude}) else {
+            return
+        }
         mapView.addAnnotation(annotation)
         ///check if the mapview centered to the searched location or not
         if mapView.centerCoordinate.latitude != annotation.coordinate.latitude && mapView.centerCoordinate.longitude != annotation.coordinate.longitude {
@@ -227,7 +230,7 @@ class MapViewAPI {
         ///redundantly setting up mapview status to navigating mode to make sure no misteps.
         parent.mapViewStatus = .navigating
         ///method that will get the ETA to the given destintion coordinates.
-        guard let targetLocation = parent.localSearch.suggestedLocations!.count > 1 ? parent.tappedAnnotation : parent.localSearch.suggestedLocations?.first else {
+        guard let targetLocation = parent.localSearch.suggestedLocations!.count > 2 ? parent.tappedAnnotation : parent.localSearch.suggestedLocations?.first else {
           return
         }
         getETA(to: targetLocation.coordinate, in: &parent, with: mapView)
@@ -1093,11 +1096,11 @@ extension MapViewAPI {
             case 101...200:
                 return size > 10 ? (20, 50, 20) : (20, 30, 20)
             case 201...400:
-                return size > 15 ? (25, 60, 25): (20, 50, 20)
+                return size > 15 ? (25, 60, 20): (20, 50, 20)
             case 401...1000:
-                return size > 30 ? (25, 80, 25) : (25, 60, 25)
+                return size > 30 ? (25, 80, 20) : (25, 60, 20)
             default:
-                return (60, 120, 40)
+                return (60, 120, 20)
             }
         case 61...200:
             return (60, 120, 40)

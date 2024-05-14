@@ -38,6 +38,10 @@ struct ListView: View {
                 }
                 ///on tap of this list item the code in the braces will be executed to get that location in the map
                 .onTapGesture {
+                    ///set the flag to true to indicate search for the locations is in progress.
+                    localSearch.isSearchInProgress = true
+                    ///set this flag to false as listview will disappear on tap.
+                    localSearch.isListViewVisible = false
                     ///this method will pin the given location in the map.
                     localSearch.getPlace(from: suggestion)
                     ///replace the partial searched text with the complete title received from selected location
@@ -47,6 +51,13 @@ struct ListView: View {
                 }
             }
         }
+        .onAppear(perform:  {
+            ///on appearance of listview
+            DispatchQueue.main.async {
+                ///set the flag to true to indicate listview is on display
+                localSearch.isListViewVisible = true
+            }
+        })
     }
 }
 

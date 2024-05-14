@@ -20,12 +20,8 @@ struct MapView: UIViewRepresentable {
     
     
     typealias UIViewType = MKMapView
-    ///this property holds the location coordinate values accessed from core location. it is passed by Map SwiftUI.
-  //  @Binding var location: CLLocation?
     ///this property is bound to the tapped property of Map SwiftUI. it will be true when re-center button is pressed from Map SwiftUI.
     @Binding var mapViewAction: MapViewAction
-    ///this property holds the user's current heading data accessed from core location. it is passed by Map SwiftUI
-//    @Binding var heading: CLHeading?
     ///this property holds the error codes that we have defined in enum type in Map SwiftUI file.
     @Binding var mapError: Errors
     ///this property is needed to set the map region centered to user's location when app is launched for the first time.
@@ -60,7 +56,7 @@ struct MapView: UIViewRepresentable {
     @Binding var showGreetings: Bool
     ///flag used to determine if the routeSelection is tapped or not.
     @Binding var isRouteSelectTapped: Bool
-    
+    ///this variable holds the annotation object that is selected from the list of locations when user taps search nearby option.
     @Binding var tappedAnnotation: MKAnnotation?
     @State var animated = true
     ///this is the function that our MapView will execute the first time on its inception. this function will instantiate the Coordinator class with a copy of its parent object.
@@ -95,9 +91,9 @@ struct MapView: UIViewRepresentable {
             }
             ///hightlight the tapped overlay
             MapViewAPI.setTappedOverlay(in: self.mapView, having: overlay, parent: &self.parent)
-            
+            ///get the uuid in string format from a given overlay title
             let uuidText = MapViewAPI.getUUIDString(from: overlay.title)
-        
+            ///check if the given routeData array contatins the element having the uuid of the overlay that user has selected. if yes, then get the index of that element.
             guard let indexOfSelectedRoute = parent.routeData.firstIndex(where: { $0.uniqueString.contains(uuidText) }) else {
                 return
             }
@@ -168,6 +164,7 @@ struct MapView: UIViewRepresentable {
                 if searchedLocation.count <= 2 {
                     parent.searchLocationInterface(in: mapView, for: searchedLocation.first!)
                 }
+                ///if there are more than 2 locations found.
                 else {
                     parent.searchLocationInterface(in: mapView, for: searchedLocation)
                     if parent.tappedAnnotation != nil {
@@ -199,6 +196,7 @@ struct MapView: UIViewRepresentable {
                 ///idle in navigation mode.
                 case .idleInNavigation:
                     parent.mapViewStatus = .inNavigationNotCentered
+                ///set the animated flag to false so when user centers to current location it won't animate the re-centering of mapcamera operation to avoid consuming time.
                     parent.animated = false
                     break
                 ///center to user location mode
@@ -214,6 +212,7 @@ struct MapView: UIViewRepresentable {
                     MapViewAPI.setCameraRegion(of: mapView, centeredAt: userLocation, userHeading: parent.locationDataManager.userHeading, animated: parent.animated)
                 ///start navigate the user to destination
                     MapViewAPI.startNavigation(in: mapView, parent: &parent)
+                ///when user is back in navigation mode keep the animation flag to true once camera is centerd.
                     parent.animated = true
                 break
                 ///show directions mode.
@@ -227,10 +226,13 @@ struct MapView: UIViewRepresentable {
                         return
                     }
                     parent.locationDataManager.enableGeocoding = true
+                ///if status is not set to showing directions yet
                 if parent.mapViewStatus != .showingDirections {
-                    if suggestedLocations.count > 1 {
+                    if suggestedLocations.count > 2 {
                         mapView.removeAnnotations(mapView.annotations)
-                        mapView.addAnnotation(parent.tappedAnnotation!)
+                        if let annotation = parent.tappedAnnotation {
+                            mapView.addAnnotation(annotation)
+                        }
                         ///get the navigation directions laid out from overlay renderer to map between user location and destination.
                         MapViewAPI.getNavigationDirections(in: mapView, from: mapView.userLocation.coordinate, to: parent.tappedAnnotation!.coordinate)
                     }
@@ -282,31 +284,41 @@ struct MapView: UIViewRepresentable {
         switch mapViewAction {
             ///map in idle mode.
             case .idle:
+            print("idle")
                 ///if status is not updated
                 if self.mapViewStatus != .idle {
                     DispatchQueue.main.async {
-                        print("reseting tracking")
                         ///reset the location tracking
                         MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
                         ///set the status to idle
                         self.mapViewStatus = .idle
                     }
                 }
+           
+            if localSearch.isListViewVisible && uiView.annotations.count > 1 {
+                DispatchQueue.main.async {
+                    self.clearEntities(from: uiView)
+                }
+            }
                 ///check if the localsearch object has a list of tappedLocations
-                guard let searchedLocation = self.localSearch.suggestedLocations else {
+            guard let searchedLocation = self.localSearch.suggestedLocations else {
                     DispatchQueue.main.async {
-                       
-                        ///clear entities from mapview
-                        self.clearEntities(from: uiView)
-                    //    MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
+                        if !self.localSearch.isSearchInProgress {
+                             ///clear entities from mapview
+                            DispatchQueue.main.async {
+                                print("clear entity")
+                                self.clearEntities(from: uiView)
+                            }
+                        }
                     }
+                print("search results empty")
                     return
                 }
-            
+      
                 ///check if there is any action from searchfield and make necessary updates.
-                if searchedLocation.count <= 1 {
-                    self.searchLocationInterface(in: uiView, for: searchedLocation.first!)
-                }
+            if searchedLocation.count <= 2  {
+                self.searchLocationInterface(in: uiView, for: searchedLocation.first!)
+            }
             else {
                 self.searchLocationInterface(in: uiView, for: searchedLocation)
                 if self.tappedAnnotation != nil {
@@ -364,7 +376,7 @@ struct MapView: UIViewRepresentable {
                     return
                 }
                 ///check if there is any action from searchfield and make necessary updates.
-            if searchedLocation.count <= 1 {
+            if searchedLocation.count <= 2 {
                 self.searchLocationInterface(in: uiView, for: searchedLocation.first!)
             }
             else {
@@ -413,9 +425,12 @@ struct MapView: UIViewRepresentable {
                 self.locationDataManager.enableGeocoding = true
             }
             if mapViewStatus != .showingDirections {
-                if suggestedLocations.count > 1 {
+                if suggestedLocations.count > 2 {
                     uiView.removeAnnotations(uiView.annotations)
-                    uiView.addAnnotation(self.tappedAnnotation!)
+                    if let annotation = self.tappedAnnotation {
+                        uiView.addAnnotation(annotation)
+                    }
+                   
                     ///get the navigation directions laid out from overlay renderer to map between user location and destination.
                     MapViewAPI.getNavigationDirections(in: uiView, from: uiView.userLocation.coordinate, to: self.tappedAnnotation!.coordinate)
                 }
@@ -456,7 +471,7 @@ extension MapView {
     ///method to handle location search interface,
     func searchLocationInterface(in uiView: MKMapView, for searchedLocation: MKAnnotation) {
         ///if the destination is selected
-        if self.localSearch.isDestinationSelected {
+        if self.localSearch.isDestinationSelected && !self.localSearch.isSearchInProgress && uiView.annotations.count <= 1 {
              ///annotate the location on the map and center the map to it.
             MapViewAPI.annotateLocation(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
             
@@ -464,6 +479,12 @@ extension MapView {
                 ///make sure there are no overlays while only destination is selected yet and not the directions requested.
                 uiView.removeOverlays(uiView.overlays)
                 ///reset the flag.
+            }
+        }
+        ///if there is an annotation pinned in map in addition to user location and if list view is visible
+        else if uiView.annotations.count > 1 && localSearch.isListViewVisible {
+            ///set the destination selected flag to false
+            DispatchQueue.main.async {
                 self.localSearch.isDestinationSelected = false
             }
         }
@@ -477,18 +498,24 @@ extension MapView {
             }
         }
     }
+    
     func searchLocationInterface(in uiView: MKMapView, for searchedLocations: [MKAnnotation]) {
         ///if the destination is selected
-        if self.localSearch.isDestinationSelected {
+        if self.localSearch.isDestinationSelected && !self.localSearch.isSearchInProgress && uiView.annotations.count <= 1 {
              ///annotate the location on the map and center the map to it.
             for searchedLocation in searchedLocations {
                 MapViewAPI.annotateLocations(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
             }
-            
             DispatchQueue.main.async {
                 ///make sure there are no overlays while only destination is selected yet and not the directions requested.
                 uiView.removeOverlays(uiView.overlays)
                 ///reset the flag.
+            }
+        }
+        ///if there is an annotation pinned in map in addition to user location and if list view is visible
+        else if uiView.annotations.count > 1 && localSearch.isListViewVisible {
+            ///set the destination selected flag to false
+            DispatchQueue.main.async {
                 self.localSearch.isDestinationSelected = false
             }
         }
@@ -510,7 +537,7 @@ extension MapView {
             mapView.removeOverlays(mapView.overlays)
         }
         ///if annotations are present in the mapview
-        if !mapView.annotations.isEmpty  {
+        if mapView.annotations.count > 1 {
             ///remove the annotations.
             mapView.removeAnnotations(mapView.annotations)
         }

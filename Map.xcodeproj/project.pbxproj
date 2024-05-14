@@ -556,7 +556,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.18;
+				MARKETING_VERSION = 1.2.19;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MyMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -594,7 +594,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.18;
+				MARKETING_VERSION = 1.2.19;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MyMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
