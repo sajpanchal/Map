@@ -23,3 +23,10 @@ enum Errors: String {
     case unKnownError = "Sorry, unknown error has occured!"
     case noError = " -- "
 }
+
+enum LocalSearchStatus {
+    case locationSelected
+    case localSearchInProgress
+    case localSearchCancelled
+    case localSearchResultsAppear
+}

@@ -284,17 +284,26 @@ struct MapView: UIViewRepresentable {
         switch mapViewAction {
             ///map in idle mode.
             case .idle:
-            print("idle")
+            print(self.mapViewStatus)
                 ///if status is not updated
-                if self.mapViewStatus != .idle {
+            if self.mapViewStatus != .idle && self.mapViewStatus != .notCentered {
                     DispatchQueue.main.async {
+                        print("reset")
                         ///reset the location tracking
                         MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
+                        uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
                         ///set the status to idle
                         self.mapViewStatus = .idle
                     }
                 }
-           
+            print(uiView.overlays.count)
+            if !uiView.overlays.isEmpty {
+                DispatchQueue.main.async {
+                    ///make sure there are no overlays while only destination is selected yet and not the directions requested.
+                    uiView.removeOverlays(uiView.overlays)
+                    ///reset the flag.
+                }
+            }
             if localSearch.isListViewVisible && uiView.annotations.count > 1 {
                 DispatchQueue.main.async {
                     self.clearEntities(from: uiView)
