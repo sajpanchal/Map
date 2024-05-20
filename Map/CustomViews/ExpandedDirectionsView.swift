@@ -15,6 +15,7 @@ struct ExpandedDirectionsView: View {
     var stepInstructions: [(String, Double)]
     ///bounded property that is used to show or hide this view.
     @Binding var showDirectionsList: Bool
+    @Binding var height: CGFloat
     var body: some View {
         ///
         VStack {
@@ -49,27 +50,53 @@ struct ExpandedDirectionsView: View {
                             Spacer()
                         }
                     })
+                   
                 })
+           
                 ///when this listview is tapped anywhere, hide it by toggling the flag with animation
                 .onTapGesture {
                     withAnimation {
-                        showDirectionsList.toggle()
+                        showDirectionsList = true
                     }
                 }
             }
             ///add a expand symbol at the bottom of it.
-          ExpandViewSymbol()
-            ///when this lsymbol is tapped anywhere, hide it by toggling the flag with animation
-            .onTapGesture {
-                withAnimation {
-                    showDirectionsList.toggle()
+            ExpandViewSymbol()
+            Spacer()
+        }
+        .background(bgMode == .dark ? Color.black : Color.white)
+        .gesture(DragGesture().onChanged { value in
+           // showDirectionsList = true
+            if value.translation.height >= 0 {
+                height =  min(value.translation.height, UIScreen.main.bounds.height)
+            }
+            else {
+                if height >= 0 {
+                    height = UIScreen.main.bounds.height + value.translation.height - 100
                 }
             }
-        }
-        .background(bgMode == .dark ? Color.black.gradient : Color.white.gradient)
+           // print(height, value.translation.height)
+            }
+            .onEnded { value in
+                //showDirectionsList = true
+                if height >= 0 {
+                    showDirectionsList = true                  
+                }
+                else {
+                    height = 0
+                    showDirectionsList = false
+                }
+                if value.translation.height > 150 {
+                    height = UIScreen.main.bounds.height - 100
+                }
+                else if value.translation.height < -100 {
+                    height = 0
+                    showDirectionsList = false
+                }
+            })
     }
 }
 
 #Preview {
-    ExpandedDirectionsView(stepInstructions: [], showDirectionsList: .constant(false))
+    ExpandedDirectionsView(stepInstructions: [], showDirectionsList: .constant(false), height: .constant(0))
 }

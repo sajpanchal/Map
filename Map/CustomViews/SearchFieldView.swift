@@ -61,7 +61,7 @@ struct SearchFieldView: View {
     ///method to start or stp the location search
     func handleLocationSearch(forUserInput text:String) {
         ///if location is selected or search is cancelled
-        guard !localSearch.isDestinationSelected && !localSearch.isSearchCancelled else {
+        guard localSearch.status == .searchBarActive || localSearch.status == .localSearchResultsAppear else {
            ///un-focus the search field
             enableSearchFieldFocus = false
             ///stop the location search
@@ -78,22 +78,20 @@ struct SearchFieldView: View {
     ///when searchfield is tapped this function will be executed.
     func prepareSearchfield() {
         ///location is not selected when we are starting a search.
-        localSearch.isDestinationSelected = false
+        localSearch.status = .searchBarActive
         ///this variable is a focusstate type, this is going to be passed to focus() modifier of our searchfield and is responsible to enable and disable the focus.
         enableSearchFieldFocus = true
-        ///this variable shows and hides the cancel button
-        localSearch.isSearchCancelled = false
+    
     }
     ///when cancel button is tapped
     func clearSearchfield() {
         ///clear the text from searchfield
         searchedLocationText = ""
         ///cancel the search operations
-        localSearch.isSearchCancelled = true
+        localSearch.status = .localSearchCancelled
         ///make the locations array nil
         localSearch.suggestedLocations = nil
-        ///set flag to false to indicate the destination is not selected.
-        localSearch.isDestinationSelected = false
+       
         ///un-focus the search field.
         enableSearchFieldFocus = false
     }    

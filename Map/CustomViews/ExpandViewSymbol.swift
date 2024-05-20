@@ -15,9 +15,10 @@ struct ExpandViewSymbol: View {
             Rectangle()
                 .frame(width: 30, height: 5)
                 .cornerRadius(5)
+             
             Spacer()
         }
-        .padding(5)
+        .frame(height: 30)
     }
 }
 

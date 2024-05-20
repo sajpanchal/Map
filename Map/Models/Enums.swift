@@ -29,4 +29,6 @@ enum LocalSearchStatus {
     case localSearchInProgress
     case localSearchCancelled
     case localSearchResultsAppear
+    case showingNearbyLocations
+    case searchBarActive
 }

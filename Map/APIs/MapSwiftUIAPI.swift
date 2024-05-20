@@ -66,15 +66,24 @@ func getDirectionSign(for step: String) -> String? {
     else if instruction.contains("arrive") || instruction.contains("arrived") {
         return "mappin.and.ellipse"
     }
-    else if instruction.contains("Re-calculating the route...") {
+    else if instruction.contains("re-calculating the route...") {
         return "exclamationmark.triangle"
     }
-    else if instruction.contains("destination") {
-        return "mappin.and.ellipse"
+    else if instruction.contains("Arrive at the destination") || instruction.contains("    ") {
+        return "arcade.stick"
+    }
+    else if instruction.contains("destination is on your right") || instruction.contains("   ") {
+        return "arcade.stick.and.arrow.right"
+    }
+    else if instruction.contains("destination is on your left") ||  instruction.contains("  "){
+        return "arcade.stick.and.arrow.left"
     }
     ///if there is no match then return nil
-    else {
+    else if instruction.contains("re-calculating the route..."){
         return "exclamationmark.triangle"
+    }
+    else {
+        return ""
     }
    
 }

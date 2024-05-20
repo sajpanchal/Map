@@ -15,15 +15,16 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
     ///the variable to be used as a query text for locationSearchCompleter.
     @Published var searchableText = ""
     ///flag to be used for detecting whether the user has cancelled the local search.
-    @Published var isSearchCancelled = false
+   // @Published var isSearchCancelled = false
     ///flag to be set on tap of the location from the search results list.
-    @Published var isDestinationSelected = false
+    //@Published var isDestinationSelected = false
     ///flag to be set when listview appears with search results
-    @Published var isListViewVisible = false
+   // @Published var isListViewVisible = false
     ///an array that will store the locations for a desired place (matching with location name and address)
     @Published var suggestedLocations: [MKAnnotation]?
     ///flag to be set when search request is made and is still under process.
-    @Published var isSearchInProgress = false
+   // @Published var isSearchInProgress = false
+    @Published var status: LocalSearchStatus = .localSearchCancelled
     ///an instance of MKLocalSearch to generate a search request.
     let request = MKLocalSearch.Request()
     
@@ -102,7 +103,7 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
                         annotation.title = title.contains(name) ?  title : (name + "\n" + title)
                     }           
                     ///set the flag false once response is processed.
-                    self.isSearchInProgress = false
+                    status = subTitle == "Search Nearby" ? .showingNearbyLocations : .locationSelected
                     ///return the annotation object and append it to suggestedLocations array. (Usually for each response there will be only one mapItem matching with the title and subtitle.)
                     return annotation
                 }

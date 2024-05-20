@@ -42,6 +42,7 @@ struct MapInteractionsView: View {
     @Binding var ETA: String
     @Binding var isRouteSelectTapped: Bool
     @Binding var tappedAnnotation: MKAnnotation?
+    @State var height = 200.0
     var body: some View {
         ///enclose the map interaction views in a vstack and move them to the bottom of the screen.
         VStack(spacing: 0) {
@@ -98,7 +99,7 @@ struct MapInteractionsView: View {
                   ///footer view with buttons and distance and time information
                     HStack {
                         ///if map is not navigating but location is pinned i.e. selected by the user show the footer with only the button to find routes to the destination
-                        if mapViewStatus != .navigating && mapViewStatus != .showingDirections && localSearch.suggestedLocations!.count <= 2 {
+                        if mapViewStatus != .navigating && mapViewStatus != .showingDirections && localSearch.status == .locationSelected {
                             ///routes button. On tap of it change the map action to show directions and make the throughfare nil for it to update it when starting a navigation
                             Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
                                    label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
@@ -216,7 +217,8 @@ struct MapInteractionsView: View {
                                         Spacer()
                                     }
                                 }
-                              else if localSearch.suggestedLocations!.count > 2 {
+                                else if localSearch.status == .showingNearbyLocations {
+                                    ExpandViewSymbol()
                                     List {
                                         ForEach(localSearch.suggestedLocations!, id: \.title) { suggestion in
                                             HStack {
@@ -234,6 +236,7 @@ struct MapInteractionsView: View {
                                                 }
                                                     .onTapGesture(perform: {
                                                      tappedAnnotation = suggestion
+                                                        height = 200.0
                                                      //   mapViewAction = .showDirections; locationDataManager.throughfare = nil
                                                     })
                                                 Spacer()
@@ -247,9 +250,35 @@ struct MapInteractionsView: View {
                                         }
                                        
                                     }
-                                    .frame(height: 200)
+                                    .frame(height: height)
                                 }
                             }
+                            .gesture(DragGesture().onChanged { value in
+                                DispatchQueue.main.async {
+                                    if height >= 200 && height <= 400 {
+                                        height = height - value.translation.height
+                                    }
+                                    else if height < 200 {
+                                        height = 200
+                                    }
+                                    else if height > 400 {
+                                        height = 400
+                                    }
+                                }
+                               print(height)
+                            }
+                                .onEnded{ value in
+                                    DispatchQueue.main.async {
+                                        if height < 200 {
+                                            height = 200
+                                        }
+                                        else if height > 400 {
+                                            height = 400
+                                        }
+                                    }
+                                   
+                                    print(height)
+                                })
                             Spacer()
                         }
                         .onTapGesture {
@@ -312,7 +341,7 @@ struct MapInteractionsView: View {
             ///clear the route distanc text
             routeDistance = ""
             ///keep the destination selected pinned to map.
-            localSearch.isDestinationSelected = true
+            localSearch.status = .locationSelected
             ///remove all the instructions from the array that shows them in a listview.
             stepInstructions.removeAll()
             ///clear the instruction text
