@@ -189,11 +189,15 @@ class MapViewAPI {
         ///set the flag being used to determine if the any of the routes were tapped.
         parent.isRouteSelectTapped = false
         ///if a given instruction contains word destination
-        if parent.instruction.contains(parent.destination) {
+        let trimmedDest = parent.destination.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedInst = parent.instruction.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedDest.contains(trimmedInst) {
+            print("destination contains")
             ///if userlocation and next stepLocation is available
             if let userLocation = mapView.userLocation.location, let stepLocation = parent.nextStepLocation {
+              
                 ///if the distance between user and next step is less than 5 m.
-                if userLocation.distance(from: stepLocation) <= 5 {
+                if userLocation.distance(from: stepLocation) <= 10 {
                     ///show the greeting message
                     parent.showGreetings = true
                     ///make suggested locations array nil

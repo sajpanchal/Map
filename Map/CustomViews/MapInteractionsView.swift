@@ -43,6 +43,7 @@ struct MapInteractionsView: View {
     @Binding var isRouteSelectTapped: Bool
     @Binding var tappedAnnotation: MKAnnotation?
     @State var height = 200.0
+    @State var addressViewHeight: CGFloat = 0
     var body: some View {
         ///enclose the map interaction views in a vstack and move them to the bottom of the screen.
         VStack(spacing: 0) {
@@ -65,12 +66,37 @@ struct MapInteractionsView: View {
                     if mapViewStatus == .navigating {
                         ///show the expand symbol on top of the footer view.
                         ExpandViewSymbol()
-                            .onTapGesture {
-                                ///on tap of it toggle to flag to show/hide the expandedview.
-                                withAnimation {
-                                    showAddressView.toggle()
+                            .gesture(DragGesture().onChanged {
+                                value in
+                               
+                                if value.translation.height < 0  && abs(value.translation.height) > 10 {
+                                    showAddressView = true
+                                    addressViewHeight = min(80, abs(value.translation.height))
+                                }
+                                else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
+                                    addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
+                                    if addressViewHeight <= 5 {
+                                        showAddressView = false
+                                    }
+                                   
+                                    
                                 }
                             }
+                                .onEnded {value in
+                                    if value.translation.height < 0  && abs(value.translation.height) > 10 {
+                                        showAddressView = true
+                                        addressViewHeight = min(80, abs(value.translation.height))
+                                    }
+                                    else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
+                                        addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
+                                        if addressViewHeight <= 5 {
+                                            showAddressView = false
+                                        }
+                                       
+                                        
+                                    }
+                            }
+                            )
                         ///if flag is true
                         if showAddressView {
                             ///show the hstack that is displaying the expanded view with the destination address and title.
@@ -88,12 +114,44 @@ struct MapInteractionsView: View {
                                 }
                                 Spacer()
                             }
-                            .onTapGesture {
-                                ///if user taps on the expandedview itself, show/hide it.
+                            .frame(height: addressViewHeight)
+                            .gesture(DragGesture().onChanged {
+                                value in
                                 withAnimation {
-                                    showAddressView.toggle()
+                                    
+                                
+                                if value.translation.height < 0  && abs(value.translation.height) > 10 {
+                                    showAddressView = true
+                                    addressViewHeight = min(80, abs(value.translation.height))
+                                }
+                                else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
+                                    addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
+                                    if addressViewHeight <= 5 {
+                                        showAddressView = false
+                                    }
+                                   
+                                    
+                                }
                                 }
                             }
+                                .onEnded {value in
+                                    withAnimation {
+                                        if value.translation.height < 0  && abs(value.translation.height) > 10 {
+                                            showAddressView = true
+                                            addressViewHeight = min(80, abs(value.translation.height))
+                                        }
+                                        else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
+                                            addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
+                                            if addressViewHeight <= 5 {
+                                                showAddressView = false
+                                            }
+                                           
+                                            
+                                        }
+                                    }
+                                   
+                            }
+                            )
                         }
                     }
                   ///footer view with buttons and distance and time information
@@ -216,6 +274,42 @@ struct MapInteractionsView: View {
                                         ///add a spacer after the vstack
                                         Spacer()
                                     }
+                                    .gesture(DragGesture().onChanged {
+                                        value in
+                                        withAnimation {
+                                            if value.translation.height < 0  && abs(value.translation.height) > 10 {
+                                                showAddressView = true
+                                                addressViewHeight = min(80, abs(value.translation.height))
+                                            }
+                                            else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
+                                                addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
+                                                if addressViewHeight <= 5 {
+                                                    showAddressView = false
+                                                }
+                                               
+                                                
+                                            }
+                                        }
+                                       
+                                    }
+                                        .onEnded {value in
+                                            withAnimation {
+                                                if value.translation.height < 0  && abs(value.translation.height) > 10 {
+                                                    showAddressView = true
+                                                    addressViewHeight = min(80, abs(value.translation.height))
+                                                }
+                                                else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
+                                                    addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
+                                                    if addressViewHeight <= 5 {
+                                                        showAddressView = false
+                                                    }
+                                                   
+                                                    
+                                                }
+                                            }
+                                           
+                                    }
+                                    )
                                 }
                                 else if localSearch.status == .showingNearbyLocations {
                                     ExpandViewSymbol()
