@@ -13,6 +13,7 @@ class MapViewAPI {
     static var routes: [MKRoute] = []
     ///next index of the step in route's steps array elements
     static var nextIndex = 0
+    static var nextInstructionIndex = 0
     ///array to detect if the given step has points fetched by the function call or not.
     static var isStepPointsFetched: [Bool] = []
     ///an array stores the MKMapPoints of each steps.
@@ -192,7 +193,6 @@ class MapViewAPI {
         let trimmedDest = parent.destination.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedInst = parent.instruction.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmedDest.contains(trimmedInst) {
-            print("destination contains")
             ///if userlocation and next stepLocation is available
             if let userLocation = mapView.userLocation.location, let stepLocation = parent.nextStepLocation {
               
@@ -260,6 +260,7 @@ class MapViewAPI {
         parent.routeDistance = String(format:"%.1f",Double(route.distance/1000.0)) + " km"
         ///iterate through the route steps
         for step in route.steps {
+      
             ///get the index of the given step and if it is found continue...
             guard let stepIndex = route.steps.firstIndex(of: step) else {
                 return
@@ -288,8 +289,12 @@ class MapViewAPI {
                 ///get the first step and its index
                 if let firstStep = route.steps.first(where: {!$0.instructions.isEmpty}), let firstIndex = route.steps.firstIndex(of: firstStep) {
                     ///update the step instructions
+                    print("location is 20 m away and not exited yet!")
                     updateStepInstructions(step: firstStep, instruction: firstStep.instructions, parent: &parent, stepIndex: firstIndex, mapView: mapView)
+                    updateNextStepInstruction(parent: &parent, route: route, at: firstIndex)
+                
                 }
+               
             }
             ///if the user location is near 15 m of any of the given step points, update to that step instructions and make nextIndex set to the next step index.
             if nextIndex == stepIndex && pointsArray[stepIndex].contains(where: { $0.distance(to: userPoint) < 10})  {
@@ -311,6 +316,7 @@ class MapViewAPI {
                 }
                 ///update the step instructions for display
                 updateStepInstructions(step: step, instruction: (step.instructions == "" ? thoroughfare : step.instructions), parent: &parent, stepIndex: stepIndex, mapView: mapView)
+                updateNextStepInstruction(parent: &parent, route: route, at: stepIndex)
                 break
             }
             ///if the expected next step is not found nearby but there is a step point found to be nearby and it wasn't marked as exited
@@ -333,12 +339,13 @@ class MapViewAPI {
                 }
                 ///update the step instructions for display
                 updateStepInstructions(step: step, instruction: (step.instructions == "" ? thoroughfare : step.instructions), parent: &parent, stepIndex: stepIndex, mapView: mapView)
+                updateNextStepInstruction(parent: &parent, route: route, at: stepIndex)
+
                 break
             }
         }
         ///check if the user is out of path or not
         isUserLocationOutOfRoute(in: mapView, for: nextIndex - 1, with: &parent)
-        
          ///now calculate the distance from the next step location to user location
          if let nextStepLocation = parent.nextStepLocation, let userLocation = mapView.userLocation.location {
              calculateDistance(from: nextStepLocation, to: userLocation, parent: &parent)
@@ -445,6 +452,7 @@ extension MapViewAPI {
         changeInStepDistance = nil
         isUserOutofPath = false
         isUserOutofRoute = false
+        nextInstructionIndex = 0
         polylinePoints.removeAll()
        
     }
@@ -540,6 +548,7 @@ extension MapViewAPI {
         parent.nextStepLocation = CLLocation(latitude: step.polyline.coordinate.latitude, longitude: step.polyline.coordinate.longitude)
         ///update the swiftui instruction display with the latest instruction received from next step
         parent.instruction = instruction
+        nextInstructionIndex = stepIndex + 1
         ///remove the previously exited steps from the step instruction array that displays list of future instruction in expanded view.
         parent.stepInstructions.removeAll(where: { $0.0 == instruction})
         ///mark the step polyline subtitle as region exited.
@@ -551,7 +560,21 @@ extension MapViewAPI {
         ///remove all the points from an array
         polylinePoints.removeAll()
     }
-    
+    static func updateNextStepInstruction(parent: inout MapView, route: MKRoute, at index: Int) {
+        var nextInstruction = ""
+        nextInstructionIndex = index + 1
+       print("next instruction index : \(nextInstructionIndex)")
+        if  nextInstructionIndex < route.steps.count  {
+             nextInstruction = route.steps[nextInstructionIndex].instructions
+            print("nextInstruction: \(nextInstruction)")
+            
+        }
+        else {
+             nextInstruction = ""
+        }
+      
+        parent.nextInstruction = nextInstruction
+    }
     ///method to calculate the distance from userlocation to next step.
     static func calculateDistance(from nextStepLocation:CLLocation, to userLocation: CLLocation, parent: inout MapView) {
         ///get the raw distance from userlocation to next step location
@@ -678,6 +701,8 @@ extension MapViewAPI {
     static func reRoutetoDestination(in uiView: MKMapView, from source: CLLocationCoordinate2D, to destination: CLLocationCoordinate2D?, parent: inout MapView) {
        ///set nextIndex to 0.
         nextIndex = 0
+        parent.nextInstruction = ""
+        nextInstructionIndex = 0
         ///reset all static properties of the given class.
         resetProps()
         ///remove all the step instructions to be displayed in expandable list view.

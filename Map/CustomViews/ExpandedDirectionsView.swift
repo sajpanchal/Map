@@ -16,6 +16,7 @@ struct ExpandedDirectionsView: View {
     ///bounded property that is used to show or hide this view.
     @Binding var showDirectionsList: Bool
     @Binding var height: CGFloat
+    @Binding var nextInstruction: String
     var body: some View {
         ///
         VStack {
@@ -61,8 +62,13 @@ struct ExpandedDirectionsView: View {
                 }
             }
             ///add a expand symbol at the bottom of it.
-            ExpandViewSymbol()
-            Spacer()
+            if showDirectionsList {
+                ExpandDirectionsViewSymbol(showDirectionsList: $showDirectionsList, nextInstruction: $nextInstruction)
+                Spacer()
+            }
+           
+               // .background(Color.gray)
+         
         }
         .background(bgMode == .dark ? Color.black : Color.white)
         .gesture(DragGesture().onChanged { value in
@@ -111,5 +117,5 @@ struct ExpandedDirectionsView: View {
 }
 
 #Preview {
-    ExpandedDirectionsView(stepInstructions: [], showDirectionsList: .constant(false), height: .constant(0))
+    ExpandedDirectionsView(stepInstructions: [], showDirectionsList: .constant(false), height: .constant(0), nextInstruction: .constant(""))
 }

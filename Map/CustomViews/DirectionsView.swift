@@ -51,6 +51,10 @@ struct DirectionsView: View {
                 ///add a spacer to the right of the instruction view.
                 Spacer()
             }
+            if !showDirectionsList {
+                ExpandViewSymbol()
+            }
+         
             /// on tap of the horizontal stack (Directions + instructions)
 //            .onTapGesture {
 //                ///with animation toggle the flag to hide or show the expanded directions list view.

@@ -28,6 +28,7 @@ struct MapView: UIViewRepresentable {
     @Binding var mapViewStatus: MapViewStatus
     ///this ist the state object of Map Swiftui view that is going to handle the location search
     @Binding var instruction: String
+    @Binding var nextInstruction: String
     ///localSearch struct that is responsible for address/location search start, update or cancellation.
     @StateObject var localSearch: LocalSearch
     ///locationDataManager is an instance of a class that has a delegate of LocationManager and its methods.
@@ -150,9 +151,13 @@ struct MapView: UIViewRepresentable {
                     ///if status is not updated
                     if parent.mapViewStatus != .idle {
                         ///reset the location tracking
-                        MapViewAPI.resetLocationTracking(of: mapView, parent: &parent)
-                        ///set the status to idle
-                        parent.mapViewStatus = .idle
+                        if parent.localSearch.status != .localSearchCancelled {
+                            MapViewAPI.resetLocationTracking(of: mapView, parent: &parent)
+                            ///set the status to idle
+                            parent.mapViewStatus = .idle
+                        }
+           
+                      
                     }
                 parent.handleLocationSearch(in: mapView, at: parent.localSearch.suggestedLocations, for: parent.localSearch.status)
                     break
@@ -274,10 +279,13 @@ struct MapView: UIViewRepresentable {
                     DispatchQueue.main.async {
                         print("reset")
                         ///reset the location tracking
-                        MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
-                        uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
-                        ///set the status to idle
-                        self.mapViewStatus = .idle
+                        if self.localSearch.status != .localSearchCancelled {
+                            MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
+                            uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
+                            ///set the status to idle
+                            self.mapViewStatus = .idle
+                        }
+                       
                     }
                 }
             self.handleLocationSearch(in: uiView, at: self.localSearch.suggestedLocations,  for: self.localSearch.status)

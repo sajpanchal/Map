@@ -26,6 +26,7 @@ struct Map: View {
     @State var searchedLocationText: String = ""
     ///state variable to store the current instruction to display in the directions view.
     @State var instruction: String = ""
+    @State var nextInstruction: String = ""
     ///sending this variable to other swiftui views such as MapView and MapInterationView.
     @State var nextStepLocation: CLLocation?
     ///localSearch object is instantiated on rendering this view.
@@ -83,7 +84,7 @@ struct Map: View {
                 ///grouping mapview and its associated buttons
                     Group() {
                     ///calling our custom struct that will render UIView for us in swiftui. we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class. we are also passing the state variable called tapped that is bound to the MapView.when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix. we always declare a binding propery in a child component of the associated property from its parent.once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
-                        MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus,  instruction: $instruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, routeTravelTime: $routeTravelTime, routeData: $routeData,  routeDistance: $routeDistance, remainingDistance: $remainingDistance, destination: $destination, stepInstructions: $stepInstructions, ETA: $ETA, showGreetings: $showGreetings, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnoation)
+                        MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus,  instruction: $instruction, nextInstruction: $nextInstruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, routeTravelTime: $routeTravelTime, routeData: $routeData,  routeDistance: $routeDistance, remainingDistance: $remainingDistance, destination: $destination, stepInstructions: $stepInstructions, ETA: $ETA, showGreetings: $showGreetings, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnoation)
                     ///disable the mapview when track location button is tapped but tracking is not on yet.
                             .disabled(isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction))
                     ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged() action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag. we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
@@ -117,9 +118,72 @@ struct Map: View {
                                         
                                         
                                     })
-                                    ExpandedDirectionsView(stepInstructions: stepInstructions, showDirectionsList: $showDirectionsList, height: $expandedDirectionsViewHeight)
-                                       // .frame(height: 100)
-                                    .frame(height: expandedDirectionsViewHeight <= 100 ? 40 : expandedDirectionsViewHeight , alignment: .leading)
+                                    .gesture(DragGesture().onChanged { value in
+                                       // showDirectionsList = true
+                                        withAnimation {
+                                        if value.translation.height >= 0 {
+                                           
+                                            expandedDirectionsViewHeight =  min(value.translation.height, UIScreen.main.bounds.height)
+                                            
+                                          
+                                        }
+                                        else {
+                                            if expandedDirectionsViewHeight >= 0 {
+                                               
+                                                expandedDirectionsViewHeight = UIScreen.main.bounds.height + value.translation.height - 100
+                                               
+                                               
+                                            }
+                                        }
+                                        }
+                                       // print(height, value.translation.height)
+                                        }
+                                        .onEnded { value in
+                                            //showDirectionsList = true
+                                            withAnimation {
+                                            if expandedDirectionsViewHeight >= 0 {
+                                                showDirectionsList = true
+                                            }
+                                            else {
+                                                expandedDirectionsViewHeight = 0
+                                                showDirectionsList = false
+                                            }
+                                            if value.translation.height > 150 {
+                                                
+                                                expandedDirectionsViewHeight = UIScreen.main.bounds.height - 100
+                                              
+                                               
+                                            }
+                                            else if value.translation.height < -100 {
+                                                expandedDirectionsViewHeight = 0
+                                                showDirectionsList = false
+                                            }
+                                            }
+                                        })
+                                ZStack {
+                                    HStack {
+                                        Spacer()
+                                            Image(systemName: getDirectionSign(for: nextInstruction) ?? "")
+                                            Text(nextInstruction)
+                                                .lineLimit(1)
+                                        Spacer()
+                                                                                                           
+                                }
+                                    .padding(10)
+                                    .background(bgMode == .dark ? Color(UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)) : Color(UIColor.systemGray5))
+                                    ExpandedDirectionsView(stepInstructions: stepInstructions, showDirectionsList: $showDirectionsList, height: $expandedDirectionsViewHeight, nextInstruction: $nextInstruction)
+                                       
+                                    
+                                           // .frame(height: 100)
+                                        .frame(height: expandedDirectionsViewHeight <= 100 ? 0 : expandedDirectionsViewHeight , alignment: .leading)
+                                   
+                                 
+                                    
+                                }
+                               
+                                
+                        
+                                  
                              //   }
                                // if showDirectionsList {
                                    

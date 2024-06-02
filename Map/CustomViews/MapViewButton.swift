@@ -39,7 +39,7 @@ struct MapViewButton: View {
                         .scaledToFit()
                         .frame(width: 25, height: 25)
                     ///set its color to blue gradient if image is having a circle filled otherwise set the gray geadient.
-                        .foregroundStyle(imageName == "circle.fill" ? Color.blue.gradient : Color.gray.gradient)
+                        .foregroundStyle(imageName == "circle.fill" ? RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 20) : RadialGradient(gradient: Gradient(colors: [Color(red: 0.3, green: 0.3, blue: 0.3), Color(red: 0.4, green: 0.4, blue: 0.4)]), center: .center, startRadius: 1, endRadius: 20))
                 }
             }
             .padding(10)
