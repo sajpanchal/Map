@@ -22,23 +22,7 @@ struct ExpandDirectionsViewSymbol: View {
                     Spacer()
                 }
             }
-            
-//                HStack {
-//                    if !showDirectionsList {
-//                        Image(systemName: getDirectionSign(for: nextInstruction) ?? "")
-//                        Text(nextInstruction)
-//                            .lineLimit(1)
-//                    }
-//                   
-//                
-//            }
-//                .padding(5)
-//                
-            
-          
-            //.frame(height: 30)
-        }
-     
+        }     
     }
 }
 

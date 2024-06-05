@@ -14,12 +14,6 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
     @Published var results: [AddressResult] = []
     ///the variable to be used as a query text for locationSearchCompleter.
     @Published var searchableText = ""
-    ///flag to be used for detecting whether the user has cancelled the local search.
-   // @Published var isSearchCancelled = false
-    ///flag to be set on tap of the location from the search results list.
-    //@Published var isDestinationSelected = false
-    ///flag to be set when listview appears with search results
-   // @Published var isListViewVisible = false
     ///an array that will store the locations for a desired place (matching with location name and address)
     @Published var suggestedLocations: [MKAnnotation]?
     ///flag to be set when search request is made and is still under process.

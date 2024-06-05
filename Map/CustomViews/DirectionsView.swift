@@ -54,57 +54,10 @@ struct DirectionsView: View {
             if !showDirectionsList {
                 ExpandViewSymbol()
             }
-         
-            /// on tap of the horizontal stack (Directions + instructions)
-//            .onTapGesture {
-//                ///with animation toggle the flag to hide or show the expanded directions list view.
-//                withAnimation {
-//                    showDirectionsList.toggle()
-//                }
-//            }
-            ///if flag is false i.e. directions list view is hidden add the symbol view to the bottom of the Hstack.
-            //if !showDirectionsList {
-                ///show the symbol for expandable view.
-            //  ExpandViewSymbol()
-//                .onTapGesture {
-//                    withAnimation {
-//                        showDirectionsList.toggle()
-//                    }
-//                }
-            //}
         }
         .padding(.horizontal,10)
         ///apply the black gradient to entire view.
         .background(bgMode == .dark ? Color.black.gradient : Color.white.gradient)
-//        .gesture(DragGesture().onChanged { value in
-//            if value.translation.height >= 0 {
-//                height =  min(value.translation.height, UIScreen.main.bounds.height)
-//            }
-//            else {
-//                if height >= 0 {
-//                    height = UIScreen.main.bounds.height + value.translation.height - 100
-//                }
-//            }
-//            }
-//            .onEnded { value in
-//              //  showDirectionsList = true
-//                if height > 0 {
-//                    showDirectionsList = true
-//                  
-//                }
-//                
-//                else {
-//                    height = 0
-//                    showDirectionsList = false
-//                }
-//                if abs(value.translation.height) > 100 {
-//                    height = UIScreen.main.bounds.height
-//                }
-//                else {
-//                    height = 0
-//                    showDirectionsList = false
-//                }
-//            })
     }
 }
 

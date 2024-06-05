@@ -352,10 +352,8 @@ class MapViewAPI {
          }
         ///method that will determine if user is out or route or not.
         isUserLocationOutOfRoute(in: parent)
-        ///method that will determine if user is out of thoroughfare or not.
-        //isUserOutOfThoroghfare(for: route, parent: &parent, in: mapView)
         /// if user is out of route or thoroughfare
-        if isUserOutofRoute   /*|| isUserOutofThoroughFare || isPathOutofMapCamera(in: route, of: mapView, at: nextIndex, parent: parent) */{
+        if isUserOutofRoute {
             ///set the instruction set to be displayed with a warning text.
             parent.instruction = "Re-calculating the route..."
             ///make throroughfare nil
@@ -601,11 +599,7 @@ extension MapViewAPI {
             else {
                 parent.instruction = parent.destination
             }
-         
         }
-       
-        
-        
     }
     
     ///method that will get the ETA to the given destination
@@ -760,111 +754,6 @@ extension MapViewAPI {
         reRouted = true
     }
     
-//    ///method to check if the user is out of thoroghfare
-//    static func isUserOutOfThoroghfare(for route: MKRoute, parent: inout MapView, in mapView: MKMapView) {
-//        ///instantiate the variable to store the current stepIndex
-//        var stepIndex = 0
-//        if thoroughfare == "n/a" || thoroughfare == "not found" {
-//            stopTimer()
-//            return
-//        }
-//        ///find the index of the step from steps array where current instruction on display matches with its instruction.
-//        if let index = route.steps.firstIndex(where: {
-//            $0.instructions == parent.instruction
-//        }) {
-//            ///deduct the index by 1 so we get the instruction belongs to the current thoroghfare of the user location.
-//             stepIndex = index - 1
-//            ///if the instruction contains the thoroughfare
-//            if route.steps[stepIndex].instructions.contains(thoroughfare)  {
-//                ///stop the timer
-//                stopTimer()
-//                ///return the function call.
-//                return
-//            }
-//            ///if the instruction at the given stepIndex is found empty in steps array of a given route
-//            else if route.steps[stepIndex].instructions.isEmpty {
-//                ///get the title of the route polyline separated in an array. title is actully the street name from where the route is starting towards destination.
-//                let via = route.polyline.title?.split(separator: ", ")
-//                ///create a string with initial instruction for the starting point of the route.
-//                let initialInstruction = "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(via?[1] ?? "")"
-//                ///if the initial instruction has the given thoroughfare
-//                if initialInstruction.contains(thoroughfare) {
-//                    //stop the timer and return the function call
-//                    stopTimer()
-//                    return
-//                }
-//            }
-//                ///if no conditions were met, continue
-//            else {
-//                if let point = userPoint {
-//                    if pointsArray[stepIndex].contains(where: {$0.distance(to: point) <= 20}) {
-//                         stopTimer()
-//                         return
-//                    }
-//                }
-//            }
-//        }
-//        ///if no index is found, check if the instruction is the first one where user is starting the journey.
-//        else if parent.instruction.contains(thoroughfare) {
-//            ///stop the timer and return the function call
-//            stopTimer()
-//            return
-//        }
-//        else {
-//            if let point = userPoint {
-//                if pointsArray[stepIndex].contains(where: {$0.distance(to: point) <= 20}) {
-//                    stopTimer()
-//                    return
-//                }
-//            }
-//        }
-//        ///if instruction doesn't have a current thoroughfare and speed is more than 25
-//        if parent.locationDataManager.speed >= 25 {
-//            ///if time is not on
-//            if !self.isTimerOn {
-//                ///start the timer and continue
-//                startTimer()
-//            }
-//        }
-//        else {
-//            stopTimer()
-//            return
-//        }
-//        ///once time gets past 5secs
-//        if self.time > 20  {
-//            ///set the flag to true to indicate user is out of thoroughfare.
-//            isUserOutofThoroughFare = true
-//        }
-//    }
-    
-//    ///start timer function
-//    static func startTimer() {
-//        ///instantiate scheduled timer with 1sec repeating interval  and a block of code to set timer flag and increment time
-//        DispatchQueue.main.async {
-//            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { timer in
-//                   isTimerOn = true
-//                   time += 1
-//               })
-//        }
-//    }
-    
-//    ///stop timer function
-//    static func stopTimer() {
-//        ///if timer is not nil
-//        if timer != nil {
-//            ///invalidate timet
-//            self.timer!.invalidate()
-//        }
-//        ///make timer nil.
-//        self.timer = nil
-//        ///reset the falg
-//        isUserOutofThoroughFare = false
-//        ///reset the timer
-//        time = 0
-//        ///flag timer on to false
-//        isTimerOn = false
-//    }
-    
     ///method to set the distance change preset based on user speed.
     static func setChangePreset(parent: MapView) -> Double {
         switch parent.locationDataManager.speed {
@@ -984,52 +873,6 @@ extension MapViewAPI {
                       
             ///if the polylinePoints array is empty.
             if polylinePoints.isEmpty {
-                ///iterate through the annotations
-//                for annotation in mapView.annotations {
-//                    ///if the title is available for the annotation
-//                    if let title = annotation.title {
-//                        ///if title is not nil
-//                        if let t = title {
-//                            ///if title value is integer number
-//                            if Int(t) != nil {
-//                                ///remove that title
-//                                mapView.removeAnnotation(annotation)
-//                            }
-//                        }
-//                    }
-//                }
-                ///create a varaible to store point index
-                var pointIndex = 0.0
-                ///get the divider number for a given lenght of the pointsarray at a current step
-//                let divider = getDivider(for: pointsArray[currentStep].count)
-//                ///iterate through the points for the current step.
-//                for point in pointsArray[currentStep] {
-//                   
-//                    ///if the index is divided by a divider, add it to polylinePoints array otherwise delete it.
-//                    if pointIndex.truncatingRemainder(dividingBy: divider) == 0 {
-//                        print("Step #\(currentStep) ", point.distance(to: userPoint))
-//                        ///append the point to an array
-//                        polylinePoints.append(PolylinePoint(point: point))
-//                      
-//                        ///if current step is the last step
-//                        if pointsArray.count - 1 == currentStep {
-//                            if pointsArray[currentStep].count - 1 == Int(pointIndex) {
-//                                break
-//                            }
-//                        }
-//                        ///create an annotation object
-//                        let annotation = MKPointAnnotation()
-//                        ///set its coordinate to point's coordinate
-//                        annotation.coordinate = point.coordinate
-//                        ///set its title to pointIndex of it.
-//                        annotation.title = String(Int(pointIndex))
-//                        ///now add this annotation to mapview so it will be display in map.
-//                        mapView.addAnnotation(annotation)
-//                    }
-//                    ///increase the index by 1.
-//                    pointIndex += 1
-//                }
-                
                 ///iterate through the points in a pointsArray in a given step index
                 for element in pointsArray[currentStep] {
                     ///move all points to PolylinePoints array type.
@@ -1054,53 +897,6 @@ extension MapViewAPI {
                 }
                 ///remove all points from polylinePoints array where distance from userPoint is within rangePreset.
                 polylinePoints.removeAll(where: {$0.point.distance(to: userPoint) <= rangePreset})
-                for element in polylinePoints {
-                    print("step point #\(pointIndex): \(element.point.distance(to: userPoint))")
-                    ///create an annotation object
-                    //let annotation = MKPointAnnotation()
-                    ///set its coordinate to point's coordinate
-                   // annotation.coordinate = element.point.coordinate
-                    ///set its title to pointIndex of it.
-                  //  annotation.title = String(Int(pointIndex))
-                    ///now add this annotation to mapview so it will be display in map.
-                 //   mapView.addAnnotation(annotation)
-                    pointIndex += 1
-                }
-                ///if the step number is 0 or 1.
-                /*if currentStep <= 1 {
-                    ///remove first 4 polyline points
-                    for i in 0...3 {
-                        ///get the first annotation where coordinates are matching with the first element of the polyline points.
-                        if let first = mapView.annotations.first(where: {$0.coordinate.longitude == polylinePoints.first?.point.coordinate.longitude && $0.coordinate.latitude == polylinePoints.first?.point.coordinate.latitude}) {
-                            ///remove that annotation
-                            mapView.removeAnnotation(first)
-                        }
-                        ///if polyline points array is not empty
-                        if !polylinePoints.isEmpty {
-                            ///if the point is within rangePreset remove that point from an array
-                            if (polylinePoints.first?.point.distance(to: userPoint))! <= rangePreset {
-                                polylinePoints.removeFirst()
-                            }
-                        }
-                        ///if it is the last iteration and route has been already rerouted
-                        if i == 3 && reRouted {
-                            ///exit the loop
-                            reRouted = false
-                            break
-                        }
-                        ///else if it is the 2nd iteration and route is not re-routed then exit the loop.
-                        else if i == 1 && !reRouted {
-                            break
-                        }
-                    }
-                }
-                else {
-                    polylinePoints.removeFirst()
-                    if let annotation = mapView.annotations.first(where: {$0.title == "0"}) {
-                        mapView.removeAnnotation(annotation)
-                    }
-                   
-                }*/
                 comment = "Step #\(currentStep) | pts fetched | \(polylinePoints.count)"
             }
             ///if array is not empty
@@ -1143,7 +939,7 @@ extension MapViewAPI {
                                 ///remove all points
                                 polylinePoints.removeAll()
                                 ///remove all annotations.
-                              //  mapView.removeAnnotations(mapView.annotations)
+                              ///  mapView.removeAnnotations(mapView.annotations)
                                 ///method to perform re-routing to the current destination.
                                 reRoutetoDestination(in: mapView, from: parent.locationDataManager.userlocation!.coordinate, to: parent.localSearch.suggestedLocations!.first!.coordinate, parent: &parent)
                                 return

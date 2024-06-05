@@ -72,27 +72,18 @@ struct ExpandedDirectionsView: View {
         }
         .background(bgMode == .dark ? Color.black : Color.white)
         .gesture(DragGesture().onChanged { value in
-           // showDirectionsList = true
-            withAnimation {
-            if value.translation.height >= 0 {
-               
-                    height =  min(value.translation.height, UIScreen.main.bounds.height)
-                
-              
-            }
-            else {
-                if height >= 0 {
-                   
-                        height = UIScreen.main.bounds.height + value.translation.height - 100
-                   
-                   
+                withAnimation {
+                    if value.translation.height >= 0 {
+                            height =  min(value.translation.height, UIScreen.main.bounds.height)
+                    }
+                    else {
+                        if height >= 0 {
+                                height = UIScreen.main.bounds.height + value.translation.height - 100
+                        }
+                    }
                 }
             }
-            }
-           // print(height, value.translation.height)
-            }
             .onEnded { value in
-                //showDirectionsList = true
                 withAnimation {
                 if height >= 0 {
                     showDirectionsList = true                  
@@ -102,10 +93,7 @@ struct ExpandedDirectionsView: View {
                     showDirectionsList = false
                 }
                 if value.translation.height > 150 {
-                    
                         height = UIScreen.main.bounds.height - 100
-                  
-                   
                 }
                 else if value.translation.height < -100 {
                     height = 0

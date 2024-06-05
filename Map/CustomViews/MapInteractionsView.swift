@@ -78,11 +78,9 @@ struct MapInteractionsView: View {
                                     if addressViewHeight <= 5 {
                                         showAddressView = false
                                     }
-                                   
-                                    
                                 }
                             }
-                                .onEnded {value in
+                                .onEnded { value in
                                     if value.translation.height < 0  && abs(value.translation.height) > 10 {
                                         showAddressView = true
                                         addressViewHeight = min(80, abs(value.translation.height))
@@ -92,11 +90,8 @@ struct MapInteractionsView: View {
                                         if addressViewHeight <= 5 {
                                             showAddressView = false
                                         }
-                                       
-                                        
                                     }
-                            }
-                            )
+                            })
                         ///if flag is true
                         if showAddressView {
                             ///show the hstack that is displaying the expanded view with the destination address and title.
@@ -129,29 +124,23 @@ struct MapInteractionsView: View {
                                     if addressViewHeight <= 5 {
                                         showAddressView = false
                                     }
-                                   
-                                    
-                                }
                                 }
                             }
-                                .onEnded {value in
-                                    withAnimation {
-                                        if value.translation.height < 0  && abs(value.translation.height) > 10 {
-                                            showAddressView = true
-                                            addressViewHeight = min(80, abs(value.translation.height))
-                                        }
-                                        else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
-                                            addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
-                                            if addressViewHeight <= 5 {
-                                                showAddressView = false
-                                            }
-                                           
-                                            
-                                        }
+                        }  
+                        .onEnded { value in
+                            withAnimation {
+                                if value.translation.height < 0  && abs(value.translation.height) > 10 {
+                                    showAddressView = true
+                                    addressViewHeight = min(80, abs(value.translation.height))
+                                }
+                                else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
+                                    addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
+                                    if addressViewHeight <= 5 {
+                                        showAddressView = false
                                     }
-                                   
+                                }
                             }
-                            )
+                        })
                         }
                     }
                   ///footer view with buttons and distance and time information
@@ -242,10 +231,6 @@ struct MapInteractionsView: View {
                                             })
                                            
                                         }
-                                    
-                                  
-                                    
-                                  
                                 }
                                 ///if map is navigating then show the remaining distance from the current location to the destination.
                                 else if mapViewStatus == .navigating {
@@ -286,11 +271,8 @@ struct MapInteractionsView: View {
                                                 if addressViewHeight <= 5 {
                                                     showAddressView = false
                                                 }
-                                               
-                                                
                                             }
                                         }
-                                       
                                     }
                                         .onEnded {value in
                                             withAnimation {
@@ -303,11 +285,8 @@ struct MapInteractionsView: View {
                                                     if addressViewHeight <= 5 {
                                                         showAddressView = false
                                                     }
-                                                   
-                                                    
                                                 }
-                                            }
-                                           
+                                            }                                        
                                     }
                                     )
                                 }
@@ -475,19 +454,5 @@ struct MapInteractionsView: View {
 #Preview {
     MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation()))
 }
-
-
-/*
- List {
-     ForEach(routeData, id: \.id) {_ in
-         Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
-                label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
-         .background(.blue.gradient)
-         .cornerRadius(15)
-         .padding(5)
-     }
-    
- }
- */
 
 

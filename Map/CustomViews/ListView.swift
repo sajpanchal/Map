@@ -40,8 +40,6 @@ struct ListView: View {
                 .onTapGesture {
                     ///set the flag to true to indicate search for the locations is in progress.
                     localSearch.status = .localSearchInProgress
-                    ///set this flag to false as listview will disappear on tap.
-                  //  localSearch.isListViewVisible = false
                     ///this method will pin the given location in the map.
                     localSearch.getPlace(from: suggestion)
                     ///replace the partial searched text with the complete title received from selected location
