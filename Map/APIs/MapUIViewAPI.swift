@@ -985,19 +985,19 @@ extension MapViewAPI {
             ///if the polylinePoints array is empty.
             if polylinePoints.isEmpty {
                 ///iterate through the annotations
-                for annotation in mapView.annotations {
-                    ///if the title is available for the annotation
-                    if let title = annotation.title {
-                        ///if title is not nil
-                        if let t = title {
-                            ///if title value is integer number
-                            if Int(t) != nil {
-                                ///remove that title
-                                mapView.removeAnnotation(annotation)
-                            }
-                        }
-                    }
-                }
+//                for annotation in mapView.annotations {
+//                    ///if the title is available for the annotation
+//                    if let title = annotation.title {
+//                        ///if title is not nil
+//                        if let t = title {
+//                            ///if title value is integer number
+//                            if Int(t) != nil {
+//                                ///remove that title
+//                                mapView.removeAnnotation(annotation)
+//                            }
+//                        }
+//                    }
+//                }
                 ///create a varaible to store point index
                 var pointIndex = 0.0
                 ///get the divider number for a given lenght of the pointsarray at a current step
@@ -1057,13 +1057,13 @@ extension MapViewAPI {
                 for element in polylinePoints {
                     print("step point #\(pointIndex): \(element.point.distance(to: userPoint))")
                     ///create an annotation object
-                    let annotation = MKPointAnnotation()
+                    //let annotation = MKPointAnnotation()
                     ///set its coordinate to point's coordinate
-                    annotation.coordinate = element.point.coordinate
+                   // annotation.coordinate = element.point.coordinate
                     ///set its title to pointIndex of it.
-                    annotation.title = String(Int(pointIndex))
+                  //  annotation.title = String(Int(pointIndex))
                     ///now add this annotation to mapview so it will be display in map.
-                    mapView.addAnnotation(annotation)
+                 //   mapView.addAnnotation(annotation)
                     pointIndex += 1
                 }
                 ///if the step number is 0 or 1.
@@ -1143,7 +1143,7 @@ extension MapViewAPI {
                                 ///remove all points
                                 polylinePoints.removeAll()
                                 ///remove all annotations.
-                                mapView.removeAnnotations(mapView.annotations)
+                              //  mapView.removeAnnotations(mapView.annotations)
                                 ///method to perform re-routing to the current destination.
                                 reRoutetoDestination(in: mapView, from: parent.locationDataManager.userlocation!.coordinate, to: parent.localSearch.suggestedLocations!.first!.coordinate, parent: &parent)
                                 return

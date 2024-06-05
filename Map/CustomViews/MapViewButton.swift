@@ -24,22 +24,23 @@ struct MapViewButton: View {
                     ///add a rectangle shape as a background view for the button
                     Rectangle()
                         .frame(width: 50, height: 50)
-                        .foregroundStyle(Color.white.gradient)
+                        .foregroundStyle(Color(UIColor.systemGray3))
                         .cornerRadius(10)
                     ///if the image name is circle or circle with fill
                     if imageName == "circle" || imageName == "circle.fill" {
                         ///add a circle with gray gradiant on top of a rectangle.
                         Circle()
                             .frame(width: 30, height: 30)
-                            .foregroundStyle(Color.gray.gradient)
+                            .foregroundStyle(Color.white)
                     }
                     ///add an image to be displayed
-                    Image(systemName: imageName)
+                    
+                    Image(systemName: imageName == "circle" || imageName == "circle.fill" ? "circle.fill" : imageName)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 25, height: 25)
+                        .frame(width: 20, height: 20)
                     ///set its color to blue gradient if image is having a circle filled otherwise set the gray geadient.
-                        .foregroundStyle(imageName == "circle.fill" ? RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 20) : RadialGradient(gradient: Gradient(colors: [Color(red: 0.3, green: 0.3, blue: 0.3), Color(red: 0.4, green: 0.4, blue: 0.4)]), center: .center, startRadius: 1, endRadius: 20))
+                        .foregroundStyle(imageName == "circle" || imageName == "location" ? Color.blue : Color.white)
                 }
             }
             .padding(10)

@@ -149,7 +149,7 @@ struct MapView: UIViewRepresentable {
                 ///map in idle mode.
                 case .idle:
                     ///if status is not updated
-                    if parent.mapViewStatus != .idle {
+                    if parent.mapViewStatus != .idle && parent.mapViewStatus != .notCentered {
                         ///reset the location tracking
                         if parent.localSearch.status != .localSearchCancelled {
                             MapViewAPI.resetLocationTracking(of: mapView, parent: &parent)
@@ -288,7 +288,7 @@ struct MapView: UIViewRepresentable {
                        
                     }
                 }
-            self.handleLocationSearch(in: uiView, at: self.localSearch.suggestedLocations,  for: self.localSearch.status)
+            self.handleLocationSearch(in: uiView, at: self.localSearch.suggestedLocations, for: self.localSearch.status)
                 break
             ///idle in showdirections  mode.
             case .idleInshowDirections:
@@ -325,12 +325,14 @@ struct MapView: UIViewRepresentable {
             case.centerToUserLocation:
                  ///if the status is not updated
                 if self.mapViewStatus != .centeredToUserLocation {
+                    print("centered")
                     DispatchQueue.main.async {
                         ///zoom the map to user location
                         uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
                         self.mapViewStatus = .centeredToUserLocation
                     }
                 }
+            
             self.handleLocationSearch(in: uiView, at: self.localSearch.suggestedLocations, for: self.localSearch.status)
                 break
             ///in navigation mode center map to userlocation
@@ -433,6 +435,7 @@ extension MapView {
             }
             break
         case .locationSelected:
+         
             guard let locations = searchedLocations else {
                 DispatchQueue.main.async {
                     ///make sure there are no overlays while only destination is selected yet and not the directions requested.
@@ -444,6 +447,7 @@ extension MapView {
             guard let location = locations.first else {
                 break
             }
+            
             MapViewAPI.annotateLocation(in: uiView, at: location.coordinate, for: location)
             if !uiView.overlays.isEmpty {
                 DispatchQueue.main.async {

@@ -121,22 +121,15 @@ struct Map: View {
                                     .gesture(DragGesture().onChanged { value in
                                        // showDirectionsList = true
                                         withAnimation {
-                                        if value.translation.height >= 0 {
-                                           
+                                        if value.translation.height >= 0 {                                           
                                             expandedDirectionsViewHeight =  min(value.translation.height, UIScreen.main.bounds.height)
-                                            
-                                          
                                         }
                                         else {
                                             if expandedDirectionsViewHeight >= 0 {
-                                               
                                                 expandedDirectionsViewHeight = UIScreen.main.bounds.height + value.translation.height - 100
-                                               
-                                               
                                             }
                                         }
                                         }
-                                       // print(height, value.translation.height)
                                         }
                                         .onEnded { value in
                                             //showDirectionsList = true
@@ -172,30 +165,11 @@ struct Map: View {
                                     .padding(10)
                                     .background(bgMode == .dark ? Color(UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)) : Color(UIColor.systemGray5))
                                     ExpandedDirectionsView(stepInstructions: stepInstructions, showDirectionsList: $showDirectionsList, height: $expandedDirectionsViewHeight, nextInstruction: $nextInstruction)
-                                       
-                                    
-                                           // .frame(height: 100)
+
                                         .frame(height: expandedDirectionsViewHeight <= 100 ? 0 : expandedDirectionsViewHeight , alignment: .leading)
-                                   
-                                 
-                                    
+  
                                 }
-                               
-                                
-                        
-                                  
-                             //   }
-                               // if showDirectionsList {
-                                   
-                                   
-                                    
-                                    
-                               // }
-                                
                             }
-                            //.padding(.top, 30)
-                            
-                            
                             Spacer()
                         }
                        
