@@ -447,8 +447,9 @@ extension MapView {
             guard let location = locations.first else {
                 break
             }
-            
-            MapViewAPI.annotateLocation(in: uiView, at: location.coordinate, for: location)
+            if uiView.annotations.count <= 1 {
+                MapViewAPI.annotateLocation(in: uiView, at: location.coordinate, for: location)
+            }
             if !uiView.overlays.isEmpty {
                 DispatchQueue.main.async {
                     ///make sure there are no overlays while only destination is selected yet and not the directions requested.
