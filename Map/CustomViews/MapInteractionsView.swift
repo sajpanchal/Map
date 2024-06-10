@@ -66,32 +66,11 @@ struct MapInteractionsView: View {
                     if mapViewStatus == .navigating {
                         ///show the expand symbol on top of the footer view.
                         ExpandViewSymbol()
-                            .gesture(DragGesture().onChanged {
-                                value in
-                               
-                                if value.translation.height < 0  && abs(value.translation.height) > 10 {
-                                    showAddressView = true
-                                    addressViewHeight = min(80, abs(value.translation.height))
-                                }
-                                else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
-                                    addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
-                                    if addressViewHeight <= 5 {
-                                        showAddressView = false
-                                    }
-                                }
-                            }
-                                .onEnded { value in
-                                    if value.translation.height < 0  && abs(value.translation.height) > 10 {
-                                        showAddressView = true
-                                        addressViewHeight = min(80, abs(value.translation.height))
-                                    }
-                                    else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
-                                        addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
-                                        if addressViewHeight <= 5 {
-                                            showAddressView = false
-                                        }
-                                    }
-                            })
+                            .gesture(
+                                DragGesture()
+                                    .onChanged(expandedDestinationInfoViewDragChanged)
+                                    .onEnded(expandedDestinationInfoViewDragChanged)
+                            )
                         ///if flag is true
                         if showAddressView {
                             ///show the hstack that is displaying the expanded view with the destination address and title.
@@ -99,7 +78,7 @@ struct MapInteractionsView: View {
                                 Spacer()
                                 ///showing the title and destination address and its name.
                                 VStack {
-                                    Text(MapViewAPI.comment)
+                                    //Text(MapViewAPI.comment)
                                     Text("Heading to destination")
                                         .font(.caption2)
                                         .fontWeight(.bold)
@@ -110,43 +89,17 @@ struct MapInteractionsView: View {
                                 Spacer()
                             }
                             .frame(height: addressViewHeight)
-                            .gesture(DragGesture().onChanged {
-                                value in
-                                withAnimation {
-                                    
-                                
-                                if value.translation.height < 0  && abs(value.translation.height) > 10 {
-                                    showAddressView = true
-                                    addressViewHeight = min(80, abs(value.translation.height))
-                                }
-                                else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
-                                    addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
-                                    if addressViewHeight <= 5 {
-                                        showAddressView = false
-                                    }
-                                }
-                            }
-                        }  
-                        .onEnded { value in
-                            withAnimation {
-                                if value.translation.height < 0  && abs(value.translation.height) > 10 {
-                                    showAddressView = true
-                                    addressViewHeight = min(80, abs(value.translation.height))
-                                }
-                                else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
-                                    addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
-                                    if addressViewHeight <= 5 {
-                                        showAddressView = false
-                                    }
-                                }
-                            }
-                        })
+                            .gesture(
+                                DragGesture()
+                                    .onChanged(expandedDestinationInfoViewDragChanged)
+                                    .onEnded(expandedDestinationInfoViewDragChanged)
+                            )
                         }
                     }
                   ///footer view with buttons and distance and time information
                     HStack {
                         ///if map is not navigating but location is pinned i.e. selected by the user show the footer with only the button to find routes to the destination
-                        if mapViewStatus != .navigating && mapViewStatus != .showingDirections && localSearch.status == .locationSelected {
+                        if mapViewStatus != .inNavigationNotCentered && mapViewStatus != .navigating && mapViewStatus != .showingDirections && localSearch.status == .locationSelected {
                             ///routes button. On tap of it change the map action to show directions and make the throughfare nil for it to update it when starting a navigation
                             Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
                                    label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
@@ -156,202 +109,30 @@ struct MapInteractionsView: View {
                         }
                         ///center portion of the footer view to show the numeric data related to the travel.
                         Group {
-                            Spacer()
+                           Spacer()
                             ///enclose the text in vstack
                             VStack(spacing: 0) {
                                 ///if routes are showing up then show the travel time and distance for the selected route.
                                 if mapViewStatus == .showingDirections {
                                     ///for each routeData element create a HStack showing the route travel time, distance, title and navigate button
-                                        ForEach(routeData.reversed(), id: \.id) { route in
-                                            ///enclose the content in HStack
-                                            HStack {
-                                                Spacer()
-                                                ///enclose the Text and HStack in VStack
-                                                VStack {
-                                                    ///show the travel time at the top
-                                                    Text(route.travelTime)
-                                                        .fontWeight(.semibold)
-                                                        .font(.title3)
-                                                    ///show the distane and title at the bottom enclosed in HStack
-                                                    HStack {
-                                                        Text(route.distance)
-                                                            .fontWeight(.light)
-                                                            .font(.footnote)
-                                                        Text("Via " + route.title)
-                                                            .fontWeight(.light)
-                                                            .font(.footnote)
-                                                    }
-                                                }
-                                                Spacer()
-                                                ///if the route is tapped show the button at the right space in the HStack
-                                                if route.tapped {
-                                                    ///on tap of the button updateUserTracking method will be called. its background will change based on whether it is navigating or not.
-                                                    Button(action: updateLocationTracking, label: {
-                                                        ///if map is navigating
-                                                        isMapInNavigationMode().0 ?
-                                                        ///change the button appearance with stop text and xmark symbol
-                                                        NavigationButton(imageName: "xmark", title: "Stop") :
-                                                        ///if it is not navigating then change the text with navigate and arrows symbol with blue background.
-                                                        NavigationButton(imageName: "steeringwheel", title: "Go")
-                                                        
-                                                    })
-                                                    .background(isMapInNavigationMode().0 ? RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50) :  RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50))
-                                                    .cornerRadius(10)
-                                                    .padding(0)
-                                                    
-                                                }
-                                                ///else hide it.
-                                                else {
-                                                    ///on tap of the button updateUserTracking method will be called. its background will change based on whether it is navigating or not.
-                                                    Button(action: updateLocationTracking, label: {
-                                                        ///if map is navigating
-                                                        isMapInNavigationMode().0 ?
-                                                        ///change the button appearance with stop text and xmark symbol
-                                                        NavigationButton(imageName: "xmark", title: "Stop") :
-                                                        ///if it is not navigating then change the text with navigate and arrows symbol with blue background.
-                                                        NavigationButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", title: "Navigate")
-                                                        
-                                                    })
-                                                    .background(isMapInNavigationMode().0 ? RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50) :  RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50))
-                                                    .cornerRadius(10)
-                                                    .padding(0)
-                                                    .disabled(true)
-                                                    .hidden()
-                                                }
-                                               
-                                              
-                                            }
-                                            .background(bgMode == .dark ? Color(.darkGray) : Color(.lightGray))
-                                            .overlay(Divider().background(bgMode == .dark ? Color(.lightGray) : Color(.darkGray)), alignment: .bottom)
-                                            .cornerRadius(10)
-                                           
-                                            .onTapGesture(perform: {
-                                                updateRouteData(for: route)
-                                                isRouteSelectTapped = true
-                                            })
-                                           
-                                        }
+                                    NavigationRoutesListView( routeData: $routeData, isRouteSelectTapped: $isRouteSelectTapped, mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, routeTravelTime: $routeTravelTime, routeDistance: $routeDistance, locationDataManager: locationDataManager, localSearch: localSearch, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions)
                                 }
                                 ///if map is navigating then show the remaining distance from the current location to the destination.
-                                else if mapViewStatus == .navigating {
+                                else if mapViewStatus == .navigating || mapViewStatus == .inNavigationNotCentered {
                                     ///enclose the ETA texts in HStack
-                                    HStack {
-                                        ///add as spacer on left side of the hstack
-                                        Spacer()
-                                        ///enclose the remaining Distance text with its subtitle in VStack.
-                                        VStack {
-                                            Text(remainingDistance)
-                                                .font(.title2)
-                                                .fontWeight(.black)
-                                            Text("Remains")
-                                                .foregroundStyle(.gray)
-                                        }
-                                        ///add a spacer after the vstack
-                                        Spacer()
-                                        ///enclose the ETA text with its subtitle in VStack
-                                        VStack {
-                                            Text(ETA)
-                                                .font(.title2)
-                                                .fontWeight(.black)
-                                            Text("Arrival")
-                                                .foregroundStyle(.gray)
-                                        }
-                                        ///add a spacer after the vstack
-                                        Spacer()
-                                    }
-                                    .gesture(DragGesture().onChanged {
-                                        value in
-                                        withAnimation {
-                                            if value.translation.height < 0  && abs(value.translation.height) > 10 {
-                                                showAddressView = true
-                                                addressViewHeight = min(80, abs(value.translation.height))
-                                            }
-                                            else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
-                                                addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
-                                                if addressViewHeight <= 5 {
-                                                    showAddressView = false
-                                                }
-                                            }
-                                        }
-                                    }
-                                        .onEnded {value in
-                                            withAnimation {
-                                                if value.translation.height < 0  && abs(value.translation.height) > 10 {
-                                                    showAddressView = true
-                                                    addressViewHeight = min(80, abs(value.translation.height))
-                                                }
-                                                else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
-                                                    addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
-                                                    if addressViewHeight <= 5 {
-                                                        showAddressView = false
-                                                    }
-                                                }
-                                            }                                        
-                                    }
-                                    )
+                                    RouteETAStackView(showAddressView: $showAddressView, destination: destination, ETA: $ETA, addressViewHeight: $addressViewHeight, remainingDistance: remainingDistance)
                                 }
                                 else if localSearch.status == .showingNearbyLocations {
                                     ExpandViewSymbol()
-                                    List {
-                                        ForEach(localSearch.suggestedLocations!, id: \.title) { suggestion in
-                                            HStack {
-                                                VStack {
-                                                    HStack {
-                                                        Text(suggestion.title!!.split(separator: "\n").first!)
-                                                            .font(.caption)
-                                                            .fontWeight(.black)
-                                                        Spacer()
-                                                    }
-                                                  
-                                                    Text(suggestion.title!!.split(separator: "\n").last!)
-                                                        .font(.caption2)
-                                                        .foregroundStyle(.gray)
-                                                }
-                                                    .onTapGesture(perform: {
-                                                     tappedAnnotation = suggestion
-                                                        height = 200.0
-                                                     //   mapViewAction = .showDirections; locationDataManager.throughfare = nil
-                                                    })
-                                                Spacer()
-                                                Button(action: { tappedAnnotation = suggestion; mapViewAction = .showDirections; locationDataManager.throughfare = nil },
-                                                       label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
-                                                .buttonStyle(.plain)
-                                                .background(RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50))
-                                                .cornerRadius(10)
-                                               // .padding(5)
-                                            }
-                                        }
-                                       
-                                    }
-                                    .frame(height: height)
+                                    NearbyLocationsListView(localSearch: localSearch, locationDataManager: locationDataManager, mapViewAction: $mapViewAction, tappedAnnotation: $tappedAnnotation, height: $height)
+                                        .frame(height: height)
                                 }
                             }
-                            .gesture(DragGesture().onChanged { value in
-                                DispatchQueue.main.async {
-                                    if height >= 200 && height <= 400 {
-                                        height = height - value.translation.height
-                                    }
-                                    else if height < 200 {
-                                        height = 200
-                                    }
-                                    else if height > 400 {
-                                        height = 400
-                                    }
-                                }
-                               print(height)
-                            }
-                                .onEnded{ value in
-                                    DispatchQueue.main.async {
-                                        if height < 200 {
-                                            height = 200
-                                        }
-                                        else if height > 400 {
-                                            height = 400
-                                        }
-                                    }
-                                   
-                                    print(height)
-                                })
+                            .gesture(
+                                DragGesture()
+                                    .onChanged(destinationInfoViewDragChanged)
+                                    .onEnded(destinationInfoViewDragEnded)
+                            )
                             Spacer()
                         }
                         .onTapGesture {
@@ -360,7 +141,7 @@ struct MapInteractionsView: View {
                             }
                         }
                         ///if map is showing directions or is already navigating, show the button to start/stop the navigation. ///button appearance will be changed based on whether the map is navigating or not
-                        if mapViewStatus == .navigating {
+                        if mapViewStatus == .navigating || mapViewStatus == .inNavigationNotCentered {
                             ///on tap of the button updateUserTracking method will be called. its background will change based on whether it is navigating or not.
                             Button(action: updateLocationTracking, label: {
                                 ///if map is navigating
@@ -449,10 +230,48 @@ struct MapInteractionsView: View {
         ///set the tapped prop of a currenty selected route.
         routeData[indexOfSelectedRoute].tapped = true
     }
+    func expandedDestinationInfoViewDragChanged(value: DragGesture.Value) {
+        withAnimation {
+            if value.translation.height < 0  && abs(value.translation.height) > 10 {
+                showAddressView = true
+                addressViewHeight = min(80, abs(value.translation.height))
+            }
+            else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
+                addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
+                if addressViewHeight <= 5 {
+                    showAddressView = false
+                }
+            }
+        }
+    }
+    func destinationInfoViewDragChanged(value: DragGesture.Value) {
+        DispatchQueue.main.async {
+            if height >= 200 && height <= 400 {
+                height = height - value.translation.height
+            }
+            else if height < 200 {
+                height = 200
+            }
+            else if height > 400 {
+                height = 400
+            }
+        }
+    }
+    func destinationInfoViewDragEnded(value: DragGesture.Value) {
+        DispatchQueue.main.async {
+            if height < 200 {
+                height = 200
+            }
+            else if height > 400 {
+                height = 400
+            }
+        }
+    }
+    
 }
 
 #Preview {
-    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation()))
+    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""),remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation()))
 }
 
 
