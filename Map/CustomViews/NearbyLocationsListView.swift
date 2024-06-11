@@ -16,7 +16,7 @@ struct NearbyLocationsListView: View {
     @Binding var mapViewAction: MapViewAction
     @Binding var tappedAnnotation: MKAnnotation?
     @Binding var height: Double
-    
+    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50)
     var body: some View {
         List {
             ForEach(localSearch.suggestedLocations!, id: \.title) { suggestion in
@@ -41,7 +41,7 @@ struct NearbyLocationsListView: View {
                     Button(action: { tappedAnnotation = suggestion; mapViewAction = .showDirections; locationDataManager.throughfare = nil },
                            label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
                     .buttonStyle(.plain)
-                    .background(RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50))
+                    .background(redRadialGradient)
                     .cornerRadius(10)
                 }
             }           

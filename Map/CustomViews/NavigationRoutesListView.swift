@@ -31,7 +31,8 @@ struct NavigationRoutesListView: View {
     @Binding var nextStepLocation: CLLocation?
     ///bounded property stores an array of tuples with a list of instructions and its distances by each step.
     @Binding var stepInstructions: [(String, Double)]
-    
+    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50)
+    var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50)
     var body: some View {
         ForEach(routeData.reversed(), id: \.id) { route in
             ///enclose the content in HStack
@@ -66,7 +67,7 @@ struct NavigationRoutesListView: View {
                         NavigationButton(imageName: "steeringwheel", title: "Go")
                         
                     })
-                    .background(isMapInNavigationMode().0 ? RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50) :  RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50))
+                    .background(isMapInNavigationMode().0 ? redRadialGradient : blueRadialGradient)
                     .cornerRadius(10)
                     .padding(0)
                     
@@ -83,7 +84,7 @@ struct NavigationRoutesListView: View {
                         NavigationButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", title: "Navigate")
                         
                     })
-                    .background(isMapInNavigationMode().0 ? RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50) :  RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50))
+                    .background(isMapInNavigationMode().0 ? redRadialGradient : blueRadialGradient)
                     .cornerRadius(10)
                     .padding(0)
                     .disabled(true)

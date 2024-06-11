@@ -71,36 +71,40 @@ struct ExpandedDirectionsView: View {
          
         }
         .background(bgMode == .dark ? Color.black : Color.white)
-        .gesture(DragGesture().onChanged { value in
-                withAnimation {
-                    if value.translation.height >= 0 {
-                            height =  min(value.translation.height, UIScreen.main.bounds.height)
-                    }
-                    else {
-                        if height >= 0 {
-                                height = UIScreen.main.bounds.height + value.translation.height - 100
-                        }
-                    }
+        .gesture(
+            DragGesture()
+                .onChanged(dragGestureChanged)
+                .onEnded(dragGestureEnded))
+    }
+    func dragGestureChanged(value: DragGesture.Value) {
+        withAnimation {
+            if value.translation.height >= 0 {
+                    height =  min(value.translation.height, UIScreen.main.bounds.height)
+            }
+            else {
+                if height >= 0 {
+                        height = UIScreen.main.bounds.height + value.translation.height - 100
                 }
             }
-            .onEnded { value in
-                withAnimation {
-                if height >= 0 {
-                    showDirectionsList = true                  
-                }
-                else {
-                    height = 0
-                    showDirectionsList = false
-                }
-                if value.translation.height > 150 {
-                        height = UIScreen.main.bounds.height - 100
-                }
-                else if value.translation.height < -100 {
-                    height = 0
-                    showDirectionsList = false
-                }
-                }
-            })
+        }
+    }
+    func dragGestureEnded(value: DragGesture.Value) {
+        withAnimation {
+        if height >= 0 {
+            showDirectionsList = true
+        }
+        else {
+            height = 0
+            showDirectionsList = false
+        }
+        if value.translation.height > 150 {
+                height = UIScreen.main.bounds.height - 100
+        }
+        else if value.translation.height < -100 {
+            height = 0
+            showDirectionsList = false
+        }
+        }
     }
 }
 

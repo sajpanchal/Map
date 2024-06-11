@@ -44,6 +44,8 @@ struct MapInteractionsView: View {
     @Binding var tappedAnnotation: MKAnnotation?
     @State var height = 200.0
     @State var addressViewHeight: CGFloat = 0
+    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50)
+    var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50)
     var body: some View {
         ///enclose the map interaction views in a vstack and move them to the bottom of the screen.
         VStack(spacing: 0) {
@@ -103,7 +105,7 @@ struct MapInteractionsView: View {
                             ///routes button. On tap of it change the map action to show directions and make the throughfare nil for it to update it when starting a navigation
                             Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
                                    label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
-                            .background(RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50))
+                            .background(blueRadialGradient)
                             .cornerRadius(15)
                             .padding(5)
                         }
@@ -151,7 +153,7 @@ struct MapInteractionsView: View {
                                 ///if it is not navigating then change the text with navigate and arrows symbol with blue background.
                                 NavigationButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", title: "Navigate")
                             })                           
-                            .background(isMapInNavigationMode().0 ? RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50) :  RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50))
+                            .background(isMapInNavigationMode().0 ? redRadialGradient : blueRadialGradient)
                             .cornerRadius(15)
                             .padding(5)
                         }

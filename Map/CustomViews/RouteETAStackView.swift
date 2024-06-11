@@ -43,36 +43,25 @@ struct RouteETAStackView: View {
             ///add a spacer after the vstack
             Spacer()
         }
-        .gesture(DragGesture().onChanged {
-            value in
-            withAnimation {
-                if value.translation.height < 0  && abs(value.translation.height) > 10 {
-                    showAddressView = true
-                    addressViewHeight = min(80, abs(value.translation.height))
-                }
-                else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
-                    addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
-                    if addressViewHeight <= 5 {
-                        showAddressView = false
-                    }
+        .gesture(
+            DragGesture()
+            .onChanged(dragGestureChanged)
+            .onEnded(dragGestureChanged)
+        )
+    }
+    func dragGestureChanged(value: DragGesture.Value) {
+        withAnimation {
+            if value.translation.height < 0  && abs(value.translation.height) > 10 {
+                showAddressView = true
+                addressViewHeight = min(80, abs(value.translation.height))
+            }
+            else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
+                addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
+                if addressViewHeight <= 5 {
+                    showAddressView = false
                 }
             }
         }
-            .onEnded { value in
-                withAnimation {
-                    if value.translation.height < 0  && abs(value.translation.height) > 10 {
-                        showAddressView = true
-                        addressViewHeight = min(80, abs(value.translation.height))
-                    }
-                    else if value.translation.height >= 0 && abs(value.translation.height) > 10 {
-                        addressViewHeight = abs(value.translation.height) <= 80 ?  80 - value.translation.height : 0
-                        if addressViewHeight <= 5 {
-                            showAddressView = false
-                        }
-                    }
-                }
-        }
-        )
     }
 }
 
