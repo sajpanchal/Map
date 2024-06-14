@@ -8,7 +8,7 @@
 import SwiftUI
 
 ///a view responsible to show the direction signs along with the instruction text on top of the screen while navigating.
-struct DirectionsView: View {
+struct DirectionHeaderView: View {
     ///environment variable to get the color mode of the phone
     @Environment (\.colorScheme) var bgMode: ColorScheme
     ///variable that stores the image name for various direction signs.
@@ -62,5 +62,5 @@ struct DirectionsView: View {
 }
 
 #Preview {
-    DirectionsView(directionSign: "", nextStepDistance: "", instruction: "", showDirectionsList: .constant(false), height: .constant(0))
+    DirectionHeaderView(directionSign: "", nextStepDistance: "", instruction: "", showDirectionsList: .constant(false), height: .constant(0))
 }
