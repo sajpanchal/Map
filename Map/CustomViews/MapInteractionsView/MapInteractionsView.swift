@@ -18,7 +18,7 @@ struct MapInteractionsView: View {
     ///bounded property to store map action to be performed
     @Binding var mapViewAction: MapViewAction
     ///bounded property to show or hide the footer expanded view
-    @Binding var showAddressView: Bool
+    @State var showAddressView: Bool = false
     ///state object of Location manager to show the distance remaining from destination
     @StateObject var locationDataManager: LocationDataManager
     ///state object of local search to check if the destination location has been selected or not
@@ -108,7 +108,7 @@ struct MapInteractionsView: View {
 }
 
 #Preview {
-    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""),remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation()))
+    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""),remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation()))
 }
 
 

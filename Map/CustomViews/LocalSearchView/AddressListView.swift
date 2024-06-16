@@ -8,7 +8,7 @@
 import SwiftUI
 
 ///this swiftui view is responsible for showing up the list of suggested addresses when user is typing any address string in the searchfield.
-struct ListView: View {
+struct AddressListView: View {
     ///local search object that handles the search queries/
     @StateObject var localSearch: LocalSearch
     ///bounded string that stores the searched string getting from the searchfield input
@@ -61,6 +61,6 @@ struct ListView: View {
 
 struct ListView_Previews: PreviewProvider {
     static var previews: some View {
-        ListView(localSearch: LocalSearch(), searchedLocationText: .constant(""))
+        AddressListView(localSearch: LocalSearch(), searchedLocationText: .constant(""))
     }
 }

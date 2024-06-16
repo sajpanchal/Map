@@ -13,7 +13,7 @@ struct DirectionsView: View {
     @Binding var instruction: String
     @Binding var nextStepDistance: String
     @Binding var showDirectionsList: Bool
-    @Binding var expandedDirectionsViewHeight: CGFloat
+    @State var expandedDirectionsViewHeight: CGFloat = 0
     @Binding var nextInstruction: String
     @Binding var stepInstructions: [(String, Double)]
 
@@ -75,5 +75,5 @@ struct DirectionsView: View {
 }
 
 #Preview {
-    DirectionsView(instruction: .constant(""), nextStepDistance: .constant(""), showDirectionsList: .constant(false), expandedDirectionsViewHeight: .constant(0.0), nextInstruction: .constant(""), stepInstructions: .constant([]))
+    DirectionsView(instruction: .constant(""), nextStepDistance: .constant(""), showDirectionsList: .constant(false), nextInstruction: .constant(""), stepInstructions: .constant([]))
 }

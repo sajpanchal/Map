@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		72053A872A951D5000B1D3FC /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72053A862A951D5000B1D3FC /* ListView.swift */; };
+		72053A872A951D5000B1D3FC /* AddressListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72053A862A951D5000B1D3FC /* AddressListView.swift */; };
 		7218C7852C04D95A00986B0B /* ExpandDirectionsViewSymbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7218C7842C04D95A00986B0B /* ExpandDirectionsViewSymbol.swift */; };
 		7222C2282C1C98F30029E26F /* InteractionFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7222C2272C1C98F30029E26F /* InteractionFooterView.swift */; };
 		7222C22A2C1C9D040029E26F /* AddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7222C2292C1C9D040029E26F /* AddressView.swift */; };
@@ -61,7 +61,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		72053A862A951D5000B1D3FC /* ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListView.swift; sourceTree = "<group>"; };
+		72053A862A951D5000B1D3FC /* AddressListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressListView.swift; sourceTree = "<group>"; };
 		7218C7842C04D95A00986B0B /* ExpandDirectionsViewSymbol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandDirectionsViewSymbol.swift; sourceTree = "<group>"; };
 		7222C2272C1C98F30029E26F /* InteractionFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionFooterView.swift; sourceTree = "<group>"; };
 		7222C2292C1C9D040029E26F /* AddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressView.swift; sourceTree = "<group>"; };
@@ -155,12 +155,11 @@
 		7223439A2A8FD57500DC7120 /* CustomViews */ = {
 			isa = PBXGroup;
 			children = (
+				72FDDCE62C1DE8EF001D555E /* LocalSearchView */,
 				7222C2262C1C98740029E26F /* MapInteractionsView */,
 				725181C82C19F23A00757DD7 /* Buttons */,
 				725181C72C19F1FC00757DD7 /* DirectionsView */,
 				7223439D2A8FD6ED00DC7120 /* MapProgressView.swift */,
-				72053A862A951D5000B1D3FC /* ListView.swift */,
-				72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */,
 				72EDE4152B26334E00578B8A /* ExpandViewSymbol.swift */,
 				728A7CA52B90F282003AA218 /* GreetingsView.swift */,
 			);
@@ -264,6 +263,15 @@
 				72EDE41C2B26457A00578B8A /* MapSwiftUIAPI.swift */,
 			);
 			path = APIs;
+			sourceTree = "<group>";
+		};
+		72FDDCE62C1DE8EF001D555E /* LocalSearchView */ = {
+			isa = PBXGroup;
+			children = (
+				72053A862A951D5000B1D3FC /* AddressListView.swift */,
+				72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */,
+			);
+			path = LocalSearchView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -400,7 +408,7 @@
 				726754252A7C004000CE6F46 /* ContentView.swift in Sources */,
 				72EDE4142B2631D800578B8A /* DirectionHeaderView.swift in Sources */,
 				72A6D14F2BD01B8000A33A0A /* PolylinePoint.swift in Sources */,
-				72053A872A951D5000B1D3FC /* ListView.swift in Sources */,
+				72053A872A951D5000B1D3FC /* AddressListView.swift in Sources */,
 				726754502A7C077500CE6F46 /* MapSwiftUI.swift in Sources */,
 				7271514D2A7D53B200B20767 /* LocationManager.swift in Sources */,
 				725181CA2C19F32E00757DD7 /* DirectionsView.swift in Sources */,

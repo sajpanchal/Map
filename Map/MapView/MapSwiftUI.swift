@@ -43,8 +43,7 @@ struct Map: View {
     @State var remainingDistance: String = ""
     ///variable to show the destination address in the expanded view.
     @State var destination = ""
-    ///flag to show/hide the destination info view,
-    @State var showAddressView = false
+  
     ///flag to show/hide the directions list view.
     @State var showDirectionsList = false
     ///binding this variable of array type to ExpendedDirectionsView.
@@ -56,8 +55,6 @@ struct Map: View {
     ///flag used to determine if the routeSelection is tapped or not.
     @State var isRouteSelectTapped: Bool = false
     @State var tappedAnnoation: MKAnnotation?
-    @State var expandedDirectionsViewHeight: CGFloat = 0
-    @State var offset: CGFloat = 0
    // let synthesizer = AVSpeechSynthesizer()
     var body: some View {
  
@@ -80,14 +77,14 @@ struct Map: View {
                                 .background(bgMode == .dark ? Color.black : Color.white)
                             ///if search results are avialable, show them in the listview on top of everything in zstack view.
                             if !$localSearch.results.isEmpty {
-                                ListView(localSearch: localSearch, searchedLocationText: $searchedLocationText)
+                                AddressListView(localSearch: localSearch, searchedLocationText: $searchedLocationText)
                             }
                             Spacer()
                         }
                         
                     }
                     else if isMapInNavigationMode(for: mapViewStatus).0  {
-                        DirectionsView(instruction: $instruction, nextStepDistance: $nextStepDistance, showDirectionsList: $showDirectionsList, expandedDirectionsViewHeight: $expandedDirectionsViewHeight, nextInstruction: $nextInstruction, stepInstructions: $stepInstructions)
+                        DirectionsView(instruction: $instruction, nextStepDistance: $nextStepDistance, showDirectionsList: $showDirectionsList, nextInstruction: $nextInstruction, stepInstructions: $stepInstructions)
                     }
                     if showGreetings {
                         GreetingsView(showGreetings: $showGreetings, destination: $destination)
@@ -110,7 +107,7 @@ struct Map: View {
                     }
                     if !showDirectionsList {
                         ///this view is reponsible to show the map interation buttons and the bottom stack with route info and navigation related buttons on top of MapView.
-                        MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showAddressView: $showAddressView, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeTravelTime: $routeTravelTime, routeData: $routeData, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions, ETA: $ETA, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnoation)
+                        MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeTravelTime: $routeTravelTime, routeData: $routeData, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions, ETA: $ETA, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnoation)
                     }
             }
 }
