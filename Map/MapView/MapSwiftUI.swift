@@ -30,7 +30,7 @@ struct Map: View {
     ///sending this variable to other swiftui views such as MapView and MapInterationView.
     @State var nextStepLocation: CLLocation?
     ///localSearch object is instantiated on rendering this view.
-    @StateObject var localSearch = LocalSearch()
+    @StateObject var localSearch: LocalSearch
     //state variable storing the next step distance to be displayed in the directions view.
     @State var nextStepDistance: String = ""
     ///variable to show the selected route's travel time.
@@ -147,7 +147,7 @@ struct Map: View {
 
 struct Map_Previews: PreviewProvider {
     static var previews: some View {
-        Map()
+        Map(localSearch: LocalSearch())
     }
 }
 

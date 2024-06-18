@@ -29,6 +29,8 @@
 		726754502A7C077500CE6F46 /* MapSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267544F2A7C077500CE6F46 /* MapSwiftUI.swift */; };
 		726A77DA2B486ABE0095B047 /* NavigationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 726A77D92B486ABE0095B047 /* NavigationButton.swift */; };
 		7271514D2A7D53B200B20767 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7271514C2A7D53B200B20767 /* LocationManager.swift */; };
+		727996302C1F3E4D00F323B4 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7279962F2C1F3E4D00F323B4 /* StatsView.swift */; };
+		727996332C1F3EDE00F323B4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727996322C1F3EDE00F323B4 /* SettingsView.swift */; };
 		727F5E072B34C748000ECCB7 /* LocalSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727F5E062B34C748000ECCB7 /* LocalSearch.swift */; };
 		727F5E092B34C7C8000ECCB7 /* AddressResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727F5E082B34C7C8000ECCB7 /* AddressResult.swift */; };
 		728237572C14AA7900F91AD8 /* NavigationRoutesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728237562C14AA7900F91AD8 /* NavigationRoutesListView.swift */; };
@@ -86,6 +88,8 @@
 		7267544F2A7C077500CE6F46 /* MapSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSwiftUI.swift; sourceTree = "<group>"; };
 		726A77D92B486ABE0095B047 /* NavigationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationButton.swift; sourceTree = "<group>"; };
 		7271514C2A7D53B200B20767 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		7279962F2C1F3E4D00F323B4 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		727996322C1F3EDE00F323B4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		727F5E062B34C748000ECCB7 /* LocalSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocalSearch.swift; path = ../MapView/LocalSearch.swift; sourceTree = "<group>"; };
 		727F5E082B34C7C8000ECCB7 /* AddressResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressResult.swift; sourceTree = "<group>"; };
 		728237562C14AA7900F91AD8 /* NavigationRoutesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRoutesListView.swift; sourceTree = "<group>"; };
@@ -209,6 +213,8 @@
 		726754212A7C004000CE6F46 /* Map */ = {
 			isa = PBXGroup;
 			children = (
+				727996312C1F3EC100F323B4 /* SettingsView */,
+				7279962E2C1F3E2400F323B4 /* StatsView */,
 				72C5E9A32B36072600B8C0E4 /* APIs */,
 				72053A832A95107500B1D3FC /* Models */,
 				7223439A2A8FD57500DC7120 /* CustomViews */,
@@ -254,6 +260,22 @@
 				7267544F2A7C077500CE6F46 /* MapSwiftUI.swift */,
 			);
 			path = MapView;
+			sourceTree = "<group>";
+		};
+		7279962E2C1F3E2400F323B4 /* StatsView */ = {
+			isa = PBXGroup;
+			children = (
+				7279962F2C1F3E4D00F323B4 /* StatsView.swift */,
+			);
+			path = StatsView;
+			sourceTree = "<group>";
+		};
+		727996312C1F3EC100F323B4 /* SettingsView */ = {
+			isa = PBXGroup;
+			children = (
+				727996322C1F3EDE00F323B4 /* SettingsView.swift */,
+			);
+			path = SettingsView;
 			sourceTree = "<group>";
 		};
 		72C5E9A32B36072600B8C0E4 /* APIs */ = {
@@ -430,8 +452,10 @@
 				727F5E092B34C7C8000ECCB7 /* AddressResult.swift in Sources */,
 				72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */,
 				72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */,
+				727996302C1F3E4D00F323B4 /* StatsView.swift in Sources */,
 				728A7CA62B90F282003AA218 /* GreetingsView.swift in Sources */,
 				72EDE41D2B26457A00578B8A /* MapSwiftUIAPI.swift in Sources */,
+				727996332C1F3EDE00F323B4 /* SettingsView.swift in Sources */,
 				72EDE41B2B26408A00578B8A /* ExpandedDirectionsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
