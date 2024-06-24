@@ -15,7 +15,7 @@ struct Map: View {
     ////environment variable to get the color mode of the phone
     @Environment (\.colorScheme) var bgMode: ColorScheme
     ///this will make our MapView update if any @published value in location manager changes.
-    @StateObject var locationDataManager = LocationDataManager()
+    @StateObject var locationDataManager: LocationDataManager
     /// this variable is used to store the status of our mapview. it is bound to our MapView file
     @State var mapViewStatus: MapViewStatus = .idle
     ///this variable is used to store the actions inputted by the user by tapping buttons or other gestures to mapView
@@ -147,7 +147,7 @@ struct Map: View {
 
 struct Map_Previews: PreviewProvider {
     static var previews: some View {
-        Map(localSearch: LocalSearch())
+        Map(locationDataManager: LocationDataManager(), localSearch: LocalSearch())
     }
 }
 

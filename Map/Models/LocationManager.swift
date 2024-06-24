@@ -28,7 +28,9 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     @Published var throughfare: String?
     ///flag to be used for enabling and disabling the reverse geocoding
     @Published var enableGeocoding = true
-    
+    @Published var distance: CLLocationDistance = 0.0
+    @Published var distanceText: String = "0.0 km"
+    @Published var odometer: CLLocationDistance = 0.0
     ///overriding the initializer of NSObject class
     override init() {
         ///execute the parent class initializer first
@@ -95,6 +97,10 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                 ///subtract the remaining distance from it self by the distance travelled by the user.
 ///                remainingDistance! -= (userlocation!.distance(from: lastUserLocation)/1000)
                 ///update the lastLocation variable with the latest user location recevied by location manager.
+                self.distance += self.userlocation!.distance(from: lastUserLocation)/1000
+                self.distanceText = String(format: "%.1f",self.distance)
+                self.odometer += self.userlocation!.distance(from: lastUserLocation)/1000
+                
                 userlocation = lastUserLocation
             }
             ///calculate the speed of the user
