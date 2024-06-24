@@ -12,26 +12,32 @@ struct AutoStatsView: View {
     @State var showFuelHistoryView = false
     @State var showServiceHistoryView = false
     @State var showFuellingEntryform = false
+    @State var showServiceEntryForm = false
     @State var fuelDataHistory: [FuelData] = []
+    @State var autoServiceHistory: [AutoService] = []
     @Environment (\.colorScheme) var bgMode: ColorScheme
     @StateObject var locationDataManager: LocationDataManager
+    
     var redColor = Color(red:0.861, green: 0.194, blue:0.0)
     var lightRedColor = Color(red:1.0, green:0.654, blue:0.663)
+    
     var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
     var lightGreenColor = Color(red: 0.723, green: 1.0, blue: 0.856)
-   // var lightGreenColor = Color(red: 0.674, green: 1.0, blue: 0.775)
+    
     var orangeColor = Color(red: 0.975, green: 0.505, blue: 0.076)
-    //var lightOrangeColor = Color(red: 0.975, green: 0.682, blue: 0.603)
     var lightOrangeColor = Color(red: 0.904, green: 0.808, blue: 0.827)
+    
     var skyColor = Color(red:0.031, green:0.739, blue:0.861)
-    //var lightSkyColor = Color(red:0.607, green:0.927, blue: 1.0)
     var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
+    
     var yellowColor = Color(red:0.975, green: 0.646, blue: 0.207)
-    //var lightYellowColor = Color(red:0.975, green: 0.918, blue: 0.647)
     var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.781)
+    
     var purpleColor = Color(red: 0.396, green: 0.381, blue: 0.905)
     var lightPurpleColor = Color(red:0.725,green:0.721, blue:1.0)
+    
     let dateFomatter = DateFormatter()
+    
     var body: some View {
         GeometryReader { geo in
             NavigationStack {
@@ -59,9 +65,6 @@ struct AutoStatsView: View {
                                 FuellingEntryForm(fuelDataHistory: $fuelDataHistory, showFuellingEntryform: $showFuellingEntryform)
                             })
                             ForEach(fuelDataHistory, id:\.self.id) { fuelData in
-                             
-                                    
-                                                              
                                     Group {
                                         VStack {
                                             Text((fuelData.date!.formatted(date: .long, time: .omitted)))
@@ -112,17 +115,12 @@ struct AutoStatsView: View {
                                         }
                                         .padding(10)
                                             .frame(width:geo.size.width - 30)
-                                        
-                                      
                                         Divider()
                                             .padding(.horizontal,20)
                                     }
                                     .onTapGesture {
-                                       // print("\(i) tapped")
+                                      
                                 }
-                      
-                            
-                       
                             }
                         }
                         .frame(width:geo.size.width - 20,height: geo.size.height/1.5)
@@ -146,34 +144,47 @@ struct AutoStatsView: View {
                             
                         }
                     }
-                  //  .frame(width:geo.size.width - 20)
-           
-               //     .background(.red)
-               
+    
                     Section {
                         ScrollView {
-                            ForEach(0..<10) { i in
-                                if i == 0 {
-                                    NewEntryStackView(width: geo.size.width)
-                                    .onTapGesture {
-                                        
-                                    }
-                                }
-                                else {
+                            NewEntryStackView(width: geo.size.width)
+                            .onTapGesture {
+                                showServiceEntryForm.toggle()
+                            }
+                            .sheet(isPresented: $showServiceEntryForm, content: {
+                                ServiceEntryForm(autoServiceHistory: $autoServiceHistory, showServiceEntryForm: $showServiceEntryForm)
+                            })
+                            ForEach(autoServiceHistory, id: \.self.id) { autoService in
                                     Group {
                                         VStack {
+                                            Text(autoService.date!.formatted(date: .long, time: .omitted))
+                                                .font(.system(size: 15))
+                                                .fontWeight(.black)
+                                                .foregroundStyle(redColor)
+                                            Spacer()
                                             HStack {
-                                                
-                                                    Text("Location \(i)")
-                                                
+                                                VStack {
+                                                    Text("Auto Shop")
+                                                        .font(.system(size: 12, weight: .semibold))
+                                                        .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
+                                                    Text(autoService.location!)
+                                                        .fontWeight(.bold)
+                                                        .foregroundStyle(skyColor)
+                                                }
                                                
                                                 Spacer()
-                                                Text("Service \(i)")
-                                                Spacer()
-                                                Text("$\(i).00")
+                                                VStack {
+                                                    Text("Cost")
+                                                        .font(.system(size: 12, weight: .semibold))
+                                                        .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
+                                                    Text("$" + String(format:"%.2f",autoService.cost!))
+                                                        .fontWeight(.bold)
+                                                        .foregroundStyle(greenColor)
+                                                }
+                                           
                                             }
                                            Spacer()
-                                            Text("\(Date())")
+                                            Text("Created at: " + autoService.timeStamp)
                                                 .font(.system(size: 8))
                                         }
                                         .padding(10)
@@ -184,16 +195,13 @@ struct AutoStatsView: View {
                                             .padding(.horizontal,20)
                                     }
                                     .onTapGesture {
-                                        print("\(i) tapped")
-                                }
-                                }
-                               
+                                      
+                                    }
+                                
                             }
                         }
                         .frame(width:geo.size.width - 20,height: geo.size.height/1.5)
-                        
                     }
-                   // .frame(width:geo.size.width - 20)
                 header: {
                         VStack {
                             HStack(spacing: 0) {

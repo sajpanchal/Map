@@ -42,6 +42,8 @@
 		7286A14B2C24948100333A4F /* ServiceHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7286A14A2C24948100333A4F /* ServiceHistoryView.swift */; };
 		728A7CA62B90F282003AA218 /* GreetingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728A7CA52B90F282003AA218 /* GreetingsView.swift */; };
 		72A6D14F2BD01B8000A33A0A /* PolylinePoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */; };
+		72A8BC242C29C3F600E0D7B2 /* AutoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A8BC232C29C3F600E0D7B2 /* AutoService.swift */; };
+		72A8BC262C29C7EB00E0D7B2 /* ServiceEntryForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */; };
 		72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */; };
 		72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A62A9911FC0073CCC5 /* Enums.swift */; };
 		72EDE4142B2631D800578B8A /* DirectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EDE4132B2631D800578B8A /* DirectionHeaderView.swift */; };
@@ -107,6 +109,8 @@
 		7286A14A2C24948100333A4F /* ServiceHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceHistoryView.swift; sourceTree = "<group>"; };
 		728A7CA52B90F282003AA218 /* GreetingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreetingsView.swift; sourceTree = "<group>"; };
 		72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolylinePoint.swift; sourceTree = "<group>"; };
+		72A8BC232C29C3F600E0D7B2 /* AutoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoService.swift; sourceTree = "<group>"; };
+		72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceEntryForm.swift; sourceTree = "<group>"; };
 		72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFieldView.swift; sourceTree = "<group>"; };
 		72C3D8A62A9911FC0073CCC5 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		72D68E2E2B1199DF00756253 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -152,6 +156,7 @@
 				722DABAD2BADF267004447FE /* RouteData.swift */,
 				72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */,
 				7246B2142C272E1B00086BFB /* FuelData.swift */,
+				72A8BC232C29C3F600E0D7B2 /* AutoService.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -284,6 +289,7 @@
 				7286A14A2C24948100333A4F /* ServiceHistoryView.swift */,
 				725110712C25CCA900822837 /* DashGridItemView.swift */,
 				7246B2122C27284A00086BFB /* FuellingEntryForm.swift */,
+				72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */,
 			);
 			path = AutoStatsView;
 			sourceTree = "<group>";
@@ -447,6 +453,7 @@
 				7223439E2A8FD6ED00DC7120 /* MapProgressView.swift in Sources */,
 				726754252A7C004000CE6F46 /* ContentView.swift in Sources */,
 				72EDE4142B2631D800578B8A /* DirectionHeaderView.swift in Sources */,
+				72A8BC262C29C7EB00E0D7B2 /* ServiceEntryForm.swift in Sources */,
 				72A6D14F2BD01B8000A33A0A /* PolylinePoint.swift in Sources */,
 				7286A1492C24813400333A4F /* FuelHistoryView.swift in Sources */,
 				72053A872A951D5000B1D3FC /* AddressListView.swift in Sources */,
@@ -480,6 +487,7 @@
 				72EDE41D2B26457A00578B8A /* MapSwiftUIAPI.swift in Sources */,
 				727996332C1F3EDE00F323B4 /* SettingsView.swift in Sources */,
 				72EDE41B2B26408A00578B8A /* ExpandedDirectionsView.swift in Sources */,
+				72A8BC242C29C3F600E0D7B2 /* AutoService.swift in Sources */,
 				7286A1472C24804700333A4F /* NewEntryStackView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
