@@ -44,6 +44,8 @@
 		72A6D14F2BD01B8000A33A0A /* PolylinePoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */; };
 		72A8BC242C29C3F600E0D7B2 /* AutoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A8BC232C29C3F600E0D7B2 /* AutoService.swift */; };
 		72A8BC262C29C7EB00E0D7B2 /* ServiceEntryForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */; };
+		72C226252C2C6C4700E51D9E /* Vehicle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C226242C2C6C4700E51D9E /* Vehicle.swift */; };
+		72C226272C2C6D8600E51D9E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C226262C2C6D8600E51D9E /* Settings.swift */; };
 		72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */; };
 		72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A62A9911FC0073CCC5 /* Enums.swift */; };
 		72EDE4142B2631D800578B8A /* DirectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EDE4132B2631D800578B8A /* DirectionHeaderView.swift */; };
@@ -111,6 +113,8 @@
 		72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolylinePoint.swift; sourceTree = "<group>"; };
 		72A8BC232C29C3F600E0D7B2 /* AutoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoService.swift; sourceTree = "<group>"; };
 		72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceEntryForm.swift; sourceTree = "<group>"; };
+		72C226242C2C6C4700E51D9E /* Vehicle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vehicle.swift; sourceTree = "<group>"; };
+		72C226262C2C6D8600E51D9E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFieldView.swift; sourceTree = "<group>"; };
 		72C3D8A62A9911FC0073CCC5 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		72D68E2E2B1199DF00756253 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -157,6 +161,8 @@
 				72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */,
 				7246B2142C272E1B00086BFB /* FuelData.swift */,
 				72A8BC232C29C3F600E0D7B2 /* AutoService.swift */,
+				72C226242C2C6C4700E51D9E /* Vehicle.swift */,
+				72C226262C2C6D8600E51D9E /* Settings.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -458,6 +464,7 @@
 				7286A1492C24813400333A4F /* FuelHistoryView.swift in Sources */,
 				72053A872A951D5000B1D3FC /* AddressListView.swift in Sources */,
 				726754502A7C077500CE6F46 /* MapSwiftUI.swift in Sources */,
+				72C226252C2C6C4700E51D9E /* Vehicle.swift in Sources */,
 				7271514D2A7D53B200B20767 /* LocationManager.swift in Sources */,
 				725181CA2C19F32E00757DD7 /* DirectionsView.swift in Sources */,
 				7218C7852C04D95A00986B0B /* ExpandDirectionsViewSymbol.swift in Sources */,
@@ -468,6 +475,7 @@
 				725BEFC92C152D0E00EA3C37 /* NearbyLocationsListView.swift in Sources */,
 				728237572C14AA7900F91AD8 /* NavigationRoutesListView.swift in Sources */,
 				7222C22A2C1C9D040029E26F /* AddressView.swift in Sources */,
+				72C226272C2C6D8600E51D9E /* Settings.swift in Sources */,
 				7286A14B2C24948100333A4F /* ServiceHistoryView.swift in Sources */,
 				72EDE4192B26372D00578B8A /* MapInteractionsView.swift in Sources */,
 				7223439C2A8FD61F00DC7120 /* MapViewButton.swift in Sources */,

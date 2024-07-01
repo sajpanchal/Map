@@ -32,3 +32,61 @@ enum LocalSearchStatus {
     case showingNearbyLocations
     case searchBarActive
 }
+
+enum FuelTypes: String, CaseIterable, Identifiable  {
+    case gas
+    case EV
+    var id: Self {
+        self
+    }
+}
+enum DistanceModes: String, CaseIterable, Identifiable  {
+    case km
+    case miles
+    var id: Self {
+        self
+    }
+}
+enum FuelModes: String, CaseIterable, Identifiable  {
+    case litre
+    case gallon
+    var id: Self {
+        self
+    }
+}
+enum EfficiencyModesL: String, CaseIterable, Identifiable  {
+    case kmpl = "km/L"
+    case mpl = "miles/L"
+
+    
+    var id: Self {
+        self
+    }
+}
+enum EfficiencyModesL2: String, CaseIterable, Identifiable  {
+  
+    case lp100km = "L/100km"
+    case lp100m = "L/100miles"
+    
+    var id: Self {
+        self
+    }
+}
+
+enum EfficiencyModesG: String, CaseIterable, Identifiable  {
+    case kmpg = "km/gl"
+    case mpg = "miles/gl"
+    case gp100km = "gl/100km"
+    case gp100m = "gl/100miles"
+    var id: Self {
+        self
+    }
+}
+enum EfficiencyModesG2: String, CaseIterable, Identifiable  {
+    
+    case gp100km = "gl/100km"
+    case gp100m = "gl/100miles"
+    var id: Self {
+        self
+    }
+}
