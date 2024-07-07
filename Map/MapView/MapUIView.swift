@@ -273,11 +273,11 @@ struct MapView: UIViewRepresentable {
         switch mapViewAction {
             ///map in idle mode.
             case .idle:
-            print(self.mapViewStatus)
+          //  print(self.mapViewStatus)
                 ///if status is not updated
             if self.mapViewStatus != .idle && self.mapViewStatus != .notCentered {
                     DispatchQueue.main.async {
-                        print("reset")
+                   //     print("reset")
                         ///reset the location tracking
                         if self.localSearch.status != .localSearchCancelled {
                             MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
@@ -325,7 +325,7 @@ struct MapView: UIViewRepresentable {
             case.centerToUserLocation:
                  ///if the status is not updated
                 if self.mapViewStatus != .centeredToUserLocation {
-                    print("centered")
+                  //  print("centered")
                     DispatchQueue.main.async {
                         ///zoom the map to user location
                         uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
@@ -418,7 +418,7 @@ struct MapView: UIViewRepresentable {
 extension MapView {
     ///method to handle location search interface,
     func handleLocationSearch(in uiView: MKMapView, at searchedLocations: [MKAnnotation]?, for status: LocalSearchStatus) {
-        print(status)
+      //  print(status)
         switch status {
         case .localSearchCancelled:
             DispatchQueue.main.async {
@@ -464,7 +464,7 @@ extension MapView {
             }
            
             if self.tappedAnnotation != nil {
-                print("centering")
+               // print("centering")
                 uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: self.tappedAnnotation!.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
             }
             else {
