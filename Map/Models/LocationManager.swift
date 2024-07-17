@@ -31,12 +31,17 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     @Published var distance: CLLocationDistance = 0.0
     @Published var distanceText: String = "0.0 km"
     @Published var odometer: CLLocationDistance = 0.0
+    @Published var trip: CLLocationDistance = 0.0
     ///overriding the initializer of NSObject class
     override init() {
         ///execute the parent class initializer first
         super.init()
         ///set the LocationDataManager object as a delegate of locationManager object.when we set This class object as a delegate to the locationManage object, if there are any change in CLLocationManager,it will be reflected in LocationDataManager automatically.
         locationManager.delegate = self
+        locationManager.pausesLocationUpdatesAutomatically = false
+        
+        locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.showsBackgroundLocationIndicator = true
     }
     
     ///before we setup this method we have to setup a key-value pair in info.plist file of our project. this will be a privacy key that will pop up an alert when this app is launched asking user whether to allow this app to access user location. if so corelocation will be instantiated. delegate mathod to be executed when user updates their authorization status
@@ -93,11 +98,13 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         ///if locations array is not nil and has the first location of the user, get the last user location, also check if the remainingDistance is not nil
         if let lastUserLocation = locations.last {
          ///check if the distance updated is greater than 0.01 meters and make sure distance is greater than 0.
-            if  self.userlocation!.distance(from: lastUserLocation)/1000 >= 0.01 {
+            if  self.userlocation!.distance(from: lastUserLocation)/1000 >= 0.001 {
+                print("manager:",self.trip)
                 ///subtract the remaining distance from it self by the distance travelled by the user.
 ///                remainingDistance! -= (userlocation!.distance(from: lastUserLocation)/1000)
                 ///update the lastLocation variable with the latest user location recevied by location manager.
                 self.distance += self.userlocation!.distance(from: lastUserLocation)/1000
+                self.trip += self.userlocation!.distance(from: lastUserLocation)/1000
                 self.distanceText = String(format: "%.1f",self.distance)
                 self.odometer += self.userlocation!.distance(from: lastUserLocation)/1000
                 

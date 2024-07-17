@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct ServiceEntryForm: View {
-    @Binding var autoServiceHistory: [AutoService]
+   // @Binding var autoServiceHistory: [Service]
+//    @Binding var vehicle: AutoVehicle?
+//    @Binding var vehicles: [AutoVehicle]
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @State var location: String = ""
     @State var type: ServiceTypes = .service
     @State var description: String = ""
@@ -83,40 +87,56 @@ struct ServiceEntryForm: View {
                             .foregroundStyle(.red)
                     }
                 }
-                VStack {
-                    Button {
-                        if isTextFieldEntryValid() {
-                            if autoServiceHistory.isEmpty {
-                                autoServiceHistory.insert(AutoService(location: location, type: type.rawValue.capitalized, description:description, cost: Double(cost), date: date), at: 0)
+                if let vehicle = vehicles.first(where: {$0.isActive}) {
+                    VStack {
+                        Button {
+                            if isTextFieldEntryValid() {
+                                let service = AutoService(context: viewContext)
+                                service.uniqueID = UUID()
+                                service.cost = Double(cost) ?? 0
+                                service.details = description
+                                service.location = location
+                                service.type = type.rawValue.capitalized
+                                service.date = date
+                                service.timeStamp = Date()
+                
+                                vehicle.addToServices(service)
+                                if  let i = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
+                         
+                                    vehicles[i].serviceCost = 0
+                                    for service in vehicle.getServices {
+                                        vehicles[i].serviceCost += service.cost
+                                }
+                                    Vehicle.saveContext(viewContext: viewContext)
+                                }
                             }
-                            else {
-                                autoServiceHistory.append(AutoService(location: location, type: type.rawValue.capitalized, description:description, cost: Double(cost), date: date))
+                       
+                            isButtonTapped = true
+                          
+                         showServiceEntryForm = !isTextFieldEntryValid()
+                        } label: {
+                            HStack {
+                                Spacer()
+                                Image(systemName: "plus.square.fill")
+                                    .foregroundStyle(lightRedColor)
+                                    .font(Font.system(size: 25))
+                                
+                                Text("Add Entry")
+                                
+                                    .foregroundStyle(lightRedColor)
+                                Spacer()
                             }
+                            .frame(height: 40, alignment: .center)
                         }
-                        isButtonTapped = true
-                      
-                     showServiceEntryForm = !isTextFieldEntryValid()
-                    } label: {
-                        HStack {
-                            Spacer()
-                            Image(systemName: "plus.square.fill")
-                                .foregroundStyle(lightRedColor)
-                                .font(Font.system(size: 25))
-                            
-                            Text("Add Entry")
-                            
-                                .foregroundStyle(lightRedColor)
-                            Spacer()
-                        }
-                        .frame(height: 40, alignment: .center)
+                        .background(redColor)
+                        .buttonStyle(BorderlessButtonStyle())
+                        .cornerRadius(100)
+                        
                     }
-                    .background(redColor)
-                    .buttonStyle(BorderlessButtonStyle())
-                    .cornerRadius(100)
-                    
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
                 }
-                .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets())
+               
                 
             }
             .navigationTitle("Add Auto Service")
@@ -137,5 +157,5 @@ struct ServiceEntryForm: View {
 }
 
 #Preview {
-    ServiceEntryForm(autoServiceHistory: .constant([]), showServiceEntryForm: .constant(false))
+    ServiceEntryForm(showServiceEntryForm: .constant(false))
 }

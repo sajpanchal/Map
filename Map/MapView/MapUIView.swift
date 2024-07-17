@@ -21,6 +21,9 @@ struct MapView: UIViewRepresentable {
     
     typealias UIViewType = MKMapView
     ///this property is bound to the tapped property of Map SwiftUI. it will be true when re-center button is pressed from Map SwiftUI.
+//    @Binding var vehicle: AutoVehicle?
+//    @Binding var vehicles: [AutoVehicle]
+    @Environment(\.managedObjectContext) private var viewContext
     @Binding var mapViewAction: MapViewAction
     ///this property holds the error codes that we have defined in enum type in Map SwiftUI file.
     @Binding var mapError: Errors
@@ -59,7 +62,10 @@ struct MapView: UIViewRepresentable {
     @Binding var isRouteSelectTapped: Bool
     ///this variable holds the annotation object that is selected from the list of locations when user taps search nearby option.
     @Binding var tappedAnnotation: MKAnnotation?
+    @State var tripReset = false
     @State var animated = true
+    @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var setting: FetchedResults<Settings>
+    @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     ///this is the function that our MapView will execute the first time on its inception. this function will instantiate the Coordinator class with a copy of its parent object.
     func makeCoordinator() -> (Coordinator) {
         return Coordinator(self)
@@ -144,6 +150,42 @@ struct MapView: UIViewRepresentable {
         @MainActor func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
             ///set the initial mapview region centered to current location
             MapViewAPI.setRegionIn(mapView: mapView, centeredAt: userLocation, parent: &parent)
+            if let vehicle = parent.vehicles.first(where: {$0.isActive}) {
+                print("odometer updated: ",parent.locationDataManager.odometer)
+                print("trip updated:",parent.locationDataManager.trip)
+                print(vehicle.trip)
+               
+                print(parent.locationDataManager.trip)
+                if parent.locationDataManager.odometer < vehicle.odometer {
+                    parent.locationDataManager.odometer = vehicle.odometer
+                }
+                else {
+                     vehicle.odometer = parent.locationDataManager.odometer
+                }
+                if parent.locationDataManager.trip == 0 && vehicle.trip != 0{
+                    parent.locationDataManager.trip = vehicle.trip
+                }
+                if vehicle.trip == 0 && !parent.tripReset {
+                    parent.locationDataManager.trip = 0
+                    parent.tripReset = true
+                }
+                else {
+                     vehicle.trip = parent.locationDataManager.trip
+                }
+                
+                        
+                if let index = parent.vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
+                        parent.vehicles[index].odometer = vehicle.odometer
+                        parent.vehicles[index].trip = vehicle.trip
+                    Vehicle.saveContext(viewContext: parent.viewContext)
+                        
+                    }
+                   
+                
+            }
+            
+           
+            
             ///check what mapviewaction is to be performed
             switch parent.mapViewAction {
                 ///map in idle mode.
@@ -200,6 +242,7 @@ struct MapView: UIViewRepresentable {
                 ///set the camera region centered at user location and follow it with megnatic heading
                     MapViewAPI.setCameraRegion(of: mapView, centeredAt: userLocation, userHeading: parent.locationDataManager.userHeading, animated: parent.animated)
                 ///start navigate the user to destination
+            
                     MapViewAPI.startNavigation(in: mapView, parent: &parent)
                 ///when user is back in navigation mode keep the animation flag to true once camera is centerd.
                     parent.animated = true

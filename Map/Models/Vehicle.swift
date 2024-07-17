@@ -8,13 +8,19 @@
 import Foundation
 import SwiftUI
 
-struct Vehicle: Identifiable, Hashable {
+struct AutoVehicle: Identifiable, Hashable {
+   
     var id = UUID()
     var make: String?
     var model: String?
-    var year: String?
+    var year: Int?
     var type: String?
     var fuelType: String?
-    var image: String?
-    
+    var odometer: Double?
+    var trip: Double?
+    var isActive: Bool
+    var serviceHistory: [Service]
+    var fuelHistory: [FuelData]
+    var serviceCost: Double?
+    var fuelCost: Double?
 }

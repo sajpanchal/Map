@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FuelData: Identifiable {
+struct FuelData: Identifiable, Hashable {
     var id: UUID = UUID()
     var location: String?
     var amount: Double?

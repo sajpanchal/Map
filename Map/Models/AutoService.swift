@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AutoService: Identifiable {
+struct Service: Identifiable, Hashable {
     var id = UUID()
     var location: String?
     var type: String?

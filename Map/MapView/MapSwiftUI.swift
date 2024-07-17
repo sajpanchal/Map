@@ -55,6 +55,8 @@ struct Map: View {
     ///flag used to determine if the routeSelection is tapped or not.
     @State var isRouteSelectTapped: Bool = false
     @State var tappedAnnoation: MKAnnotation?
+    @Binding var vehicle: AutoVehicle?
+    @Binding var vehicles: [AutoVehicle]
    // let synthesizer = AVSpeechSynthesizer()
     var body: some View {
  
@@ -147,7 +149,7 @@ struct Map: View {
 
 struct Map_Previews: PreviewProvider {
     static var previews: some View {
-        Map(locationDataManager: LocationDataManager(), localSearch: LocalSearch())
+        Map(locationDataManager: LocationDataManager(), localSearch: LocalSearch(), vehicle: .constant(AutoVehicle(isActive: false, serviceHistory: [], fuelHistory: [])), vehicles: .constant([]))
     }
 }
 

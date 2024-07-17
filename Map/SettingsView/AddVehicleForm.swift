@@ -8,17 +8,21 @@
 import SwiftUI
 
 struct AddVehicleForm: View {
+    @Environment(\.managedObjectContext) private var viewContext
     @State var vehicleType: VehicleTypes = .Car
     @State var vehicleMake: VehicleMake = .AC
     @State var alphabet: Alphbets = .A
     @State var model: Model = .Ace
-    @State var year = 0
+    @State var year = (Calendar.current.dateComponents([.year], from: Date())).year!
     @State var index = 0
     @State var range = 1900..<(Calendar.current.dateComponents([.year], from: Date())).year! + 1
     @State var fuelType = FuelTypes.Gas
+    @State var odometer = "0"
+    @State var trip = "0.0"
     var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
     var lightGreenColor = Color(red: 0.723, green: 1.0, blue: 0.856)
-    @State var vehicle: Vehicle?
+    @State var vehicle: AutoVehicle?
+   
     var body: some View {
         NavigationStack {
             Form {
@@ -87,17 +91,18 @@ struct AddVehicleForm: View {
                     }
                     .pickerStyle(.segmented)
                 }
+                Section("Vehicle Odometer") {
+                    TextField("Enter the odometer readings", text: $odometer)
+                        .keyboardType(.numberPad)
+                }
+                Section("Vehicle Trip") {
+                    TextField("Enter the Trip readings", text: $trip)
+                        .keyboardType(.decimalPad)
+                }
                 VStack {
                     Button {
                        
-                        vehicle = Vehicle(make: vehicleMake.rawValue.replacingOccurrences(of: "_", with: " "), model: model.rawValue.replacingOccurrences(of: "_", with: " "), year: String(year), type: vehicleType.rawValue, fuelType: fuelType.rawValue)
-                     print("vehicle added!")
-                        print(vehicle!.id)
-                        print(vehicle!.type)
-                        print(vehicle!.make)
-                        print(vehicle!.model)
-                        print(vehicle!.year)
-                        print(vehicle!.fuelType)
+                       addVehicle()
                       
                    
                     } label: {
@@ -123,6 +128,20 @@ struct AddVehicleForm: View {
             }
             .navigationTitle("Add New Vehicle")
         }
+    }
+    func addVehicle() {
+        let vehicle = Vehicle(context: viewContext)
+        vehicle.uniqueID = UUID()
+        vehicle.fuelEngine = fuelType.rawValue
+        vehicle.make = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
+        vehicle.model = model.rawValue.replacingOccurrences(of: "_", with: " ")
+        vehicle.type = vehicleType.rawValue
+        vehicle.isActive = false
+        vehicle.year = Int16(year)
+        vehicle.odometer = Double(odometer) ?? 0
+        vehicle.trip = Double(trip) ?? 0
+     
+        Vehicle.saveContext(viewContext: viewContext)
     }
 }
 

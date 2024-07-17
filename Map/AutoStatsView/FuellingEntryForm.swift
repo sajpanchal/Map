@@ -8,13 +8,19 @@
 import SwiftUI
 
 struct FuellingEntryForm: View {
-    @Binding var fuelDataHistory: [FuelData]
+   // @Binding var fuelDataHistory: [FuelData]
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
+    @StateObject var locationDatamanager: LocationDataManager
+//    @Binding var vehicle: AutoVehicle?
+//    @Binding var vehicles: [AutoVehicle]
     @State var location = ""
     @State var amount = ""
     @State var cost = ""
     @State var date: Date = Date()
     @Binding var showFuellingEntryform: Bool
     @State var isTapped = false
+  
     var yellowColor = Color(red:0.975, green: 0.646, blue: 0.207)
     //var lightYellowColor = Color(red:0.975, green: 0.918, blue: 0.647)
     var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.781)
@@ -82,41 +88,65 @@ struct FuellingEntryForm: View {
                             .foregroundStyle(.red)
                     }
                 }
-                VStack {
-                    Button {
-                        if isTextFieldEntryValid() {
-                            if fuelDataHistory.isEmpty {
-                                fuelDataHistory.insert(FuelData(location: location, amount: Double(amount), cost: Double(cost), date: date), at: 0)
+                if let vehicle = vehicles.first(where: {$0.isActive}) {
+                    VStack {
+                        Button {
+                            if isTextFieldEntryValid() {
+                                                    let fuelling = AutoFuelling(context: viewContext)
+                                fuelling.uniqueID = UUID()
+                                fuelling.cost = Double(cost) ?? 0
+                                fuelling.date = date
+                                fuelling.timeStamp = Date()
+                                fuelling.location = location
+                                fuelling.volume = Double(amount) ?? 0
+                                vehicle.addToFuellings(fuelling)
+                                if  let i = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
+                                    //vehicles[i]
+                                    vehicles[i].fuelCost = 0
+                                    locationDatamanager.trip = 0.00
+                                   
+                                    vehicles[i].trip = 0
+                                    print("trip:",  locationDatamanager.trip)
+                                    print("odometer:", vehicles[i].odometer)
+                                    for fuel in vehicle.getFuellings {
+                                        vehicles[i].fuelCost += fuel.cost
+                                      
+                                      
+                                    
+                                        print("fuel cost = \(vehicles[i].fuelCost)")
+                                    }
+                                    Vehicle.saveContext(viewContext: viewContext)
+                                    print("updated:", vehicles[i].odometer, vehicles[i].trip)
+                                }
+                               
+                               
                             }
-                            else {
-                                fuelDataHistory.append(FuelData(location: location, amount: Double(amount), cost: Double(cost), date: date))
+                           
+                            isTapped = true
+                          
+                         showFuellingEntryform = !isTextFieldEntryValid()
+                        } label: {
+                            HStack {
+                                Spacer()
+                                Image(systemName: "plus.square.fill")
+                                    .foregroundStyle(lightYellowColor)
+                                    .font(Font.system(size: 25))
+                                
+                                Text("Add Entry")
+                                  
+                                    .foregroundStyle(lightYellowColor)
+                                Spacer()
                             }
-                            print(DateFormatter().string(from: date))
+                            .frame(height: 40, alignment: .center)
                         }
-                       
-                        isTapped = true
-                      
-                     showFuellingEntryform = !isTextFieldEntryValid()
-                    } label: {
-                        HStack {
-                            Spacer()
-                            Image(systemName: "plus.square.fill")
-                                .foregroundStyle(lightYellowColor)
-                                .font(Font.system(size: 25))
-                            
-                            Text("Add Entry")
-                              
-                                .foregroundStyle(lightYellowColor)
-                            Spacer()
-                        }
-                        .frame(height: 40, alignment: .center)
+                        .background(yellowColor)
+                        .buttonStyle(BorderlessButtonStyle())
+                        .cornerRadius(100)
                     }
-                    .background(yellowColor)
-                    .buttonStyle(BorderlessButtonStyle())
-                    .cornerRadius(100)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
                 }
-                .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets())
+              
                       
             }
             .navigationTitle("Add Fuelling Entry")
@@ -143,5 +173,6 @@ struct FuellingEntryForm: View {
 
 
 #Preview {
-    FuellingEntryForm(fuelDataHistory: .constant([]), showFuellingEntryform: .constant(false))
+   // FuellingEntryForm(vehicle: .constant(AutoVehicle(isActive: false, serviceHistory: [], fuelHistory: [])), showFuellingEntryform: .constant(false))
+    FuellingEntryForm(locationDatamanager: LocationDataManager(), showFuellingEntryform: .constant(false))
 }

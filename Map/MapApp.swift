@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
-
+import CoreData
 @main
 struct MapApp: App {
+    @StateObject private var coreDataStack = CoreDataStack.shared
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.managedObjectContext, coreDataStack.persistantContainer.viewContext)
         }
     }
 }
