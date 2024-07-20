@@ -19,7 +19,7 @@ struct ContentView: View {
 //        return request
 //    }()
     var isEmpty: Bool {
-        print("requesting")
+        //print("requesting")
         do {
             let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Vehicle")
             let count  = try viewContext.count(for: request)

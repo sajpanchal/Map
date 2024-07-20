@@ -45,7 +45,7 @@ struct AutoStatsView: View {
                         Section("Dashboard") {
                             LazyHGrid(rows: rows) {
                                // DashGridItemView(title: "ODOMETER", foreGroundColor: purpleColor, backGroundColor: lightPurpleColor, numericText: String(format:"%.1f",vehicle!.odometer ?? "na"), unitText: "km", geometricSize: geo.size)
-                                DashGridItemView(title: "ODOMETER", foreGroundColor: purpleColor, backGroundColor: lightPurpleColor, numericText: String(format:"%.1f",vehicle.odometer), unitText: "km", geometricSize: geo.size)
+                                DashGridItemView(title: "ODOMETER", foreGroundColor: purpleColor, backGroundColor: lightPurpleColor, numericText: String(format:"%.0f",vehicle.odometer), unitText: "km", geometricSize: geo.size)
 
                                 DashGridItemView(title: "LAST FUELLING", foreGroundColor: yellowColor, backGroundColor: lightYellowColor, numericText: String(format:"%.1f",vehicle.getFuellings.first?.volume ?? "--"), unitText: "litre", geometricSize: geo.size)
                                 DashGridItemView(title: "FUEL COST", foreGroundColor: orangeColor, backGroundColor: lightOrangeColor, numericText: String(format:"%.1f",vehicle.fuelCost), unitText: "Year 2024", geometricSize: geo.size)

@@ -150,40 +150,17 @@ struct MapView: UIViewRepresentable {
         @MainActor func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
             ///set the initial mapview region centered to current location
             MapViewAPI.setRegionIn(mapView: mapView, centeredAt: userLocation, parent: &parent)
-            if let vehicle = parent.vehicles.first(where: {$0.isActive}) {
-                print("odometer updated: ",parent.locationDataManager.odometer)
-                print("trip updated:",parent.locationDataManager.trip)
-                print(vehicle.trip)
-               
-                print(parent.locationDataManager.trip)
-                if parent.locationDataManager.odometer < vehicle.odometer {
-                    parent.locationDataManager.odometer = vehicle.odometer
-                }
-                else {
-                     vehicle.odometer = parent.locationDataManager.odometer
-                }
-                if parent.locationDataManager.trip == 0 && vehicle.trip != 0{
-                    parent.locationDataManager.trip = vehicle.trip
-                }
-                if vehicle.trip == 0 && !parent.tripReset {
-                    parent.locationDataManager.trip = 0
-                    parent.tripReset = true
-                }
-                else {
-                     vehicle.trip = parent.locationDataManager.trip
-                }
-                
-                        
-                if let index = parent.vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
-                        parent.vehicles[index].odometer = vehicle.odometer
-                        parent.vehicles[index].trip = vehicle.trip
-                    Vehicle.saveContext(viewContext: parent.viewContext)
-                        
-                    }
-                   
-                
-            }
-            
+//            if let vehicle = parent.vehicles.first(where: {$0.isActive}) {
+//                vehicle.odometer += parent.locationDataManager.distance
+//                vehicle.trip += parent.locationDataManager.distance
+//                print("odometer = \(vehicle.odometer)")
+//                print("trip = \(vehicle.trip)")
+//                        
+//               
+//                   
+//                
+//            }
+//            
            
             
             ///check what mapviewaction is to be performed

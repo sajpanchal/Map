@@ -50,6 +50,8 @@
 		7286A1492C24813400333A4F /* FuelHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7286A1482C24813400333A4F /* FuelHistoryView.swift */; };
 		7286A14B2C24948100333A4F /* ServiceHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7286A14A2C24948100333A4F /* ServiceHistoryView.swift */; };
 		728A7CA62B90F282003AA218 /* GreetingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728A7CA52B90F282003AA218 /* GreetingsView.swift */; };
+		72928F9B2C481548007ED736 /* GarageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72928F9A2C481548007ED736 /* GarageView.swift */; };
+		72928F9D2C481763007ED736 /* UpdateVehicleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72928F9C2C481763007ED736 /* UpdateVehicleView.swift */; };
 		72A6D14F2BD01B8000A33A0A /* PolylinePoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */; };
 		72A8BC242C29C3F600E0D7B2 /* AutoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A8BC232C29C3F600E0D7B2 /* AutoService.swift */; };
 		72A8BC262C29C7EB00E0D7B2 /* ServiceEntryForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */; };
@@ -131,6 +133,8 @@
 		7286A1482C24813400333A4F /* FuelHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuelHistoryView.swift; sourceTree = "<group>"; };
 		7286A14A2C24948100333A4F /* ServiceHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceHistoryView.swift; sourceTree = "<group>"; };
 		728A7CA52B90F282003AA218 /* GreetingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreetingsView.swift; sourceTree = "<group>"; };
+		72928F9A2C481548007ED736 /* GarageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarageView.swift; sourceTree = "<group>"; };
+		72928F9C2C481763007ED736 /* UpdateVehicleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateVehicleView.swift; sourceTree = "<group>"; };
 		72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolylinePoint.swift; sourceTree = "<group>"; };
 		72A8BC232C29C3F600E0D7B2 /* AutoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoService.swift; sourceTree = "<group>"; };
 		72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceEntryForm.swift; sourceTree = "<group>"; };
@@ -340,6 +344,8 @@
 				727996322C1F3EDE00F323B4 /* SettingsView.swift */,
 				721C11812C3495DB00272F31 /* AddVehicleForm.swift */,
 				72D189C62C45805900AAC514 /* InitialSettingsView.swift */,
+				72928F9A2C481548007ED736 /* GarageView.swift */,
+				72928F9C2C481763007ED736 /* UpdateVehicleView.swift */,
 			);
 			path = SettingsView;
 			sourceTree = "<group>";
@@ -517,6 +523,7 @@
 				72EDE4192B26372D00578B8A /* MapInteractionsView.swift in Sources */,
 				7223439C2A8FD61F00DC7120 /* MapViewButton.swift in Sources */,
 				725EF4E02A91089B000FB0E1 /* MapUIViewAPI.swift in Sources */,
+				72928F9B2C481548007ED736 /* GarageView.swift in Sources */,
 				726A77DA2B486ABE0095B047 /* NavigationButton.swift in Sources */,
 				7246B2132C27284A00086BFB /* FuellingEntryForm.swift in Sources */,
 				726754232A7C004000CE6F46 /* MapApp.swift in Sources */,
@@ -529,6 +536,7 @@
 				72B4D2E92C3D8B2800B9F2AD /* AppDataModel.xcdatamodeld in Sources */,
 				72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */,
 				72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */,
+				72928F9D2C481763007ED736 /* UpdateVehicleView.swift in Sources */,
 				727996302C1F3E4D00F323B4 /* AutoStatsView.swift in Sources */,
 				728A7CA62B90F282003AA218 /* GreetingsView.swift in Sources */,
 				72EDE41D2B26457A00578B8A /* MapSwiftUIAPI.swift in Sources */,

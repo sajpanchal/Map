@@ -22,7 +22,7 @@ struct AddVehicleForm: View {
     var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
     var lightGreenColor = Color(red: 0.723, green: 1.0, blue: 0.856)
     @State var vehicle: AutoVehicle?
-   
+    @Binding var showAddVehicleForm: Bool
     var body: some View {
         NavigationStack {
             Form {
@@ -140,11 +140,18 @@ struct AddVehicleForm: View {
         vehicle.year = Int16(year)
         vehicle.odometer = Double(odometer) ?? 0
         vehicle.trip = Double(trip) ?? 0
-     
+        print("---------new vehicle added-------")
+        print(vehicle.uniqueID ?? "")
+        print(vehicle.fuelEngine ?? "")
+        print(vehicle.make ?? "")
+        print(vehicle.model ?? "")
+        print(vehicle.type ?? "")
+        showAddVehicleForm = false
+       
         Vehicle.saveContext(viewContext: viewContext)
     }
 }
 
 #Preview {
-    AddVehicleForm()
+    AddVehicleForm(showAddVehicleForm: .constant(false))
 }

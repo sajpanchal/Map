@@ -4,15 +4,16 @@
 //
 //  Created by saj panchal on 2023-08-04.
 //
-
+import CoreData
 import Foundation
 import CoreLocation
 import MapKit
+import SwiftUI
 ///custom Location manager class that inherits NSObject class and CLlocationManageDelegate protocol. this class also conforms to ObservableObject type-alias. it means that this instance will be obsered by swiftui view  for any changes in data associated with it. to make it possible we just have to type-alias it as @ObservedObject. we have to do it as we as interfacing between structs and classes. structs are value types and classes are reference type LocationDataManager is responsible to handle user location authorization, gather all the user location data and track user data.
 class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     ///locationManager object is instantiated in a class
     var locationManager = CLLocationManager()
-    
+    @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[]) var vehicles: FetchedResults<Vehicle>
     ///this is a object property that will reflect the user location authorization status. it is set as a type-alieas @published. which makes updates to swiftui if this object is used in that swiftui view.
     ///property storing userlocation
     @Published var userlocation: CLLocation?
@@ -23,6 +24,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     ///remaining distance from the userlocation to the destination while in navigation
     @Published var remainingDistance: CLLocationDistance?
     ///speed of the user
+    var viewContext = CoreDataStack.shared.persistantContainer.viewContext
     @Published var speed: Int = 0
     ///throughfare i.e. street name of the current location received by reverse geocoding.
     @Published var throughfare: String?
@@ -32,6 +34,8 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     @Published var distanceText: String = "0.0 km"
     @Published var odometer: CLLocationDistance = 0.0
     @Published var trip: CLLocationDistance = 0.0
+    var results: [Vehicle] = []
+    var index: Int?
     ///overriding the initializer of NSObject class
     override init() {
         ///execute the parent class initializer first
@@ -39,7 +43,18 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         ///set the LocationDataManager object as a delegate of locationManager object.when we set This class object as a delegate to the locationManage object, if there are any change in CLLocationManager,it will be reflected in LocationDataManager automatically.
         locationManager.delegate = self
         locationManager.pausesLocationUpdatesAutomatically = false
-        
+        do {
+            self.results = try viewContext.fetch(NSFetchRequest(entityName: "Vehicle")) as [Vehicle]
+            self.index = self.results.firstIndex(where: {$0.isActive})
+            for i in results {
+                print(i.type)
+                print(i.odometer)
+                
+            }
+        }
+        catch {
+            print("error")
+        }
         locationManager.allowsBackgroundLocationUpdates = true
         locationManager.showsBackgroundLocationIndicator = true
     }
@@ -103,12 +118,23 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                 ///subtract the remaining distance from it self by the distance travelled by the user.
 ///                remainingDistance! -= (userlocation!.distance(from: lastUserLocation)/1000)
                 ///update the lastLocation variable with the latest user location recevied by location manager.
-                self.distance += self.userlocation!.distance(from: lastUserLocation)/1000
-                self.trip += self.userlocation!.distance(from: lastUserLocation)/1000
+                ///
+                self.distance = self.userlocation!.distance(from: lastUserLocation)/1000
+              
                 self.distanceText = String(format: "%.1f",self.distance)
-                self.odometer += self.userlocation!.distance(from: lastUserLocation)/1000
+                if let i = index {
+                    self.results[i].odometer += self.userlocation!.distance(from: lastUserLocation)/1000
+                    self.results[i].trip += self.userlocation!.distance(from: lastUserLocation)/1000
+                    print(self.results[i].odometer)
+                        Vehicle.saveContext(viewContext: viewContext)
+                            
+                        
+                }
                 
                 userlocation = lastUserLocation
+            }
+            else {
+                self.distance = 0.0
             }
             ///calculate the speed of the user
             self.speed = Int(self.userlocation!.speed * 3.6)

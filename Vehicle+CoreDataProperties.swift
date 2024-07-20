@@ -37,13 +37,18 @@ extension Vehicle {
     public var getMake: String {
         make ?? "N/A"
     }
-    
+    public var getVehicleText: String {
+        "\(make ?? "") \(model?.replacingOccurrences(of: "_", with: " ") ?? "")"
+    }
     public var getModel: String {
         model ?? "N/A"
     }
     
     public var getType: String {
         type ?? "N/A"
+    }
+    public var getYear: String {
+        String(year)
     }
     
     

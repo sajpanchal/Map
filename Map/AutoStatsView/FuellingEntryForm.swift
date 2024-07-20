@@ -92,7 +92,7 @@ struct FuellingEntryForm: View {
                     VStack {
                         Button {
                             if isTextFieldEntryValid() {
-                                                    let fuelling = AutoFuelling(context: viewContext)
+                                let fuelling = AutoFuelling(context: viewContext)
                                 fuelling.uniqueID = UUID()
                                 fuelling.cost = Double(cost) ?? 0
                                 fuelling.date = date
