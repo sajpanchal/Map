@@ -36,7 +36,28 @@ struct AutoStatsView: View {
     var lightPurpleColor = Color(red:0.725,green:0.721, blue:1.0)
     
     let dateFomatter = DateFormatter()
-    
+    let numberFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+               formatter.numberStyle = .decimal
+               formatter.maximumFractionDigits = 0
+        return formatter
+
+    }()
+    let deciNumberFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+               formatter.numberStyle = .decimal
+               formatter.maximumFractionDigits = 1
+        return formatter
+
+    }()
+    let currencyFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+               formatter.numberStyle = .currency
+         formatter.locale = .current
+               formatter.maximumFractionDigits = 2
+        return formatter
+
+    }()
     var body: some View {
         GeometryReader { geo in
             NavigationStack {
@@ -44,17 +65,18 @@ struct AutoStatsView: View {
                     if let vehicle = vehicles.first(where: {$0.isActive}) {
                         Section("Dashboard") {
                             LazyHGrid(rows: rows) {
-                               // DashGridItemView(title: "ODOMETER", foreGroundColor: purpleColor, backGroundColor: lightPurpleColor, numericText: String(format:"%.1f",vehicle!.odometer ?? "na"), unitText: "km", geometricSize: geo.size)
-                                DashGridItemView(title: "ODOMETER", foreGroundColor: purpleColor, backGroundColor: lightPurpleColor, numericText: String(format:"%.0f",vehicle.odometer), unitText: "km", geometricSize: geo.size)
+                             
+                                DashGridItemView(title: "ODOMETER", foreGroundColor: purpleColor, backGroundColor: lightPurpleColor, numericText: numberFormatter.string(for: vehicle.odometer) ?? "--", unitText: "km", geometricSize: geo.size)
 
-                                DashGridItemView(title: "LAST FUELLING", foreGroundColor: yellowColor, backGroundColor: lightYellowColor, numericText: String(format:"%.1f",vehicle.getFuellings.first?.volume ?? "--"), unitText: "litre", geometricSize: geo.size)
-                                DashGridItemView(title: "FUEL COST", foreGroundColor: orangeColor, backGroundColor: lightOrangeColor, numericText: String(format:"%.1f",vehicle.fuelCost), unitText: "Year 2024", geometricSize: geo.size)
-                               // DashGridItemView(title: "TRIP", foreGroundColor: skyColor, backGroundColor: lightSkyColor, numericText: String(format:"%.1f",vehicle!.trip ?? "na"), unitText: "km", geometricSize: geo.size)
-                                DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: skyColor, backGroundColor: lightSkyColor, numericText: String(format:"%.1f",vehicle.trip), unitText: "km", geometricSize: geo.size)
-
-                                DashGridItemView(title: "MILEAGE", foreGroundColor: greenColor, backGroundColor: lightGreenColor, numericText: "12.32", unitText: "km/l", geometricSize: geo.size)
+                                DashGridItemView(title: "LAST FUELLING", foreGroundColor: yellowColor, backGroundColor: lightYellowColor, numericText: deciNumberFormatter.string(for: vehicle.getFuellings.first?.volume ?? 0) ?? "--", unitText: "litre", geometricSize: geo.size)
+                                DashGridItemView(title: "FUEL COST", foreGroundColor: orangeColor, backGroundColor: lightOrangeColor, numericText: currencyFormatter.string(for: vehicle.fuelCost) ?? "--", unitText: "Year 2024", geometricSize: geo.size)
                                
-                                DashGridItemView(title: "REPAIR COST", foreGroundColor: redColor    , backGroundColor: lightRedColor, numericText: String(format:"%.1f",vehicle.serviceCost), unitText: "Year 2024", geometricSize: geo.size)
+                                DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: skyColor, backGroundColor: lightSkyColor, numericText:
+                                                    deciNumberFormatter.string(for: vehicle.trip) ?? "--", unitText: "km", geometricSize: geo.size)
+
+                                DashGridItemView(title: "MILEAGE", foreGroundColor: greenColor, backGroundColor: lightGreenColor, numericText: deciNumberFormatter.string(for: vehicle.fuelEfficiency) ?? "--", unitText: "km/l", geometricSize: geo.size)
+                               
+                                DashGridItemView(title: "REPAIR COST", foreGroundColor: redColor    , backGroundColor: lightRedColor, numericText: currencyFormatter.string(for: vehicle.serviceCost) ?? "--",  unitText: "Year 2024", geometricSize: geo.size)
                             }
                         }
                         .padding(10)
@@ -145,7 +167,7 @@ struct AutoStatsView: View {
                                         showFuelHistoryView.toggle()
                                     }, label: {Text("View More").font(.system(size: 12))})
                                     .sheet(isPresented: $showFuelHistoryView, content: {
-                                        FuelHistoryView()
+                                        FuelHistoryView(vehicle: vehicle)
                                     })
                                 }
                                 
@@ -222,7 +244,7 @@ struct AutoStatsView: View {
                                         showServiceHistoryView.toggle()
                                     }, label: {Text("View More").font(.system(size: 12))})
                                     .sheet(isPresented: $showServiceHistoryView, content: {
-                                       ServiceHistoryView()
+                                        ServiceHistoryView(vehicle: vehicle)
                                     })
                                 }
                                 

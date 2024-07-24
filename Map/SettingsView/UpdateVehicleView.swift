@@ -59,6 +59,9 @@ struct UpdateVehicleView: View {
                                 Text(make.rawValue)
                             }
                         }
+                        .onChange(of: vehicleMake) {
+                            model = vehicleMake.models.first ?? .Other
+                        }
                         
                         .pickerStyle(.wheel)
                     }
@@ -248,49 +251,7 @@ struct UpdateVehicleView: View {
             }
             
             .navigationTitle("Update Settings")
-         /*   .toolbar {
-                Button {
-                    showAddVehicleForm.toggle()
-                }
-              
-            label: {
-                ZStack {
-                    Image(systemName: "car.fill")
-                        .font(Font.system(size:30))
-
-                    VStack {
-                        HStack {
-                            ZStack {
-                                Circle()
-                                 
-                                    .foregroundStyle(Color(UIColor.systemBackground))
-                                  
-                                Image(systemName:"plus.circle.fill")
-                                    .font(Font.system(size:14))
-                                    .fontWeight(.black)
-                            }
-                           
-                                                           
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                        }
-                        HStack {
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                            
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                        }
-                    }
-                                   
-                }
-                //.padding(10)
-            }
-            .sheet(isPresented: $showAddVehicleForm, content: {
-              //  AddVehicleForm(vehicles: $vehicles)
-            })
-            .padding(.top, 10)
-            }*/
+         
         }
         .onAppear {
             vehicleType = VehicleTypes(rawValue: vehicle.getType) ?? .Car

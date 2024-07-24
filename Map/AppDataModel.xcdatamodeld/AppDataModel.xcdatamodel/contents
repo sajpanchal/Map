@@ -3,6 +3,7 @@
     <entity name="AutoFuelling" representedClassName=".AutoFuelling" syncable="YES">
         <attribute name="cost" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="lasttrip" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="location" optional="YES" attributeType="String"/>
         <attribute name="timeStamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="uniqueID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
@@ -28,6 +29,7 @@
     </entity>
     <entity name="Vehicle" representedClassName=".Vehicle" syncable="YES">
         <attribute name="fuelCost" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="fuelEfficiency" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="fuelEngine" optional="YES" attributeType="String"/>
         <attribute name="isActive" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="make" optional="YES" attributeType="String"/>

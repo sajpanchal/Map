@@ -98,23 +98,42 @@ struct FuellingEntryForm: View {
                                 fuelling.date = date
                                 fuelling.timeStamp = Date()
                                 fuelling.location = location
+                                if  let i = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
+                                    fuelling.lasttrip = vehicles[i].trip
+                                }
+                                else {
+                                    fuelling.lasttrip = 0.0
+                                }
+                              
                                 fuelling.volume = Double(amount) ?? 0
                                 vehicle.addToFuellings(fuelling)
                                 if  let i = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
                                     //vehicles[i]
                                     vehicles[i].fuelCost = 0
                                     locationDatamanager.trip = 0.00
-                                   
+                                                                   
                                     vehicles[i].trip = 0
                                     print("trip:",  locationDatamanager.trip)
                                     print("odometer:", vehicles[i].odometer)
                                     for fuel in vehicle.getFuellings {
+                                        
                                         vehicles[i].fuelCost += fuel.cost
-                                      
+                                        
                                       
                                     
                                         print("fuel cost = \(vehicles[i].fuelCost)")
                                     }
+                                    let fuellings = vehicle.getFuellings.filter({$0.lasttrip != 0})
+                                    var v = 0.0
+                                    var t = 0.0
+                                    for fuel in fuellings {
+                                        v += fuel.volume
+                                        t += fuel.lasttrip
+                                    }
+                                    if !fuellings.isEmpty {
+                                        vehicles[i].fuelEfficiency = (t/v)
+                                    }
+                               
                                     Vehicle.saveContext(viewContext: viewContext)
                                     print("updated:", vehicles[i].odometer, vehicles[i].trip)
                                 }

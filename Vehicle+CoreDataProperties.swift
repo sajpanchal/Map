@@ -2,7 +2,7 @@
 //  Vehicle+CoreDataProperties.swift
 //  Map
 //
-//  Created by saj panchal on 2024-07-16.
+//  Created by saj panchal on 2024-07-20.
 //
 //
 
@@ -16,17 +16,18 @@ extension Vehicle {
         return NSFetchRequest<Vehicle>(entityName: "Vehicle")
     }
 
+    @NSManaged public var fuelCost: Double
     @NSManaged public var fuelEngine: String?
     @NSManaged public var isActive: Bool
     @NSManaged public var make: String?
     @NSManaged public var model: String?
     @NSManaged public var odometer: Double
+    @NSManaged public var serviceCost: Double
     @NSManaged public var trip: Double
     @NSManaged public var type: String?
     @NSManaged public var uniqueID: UUID?
     @NSManaged public var year: Int16
-    @NSManaged public var fuelCost: Double
-    @NSManaged public var serviceCost: Double
+    @NSManaged public var fuelEfficiency: Double
     @NSManaged public var fuellings: NSSet?
     @NSManaged public var services: NSSet?
     
@@ -74,6 +75,7 @@ extension Vehicle {
             fatalError(error.localizedDescription)
         }
     }
+
 
 }
 
