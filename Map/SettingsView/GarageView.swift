@@ -18,63 +18,8 @@ struct GarageView: View {
             ForEach(vehicles, id: \.self.uniqueID) { vehicle in
                 
                 NavigationLink(destination: UpdateVehicleView(locationDataManager: locationDataManager, settings: setting.first!, vehicle: vehicle), label: {
-                 HStack {
-                         VStack {
-                             Text(vehicle.getVehicleText)
-                                 .frame(alignment: .leading)
-                                 .font(.subheadline)
-                                 .fontWeight(.bold)
-                            
-                              
-                                 Text(String(vehicle.year))
-                                 .frame(alignment: .leading)
-                                 .font(.system(size: 10))
-                                 .fontWeight(.regular)
-                             
-                                                                     
-                                                                   
-                         }
-                     Spacer()
-                         HStack {
-                            
-                             Image(systemName: "car.fill")
-                                 .font(.system(size: 20))
-                                 .foregroundStyle(.blue)
-                             if vehicle.getFuelEngine == "Gas" {
-                                
-                                 Image(systemName: "fuelpump.fill")
-                                     .font(.system(size: 20))
-                                     .foregroundStyle(.yellow)
-                             }
-                             else if vehicle.getFuelEngine == "EV" {
-                                 
-                                 Image(systemName: "bolt.batteryblock.fill")
-                                     .font(.system(size: 20))
-                                     .foregroundStyle(.green)
-                                 
-                             }
-                             else {
-                                 
-                                 Image(systemName: "fuelpump.fill")
-                                     .font(.system(size: 20))
-                                     .foregroundStyle(.yellow)
-                             
-                                 Image(systemName: "bolt.batteryblock.fill")
-                                     .font(.system(size: 20))
-                                     .foregroundStyle(.green)
-                             }
-                           
-                         }
-                        
-                        
-                         
-                       
-                     
-                    
-                 }
-                 .onAppear {
-                    // carText = vehicle.getMake + " " + vehicle.getModel.replacingOccurrences(of: "_", with: " ") + " " + vehicle.getModel.replacingOccurrences(of: "_", with: " ")
-                 }
+                    VehicleListItem(v: vehicles.firstIndex(of: vehicle) ?? 0)
+                
              })
                 
              

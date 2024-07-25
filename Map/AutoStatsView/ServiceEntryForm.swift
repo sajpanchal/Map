@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct ServiceEntryForm: View {
-   // @Binding var autoServiceHistory: [Service]
-//    @Binding var vehicle: AutoVehicle?
-//    @Binding var vehicles: [AutoVehicle]
+ 
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @State var location: String = ""
@@ -115,18 +113,7 @@ struct ServiceEntryForm: View {
                           
                          showServiceEntryForm = !isTextFieldEntryValid()
                         } label: {
-                            HStack {
-                                Spacer()
-                                Image(systemName: "plus.square.fill")
-                                    .foregroundStyle(lightRedColor)
-                                    .font(Font.system(size: 25))
-                                
-                                Text("Add Entry")
-                                
-                                    .foregroundStyle(lightRedColor)
-                                Spacer()
-                            }
-                            .frame(height: 40, alignment: .center)
+                            FormButton(imageName: "plus.square.fill", text: "Add Entry", color: lightRedColor)
                         }
                         .background(redColor)
                         .buttonStyle(BorderlessButtonStyle())

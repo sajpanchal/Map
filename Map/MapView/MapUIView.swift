@@ -150,18 +150,6 @@ struct MapView: UIViewRepresentable {
         @MainActor func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
             ///set the initial mapview region centered to current location
             MapViewAPI.setRegionIn(mapView: mapView, centeredAt: userLocation, parent: &parent)
-//            if let vehicle = parent.vehicles.first(where: {$0.isActive}) {
-//                vehicle.odometer += parent.locationDataManager.distance
-//                vehicle.trip += parent.locationDataManager.distance
-//                print("odometer = \(vehicle.odometer)")
-//                print("trip = \(vehicle.trip)")
-//                        
-//               
-//                   
-//                
-//            }
-//            
-           
             
             ///check what mapviewaction is to be performed
             switch parent.mapViewAction {

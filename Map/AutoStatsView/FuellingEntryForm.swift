@@ -8,12 +8,9 @@
 import SwiftUI
 
 struct FuellingEntryForm: View {
-   // @Binding var fuelDataHistory: [FuelData]
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @StateObject var locationDatamanager: LocationDataManager
-//    @Binding var vehicle: AutoVehicle?
-//    @Binding var vehicles: [AutoVehicle]
     @State var location = ""
     @State var amount = ""
     @State var cost = ""
@@ -22,7 +19,6 @@ struct FuellingEntryForm: View {
     @State var isTapped = false
   
     var yellowColor = Color(red:0.975, green: 0.646, blue: 0.207)
-    //var lightYellowColor = Color(red:0.975, green: 0.918, blue: 0.647)
     var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.781)
     var body: some View {
         NavigationStack {
@@ -111,17 +107,11 @@ struct FuellingEntryForm: View {
                                     //vehicles[i]
                                     vehicles[i].fuelCost = 0
                                     locationDatamanager.trip = 0.00
-                                                                   
                                     vehicles[i].trip = 0
                                     print("trip:",  locationDatamanager.trip)
                                     print("odometer:", vehicles[i].odometer)
                                     for fuel in vehicle.getFuellings {
-                                        
                                         vehicles[i].fuelCost += fuel.cost
-                                        
-                                      
-                                    
-                                        print("fuel cost = \(vehicles[i].fuelCost)")
                                     }
                                     let fuellings = vehicle.getFuellings.filter({$0.lasttrip != 0})
                                     var v = 0.0
@@ -133,30 +123,14 @@ struct FuellingEntryForm: View {
                                     if !fuellings.isEmpty {
                                         vehicles[i].fuelEfficiency = (t/v)
                                     }
-                               
                                     Vehicle.saveContext(viewContext: viewContext)
                                     print("updated:", vehicles[i].odometer, vehicles[i].trip)
                                 }
-                               
-                               
                             }
-                           
                             isTapped = true
-                          
                          showFuellingEntryform = !isTextFieldEntryValid()
                         } label: {
-                            HStack {
-                                Spacer()
-                                Image(systemName: "plus.square.fill")
-                                    .foregroundStyle(lightYellowColor)
-                                    .font(Font.system(size: 25))
-                                
-                                Text("Add Entry")
-                                  
-                                    .foregroundStyle(lightYellowColor)
-                                Spacer()
-                            }
-                            .frame(height: 40, alignment: .center)
+                            FormButton(imageName: "plus.square.fill", text: "Add Entry", color: lightYellowColor)
                         }
                         .background(yellowColor)
                         .buttonStyle(BorderlessButtonStyle())

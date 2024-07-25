@@ -106,18 +106,7 @@ struct AddVehicleForm: View {
                       
                    
                     } label: {
-                        HStack {
-                            Spacer()
-                            Image(systemName: "car.fill")
-                                .foregroundStyle(lightGreenColor)
-                                .font(Font.system(size: 25))
-                            
-                            Text("Add Vehicle")
-                              
-                                .foregroundStyle(lightGreenColor)
-                            Spacer()
-                        }
-                        .frame(height: 40, alignment: .center)
+                        FormButton(imageName: "car.fill", text: "Add Vehicle", color: lightGreenColor)
                     }
                     .background(greenColor)
                     .buttonStyle(BorderlessButtonStyle())

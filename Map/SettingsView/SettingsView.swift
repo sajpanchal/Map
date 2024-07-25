@@ -11,7 +11,6 @@ struct SettingsView: View {
     @State var vIndex = 0
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject var locationDataManager: LocationDataManager
-    //@Binding var vehicles: [AutoVehicle]
     @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[]) var vehicles: FetchedResults<Vehicle>
     @State var vehicle: Vehicle?
     @State var fuelType: FuelTypes = .Gas
@@ -32,81 +31,12 @@ struct SettingsView: View {
                     Picker("Select Vehicle", selection: $vIndex) {
                         List {
                             ForEach(vehicles.indices, id: \.self) { v in
-                                HStack {
-                                    VStack {
-                                        Text(vehicles[v].getVehicleText)
-                                            .frame(alignment: .leading)
-                                            .font(.subheadline)
-                                            .fontWeight(.bold)
-//                                        HStack {
-//                                            Text(vehicles[v].getMake)
-//                                            .frame(alignment: .leading)
-//                                            .font(.subheadline)
-//                                            .fontWeight(.bold)
-//                                            Text( vehicles[v].getModel.replacingOccurrences(of: "_", with: " "))
-//                                        .frame(alignment: .leading)
-//                                        .font(.subheadline)
-//                                        .fontWeight(.bold)
-//                                        }
-                                            
-                                       
-                                       
-                                            //Text(vehicles[v].getMake)
-                                          //Text(vehicles[v].getModel.replacingOccurrences(of: "_", with: " "))
-                                            Text(String(vehicles[v].year))
-                                            .frame(alignment: .leading)
-                                            .font(.system(size: 14))
-                                            .fontWeight(.regular)
-                                        
-                                      
-                                                                              
-                                    }
-                                    Spacer()
-                                    HStack {
-                                       
-                                        Image(systemName: "car.fill")
-                                            .font(.system(size: 20))
-                                            .foregroundStyle(.blue)
-                                        if vehicles[v].getFuelEngine == "Gas" {
-                                           
-                                            Image(systemName: "fuelpump.fill")
-                                                .font(.system(size: 20))
-                                                .foregroundStyle(.yellow)
-                                        }
-                                        else if vehicles[v].getFuelEngine == "EV" {
-                                            
-                                            Image(systemName: "bolt.batteryblock.fill")
-                                                .font(.system(size: 20))
-                                                .foregroundStyle(.green)
-                                            
-                                        }
-                                        else {
-                                            
-                                            Image(systemName: "fuelpump.fill")
-                                                .font(.system(size: 20))
-                                                .foregroundStyle(.yellow)
-                                        
-                                            Image(systemName: "bolt.batteryblock.fill")
-                                                .font(.system(size: 20))
-                                                .foregroundStyle(.green)
-                                        }
-                                      
-                                    }
-                                   
-                                   
-                                
-                                }
-                                
-                            }
-                            .onAppear {
-                                //carText = vehicle.getMake + " " + vehicles[v].getModel.replacingOccurrences(of: "_", with: " ")
+                              VehicleListItem(v: v)
                             }
                         }
-                     
                     }
                     .onChange(of: vIndex) {
                         fuelType = FuelTypes(rawValue: vehicles[vIndex].getFuelEngine) ?? .Gas
-                       // distanceMode = DistanceModes(rawValue: vehicles[vIndex].)
                     }
                     .pickerStyle(.inline)
                 }
@@ -151,15 +81,12 @@ struct SettingsView: View {
                     if fuelType == .Gas && (vehicles[vIndex].getFuelEngine == "Gas" || vehicles[vIndex].getFuelEngine == "Hybrid"){
                         Section(header: Text("Fuel Efficiency Unit")) {
                             if fuelMode == .Litre {
-                                
-                                
                                 if distanceMode == .km {
                                     Picker("Select Unit", selection: $efficiencyMode) {
                                         ForEach(efficiencyModes.indices, id: \.self) {index in
                                             if index < 2 {
                                                 Text(efficiencyModes[index])
                                             }
-                                            
                                         }
                                     }
                                     .pickerStyle(.segmented)
@@ -177,14 +104,12 @@ struct SettingsView: View {
                                 
                             }
                             else if fuelMode == .Gallon {
-                                
                                 if distanceMode == .km {
                                     Picker("Select Unit", selection: $efficiencyMode) {
                                         ForEach(efficiencyModes.indices, id: \.self) { index in
                                             if index > 3 && index < 6 {
                                                 Text(efficiencyModes[index])
                                             }
-                                            
                                         }
                                     }
                                     .pickerStyle(.segmented)
@@ -195,40 +120,20 @@ struct SettingsView: View {
                                             if index > 5 && index < 8 {
                                                 Text(efficiencyModes[index])
                                             }
-                                            
                                         }
                                     }
                                     .pickerStyle(.segmented)
                                 }
-                                
-                                
-                                
                             }
-                           
                         }
                     }
                 }
-               
               
                 VStack {
                     Button {
                        updateActiveVehicle()
-                        
-                        
                     } label: {
-                        HStack {
-                            Spacer()
-                            Image(systemName: "gear.fill")
-                                .foregroundStyle(lightSkyColor)
-                                .font(Font.system(size: 25))
-                            
-                            Text("Save Settings")
-                                .fontWeight(.black)
-                            
-                                .foregroundStyle(lightSkyColor)
-                            Spacer()
-                        }
-                        .frame(height: 40, alignment: .center)
+                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: lightSkyColor)
                     }
                     .background(skyColor)
                     .buttonStyle(BorderlessButtonStyle())
@@ -236,47 +141,14 @@ struct SettingsView: View {
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets())
-                
             }
-            
             .navigationTitle("Settings")
             .toolbar {
                 Button {
                     showAddVehicleForm.toggle()
                 }
-              
             label: {
-                ZStack {
-                    Image(systemName: "car.fill")
-                        .font(Font.system(size:30))
-
-                    VStack {
-                        HStack {
-                            ZStack {
-                                Circle()
-                                 
-                                    .foregroundStyle(Color(UIColor.systemBackground))
-                                  
-                                Image(systemName:"plus.circle.fill")
-                                    .font(Font.system(size:14))
-                                    .fontWeight(.black)
-                            }
-                           
-                                                           
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                        }
-                        HStack {
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                            
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                        }
-                    }
-                                   
-                }
-                //.padding(10)
+             AddCarImage()             
             }
             .sheet(isPresented: $showAddVehicleForm, content: {
                 AddVehicleForm(showAddVehicleForm: $showAddVehicleForm)
@@ -286,24 +158,22 @@ struct SettingsView: View {
         }
         .onAppear{
             getActiveVehicle()
-           
         }
-       
     }
+    
     func getActiveVehicle() {
         if let object = setting.first {
             if let v = object.vehicle {
                 vehicle = v
             }
-           
         }
-      
         if let object = vehicle {
             locationDataManager.odometer = object.odometer
             locationDataManager.trip = object.trip
         }
         vIndex = vehicles.firstIndex(where: {$0.isActive}) ?? vIndex
     }
+    
     func updateActiveVehicle() {
         if !vehicles.isEmpty {
             for i in vehicles.indices {
@@ -313,12 +183,9 @@ struct SettingsView: View {
                 else {
                     vehicles[i].isActive = true
                     vehicle = vehicles[i]
-                  
                     locationDataManager.odometer = vehicles[i].odometer
-                        locationDataManager.trip = vehicles[i].trip
-                    
+                    locationDataManager.trip = vehicles[i].trip
                 }
-               
                 print("given vehicles selected:\n \(vehicles[i].make ?? "") \(vehicles[i].model ?? "") \(vehicles[i].year) \(vehicles[i].getFuelEngine) \(vehicles[i].odometer) \(vehicles[i].trip) \(vehicles[i].isActive)")
             }
             Vehicle.saveContext(viewContext: viewContext)

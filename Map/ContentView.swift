@@ -14,12 +14,8 @@ struct ContentView: View {
     @State var vehicles: [AutoVehicle] = []
     @State var vehicle: AutoVehicle?
     @Environment(\.managedObjectContext) private var viewContext
-//    let request: NSFetchRequest = {
-//        let request = Settings.fetchRequest()
-//        return request
-//    }()
+
     var isEmpty: Bool {
-        //print("requesting")
         do {
             let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Vehicle")
             let count  = try viewContext.count(for: request)
@@ -28,11 +24,9 @@ struct ContentView: View {
             return true
         }
     }
-    //@FetchRequest(entity:Vehicle.entity(), sortDescriptors:[]) var setting: FetchedResults<Vehicle>
 
     var body: some View {
         if isEmpty {
-           // SettingsView(locationDataManager: locationDataManager, vehicles: $vehicles, vehicle: $vehicle)
             InitialSettingsView(locationDataManager: locationDataManager)
         }
         else {
@@ -55,16 +49,14 @@ struct ContentView: View {
                     }
                     .toolbar(localSearch.status != .localSearchCancelled ? .hidden : .visible, for: .tabBar)
             }
-            .onAppear{
+            .onAppear {
                 vehicle = vehicles.first(where: {$0.isActive})
                 if let object = vehicle {
                     locationDataManager.odometer = object.odometer ?? 0
                     locationDataManager.trip = object.trip ?? 0
                 }
-              
             }
         }
-       
     }
 }
 

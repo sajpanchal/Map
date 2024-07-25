@@ -65,17 +65,12 @@ struct AutoStatsView: View {
                     if let vehicle = vehicles.first(where: {$0.isActive}) {
                         Section("Dashboard") {
                             LazyHGrid(rows: rows) {
-                             
                                 DashGridItemView(title: "ODOMETER", foreGroundColor: purpleColor, backGroundColor: lightPurpleColor, numericText: numberFormatter.string(for: vehicle.odometer) ?? "--", unitText: "km", geometricSize: geo.size)
-
                                 DashGridItemView(title: "LAST FUELLING", foreGroundColor: yellowColor, backGroundColor: lightYellowColor, numericText: deciNumberFormatter.string(for: vehicle.getFuellings.first?.volume ?? 0) ?? "--", unitText: "litre", geometricSize: geo.size)
                                 DashGridItemView(title: "FUEL COST", foreGroundColor: orangeColor, backGroundColor: lightOrangeColor, numericText: currencyFormatter.string(for: vehicle.fuelCost) ?? "--", unitText: "Year 2024", geometricSize: geo.size)
-                               
                                 DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: skyColor, backGroundColor: lightSkyColor, numericText:
                                                     deciNumberFormatter.string(for: vehicle.trip) ?? "--", unitText: "km", geometricSize: geo.size)
-
                                 DashGridItemView(title: "MILEAGE", foreGroundColor: greenColor, backGroundColor: lightGreenColor, numericText: deciNumberFormatter.string(for: vehicle.fuelEfficiency) ?? "--", unitText: "km/l", geometricSize: geo.size)
-                               
                                 DashGridItemView(title: "REPAIR COST", foreGroundColor: redColor    , backGroundColor: lightRedColor, numericText: currencyFormatter.string(for: vehicle.serviceCost) ?? "--",  unitText: "Year 2024", geometricSize: geo.size)
                             }
                         }
@@ -91,69 +86,13 @@ struct AutoStatsView: View {
                                 }
                                 .sheet(isPresented: $showFuellingEntryform, content: {
                                     FuellingEntryForm(locationDatamanager: LocationDataManager(), showFuellingEntryform: $showFuellingEntryform)
-                                    //FuellingEntryForm(fuelDataHistory: $fuelDataHistory, showFuellingEntryform: $showFuellingEntryform)
                                 })
                                 ForEach(vehicle.getFuellings, id:\.self.uniqueID) { fuelData in
-                                        Group {
-                                            VStack {
-                                                Text((fuelData.date!.formatted(date: .long, time: .omitted)))
-                                                    .font(.system(size: 15))
-                                                    .fontWeight(.black)
-                                                    .foregroundStyle(redColor)
-                                                   // .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
-                                                    Spacer()
-                                                HStack {
-                                                    VStack {
-                                                        Text("Fuel Station")
-                                                            .font(.system(size: 12, weight: .semibold))
-                                                            .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
-                                                        Text(fuelData.location!)
-                                                            .fontWeight(.bold)
-                                                            .foregroundStyle(skyColor)
-                                                    }
-                                                    .frame(width: 100)
-                                                   
-                                                    Spacer()
-                                                    VStack {
-                                                        Text("Fuel")
-                                                            .font(.system(size: 12, weight: .semibold))
-                                                            .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
-                                                        Text(String(format:"%.2f",fuelData.volume) + " L")
-                                                            .fontWeight(.bold)
-                                                            .foregroundStyle(yellowColor)
-                                                       
-                                             
-                                                    }
-                                                    Spacer()
-                                                    VStack {
-                                                        Text("Cost")
-                                                            .font(.system(size: 12, weight: .semibold))
-                                                            .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
-                                                        Text("$" + String(format:"%.2f",fuelData.cost))
-                                                            .fontWeight(.bold)
-                                                            .foregroundStyle(greenColor)
-                                                    }
-                                                  
-                                                   
-                                                }
-                                               Spacer()
-                                                
-                                                Text("timeStamp: " + fuelData.getTimeStamp)
-                                                    .font(.system(size: 8))
-                                                    .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
-                                            }
-                                            .padding(10)
-                                                .frame(width:geo.size.width - 30)
-                                            Divider()
-                                                .padding(.horizontal,20)
-                                        }
-                                        .onTapGesture {
-                                          
-                                    }
+                                    CustomListView(date: fuelData.date!, text1: ("Fuel Station",fuelData.location!), text2:("Fuel Amount",String(format:"%.2f",fuelData.volume) + "L"), text3: ("Cost","$" + String(format:"%.2f",fuelData.cost)), timeStamp: fuelData.getTimeStamp, width: geo.size.width)
+                                      
                                 }
                             }
                             .frame(width:geo.size.width - 20,height: geo.size.height/1.5)
-                            
                         }
                     header: {
                             VStack {
@@ -170,7 +109,6 @@ struct AutoStatsView: View {
                                         FuelHistoryView(vehicle: vehicle)
                                     })
                                 }
-                                
                             }
                         }
         
@@ -182,52 +120,9 @@ struct AutoStatsView: View {
                                 }
                                 .sheet(isPresented: $showServiceEntryForm, content: {
                                     ServiceEntryForm(showServiceEntryForm: $showServiceEntryForm)
-                                   // ServiceEntryForm(autoServiceHistory: $autoServiceHistory, showServiceEntryForm: $showServiceEntryForm)
                                 })
                                 ForEach(vehicle.getServices, id: \.self.uniqueID) { autoService in
-                                        Group {
-                                            VStack {
-                                                Text(autoService.date!.formatted(date: .long, time: .omitted))
-                                                    .font(.system(size: 15))
-                                                    .fontWeight(.black)
-                                                    .foregroundStyle(redColor)
-                                                Spacer()
-                                                HStack {
-                                                    VStack {
-                                                        Text("Auto Shop")
-                                                            .font(.system(size: 12, weight: .semibold))
-                                                            .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
-                                                        Text(autoService.location!)
-                                                            .fontWeight(.bold)
-                                                            .foregroundStyle(skyColor)
-                                                    }
-                                                   
-                                                    Spacer()
-                                                    VStack {
-                                                        Text("Cost")
-                                                            .font(.system(size: 12, weight: .semibold))
-                                                            .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
-                                                        Text("$" + String(format:"%.2f",autoService.cost))
-                                                            .fontWeight(.bold)
-                                                            .foregroundStyle(greenColor)
-                                                    }
-                                               
-                                                }
-                                               Spacer()
-                                                Text("Created at: " + autoService.getTimeStamp)
-                                                    .font(.system(size: 8))
-                                            }
-                                            .padding(10)
-                                                .frame(width:geo.size.width - 30)
-                                            
-                                          
-                                            Divider()
-                                                .padding(.horizontal,20)
-                                        }
-                                        .onTapGesture {
-                                          
-                                        }
-                                    
+                                    CustomListView(date: autoService.date!, text1: ("Auto Shop",autoService.location!), text2: ("",""), text3: ("Cost","$" + String(format:"%.2f",autoService.cost)), timeStamp: "Created at: " + autoService.getTimeStamp, width: geo.size.width)
                                 }
                             }
                             .frame(width:geo.size.width - 20,height: geo.size.height/1.5)
@@ -247,20 +142,14 @@ struct AutoStatsView: View {
                                         ServiceHistoryView(vehicle: vehicle)
                                     })
                                 }
-                                
                             }
                         }
                     }
-              
-                  //  .background(.green)
                 }
                 .frame(width: geo.size.width, height: geo.size.height - 40)
                 .navigationTitle("Auto Summary")
             }
-          
-           
         }
-        
     }
 }
 

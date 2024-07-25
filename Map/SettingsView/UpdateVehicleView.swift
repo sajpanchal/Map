@@ -227,19 +227,7 @@ struct UpdateVehicleView: View {
                         Vehicle.saveContext(viewContext: viewContext)
                         
                     } label: {
-                        HStack {
-                            Spacer()
-                            Image(systemName: "gear.fill")
-                                .foregroundStyle(lightSkyColor)
-                                .font(Font.system(size: 25))
-                            
-                            Text("Save Settings")
-                                .fontWeight(.black)
-                            
-                                .foregroundStyle(lightSkyColor)
-                            Spacer()
-                        }
-                        .frame(height: 40, alignment: .center)
+                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: lightSkyColor)
                     }
                     .background(skyColor)
                     .buttonStyle(BorderlessButtonStyle())

@@ -68,14 +68,7 @@ struct InitialSettingsView: View {
                             Text(model.rawValue.replacingOccurrences(of: "_", with: " "))
                         }
                         
-                    }
-                    .onChange(of: model) {
-                        // model = vehicleMake.models[index].rawValue
-                        print(model)
-                        for j in vehicleMake.models {
-                            print(index," = ", j )
-                        }
-                    }
+                    }                   
                     .pickerStyle(.wheel)
                 }
                 Section("Manufacuring Year") {
@@ -106,19 +99,14 @@ struct InitialSettingsView: View {
                     TextField("Enter the Trip readings", text: $trip)
                         .keyboardType(.decimalPad)
                 }
-
-
-                    Section(header: Text("Fuel Type")) {
-                     
-                            Picker("Fuel", selection: $fuelType) {
-                                ForEach(FuelTypes.allCases) { type in
-                                    Text(type.rawValue.capitalized)
-                                }
-                            }
-                            .pickerStyle(.segmented)
+                Section(header: Text("Fuel Type")) {
+                    Picker("Fuel", selection: $fuelType) {
+                        ForEach(FuelTypes.allCases) { type in
+                            Text(type.rawValue.capitalized)
+                        }
+                    }
+                    .pickerStyle(.segmented)
                 }
-               
-                
                 Section(header: Text("Distance Unit")) {
                     Picker("Select Unit", selection: $distanceMode) {
                         ForEach(DistanceModes.allCases) { unit in
@@ -141,8 +129,6 @@ struct InitialSettingsView: View {
                     if fuelType == .Gas {
                         Section(header: Text("Fuel Efficiency Unit")) {
                             if fuelMode == .Litre {
-                                
-                                
                                 if distanceMode == .km {
                                     Picker("Select Unit", selection: $efficiencyMode) {
                                         ForEach(efficiencyModes.indices, id: \.self) {index in
@@ -190,19 +176,11 @@ struct InitialSettingsView: View {
                                     }
                                     .pickerStyle(.segmented)
                                 }
-                                
-                                
-                                
                             }
-                           
                         }
                     }
-                
-               
-              
                 VStack {
                     Button {
-                       //updateActiveVehicle()
                     let settings = Settings(context: viewContext)
                         let vehicle = Vehicle(context: viewContext)
                         vehicle.uniqueID = UUID()
@@ -224,19 +202,7 @@ struct InitialSettingsView: View {
                         Vehicle.saveContext(viewContext: viewContext)
                         
                     } label: {
-                        HStack {
-                            Spacer()
-                            Image(systemName: "gear.fill")
-                                .foregroundStyle(lightSkyColor)
-                                .font(Font.system(size: 25))
-                            
-                            Text("Save Settings")
-                                .fontWeight(.black)
-                            
-                                .foregroundStyle(lightSkyColor)
-                            Spacer()
-                        }
-                        .frame(height: 40, alignment: .center)
+                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: lightSkyColor)
                     }
                     .background(skyColor)
                     .buttonStyle(BorderlessButtonStyle())
@@ -246,51 +212,7 @@ struct InitialSettingsView: View {
                 .listRowInsets(EdgeInsets())
                 
             }
-            
             .navigationTitle("Settings")
-         /*   .toolbar {
-                Button {
-                    showAddVehicleForm.toggle()
-                }
-              
-            label: {
-                ZStack {
-                    Image(systemName: "car.fill")
-                        .font(Font.system(size:30))
-
-                    VStack {
-                        HStack {
-                            ZStack {
-                                Circle()
-                                 
-                                    .foregroundStyle(Color(UIColor.systemBackground))
-                                  
-                                Image(systemName:"plus.circle.fill")
-                                    .font(Font.system(size:14))
-                                    .fontWeight(.black)
-                            }
-                           
-                                                           
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                        }
-                        HStack {
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                            
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                        }
-                    }
-                                   
-                }
-                //.padding(10)
-            }
-            .sheet(isPresented: $showAddVehicleForm, content: {
-              //  AddVehicleForm(vehicles: $vehicles)
-            })
-            .padding(.top, 10)
-            }*/
         }
     }
 }
