@@ -16,22 +16,15 @@ struct GarageView: View {
     var body: some View {
         List {
             ForEach(vehicles, id: \.self.uniqueID) { vehicle in
-                
                 NavigationLink(destination: UpdateVehicleView(locationDataManager: locationDataManager, settings: setting.first!, vehicle: vehicle), label: {
                     VehicleListItem(v: vehicles.firstIndex(of: vehicle) ?? 0)
-                
              })
-                
-             
-                
             }
             .onDelete(perform: { indexSet in
                 for i in indexSet {
                     let vehicle = vehicles[i]
                     viewContext.delete(vehicle)
                     Vehicle.saveContext(viewContext: viewContext)
-                
-                    
                 }
             })
         }

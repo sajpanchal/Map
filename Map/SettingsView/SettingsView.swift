@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @State var vIndex = 0
+
     @Environment(\.managedObjectContext) private var viewContext
-    @StateObject var locationDataManager: LocationDataManager
+    @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var setting: FetchedResults<Settings>
     @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[]) var vehicles: FetchedResults<Vehicle>
+    @StateObject var locationDataManager: LocationDataManager
+    @State var vIndex = 0
     @State var vehicle: Vehicle?
     @State var fuelType: FuelTypes = .Gas
     @State var distanceMode: DistanceModes = .km
@@ -22,7 +24,7 @@ struct SettingsView: View {
     @State var carText = ""
     var skyColor = Color(red:0.031, green:0.739, blue:0.861)
     var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
-    @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var setting: FetchedResults<Settings>
+ 
     var body: some View {
         NavigationStack {
             Form {
@@ -57,8 +59,6 @@ struct SettingsView: View {
                         }
                     }
                 }
-               
-                
                 Section(header: Text("Distance Unit")) {
                     Picker("Select Unit", selection: $distanceMode) {
                         ForEach(DistanceModes.allCases) { unit in
@@ -128,7 +128,6 @@ struct SettingsView: View {
                         }
                     }
                 }
-              
                 VStack {
                     Button {
                        updateActiveVehicle()
@@ -185,8 +184,7 @@ struct SettingsView: View {
                     vehicle = vehicles[i]
                     locationDataManager.odometer = vehicles[i].odometer
                     locationDataManager.trip = vehicles[i].trip
-                }
-                print("given vehicles selected:\n \(vehicles[i].make ?? "") \(vehicles[i].model ?? "") \(vehicles[i].year) \(vehicles[i].getFuelEngine) \(vehicles[i].odometer) \(vehicles[i].trip) \(vehicles[i].isActive)")
+                }                
             }
             Vehicle.saveContext(viewContext: viewContext)
           

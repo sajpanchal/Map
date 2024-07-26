@@ -19,10 +19,12 @@ struct AddVehicleForm: View {
     @State var fuelType = FuelTypes.Gas
     @State var odometer = "0"
     @State var trip = "0.0"
-    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
-    var lightGreenColor = Color(red: 0.723, green: 1.0, blue: 0.856)
     @State var vehicle: AutoVehicle?
     @Binding var showAddVehicleForm: Bool
+    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
+    var lightGreenColor = Color(red: 0.723, green: 1.0, blue: 0.856)
+   
+    
     var body: some View {
         NavigationStack {
             Form {
@@ -43,7 +45,6 @@ struct AddVehicleForm: View {
                         .onChange(of:$alphabet.id) {
                             model = alphabet.makes.first!.models.first!
                             vehicleMake = alphabet.makes.first!
-                            print(model)
                         }
                         .pickerStyle(.wheel)
                         Picker("", selection:$vehicleMake) {
@@ -51,7 +52,6 @@ struct AddVehicleForm: View {
                                 Text(make.rawValue)
                             }
                         }
-                        
                         .pickerStyle(.wheel)
                     }
                 }
@@ -59,14 +59,6 @@ struct AddVehicleForm: View {
                     Picker("Select Model", selection: $model) {
                         ForEach(vehicleMake.models, id: \.id) { model in
                             Text(model.rawValue.replacingOccurrences(of: "_", with: " "))
-                        }
-                        
-                    }
-                    .onChange(of: model) {
-                        // model = vehicleMake.models[index].rawValue
-                        print(model)
-                        for j in vehicleMake.models {
-                            print(index," = ", j )
                         }
                     }
                     .pickerStyle(.wheel)
@@ -76,10 +68,6 @@ struct AddVehicleForm: View {
                         ForEach(range.reversed(), id: \.self) { i in
                             Text(String(i))
                         }
-                    }
-                    .onChange(of:year) {
-                        print(index)
-                        print(year)
                     }
                     .pickerStyle(.wheel)
                 }
@@ -101,9 +89,7 @@ struct AddVehicleForm: View {
                 }
                 VStack {
                     Button {
-                       
                        addVehicle()
-                      
                    
                     } label: {
                         FormButton(imageName: "car.fill", text: "Add Vehicle", color: lightGreenColor)
@@ -129,12 +115,7 @@ struct AddVehicleForm: View {
         vehicle.year = Int16(year)
         vehicle.odometer = Double(odometer) ?? 0
         vehicle.trip = Double(trip) ?? 0
-        print("---------new vehicle added-------")
-        print(vehicle.uniqueID ?? "")
-        print(vehicle.fuelEngine ?? "")
-        print(vehicle.make ?? "")
-        print(vehicle.model ?? "")
-        print(vehicle.type ?? "")
+        
         showAddVehicleForm = false
        
         Vehicle.saveContext(viewContext: viewContext)
