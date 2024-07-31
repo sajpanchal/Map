@@ -182,6 +182,7 @@ struct SettingsView: View {
                 else {
                     vehicles[i].isActive = true
                     vehicle = vehicles[i]
+                    locationDataManager.index = i
                     locationDataManager.odometer = vehicles[i].odometer
                     locationDataManager.trip = vehicles[i].trip
                 }                

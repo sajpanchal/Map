@@ -23,41 +23,43 @@ struct ServiceHistoryView: View {
         NavigationStack {
           
             List {
+               
                 ForEach(vehicle.getServices, id: \.self.uniqueID) { autoService in
-                        Group {
-                            VStack {
-                                Text(autoService.date!.formatted(date: .long, time: .omitted))
-                                    .font(.system(size: 15))
-                                    .fontWeight(.black)
-                                    .foregroundStyle(redColor)
-                                Spacer()
-                                HStack {
-                                    VStack {
-                                        Text("Auto Shop")
-                                            .font(.system(size: 12, weight: .semibold))
-                                            .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
-                                        Text(autoService.location!)
-                                            .fontWeight(.bold)
-                                            .foregroundStyle(skyColor)
-                                    }
-                                   
-                                    Spacer()
-                                    VStack {
-                                        Text("Cost")
-                                            .font(.system(size: 12, weight: .semibold))
-                                            .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
-                                        Text("$" + String(format:"%.2f",autoService.cost))
-                                            .fontWeight(.bold)
-                                            .foregroundStyle(greenColor)
-                                    }
-                               
+                    NavigationLink(destination: UpdateServiceEntry(serviceEntry: autoService), label:  {
+                        VStack {
+                            Text(autoService.date!.formatted(date: .long, time: .omitted))
+                                .font(.system(size: 15))
+                                .fontWeight(.black)
+                                .foregroundStyle(redColor)
+                            Spacer()
+                            HStack {
+                                VStack {
+                                    Text("Auto Shop")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
+                                    Text(autoService.location!)
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(skyColor)
                                 }
-                               Spacer()
-                                Text("Created at: " + autoService.getTimeStamp)
-                                    .font(.system(size: 8))
+                               
+                                Spacer()
+                                VStack {
+                                    Text("Cost")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
+                                    Text("$" + String(format:"%.2f",autoService.cost))
+                                        .fontWeight(.bold)
+                                        .foregroundStyle(greenColor)
+                                }
+                           
                             }
-                            .padding(10)
+                           Spacer()
+                            Text("Created at: " + autoService.getTimeStamp)
+                                .font(.system(size: 8))
                         }
+                        .padding(10)
+                    })
+                      
                 }
                 .onDelete { indexSet in
                     for i in indexSet {

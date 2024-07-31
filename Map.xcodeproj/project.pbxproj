@@ -10,6 +10,8 @@
 		72053A872A951D5000B1D3FC /* AddressListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72053A862A951D5000B1D3FC /* AddressListView.swift */; };
 		7218C7852C04D95A00986B0B /* ExpandDirectionsViewSymbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7218C7842C04D95A00986B0B /* ExpandDirectionsViewSymbol.swift */; };
 		721C11822C3495DB00272F31 /* AddVehicleForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721C11812C3495DB00272F31 /* AddVehicleForm.swift */; };
+		721E4BA32C569E9200C3C769 /* UpdateServiceEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721E4BA22C569E9200C3C769 /* UpdateServiceEntry.swift */; };
+		721E4BA52C569EED00C3C769 /* UpdateFuelEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721E4BA42C569EED00C3C769 /* UpdateFuelEntry.swift */; };
 		7222C2282C1C98F30029E26F /* InteractionFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7222C2272C1C98F30029E26F /* InteractionFooterView.swift */; };
 		7222C22A2C1C9D040029E26F /* AddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7222C2292C1C9D040029E26F /* AddressView.swift */; };
 		7223439C2A8FD61F00DC7120 /* MapViewButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7223439B2A8FD61E00DC7120 /* MapViewButton.swift */; };
@@ -94,6 +96,8 @@
 		72053A862A951D5000B1D3FC /* AddressListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressListView.swift; sourceTree = "<group>"; };
 		7218C7842C04D95A00986B0B /* ExpandDirectionsViewSymbol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandDirectionsViewSymbol.swift; sourceTree = "<group>"; };
 		721C11812C3495DB00272F31 /* AddVehicleForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddVehicleForm.swift; sourceTree = "<group>"; };
+		721E4BA22C569E9200C3C769 /* UpdateServiceEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateServiceEntry.swift; sourceTree = "<group>"; };
+		721E4BA42C569EED00C3C769 /* UpdateFuelEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateFuelEntry.swift; sourceTree = "<group>"; };
 		7222C2272C1C98F30029E26F /* InteractionFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionFooterView.swift; sourceTree = "<group>"; };
 		7222C2292C1C9D040029E26F /* AddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressView.swift; sourceTree = "<group>"; };
 		7223439B2A8FD61E00DC7120 /* MapViewButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewButton.swift; sourceTree = "<group>"; };
@@ -346,6 +350,8 @@
 				725110712C25CCA900822837 /* DashGridItemView.swift */,
 				7246B2122C27284A00086BFB /* FuellingEntryForm.swift */,
 				72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */,
+				721E4BA22C569E9200C3C769 /* UpdateServiceEntry.swift */,
+				721E4BA42C569EED00C3C769 /* UpdateFuelEntry.swift */,
 			);
 			path = AutoStatsView;
 			sourceTree = "<group>";
@@ -511,6 +517,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				721C11822C3495DB00272F31 /* AddVehicleForm.swift in Sources */,
+				721E4BA52C569EED00C3C769 /* UpdateFuelEntry.swift in Sources */,
 				7223439E2A8FD6ED00DC7120 /* MapProgressView.swift in Sources */,
 				726754252A7C004000CE6F46 /* ContentView.swift in Sources */,
 				72EDE4142B2631D800578B8A /* DirectionHeaderView.swift in Sources */,
@@ -535,6 +542,7 @@
 				72C226272C2C6D8600E51D9E /* Settings.swift in Sources */,
 				7286A14B2C24948100333A4F /* ServiceHistoryView.swift in Sources */,
 				72EDE4192B26372D00578B8A /* MapInteractionsView.swift in Sources */,
+				721E4BA32C569E9200C3C769 /* UpdateServiceEntry.swift in Sources */,
 				7223439C2A8FD61F00DC7120 /* MapViewButton.swift in Sources */,
 				725EF4E02A91089B000FB0E1 /* MapUIViewAPI.swift in Sources */,
 				72928F9B2C481548007ED736 /* GarageView.swift in Sources */,
@@ -748,7 +756,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MyMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -786,7 +794,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MyMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

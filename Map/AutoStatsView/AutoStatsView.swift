@@ -8,15 +8,17 @@
 import SwiftUI
 
 struct AutoStatsView: View {
+    @Environment (\.colorScheme) var bgMode: ColorScheme
+    @StateObject var locationDataManager: LocationDataManager
+    @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
+    
     let rows = [GridItem(spacing: 10, alignment: .topLeading), GridItem(spacing: 10, alignment: .topLeading), GridItem(spacing: 10, alignment: .topLeading)]
     @State var showFuelHistoryView = false
     @State var showServiceHistoryView = false
     @State var showFuellingEntryform = false
     @State var showServiceEntryForm = false
 
-    @Environment (\.colorScheme) var bgMode: ColorScheme
-    @StateObject var locationDataManager: LocationDataManager
-    @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
+  
     var redColor = Color(red:0.861, green: 0.194, blue:0.0)
     var lightRedColor = Color(red:1.0, green:0.654, blue:0.663)
     

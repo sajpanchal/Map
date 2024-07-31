@@ -23,7 +23,7 @@ struct FuelHistoryView: View {
         NavigationStack {
             List {
                 ForEach(vehicle.getFuellings, id:\.self.uniqueID) { fuelData in
-                        Group {
+                    NavigationLink(destination: UpdateFuelEntry(fuelEntry: fuelData), label: {
                             VStack {
                                 Text((fuelData.date!.formatted(date: .long, time: .omitted)))
                                     .font(.system(size: 15))
@@ -72,10 +72,10 @@ struct FuelHistoryView: View {
                                     .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                             }
                             .padding(10)
-                        }
-                        .onTapGesture {
+                        })
                           
-                    }
+                        
+                      
                 }
                 .onDelete { indexSet in
                     for i in indexSet {

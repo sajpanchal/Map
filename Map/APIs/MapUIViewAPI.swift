@@ -227,9 +227,14 @@ class MapViewAPI {
         ///redundantly setting up mapview status to navigating mode to make sure no misteps.
         parent.mapViewStatus = .navigating
         ///method that will get the ETA to the given destintion coordinates.
-        guard let targetLocation = parent.localSearch.suggestedLocations!.count > 2 ? parent.tappedAnnotation : parent.localSearch.suggestedLocations?.first else {
+        guard let targetLocation = parent.tappedAnnotation != nil ? parent.tappedAnnotation : parent.localSearch.suggestedLocations?.first else {
           return
         }
+        if parent.tappedAnnotation != nil {
+            print(parent.tappedAnnotation?.title, "is not nil")
+        }
+        print(targetLocation.title)
+        
         getETA(to: targetLocation.coordinate, in: &parent, with: mapView)
         ///if there is any route available then get the first one otherwise exit the fuction.
         guard let route = getSelectedRoute(for: mapView) else {
@@ -704,6 +709,7 @@ extension MapViewAPI {
         ///create an instance of MKDirections request to request the directions.
         let request = MKDirections.Request()
         ///if distination is not nil
+      
         guard let destination = destination else {
         return
         }
@@ -941,7 +947,8 @@ extension MapViewAPI {
                                 ///remove all annotations.
                               ///  mapView.removeAnnotations(mapView.annotations)
                                 ///method to perform re-routing to the current destination.
-                                reRoutetoDestination(in: mapView, from: parent.locationDataManager.userlocation!.coordinate, to: parent.localSearch.suggestedLocations!.first!.coordinate, parent: &parent)
+                                let targetLocation = parent.tappedAnnotation != nil ? parent.tappedAnnotation?.coordinate : parent.localSearch.suggestedLocations?.first?.coordinate
+                                reRoutetoDestination(in: mapView, from: parent.locationDataManager.userlocation!.coordinate, to: targetLocation, parent: &parent)
                                 return
                             }
                             comment = "Step #\(currentStep) | dist = \(currentDist - prevDist)) | \(polylinePoints.count)"

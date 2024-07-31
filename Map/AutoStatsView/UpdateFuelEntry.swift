@@ -1,28 +1,28 @@
 //
-//  FuellingEntryForm.swift
+//  UpdateFuelEntry.swift
 //  Map
 //
-//  Created by saj panchal on 2024-06-22.
+//  Created by saj panchal on 2024-07-28.
 //
 
 import SwiftUI
 
-struct FuellingEntryForm: View {
+struct UpdateFuelEntry: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
-    @StateObject var locationDatamanager: LocationDataManager
+    @FetchRequest(entity: AutoFuelling.entity(), sortDescriptors: []) var fuelEntries: FetchedResults<AutoFuelling>
+    //@StateObject var locationDatamanager: LocationDataManager
     
     @State var location = ""
     @State var amount = ""
     @State var cost = ""
     @State var date: Date = Date()
     @State var isTapped = false
-    
-    @Binding var showFuellingEntryform: Bool
+    var fuelEntry: AutoFuelling
+
     
     var yellowColor = Color(red:0.975, green: 0.646, blue: 0.207)
     var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.781)
-    
     var body: some View {
         NavigationStack {
             Form {
@@ -99,9 +99,9 @@ struct FuellingEntryForm: View {
                                 }
                             }
                             isTapped = true
-                            showFuellingEntryform = !isTextFieldEntryValid()
+                         
                         } label: {
-                            FormButton(imageName: "plus.square.fill", text: "Add Entry", color: lightYellowColor)
+                            FormButton(imageName: "plus.square.fill", text: "Update Entry", color: lightYellowColor)
                         }
                         .background(yellowColor)
                         .buttonStyle(BorderlessButtonStyle())
@@ -111,8 +111,21 @@ struct FuellingEntryForm: View {
                     .listRowInsets(EdgeInsets())
                 }
             }
-            .navigationTitle("Add Fuelling Entry")
+            .navigationTitle("Update Fuelling Entry")
         }
+        .onAppear(perform: {
+            location = fuelEntry.location ?? ""
+            amount = String(fuelEntry.volume)
+            cost = String(fuelEntry.cost)
+            date = fuelEntry.date ?? Date()
+            for fuel in fuelEntries {
+                print("--------------------")
+                print(fuel.cost)
+                print(fuel.lasttrip)
+                print(fuel.volume)
+                print(fuel.vehicle?.getVehicleText)
+            }
+        })
     }
     func isTextFieldEntryValid() -> Bool {
         if location.isEmpty || amount.isEmpty || cost.isEmpty {
@@ -126,23 +139,24 @@ struct FuellingEntryForm: View {
         }
         return true
     }
-    
     func addFuellingEntry(for vehicle: Vehicle, at index: Int?) {
-        let fuelling = AutoFuelling(context: viewContext)
-        fuelling.uniqueID = UUID()
-        fuelling.cost = Double(cost) ?? 0
-        fuelling.date = date
-        fuelling.timeStamp = Date()
-        fuelling.location = location
-        fuelling.lasttrip = index != nil ? vehicles[index!].trip : 0.0
-        fuelling.volume = Double(amount) ?? 0
-        vehicle.addToFuellings(fuelling)
+        if let i = fuelEntries.firstIndex(where: {$0.uniqueID == fuelEntry.uniqueID && $0.vehicle == vehicle}) {           
+            fuelEntries[i].cost = Double(cost) ?? 0
+            fuelEntries[i].date = date
+            fuelEntries[i].timeStamp = Date()
+            fuelEntries[i].location = location
+            fuelEntries[i].lasttrip = index != nil ? vehicles[index!].trip : 0.0
+            fuelEntries[i].volume = Double(amount) ?? 0
+        }
+       // AutoFuelling.
+        Vehicle.saveContext(viewContext: viewContext)
+        
     }
     
     func resetTripData(at index: Int) {
         vehicles[index].fuelCost = 0
-        locationDatamanager.trip = 0.00
-        vehicles[index].trip = 0
+       // locationDatamanager.trip = 0.00
+        //vehicles[index].trip = 0
     }
     func calculateFuelCost(for vehicle: Vehicle, at index: Int) {
         for fuel in vehicle.getFuellings {
@@ -164,7 +178,6 @@ struct FuellingEntryForm: View {
     }
 }
 
-
 #Preview {
-    FuellingEntryForm(locationDatamanager: LocationDataManager(), showFuellingEntryform: .constant(false))
+    UpdateFuelEntry( fuelEntry: AutoFuelling())
 }
