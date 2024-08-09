@@ -21,8 +21,8 @@ struct UpdateFuelEntry: View {
     var fuelEntry: AutoFuelling
 
     
-    var yellowColor = Color(red:0.975, green: 0.646, blue: 0.207)
-    var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.781)
+    var yellowColor = Color(red:1.0, green: 0.80, blue: 0.0)
+    var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.84)
     var body: some View {
         NavigationStack {
             Form {
@@ -118,13 +118,6 @@ struct UpdateFuelEntry: View {
             amount = String(fuelEntry.volume)
             cost = String(fuelEntry.cost)
             date = fuelEntry.date ?? Date()
-            for fuel in fuelEntries {
-                print("--------------------")
-                print(fuel.cost)
-                print(fuel.lasttrip)
-                print(fuel.volume)
-                print(fuel.vehicle?.getVehicleText)
-            }
         })
     }
     func isTextFieldEntryValid() -> Bool {

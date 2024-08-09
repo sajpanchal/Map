@@ -16,8 +16,8 @@ struct FuelHistoryView: View {
     var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
     var redColor = Color(red:0.861, green: 0.194, blue:0.0)
     var lightRedColor = Color(red:1.0, green:0.654, blue:0.663)
-    var yellowColor = Color(red:0.975, green: 0.646, blue: 0.207)
-    var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.781)
+    var yellowColor = Color(red:1.0, green: 0.80, blue: 0.0)
+    var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.84)
     var vehicle: Vehicle
     var body: some View {
         NavigationStack {
@@ -26,10 +26,9 @@ struct FuelHistoryView: View {
                     NavigationLink(destination: UpdateFuelEntry(fuelEntry: fuelData), label: {
                             VStack {
                                 Text((fuelData.date!.formatted(date: .long, time: .omitted)))
-                                    .font(.system(size: 15))
+                                    .font(.system(size: 14))
                                     .fontWeight(.black)
-                                    .foregroundStyle(redColor)
-                                   // .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
+                                    .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                                     Spacer()
                                 HStack {
                                     VStack {
@@ -37,18 +36,19 @@ struct FuelHistoryView: View {
                                             .font(.system(size: 12, weight: .semibold))
                                             .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                                         Text(fuelData.location!)
-                                            .fontWeight(.bold)
-                                            .foregroundStyle(skyColor)
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundStyle(redColor)
+                                           
                                     }
                                     .frame(width: 100)
                                    
                                     Spacer()
                                     VStack {
-                                        Text("Fuel")
+                                        Text("Volume")
                                             .font(.system(size: 12, weight: .semibold))
                                             .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                                         Text(String(format:"%.2f",fuelData.volume) + " L")
-                                            .fontWeight(.bold)
+                                            .font(.system(size: 16, weight: .bold))
                                             .foregroundStyle(yellowColor)
                                        
                              
@@ -59,19 +59,26 @@ struct FuelHistoryView: View {
                                             .font(.system(size: 12, weight: .semibold))
                                             .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                                         Text("$" + String(format:"%.2f",fuelData.cost))
-                                            .fontWeight(.bold)
+                                            .font(.system(size: 16, weight: .bold))
                                             .foregroundStyle(greenColor)
                                     }
-                                  
-                                   
                                 }
-                               Spacer()
-                                
-                                Text("timeStamp: " + fuelData.getTimeStamp)
+                                Spacer()
+                                HStack {
+                                    Text("Trip Summary")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
+                                    Text(String(format:"%.2f",fuelData.lasttrip) + " km")
+                                        .font(.system(size: 16, weight: .bold))
+                                        .foregroundStyle(skyColor)
+                                }
+                                Spacer()
+                                Text("updated on: " + fuelData.getTimeStamp)
                                     .font(.system(size: 8))
                                     .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                             }
-                            .padding(10)
+                            .padding(.horizontal,10)
+                            .padding(.vertical, 5)
                         })
                           
                         

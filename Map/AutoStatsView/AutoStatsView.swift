@@ -26,13 +26,13 @@ struct AutoStatsView: View {
     var lightGreenColor = Color(red: 0.723, green: 1.0, blue: 0.856)
     
     var orangeColor = Color(red: 0.975, green: 0.505, blue: 0.076)
-    var lightOrangeColor = Color(red: 0.904, green: 0.808, blue: 0.827)
+    var lightOrangeColor = Color(red: 1.0, green: 0.85, blue: 0.7)
     
     var skyColor = Color(red:0.031, green:0.739, blue:0.861)
     var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
     
-    var yellowColor = Color(red:0.975, green: 0.646, blue: 0.207)
-    var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.781)
+    var yellowColor = Color(red:1.0, green: 0.80, blue: 0.0)
+    var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.84)
     
     var purpleColor = Color(red: 0.396, green: 0.381, blue: 0.905)
     var lightPurpleColor = Color(red:0.725,green:0.721, blue:1.0)
@@ -90,11 +90,14 @@ struct AutoStatsView: View {
                                     FuellingEntryForm(locationDatamanager: LocationDataManager(), showFuellingEntryform: $showFuellingEntryform)
                                 })
                                 ForEach(vehicle.getFuellings, id:\.self.uniqueID) { fuelData in
-                                    CustomListView(date: fuelData.date!, text1: ("Fuel Station",fuelData.location!), text2:("Fuel Amount",String(format:"%.2f",fuelData.volume) + "L"), text3: ("Cost","$" + String(format:"%.2f",fuelData.cost)), timeStamp: fuelData.getTimeStamp, width: geo.size.width)
+                                    if vehicle.getFuellings.firstIndex(of: fuelData)! <= 2 {
+                                        CustomListView(date: fuelData.date!, text1: ("Fuel Station",fuelData.location!), text2:("Volume",String(format:"%.2f",fuelData.volume) + "L"), text3: ("Cost","$" + String(format:"%.2f",fuelData.cost)), text4: String(format:"%.1f", fuelData.lasttrip) + " km", timeStamp: "Updated on: " + fuelData.getTimeStamp, width: geo.size.width)
+                                    }
+                                 
                                       
                                 }
                             }
-                            .frame(width:geo.size.width - 20,height: geo.size.height/1.5)
+                            .frame(width:geo.size.width - 20,height: geo.size.height/1.25)
                         }
                     header: {
                             VStack {
@@ -124,7 +127,9 @@ struct AutoStatsView: View {
                                     ServiceEntryForm(showServiceEntryForm: $showServiceEntryForm)
                                 })
                                 ForEach(vehicle.getServices, id: \.self.uniqueID) { autoService in
-                                    CustomListView(date: autoService.date!, text1: ("Auto Shop",autoService.location!), text2: ("",""), text3: ("Cost","$" + String(format:"%.2f",autoService.cost)), timeStamp: "Created at: " + autoService.getTimeStamp, width: geo.size.width)
+                                    if vehicle.getServices.firstIndex(of: autoService)! <= 2 {
+                                        CustomListView(date: autoService.date!, text1: ("Auto Shop",autoService.location!), text2: ("",""), text3: ("Cost","$" + String(format:"%.2f",autoService.cost)), text4: "", timeStamp: "Updated on: " + autoService.getTimeStamp, width: geo.size.width)
+                                    }
                                 }
                             }
                             .frame(width:geo.size.width - 20,height: geo.size.height/1.5)

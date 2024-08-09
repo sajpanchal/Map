@@ -184,8 +184,8 @@ struct InitialSettingsView: View {
             .navigationTitle("Settings")
         }
     }
+    
     func addVehicle(for vehicle: Vehicle) {
-        
         vehicle.uniqueID = UUID()
         vehicle.model = model.rawValue
         vehicle.make = vehicleMake.rawValue
@@ -197,6 +197,7 @@ struct InitialSettingsView: View {
         vehicle.isActive = true
         Vehicle.saveContext(viewContext: viewContext)
     }
+    
     func saveSettings(for vehicle: Vehicle) {
         let settings = Settings(context: viewContext)
         settings.vehicle = vehicle

@@ -20,12 +20,7 @@ struct ServiceEntryForm: View {
     @Binding var showServiceEntryForm: Bool
     var redColor = Color(red:0.861, green: 0.194, blue:0.0)
     var lightRedColor = Color(red:1.0, green:0.654, blue:0.663)
-    enum ServiceTypes: String, CaseIterable, Identifiable {
-        case service, repair, bodyWork, wash
-        var id: Self {
-            self
-        }
-    }
+   
     var body: some View {
         NavigationStack {
             Form {
@@ -90,45 +85,48 @@ struct ServiceEntryForm: View {
                         Button {
                             if isTextFieldEntryValid() {
                                 let service = AutoService(context: viewContext)
-                                service.uniqueID = UUID()
-                                service.cost = Double(cost) ?? 0
-                                service.details = description
-                                service.location = location
-                                service.type = type.rawValue.capitalized
-                                service.date = date
-                                service.timeStamp = Date()
-                
+                                addServiceEntry(service: service)
                                 vehicle.addToServices(service)
-                                if  let i = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
-                         
-                                    vehicles[i].serviceCost = 0
-                                    for service in vehicle.getServices {
-                                        vehicles[i].serviceCost += service.cost
-                                }
-                                    Vehicle.saveContext(viewContext: viewContext)
-                                }
+                                aggregateServiceCost(for: vehicle)
                             }
-                       
-                            isButtonTapped = true
-                          
-                         showServiceEntryForm = !isTextFieldEntryValid()
+                        isButtonTapped = true
+                        showServiceEntryForm = !isTextFieldEntryValid()
                         } label: {
                             FormButton(imageName: "plus.square.fill", text: "Add Entry", color: lightRedColor)
                         }
                         .background(redColor)
                         .buttonStyle(BorderlessButtonStyle())
                         .cornerRadius(100)
-                        
                     }
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets())
                 }
-               
-                
             }
             .navigationTitle("Add Auto Service")
         }
     }
+    
+    func addServiceEntry(service: AutoService) {
+        service.uniqueID = UUID()
+        service.cost = Double(cost) ?? 0
+        service.details = description
+        service.location = location
+        service.type = type.rawValue.capitalized
+        service.date = date
+        service.timeStamp = Date()
+        Vehicle.saveContext(viewContext: viewContext)
+    }
+    
+    func aggregateServiceCost(for vehicle: Vehicle) {
+        if  let i = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
+            vehicles[i].serviceCost = 0
+            for service in vehicle.getServices {
+                vehicles[i].serviceCost += service.cost
+        }
+            Vehicle.saveContext(viewContext: viewContext)
+        }
+    }
+    
     func isTextFieldEntryValid() -> Bool {
         if location.isEmpty || cost.isEmpty {
             return false

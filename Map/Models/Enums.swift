@@ -32,6 +32,12 @@ enum LocalSearchStatus {
     case showingNearbyLocations
     case searchBarActive
 }
+enum ServiceTypes: String, CaseIterable, Identifiable {
+    case service, repair, bodyWork, wash
+    var id: Self {
+        self
+    }
+}
 enum VehicleTypes: String, CaseIterable, Identifiable {
     case Car
     case SUV
@@ -82,6 +88,10 @@ enum Model: String, CaseIterable, Identifiable {
     case Pantera
     case _206
     case Pacer
+    case MK4_Roadster
+    case pickup
+    case _275, _296_GTB, _296_GTS, _328, _348, _355_F1, _355_Spider, _360, _360_Challenge_Stradale, _365_GT, _456, _458, _458_Italia, _458_Spider, _488, _488_GTB, _488_Pista, _488_Pista_Spider, _488_Spider, _512, _550, _575, _575M_Maranello, _599, _612, _812_GTS, _812_Superfast, _California, _California_T, F12_belinetta, _F12_TDF, F355, F430, F430_Spider, F512M, F8_Spider, F8_Triduto, FF, GTC4_Lusso, Mondial, Portfino, Portfino_M, Roma, SF90_Spider, SF90_Stradale, Testarossa
+    case _124, _124_Spider, _500, _500_Abarth, _500E
     var id: Self {
         self
     }
@@ -95,12 +105,11 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     case Bentley, BMW, Bradley, BrightDrop, Bugatti, Buick
     case Cadillac, Caterham, Chevrolet, Chrysler, Citroen, Cord
     case Daihatsu, Dailmler, Datsun, De_Soto, De_Tomaso, Divco, Dodge
-    case Eagle, Edsel
+    case Eagle, Edsel, Excalibur
+    case Factory_Five_Racing, Fargo, Farrari
     case Honda
-    case Excalibur
+    case Fiat
     
-//    case Farrari
-//    case Fiat
     var models: [Model] {
         switch self {
         case .AC:
@@ -185,10 +194,15 @@ enum VehicleMake: String, CaseIterable, Identifiable {
             return[.Civic, .Civic_Coupe, .Civic_del_Sol, .Civic_Hatchback, .Civic_Sedan, .Civic_Sedan_EX, .Civic_Sedan_LX, .Civic_Type_R, .Other]
        case .Excalibur:
             return [.Phaeton, .Roadster, .Other]
-//        case .Farrari:
-//            return [("250", UUID()), ("275", UUID())]
-//        case .Fiat:
-//            return [("124", UUID()), ("Spider", UUID())]
+        case .Factory_Five_Racing:
+            return [.MK4_Roadster, .Other]
+        case .Fargo:
+            return [.pickup, .Other]
+            
+        case .Farrari:
+            return [._250,._275, ._296_GTB, ._296_GTS, ._328, ._348, ._355_F1, ._355_Spider, ._360, ._360_Challenge_Stradale, ._365_GT, ._456, ._458, ._458_Italia, ._458_Spider, ._488, ._488_GTB, ._488_Pista, ._488_Pista_Spider, ._488_Spider, ._512, ._550, ._575, ._575M_Maranello, ._599, ._612, ._812_GTS, ._812_Superfast, ._California, ._California_T, .F12_belinetta, ._F12_TDF, .F355, .F430, .F430_Spider, .F512M, .F8_Spider, .F8_Triduto, .FF, .GTC4_Lusso, .Mondial, .Portfino, .Portfino_M, .Roma, .SF90_Spider, .SF90_Stradale, .Testarossa,.Other]
+        case .Fiat:
+            return [.Other]
         }
     }
     var id: Self {

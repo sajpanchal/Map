@@ -20,8 +20,8 @@ struct FuellingEntryForm: View {
     
     @Binding var showFuellingEntryform: Bool
     
-    var yellowColor = Color(red:0.975, green: 0.646, blue: 0.207)
-    var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.781)
+    var yellowColor = Color(red:1.0, green: 0.80, blue: 0.0)
+    var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.84)
     
     var body: some View {
         NavigationStack {

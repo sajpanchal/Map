@@ -91,44 +91,22 @@ struct UpdateServiceEntry: View {
                         Button {
                             if isTextFieldEntryValid() {
                                 if let index = serviceEntries.firstIndex(where: {$0.vehicle == vehicle && $0.uniqueID == serviceEntry.uniqueID}) {
-                                    
-                                     serviceEntries[index].cost = Double(cost) ?? 0
-                                     serviceEntries[index].details = description
-                                     serviceEntries[index].location = location
-                                     serviceEntries[index].type = type.rawValue.capitalized
-                                     serviceEntries[index].date = date
-                                     serviceEntries[index].timeStamp = Date()
-                                     Vehicle.saveContext(viewContext: viewContext)
+                                    editServiceCost(at: index)
                                 }
-                                //let service = AutoService(context: viewContext)
-                               
-                               // vehicle.addToServices(service)
-                                if  let i = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
-                         
-                                    vehicles[i].serviceCost = 0
-                                    for service in vehicle.getServices {
-                                        vehicles[i].serviceCost += service.cost
-                                }
-                                    Vehicle.saveContext(viewContext: viewContext)
-                                }
+                                aggregateServiceCost(for: vehicle)
                             }
-                       
                             isButtonTapped = true
-                          
-                         //showServiceEntryForm = !isTextFieldEntryValid()
+                       
                         } label: {
                             FormButton(imageName: "plus.square.fill", text: "Add Entry", color: lightRedColor)
                         }
                         .background(redColor)
                         .buttonStyle(BorderlessButtonStyle())
                         .cornerRadius(100)
-                        
                     }
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets())
-                }
-               
-                
+                }                
             }
             .navigationTitle("Add Auto Service")
         }
@@ -141,6 +119,28 @@ struct UpdateServiceEntry: View {
             
         })
     }
+    
+    func editServiceCost(at index: Int) {
+        serviceEntries[index].cost = Double(cost) ?? 0
+        serviceEntries[index].details = description
+        serviceEntries[index].location = location
+        serviceEntries[index].type = type.rawValue.capitalized
+        serviceEntries[index].date = date
+        serviceEntries[index].timeStamp = Date()
+        Vehicle.saveContext(viewContext: viewContext)
+    }
+    
+    func aggregateServiceCost(for vehicle: Vehicle) {
+        if  let i = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
+ 
+            vehicles[i].serviceCost = 0
+            for service in vehicle.getServices {
+                vehicles[i].serviceCost += service.cost
+        }
+            Vehicle.saveContext(viewContext: viewContext)
+        }
+    }
+    
     func isTextFieldEntryValid() -> Bool {
         if location.isEmpty || cost.isEmpty {
             return false
