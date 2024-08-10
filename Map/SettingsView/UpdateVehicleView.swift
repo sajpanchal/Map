@@ -27,6 +27,7 @@ struct UpdateVehicleView: View {
     @State var efficiencyModes = ["km/L", "L/100km", "miles/L","L/100Miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
     @State var efficiencyMode = 0
     @State var showAddVehicleForm = false
+    @Binding var showGarage: Bool
     var vehicle: Vehicle
     var skyColor = Color(red:0.031, green:0.739, blue:0.861)
     var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
@@ -175,6 +176,7 @@ struct UpdateVehicleView: View {
                     Button {
                         addVehicle(for: vehicle)
                         saveSettings(for: vehicle)
+                        showGarage = false
                     } label: {
                         FormButton(imageName: "gearshape.fill", text: "Save Settings", color: lightSkyColor)
                     }
@@ -232,5 +234,5 @@ struct UpdateVehicleView: View {
 }
 
 #Preview {
-    UpdateVehicleView(locationDataManager: LocationDataManager(), settings: Settings(), vehicle: (Vehicle()))
+    UpdateVehicleView(locationDataManager: LocationDataManager(), settings: Settings(), showGarage: .constant(false), vehicle: (Vehicle()))
 }

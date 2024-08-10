@@ -13,26 +13,30 @@ struct GarageView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject var locationDataManager: LocationDataManager
     @State var carText = ""
+    @Binding var showGarage: Bool
     var body: some View {
-        List {
-            ForEach(vehicles, id: \.self.uniqueID) { vehicle in
-                NavigationLink(destination: UpdateVehicleView(locationDataManager: locationDataManager, settings: setting.first!, vehicle: vehicle), label: {
-                    VehicleListItem(v: vehicles.firstIndex(of: vehicle) ?? 0)
-             })
-            }
-            .onDelete(perform: { indexSet in
-                for i in indexSet {
-                    let vehicle = vehicles[i]
-                    viewContext.delete(vehicle)
-                    Vehicle.saveContext(viewContext: viewContext)
+        NavigationStack {
+            List {
+                ForEach(vehicles, id: \.self.uniqueID) { vehicle in
+                    NavigationLink(destination: UpdateVehicleView(locationDataManager: locationDataManager, settings: setting.first!, showGarage: $showGarage, vehicle: vehicle), label: {
+                        VehicleListItem(v: vehicles.firstIndex(of: vehicle) ?? 0)
+                 })
                 }
-            })
+                .onDelete(perform: { indexSet in
+                    for i in indexSet {
+                        let vehicle = vehicles[i]
+                        viewContext.delete(vehicle)
+                        Vehicle.saveContext(viewContext: viewContext)
+                    }
+                })
+            }
+            .padding(.top,20)
+            .navigationTitle("Your Auto Garage")
         }
-        .padding(.top,20)
-        .navigationTitle("Your Auto Garage")
+    
     }
 }
 
 #Preview {
-    GarageView(locationDataManager: LocationDataManager())
+    GarageView(locationDataManager: LocationDataManager(), showGarage: .constant(false))
 }

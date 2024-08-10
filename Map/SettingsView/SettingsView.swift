@@ -22,13 +22,18 @@ struct SettingsView: View {
     @State var efficiencyMode = 0
     @State var showAddVehicleForm = false
     @State var carText = ""
+    @State var showGarage = false
     var skyColor = Color(red:0.031, green:0.739, blue:0.861)
     var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
  
     var body: some View {
         NavigationStack {
             Form {
-                NavigationLink("Go to Your Garage", destination: GarageView(locationDataManager: locationDataManager))
+                Button(action: {
+                    showGarage = true
+                }, label: {Text("Show My Garage")})
+                .sheet(isPresented: $showGarage,  content: {GarageView(locationDataManager: locationDataManager, showGarage: $showGarage)})
+//                NavigationLink("Go to Your Garage", destination: GarageView(locationDataManager: locationDataManager))
                 Section(header:Text("Vehicle Selection")) {
                     Picker("Select Vehicle", selection: $vIndex) {
                         List {
