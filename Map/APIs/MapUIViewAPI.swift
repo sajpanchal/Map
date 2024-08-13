@@ -411,7 +411,7 @@ class MapViewAPI {
                 ///get the title of the render polyline object
                 if overlay.isEqual(thisOverlay) {
                     ///set the stroke color to blue
-                    renderer.strokeColor = .systemBlue
+                    renderer.strokeColor = UIColor(skyColor)
                     ///set the transperancy to lowest
                     renderer.alpha = 1
                     ///title of the polyline was set before with route distance and estimated travel time. here routedata will be extracting them and put them separately in an array.
@@ -806,7 +806,7 @@ extension MapViewAPI {
                   
                     ///set the stroke color to blue
                     DispatchQueue.main.async {
-                        renderer.strokeColor = .systemBlue
+                        renderer.strokeColor = UIColor(skyColor)
                         ///set the transperancy to lowest
                         renderer.alpha = 1
                     }

@@ -17,6 +17,10 @@ struct DirectionHeaderView: View {
     var nextStepDistance: String
     ///stores the instruction string.
     var instruction: String
+    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
+    var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
+    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
+    var lightRedColor = Color(red:1.0, green:0.654, blue:0.663)
     ///flag that is bound to MapSwiftUI. it is set when user taps on this view to see the expanded directions list view.
     @Binding var showDirectionsList: Bool
     @Binding var height: CGFloat
@@ -32,6 +36,8 @@ struct DirectionHeaderView: View {
                             .font(.title)
                             .fontWeight(.black)
                             .padding(.top, 5)
+                            .foregroundStyle(.gray)
+                        
                     }
                     ///show the distance from next step
                     if !instruction.contains("Re-calculating the route...") {
@@ -39,6 +45,7 @@ struct DirectionHeaderView: View {
                             .padding(.bottom, 5)
                             .font(.title2)
                             .fontWeight(.black)
+                            .foregroundStyle(redColor)
                     }
                     
                 }
@@ -48,6 +55,8 @@ struct DirectionHeaderView: View {
                     Text(instruction)
                         .padding(10)
                         .font(.title3)
+                        .fontWeight(.black)
+                        .foregroundStyle(.gray)
                 ///add a spacer to the right of the instruction view.
                 Spacer()
             }

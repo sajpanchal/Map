@@ -13,7 +13,7 @@ import UIKit
 ///module requires to use MapKit classes, structs and its methods/properties..
 import MapKit
 
-
+var skyColor = Color(red:0.031, green:0.739, blue:0.861)
 
 ///create a custom struct called MapView and conform it to UIViewRepresentable. this class is only responsible to display map and its accessories.
 struct MapView: UIViewRepresentable {
@@ -66,6 +66,7 @@ struct MapView: UIViewRepresentable {
     @State var animated = true
     @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var setting: FetchedResults<Settings>
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
+   
     ///this is the function that our MapView will execute the first time on its inception. this function will instantiate the Coordinator class with a copy of its parent object.
     func makeCoordinator() -> (Coordinator) {
         return Coordinator(self)
@@ -128,7 +129,7 @@ struct MapView: UIViewRepresentable {
             ///if the renderer subtitle is the fastest route to the destination
             if renderer.polyline.subtitle == "fastest route" {
                 ///set the stroke color to system blue
-                renderer.strokeColor = .systemBlue
+                renderer.strokeColor = UIColor(skyColor)
                 ///set the transparency to lowest
                 renderer.alpha = 1
                 ///extract the route data from renderer title

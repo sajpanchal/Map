@@ -19,9 +19,11 @@ struct AddressView: View {
                 Text("Heading to destination")
                     .font(.caption2)
                     .fontWeight(.bold)
+                    .foregroundStyle(.gray)
                 Text(destination)
                     .font(.caption2)
                     .multilineTextAlignment(.center)
+                    .foregroundStyle(.gray)
             }
             Spacer()
         }

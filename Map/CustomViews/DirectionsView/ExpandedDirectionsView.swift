@@ -17,6 +17,10 @@ struct DirectionsListView: View {
     @Binding var showDirectionsList: Bool
     @Binding var height: CGFloat
     @Binding var nextInstruction: String
+    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
+    var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
+    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
+    var lightRedColor = Color(red:1.0, green:0.654, blue:0.663)
     var body: some View {
         ///
         VStack {
@@ -36,18 +40,22 @@ struct DirectionsListView: View {
                                         .font(.title)
                                         .fontWeight(.black)
                                         .padding(.top, 5)
+                                        .foregroundStyle(.gray)
                                 }
                                 ///convert the distance to string and do proper formating and display the returned string.
                                 Text(convertToString(from:stepInstruction.1))
                                     .padding(.bottom, 5)
                                     .font(.title2)
                                     .fontWeight(.black)
+                                    .foregroundStyle(redColor)
                             }
                             Spacer()
                             ///display the instruction string.
                             Text(stepInstruction.0)
                                 .padding(10)
                                 .font(.title3)
+                                .fontWeight(.black)
+                                .foregroundStyle(.gray)
                             Spacer()
                         }
                     })

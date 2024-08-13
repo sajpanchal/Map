@@ -33,6 +33,9 @@ struct NavigationRoutesListView: View {
     @Binding var stepInstructions: [(String, Double)]
     var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50)
     var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50)
+    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
+    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
+    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
     var body: some View {
         ForEach(routeData.reversed(), id: \.id) { route in
             ///enclose the content in HStack
@@ -42,16 +45,23 @@ struct NavigationRoutesListView: View {
                 VStack {
                     ///show the travel time at the top
                     Text(route.travelTime)
-                        .fontWeight(.semibold)
-                        .font(.title3)
+                        .fontWeight(.bold)
+                        .font(Font.system(size: 25))
+                        .foregroundStyle(greenColor)
                     ///show the distane and title at the bottom enclosed in HStack
                     HStack {
                         Text(route.distance)
-                            .fontWeight(.light)
-                            .font(.footnote)
-                        Text("Via " + route.title)
-                            .fontWeight(.light)
-                            .font(.footnote)
+                            .fontWeight(.bold)
+                            .font(Font.system(size: 16))
+                            .foregroundStyle(redColor)
+                        Text("  via")
+                            .fontWeight(.regular)
+                            .font(Font.system(size: 16))
+                            .foregroundStyle(skyColor)
+                        Text(route.title)
+                            .fontWeight(.bold)
+                            .font(Font.system(size: 16))
+                            .foregroundStyle(skyColor)
                     }
                 }
                 Spacer()
@@ -93,8 +103,8 @@ struct NavigationRoutesListView: View {
                
               
             }
-            .background(bgMode == .dark ? Color(.darkGray) : Color(.lightGray))
-            .overlay(Divider().background(bgMode == .dark ? Color(.lightGray) : Color(.darkGray)), alignment: .bottom)
+            .background(bgMode == .dark ? Color(uiColor: .darkGray) : Color(uiColor: .systemGray5))
+            .overlay(Divider().background(bgMode == .dark ? Color(.lightGray) : Color(.gray)), alignment: .bottom)
             .cornerRadius(10)
            
             .onTapGesture(perform: {
