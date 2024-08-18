@@ -61,7 +61,6 @@ enum Model: String, CaseIterable, Identifiable {
     case Copen, Hijet, Hijet_Truck
     case _024, _12_Ton_Trucks = "1/2 Ton Trucks", _100, _250, _2500, _350, _3500, _440, _600, Avenger, Caliber, Caravan, Caravan_CV, Challenger, Charger, Coronet, Custom_880, Dakota, Dart, Demon, Diplomat, Durango, Dynasty, Fargo, Hornet, Hornet_PHEV, Intrepit, Journey, Magnum, Mayfair, Monaco, Neon, Neon_SRT4, Nitro, Polara, Power_Ram, Raider, RAM, RAM_1500_Pickup, RAM_2500_Pickup, RAM_3500_Pickup, RAM_5500_Cab_Chassis, RAM_Van, Ramcharger, Shadow, Sprinter, Sprinter_2500, Sprinter_3500, SRT_10, Stealth, Super_Bee, SX_20 = "SX 2.0", Viper, W_Series_Pickup
     case Talon
-    case Civic, Civic_Coupe, Civic_del_Sol, Civic_Hatchback,Civic_Sedan, Civic_Sedan_EX,Civic_Sedan_LX, Civic_Type_R
     case Phaeton, Roadster
     case _101, _105, _147, _155, _156, _159, _164, _1750, _4C_Coupe, _4C_Spider, Giulia, Giulia_Quadrifoglio, GTV6, Milano, Spider, Stelvio, Tonale, Tonale_PHEV
     case J2R, K1
@@ -93,7 +92,15 @@ enum Model: String, CaseIterable, Identifiable {
     case _275, _296_GTB, _296_GTS, _328, _348, _355_F1, _355_Spider, _360, _360_Challenge_Stradale, _365_GT, _456, _458, _458_Italia, _458_Spider, _488, _488_GTB, _488_Pista, _488_Pista_Spider, _488_Spider, _512, _550, _575, _575M_Maranello, _599, _612, _812_GTS, _812_Superfast, _California, _California_T, F12_belinetta, _F12_TDF, F355, F430, F430_Spider, F512M, F8_Spider, F8_Triduto, FF, GTC4_Lusso, Mondial, Portfino, Portfino_M, Roma, SF90_Spider, SF90_Stradale, Testarossa
     case _124, _124_Spider, _500, _500_Abarth, _500E, _500L, _500X, _850, Coupe, X1_9
     case Karma, Ocean
-    case _1_Ton_Trucks, _3_Ton_Trucks, _4_Ton_Trucks, Anglia, Aspire, Bronco, Bronco_4WD, Bronco_Sport, C_Max, C_Max_Energi, Contour, Country_Squire, Courier_Pickup, Crestline, Crown_Victoria, Crown_Victoria_Police_PKG, Custom_500, Customline, Deluxe, E_150, E_250, E_350, E_450, E_Series, E_Series_Cargo_Van, E_Series_Cutaway, E_Series_Cutaway_Chassis, E_Transit_Chassis, E_Transit_Cutaway, Econoline, EcoSport, Edge, Escape, Excursion, EXP, Expedition, Explorer, Explorer_Sport_Trac, F_1, F_100, F_150, F_150_Lightning, F_250, F_250_HD_Series, F_250_HD_Series_Crew_Cab, F_250_Series_Crew_Cab, F_250_Series_Standard, F_350, F_350_Series, F_450, F_550, F_600, F_650, F_750, F_Series_Pickup, F_Super_Duty_Trucks, Fairlane, Fairmont_Futura, Falcon, Festiva, Fiesta, Five_Hundred, Flex, Focus, Focus_Electric, Freestar, Freestyle, Fusion, Fusion_Energi, Fusion_Hybrid, Fusion_Plug_In_Hybrid, Galaxie, Gran_Torino, LCF, Maverick, Meteor, Model_A, Model_AA, Model_T, Model_TT, Mustang, Mustang_Mach_E, Polic_Interceptor_Sedan, Polic_Interceptor_Utility, Ranchero, Ranger, Sedan, Super_Deluxe, Super_Duty_E450_DRW, Super_Duty_F600_DRW, Super_Duty_F750, Taurus, Taurus_Polic_PKG, TaurusX, Thunderbird, Torino, Transit, Transit_Cargo_Van, Transit_Connect, Transit_Connect_Cargo_Van, Transit_Crew_Van, Transit_Passanger_Wagon
+    case _1_Ton_Trucks, _3_Ton_Trucks, _4_Ton_Trucks, Anglia, Aspire, Bronco, Bronco_4WD, Bronco_Sport, C_Max, C_Max_Energi, Contour, Country_Squire, Courier_Pickup, Crestline, Crown_Victoria, Crown_Victoria_Police_PKG, Custom_500, Customline, Deluxe, E_150, E_250, E_350, E_450, E_Series, E_Series_Cargo_Van, E_Series_Cutaway, E_Series_Cutaway_Chassis, E_Transit_Chassis, E_Transit_Cutaway, Econoline, EcoSport, Edge, Escape, Excursion, EXP, Expedition, Explorer, Explorer_Sport_Trac, F_1, F_100, F_150, F_150_Lightning, F_250, F_250_HD_Series, F_250_HD_Series_Crew_Cab, F_250_Series_Crew_Cab, F_250_Series_Standard, F_350, F_350_Series, F_450, F_550, F_600, F_650, F_750, F_Series_Pickup, F_Super_Duty_Trucks, Fairlane, Fairmont_Futura, Falcon, Festiva, Fiesta, Five_Hundred, Flex, Focus, Focus_Electric, Freestar, Freestyle, Fusion, Fusion_Energi, Fusion_Hybrid, Fusion_Plug_In_Hybrid, Galaxie, Gran_Torino, LCF, Maverick, Meteor, Model_A, Model_AA, Model_T, Model_TT, Mustang, Mustang_Mach_E, Polic_Interceptor_Sedan, Polic_Interceptor_Utility, Ranchero, Ranger, Sedan, Super_Deluxe, Super_Duty_E450_DRW, Super_Duty_F600_DRW, Super_Duty_F750, Taurus, Taurus_Polic_PKG, TaurusX, Thunderbird, Torino, Transit, Transit_Cargo_Van, Transit_Connect, Transit_Connect_Cargo_Van, Transit_Crew_Van, Transit_Passanger_Wagon, Windstar
+    case _11B
+    case MT55
+    case Electrified_G80, Electrified_GV70, G70, G80, G90, GV60, GV70, GV80, GV80_Coupe
+    case Metro, Prizm
+    case _1_Ton_Chassis_Cabs, _1_Ton_Pickups, _150_Pickup, _2500_Cab_chassis, _2500_HD_Chassis_Cabs, _350_Pickup, _3500_Cab_Chassis, _3500_Chassis_Cabs, _9300, Acadia, Acadia_Denali, _C_Series, C10_Pickup, C15, C5500, C6500, Caballero, Canyon, Denali, Envoy, Hummer_EV_Pickup, Hummer_EV_SUV, Jimmy, K15_Jimmy, New_Sierra_1500, New_Sierra_2500,  Safari, Savana_1500, Savana_2500, Savana_3500, Savana_4500_Cube_Van, Savana_Cargo_Van, Savana_Passenger, Savana_Van, Sierra_1500, Sierra_1500_Denali, Sierra_2500, Sierra_2500_Cab_Chassis, Sierra_2500_Denali_HD, Sierra_3500, Sierra_3500_Cab_Chassis, Sierra_3500_Denali_HD, Sierra_3500HD, Sierra_3500HD_CC, Sonoma, Sprint, Terrain, Terrain_Denali, Topkick, Vandura, Yukon, Yukon_XL, Yukon_XL_Denali
+    case  _185, _195_Commercial, _258, _268, _338
+    case /*_600,*/ Accord, Accord_Coupe, Accord_Crosstour, Accord_Hybrid, Accord_Sedan, Acty, Civic, Civic_Coupe, Civic_del_Sol, Civic_Hatchback,Civic_Sedan, Civic_Sedan_Hybrid, Civic_Type_R,Civic_Sedan_EX,Civic_Sedan_LX
+    
     var id: Self {
         self
     }
@@ -108,8 +115,9 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     case Cadillac, Caterham, Chevrolet, Chrysler, Citroen, Cord
     case Daihatsu, Dailmler, Datsun, De_Soto, De_Tomaso, Divco, Dodge
     case Eagle, Edsel, Excalibur
-    case Factory_Five_Racing, Fargo, Farrari, Fiat, Fisker, Ford
-    case Honda
+    case Factory_Five_Racing, Fargo, Farrari, Fiat, Fisker, Ford, Franklin, Freightliner
+    case Genesis, Geo, GMC
+    case Hino, Holden, Honda
  
     
     var models: [Model] {
@@ -192,8 +200,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
             return [.Other]
         case .Edsel:
             return [.Pacer, .Other]
-        case .Honda:
-            return[.Civic, .Civic_Coupe, .Civic_del_Sol, .Civic_Hatchback, .Civic_Sedan, .Civic_Sedan_EX, .Civic_Sedan_LX, .Civic_Type_R, .Other]
+       
        case .Excalibur:
             return [.Phaeton, .Roadster, .Other]
         case .Factory_Five_Racing:
@@ -207,30 +214,49 @@ enum VehicleMake: String, CaseIterable, Identifiable {
         case .Fisker:
             return [.Karma, .Ocean, .Other]
         case .Ford:
-            return [._1_Ton_Trucks, ._3_Ton_Trucks, ._4_Ton_Trucks, .Anglia, .Aspire, .Bronco, .Bronco_4WD, .Bronco_Sport, .C_Max, .C_Max_Energi, .Cobra, .Contour, .Country_Squire, .Coupe, .Courier_Pickup, .Crestline, .Crown_Victoria, .Crown_Victoria_Police_PKG, .Custom, .Custom_500, .Customline, .Deluxe, .E_150, .E_250, .E_350, .E_450, .E_Series, .E_Series_Cargo_Van, .E_Series_Cutaway, .E_Series_Cutaway_Chassis, .E_Transit_Chassis, .E_Transit_Cutaway, .Econoline, .EcoSport, .Edge, .Escape, .Excursion, .EXP, .Expedition, .Explorer, .Explorer_Sport_Trac, .F_1, .F_100, .F_150, .F_150_Lightning, .F_250, .F_250_HD_Series, .F_250_HD_Series_Crew_Cab, .F_250_Series_Crew_Cab, .F_250_Series_Standard, .F_350, .F_350_Series, .F_450, .F_550, .F_600, .F_650, .F_750, .F_Series_Pickup, .F_Super_Duty_Trucks, .Fairlane, .Fairmont_Futura, .Falcon, .Festiva, .Fiesta, .Five_Hundred, .Flex, .Focus, .Focus_Electric, .Freestar, .Freestyle, .Fusion, .Fusion_Energi, .Fusion_Hybrid, .Fusion_Plug_In_Hybrid, .Galaxie, .Gran_Torino, .GT, .LCF, .Maverick, .Meteor, .Model_A, .Model_AA, .Model_T, .Model_TT, .Mustang, .Mustang_Mach_E, .Pickup, .Polic_Interceptor_Sedan, .Polic_Interceptor_Utility, .Ranchero, .Ranger, .Sedan, .Super_Deluxe, .Super_Duty_E450_DRW, .Super_Duty_F600_DRW, .Super_Duty_F750, .Taurus, .Taurus_Polic_PKG, .TaurusX, .Thunderbird, .Torino, .Transit, .Transit_Cargo_Van, .Transit_Connect, .Transit_Connect_Cargo_Van, .Transit_Crew_Van, .Transit_Passanger_Wagon, .V8]
+            return [._1_Ton_Trucks, ._3_Ton_Trucks, ._4_Ton_Trucks, .Anglia, .Aspire, .Bronco, .Bronco_4WD, .Bronco_Sport, .C_Max, .C_Max_Energi, .Cobra, .Contour, .Country_Squire, .Coupe, .Courier_Pickup, .Crestline, .Crown_Victoria, .Crown_Victoria_Police_PKG, .Custom, .Custom_500, .Customline, .Deluxe, .E_150, .E_250, .E_350, .E_450, .E_Series, .E_Series_Cargo_Van, .E_Series_Cutaway, .E_Series_Cutaway_Chassis, .E_Transit_Chassis, .E_Transit_Cutaway, .Econoline, .EcoSport, .Edge, .Escape, .Excursion, .EXP, .Expedition, .Explorer, .Explorer_Sport_Trac, .F_1, .F_100, .F_150, .F_150_Lightning, .F_250, .F_250_HD_Series, .F_250_HD_Series_Crew_Cab, .F_250_Series_Crew_Cab, .F_250_Series_Standard, .F_350, .F_350_Series, .F_450, .F_550, .F_600, .F_650, .F_750, .F_Series_Pickup, .F_Super_Duty_Trucks, .Fairlane, .Fairmont_Futura, .Falcon, .Festiva, .Fiesta, .Five_Hundred, .Flex, .Focus, .Focus_Electric, .Freestar, .Freestyle, .Fusion, .Fusion_Energi, .Fusion_Hybrid, .Fusion_Plug_In_Hybrid, .Galaxie, .Gran_Torino, .GT, .LCF, .Maverick, .Meteor, .Model_A, .Model_AA, .Model_T, .Model_TT, .Mustang, .Mustang_Mach_E, .Pickup, .Polic_Interceptor_Sedan, .Polic_Interceptor_Utility, .Ranchero, .Ranger, .Sedan, .Super_Deluxe, .Super_Duty_E450_DRW, .Super_Duty_F600_DRW, .Super_Duty_F750, .Taurus, .Taurus_Polic_PKG, .TaurusX, .Thunderbird, .Torino, .Transit, .Transit_Cargo_Van, .Transit_Connect, .Transit_Connect_Cargo_Van, .Transit_Crew_Van, .Transit_Passanger_Wagon, .V8, .Windstar,.Other]
+        case .Franklin:
+            return [._11B, .Other]
+        case .Freightliner:
+            return [.MT55, .Sprinter, .Other]
+        case .Genesis:
+            return [.Electrified_G80, .Electrified_GV70, .G70, .G80, .G90, .GV60, .GV70, .GV80, .GV80_Coupe, .Other]
+        case .Geo:
+            return [.Metro, .Prizm, .Other]
+        case .GMC:
+            return [._1_Ton_Chassis_Cabs, ._1_Ton_Pickups, ._100, ._150_Pickup, ._1500_Pickup, ._2500_Cab_chassis, ._2500_HD_Chassis_Cabs, ._2500_Pickup, ._350_Pickup, ._3500, ._3500_Cab_Chassis, ._3500_Chassis_Cabs, ._3500_Pickup, ._9300, .Acadia, .Acadia_Denali, .Apache, ._C_Series, .C10_Pickup, .C15, .C5500, .C6500, .Caballero, .Canyon, .Denali, .Envoy, .Hummer_EV_Pickup, .Hummer_EV_SUV, .Jimmy, .K15_Jimmy, .New_Sierra_1500, .New_Sierra_2500, .Pickup, .Safari, .Savana_1500, .Savana_2500, .Savana_3500, .Savana_4500_Cube_Van, .Savana_Cargo_Van, .Savana_Passenger, .Savana_Van, .Sierra_1500, .Sierra_1500_Denali, .Sierra_2500, .Sierra_2500_Cab_Chassis, .Sierra_2500_Denali_HD, .Sierra_3500, .Sierra_3500_Cab_Chassis, .Sierra_3500_Denali_HD, .Sierra_3500HD, .Sierra_3500HD_CC, .Sonoma, .Sprint, .Suburban, .Terrain, .Terrain_Denali, .Topkick, .Vandura, .Yukon, .Yukon_XL, .Yukon_XL_Denali, .Other]
+        case .Hino:
+            return [._155, ._185, ._195_Commercial, ._258, ._268, ._338, .Other]
+        case .Holden:
+            return [.Other]
+        case .Honda:
+            return[.Civic, .Civic_Coupe, .Civic_del_Sol, .Civic_Hatchback, .Civic_Sedan, .Civic_Sedan_EX, .Civic_Sedan_LX, .Civic_Type_R, .Other]
         }
+        
     }
     var id: Self {
         self
     }
 }
 enum Alphbets: String, CaseIterable, Identifiable {
-    case A,B,C,D,E/*,F,G*/,H//,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z
+    case A,B,C,D,E,F,G,H//,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z
  
     var makes: [VehicleMake] {
         switch self {
         case .A:
             return [.AC, .Acadian, .Acura, .Alfa_Romeo, .Allard, .Alvis, .AM_General, .American_Bantam, .American_Motors_AMC, .Amphicar, .Ariel, .Aston_Martin, .Asuna, .Audi, .Aurora, .Austin, .Austin_Healey, .Avanti_II]
         case .B:
-            return [.Bentley, .BMW]
+            return [.Bentley, .BMW, .BrightDrop, .Bugatti, .Buick]
         case .C:
-            return [.Cadillac, .Chevrolet, .Chrysler]
+            return [.Cadillac, .Caterham, .Chevrolet, .Chrysler, .Citroen, .Cord]
         case .D:
-            return [.Daihatsu, .Dailmler, .Dodge]
+            return [.Daihatsu, .Dailmler, .Datsun, .De_Soto, .De_Tomaso, .Divco, .Dodge]
         case .E:
-            return [.Eagle, .Excalibur]
-//        case .F:
-//            return[.Farrari, .Fiat]
+            return [.Eagle, .Edsel, .Excalibur]
+        case .F:
+            return[.Factory_Five_Racing, .Fargo ,.Farrari, .Fiat, .Fisker, .Ford, .Franklin, .Freightliner]
+        case .G:
+            return []
         case .H:
             return[.Honda]
         }

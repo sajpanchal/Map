@@ -11,6 +11,7 @@ struct UpdateFuelEntry: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: AutoFuelling.entity(), sortDescriptors: []) var fuelEntries: FetchedResults<AutoFuelling>
+    @FetchRequest(entity: Settings.entity(), sortDescriptors: []) var settings: FetchedResults<Settings>
     //@StateObject var locationDatamanager: LocationDataManager
     
     @State var location = ""
@@ -42,7 +43,7 @@ struct UpdateFuelEntry: View {
                             .foregroundStyle(.red)
                     }
                 }
-                Section(header:Text("Fuel Volume in Litre:").font(Font.system(size: 15))) {
+                Section(header:Text("Fuel Volume in \(settings.first!.getFuelVolumeUnit):").font(Font.system(size: 15))) {
                     TextField("Enter Amount", text: $amount)
                         .keyboardType(.decimalPad)
                         .onTapGesture {
@@ -115,7 +116,7 @@ struct UpdateFuelEntry: View {
         }
         .onAppear(perform: {
             location = fuelEntry.location ?? ""
-            amount = String(fuelEntry.volume)
+            amount = settings.first!.getFuelVolumeUnit == "Litre" ? String(fuelEntry.volume) : String(fuelEntry.volume * 0.264)
             cost = String(fuelEntry.cost)
             date = fuelEntry.date ?? Date()
         })
@@ -139,7 +140,8 @@ struct UpdateFuelEntry: View {
             fuelEntries[i].timeStamp = Date()
             fuelEntries[i].location = location
             fuelEntries[i].lasttrip = index != nil ? vehicles[index!].trip : 0.0
-            fuelEntries[i].volume = Double(amount) ?? 0
+            
+            fuelEntries[i].volume = settings.first!.getFuelVolumeUnit == "Litre" ? Double(amount) ?? 0 : (Double(amount) ?? 0) * 0.264
         }
        // AutoFuelling.
         Vehicle.saveContext(viewContext: viewContext)

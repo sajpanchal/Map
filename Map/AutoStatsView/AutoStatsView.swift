@@ -11,13 +11,12 @@ struct AutoStatsView: View {
     @Environment (\.colorScheme) var bgMode: ColorScheme
     @StateObject var locationDataManager: LocationDataManager
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
-    
+    @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
     let rows = [GridItem(spacing: 10, alignment: .topLeading), GridItem(spacing: 10, alignment: .topLeading), GridItem(spacing: 10, alignment: .topLeading)]
     @State var showFuelHistoryView = false
     @State var showServiceHistoryView = false
     @State var showFuellingEntryform = false
     @State var showServiceEntryForm = false
-
   
     var redColor = Color(red:0.861, green: 0.194, blue:0.0)
     var lightRedColor = Color(red:1.0, green:0.654, blue:0.663)
@@ -48,7 +47,7 @@ struct AutoStatsView: View {
     let deciNumberFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
                formatter.numberStyle = .decimal
-               formatter.maximumFractionDigits = 1
+               formatter.maximumFractionDigits = 2
         return formatter
 
     }()
@@ -60,6 +59,7 @@ struct AutoStatsView: View {
         return formatter
 
     }()
+    
     var body: some View {
         GeometryReader { geo in
             NavigationStack {
@@ -67,12 +67,12 @@ struct AutoStatsView: View {
                     if let vehicle = vehicles.first(where: {$0.isActive}) {
                         Section("Dashboard") {
                             LazyHGrid(rows: rows) {
-                                DashGridItemView(title: "ODOMETER", foreGroundColor: purpleColor, backGroundColor: lightPurpleColor, numericText: numberFormatter.string(for: vehicle.odometer) ?? "--", unitText: "km", geometricSize: geo.size)
-                                DashGridItemView(title: "LAST FUELLING", foreGroundColor: yellowColor, backGroundColor: lightYellowColor, numericText: deciNumberFormatter.string(for: vehicle.getFuellings.first?.volume ?? 0) ?? "--", unitText: "litre", geometricSize: geo.size)
+                                DashGridItemView(title: "ODOMETER", foreGroundColor: purpleColor, backGroundColor: lightPurpleColor, numericText: settings.first!.getDistanceUnit == "km" ? numberFormatter.string(for: vehicle.odometer) ?? "--" : numberFormatter.string(for: vehicle.getOdometerMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
+                                DashGridItemView(title: "LAST FUELLING", foreGroundColor: yellowColor, backGroundColor: lightYellowColor, numericText: deciNumberFormatter.string(for: vehicle.getFuellings.first?.volume ?? 0) ?? "--", unitText: settings.first?.getFuelVolumeUnit ?? "", geometricSize: geo.size)
                                 DashGridItemView(title: "FUEL COST", foreGroundColor: orangeColor, backGroundColor: lightOrangeColor, numericText: currencyFormatter.string(for: vehicle.fuelCost) ?? "--", unitText: "Year 2024", geometricSize: geo.size)
-                                DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: skyColor, backGroundColor: lightSkyColor, numericText:
-                                                    deciNumberFormatter.string(for: vehicle.trip) ?? "--", unitText: "km", geometricSize: geo.size)
-                                DashGridItemView(title: "MILEAGE", foreGroundColor: greenColor, backGroundColor: lightGreenColor, numericText: deciNumberFormatter.string(for: vehicle.fuelEfficiency) ?? "--", unitText: "km/l", geometricSize: geo.size)
+                                DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: skyColor, backGroundColor: lightSkyColor, numericText: settings.first!.getDistanceUnit == "km" ?
+                                                 deciNumberFormatter.string(for: vehicle.trip) ?? "--" :  deciNumberFormatter.string(for: vehicle.getTripMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
+                                DashGridItemView(title: "MILEAGE", foreGroundColor: greenColor, backGroundColor: lightGreenColor, numericText: deciNumberFormatter.string(for: getFuelEfficiency(efficiency: vehicle.fuelEfficiency)) ?? "--", unitText: settings.first?.getFuelEfficiencyUnit ?? "", geometricSize: geo.size)
                                 DashGridItemView(title: "REPAIR COST", foreGroundColor: redColor    , backGroundColor: lightRedColor, numericText: currencyFormatter.string(for: vehicle.serviceCost) ?? "--",  unitText: "Year 2024", geometricSize: geo.size)
                             }
                         }
@@ -91,10 +91,8 @@ struct AutoStatsView: View {
                                 })
                                 ForEach(vehicle.getFuellings, id:\.self.uniqueID) { fuelData in
                                     if vehicle.getFuellings.firstIndex(of: fuelData)! <= 2 {
-                                        CustomListView(date: fuelData.date!, text1: ("Fuel Station",fuelData.location!), text2:("Volume",String(format:"%.2f",fuelData.volume) + "L"), text3: ("Cost","$" + String(format:"%.2f",fuelData.cost)), text4: String(format:"%.1f", fuelData.lasttrip) + " km", timeStamp: "Updated on: " + fuelData.getTimeStamp, width: geo.size.width)
+                                        CustomListView(date: fuelData.date!, text1: ("Fuel Station",fuelData.location!), text2:("Volume", settings.first!.getFuelVolumeUnit == "Litre" ? (String(format:"%.2f",fuelData.volume) + "L") : (String(format:"%.2f",fuelData.getVolumeGallons) + "GL")), text3: ("Cost","$" + String(format:"%.2f",fuelData.cost)), text4: settings.first!.getDistanceUnit == "km" ? String(format:"%.1f", fuelData.lasttrip) + " km" : String(format:"%.1f", fuelData.getLastTripMiles) + " miles" , timeStamp: "Updated on: " + fuelData.getTimeStamp, width: geo.size.width)
                                     }
-                                 
-                                      
                                 }
                             }
                             .frame(width:geo.size.width - 20,height: geo.size.height/1.25)
@@ -156,6 +154,33 @@ struct AutoStatsView: View {
                 .frame(width: geo.size.width, height: geo.size.height - 40)
                 .navigationTitle("Auto Summary")
             }
+        }
+    }
+    
+    func getFuelEfficiency(efficiency: Double) -> Double {
+        switch settings.first!.fuelEfficiencyUnit {
+        case "km/L":
+            return efficiency
+        case "L/100km":
+            return 100/efficiency
+        case "miles/L":
+            return 0.62 * efficiency
+        case "L/100Miles":
+            return 100/(0.62 * efficiency)
+        case "km/gl":
+            return efficiency * 3.785
+        case "miles/gl":
+            return efficiency * 2.352
+        case "gl/100km":
+            return efficiency * 26.417
+        case "gl/100miles":
+            return (100/efficiency) * (0.2641/0.6213)
+        case "km/kwh":
+            return 0
+        case "miles/kwh":
+            return 0
+        default:
+            return 0
         }
     }
 }

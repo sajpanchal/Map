@@ -24,6 +24,12 @@ extension AutoFuelling {
     @NSManaged public var volume: Double
     @NSManaged public var lasttrip: Double
     @NSManaged public var vehicle: Vehicle?
+    public var getLastTripMiles: Double {
+        lasttrip * 0.62
+    }
+    public var getVolumeGallons: Double {
+        volume * 0.2641
+    }
     public var getTimeStamp: String {
         timeStamp?.formatted(date: .long, time: .complete) ?? Date().formatted(date: .long, time: .complete)
     }

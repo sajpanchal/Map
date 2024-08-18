@@ -35,6 +35,12 @@ extension Vehicle {
         fuelEngine ?? "N/A"
     }
     
+    public var getOdometerMiles: Double {
+        odometer * 0.62
+    }
+    public var getTripMiles: Double {
+        trip * 0.62
+    }
     public var getMake: String {
         make ?? "N/A"
     }
@@ -51,7 +57,9 @@ extension Vehicle {
     public var getYear: String {
         String(year)
     }
-    
+    public var getFuelEfficiencyMiles: Double {
+        fuelEfficiency * 0.62
+    }
     
     public var getFuellings: [AutoFuelling] {
         let set = fuellings as? Set<AutoFuelling> ?? []

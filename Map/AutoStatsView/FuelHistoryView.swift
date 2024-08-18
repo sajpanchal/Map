@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct FuelHistoryView: View {
+    @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
     @Environment (\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
     var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
@@ -47,9 +48,17 @@ struct FuelHistoryView: View {
                                         Text("Volume")
                                             .font(.system(size: 12, weight: .semibold))
                                             .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
-                                        Text(String(format:"%.2f",fuelData.volume) + " L")
-                                            .font(.system(size: 16, weight: .bold))
-                                            .foregroundStyle(yellowColor)
+                                        if settings.first!.fuelVolumeUnit == "Litre" {
+                                            Text(String(format:"%.2f",fuelData.volume) + " L")
+                                                .font(.system(size: 16, weight: .bold))
+                                                .foregroundStyle(yellowColor)
+                                        }
+                                        else {
+                                            Text(String(format:"%.2f",fuelData.getVolumeGallons) + " GL")
+                                                .font(.system(size: 16, weight: .bold))
+                                                .foregroundStyle(yellowColor)
+                                        }
+                                       
                                        
                              
                                     }
@@ -68,9 +77,17 @@ struct FuelHistoryView: View {
                                     Text("Trip Summary")
                                         .font(.system(size: 12, weight: .semibold))
                                         .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
-                                    Text(String(format:"%.2f",fuelData.lasttrip) + " km")
-                                        .font(.system(size: 16, weight: .bold))
-                                        .foregroundStyle(skyColor)
+                                    if settings.first!.getDistanceUnit == "km" {
+                                        Text(String(format:"%.2f",fuelData.lasttrip) + " km")
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundStyle(skyColor)
+                                    }
+                                    else {
+                                        Text(String(format:"%.2f",fuelData.getLastTripMiles) + " miles")
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundStyle(skyColor)
+                                    }
+                                   
                                 }
                                 Spacer()
                                 Text("updated on: " + fuelData.getTimeStamp)

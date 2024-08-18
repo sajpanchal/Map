@@ -94,6 +94,9 @@ struct SettingsView: View {
                                             }
                                         }
                                     }
+                                    .onAppear(perform: {
+                                        efficiencyMode = efficiencyMode.isMultiple(of: 2) ? 0 : 1
+                                    })
                                     .pickerStyle(.segmented)
                                 }
                                 else {
@@ -102,8 +105,12 @@ struct SettingsView: View {
                                             if index > 1 && index < 4 {
                                                 Text(efficiencyModes[index])
                                             }
+                                               
                                         }
                                     }
+                                    .onAppear(perform: {
+                                        efficiencyMode = efficiencyMode.isMultiple(of: 2) ? 2 : 3
+                                    })
                                     .pickerStyle(.segmented)
                                 }
                                 
@@ -117,6 +124,10 @@ struct SettingsView: View {
                                             }
                                         }
                                     }
+                                    .onAppear(perform: {
+                                
+                                        efficiencyMode = efficiencyMode.isMultiple(of: 2) ? 4 : 5
+                                    })
                                     .pickerStyle(.segmented)
                                 }
                                 else {
@@ -127,6 +138,9 @@ struct SettingsView: View {
                                             }
                                         }
                                     }
+                                    .onAppear(perform: {
+                                        efficiencyMode = efficiencyMode.isMultiple(of: 2) ? 6 : 7
+                                    })
                                     .pickerStyle(.segmented)
                                 }
                             }
@@ -136,6 +150,7 @@ struct SettingsView: View {
                 VStack {
                     Button {
                        updateActiveVehicle()
+                        saveSettings()
                     } label: {
                         FormButton(imageName: "gearshape.fill", text: "Save Settings", color: lightSkyColor)
                     }
@@ -162,6 +177,7 @@ struct SettingsView: View {
         }
         .onAppear{
             getActiveVehicle()
+            loadSettings()
         }
     }
     
@@ -176,6 +192,27 @@ struct SettingsView: View {
             locationDataManager.trip = object.trip
         }
         vIndex = vehicles.firstIndex(where: {$0.isActive}) ?? vIndex
+    }
+    func loadSettings() {
+        if setting.first != nil {
+            efficiencyModes[efficiencyMode]
+            efficiencyMode = efficiencyModes.firstIndex(of: setting.first!.getFuelEfficiencyUnit) ?? 0
+            distanceMode = DistanceModes(rawValue: setting.first!.getDistanceUnit) ?? .km
+            fuelMode = FuelModes(rawValue: setting.first!.getFuelVolumeUnit) ?? .Litre
+            fuelType = FuelTypes(rawValue: setting.first!.getAutoEngineType) ??  .Gas
+            
+        }
+    }
+    
+    func saveSettings() {
+        if setting.first != nil {
+            setting.first?.fuelEfficiencyUnit =  efficiencyModes[efficiencyMode]
+            setting.first?.distanceUnit = distanceMode.rawValue
+            setting.first?.fuelVolumeUnit = fuelMode.rawValue
+            setting.first?.autoEngineType = fuelType.rawValue
+            setting.first?.vehicle = vehicle
+            Settings.saveContext(viewContext: viewContext)
+        }
     }
     
     func updateActiveVehicle() {

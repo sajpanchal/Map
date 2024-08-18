@@ -10,6 +10,7 @@ import SwiftUI
 struct FuellingEntryForm: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
+    @FetchRequest(entity: Settings.entity(), sortDescriptors: []) var settings: FetchedResults<Settings>
     @StateObject var locationDatamanager: LocationDataManager
     
     @State var location = ""
@@ -42,7 +43,8 @@ struct FuellingEntryForm: View {
                             .foregroundStyle(.red)
                     }
                 }
-                Section(header:Text("Fuel Volume in Litre:").font(Font.system(size: 15))) {
+                
+                Section(header:Text("Fuel Volume in \(settings.first!.getFuelVolumeUnit):").font(Font.system(size: 15))) {
                     TextField("Enter Amount", text: $amount)
                         .keyboardType(.decimalPad)
                         .onTapGesture {
@@ -135,7 +137,8 @@ struct FuellingEntryForm: View {
         fuelling.timeStamp = Date()
         fuelling.location = location
         fuelling.lasttrip = index != nil ? vehicles[index!].trip : 0.0
-        fuelling.volume = Double(amount) ?? 0
+    
+        fuelling.volume = settings.first!.getFuelVolumeUnit == "Litre" ? Double(amount) ?? 0 : (Double(amount) ?? 0) * 0.264
         vehicle.addToFuellings(fuelling)
     }
     
