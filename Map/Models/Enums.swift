@@ -99,8 +99,14 @@ enum Model: String, CaseIterable, Identifiable {
     case Metro, Prizm
     case _1_Ton_Chassis_Cabs, _1_Ton_Pickups, _150_Pickup, _2500_Cab_chassis, _2500_HD_Chassis_Cabs, _350_Pickup, _3500_Cab_Chassis, _3500_Chassis_Cabs, _9300, Acadia, Acadia_Denali, _C_Series, C10_Pickup, C15, C5500, C6500, Caballero, Canyon, Denali, Envoy, Hummer_EV_Pickup, Hummer_EV_SUV, Jimmy, K15_Jimmy, New_Sierra_1500, New_Sierra_2500,  Safari, Savana_1500, Savana_2500, Savana_3500, Savana_4500_Cube_Van, Savana_Cargo_Van, Savana_Passenger, Savana_Van, Sierra_1500, Sierra_1500_Denali, Sierra_2500, Sierra_2500_Cab_Chassis, Sierra_2500_Denali_HD, Sierra_3500, Sierra_3500_Cab_Chassis, Sierra_3500_Denali_HD, Sierra_3500HD, Sierra_3500HD_CC, Sonoma, Sprint, Terrain, Terrain_Denali, Topkick, Vandura, Yukon, Yukon_XL, Yukon_XL_Denali
     case  _185, _195_Commercial, _258, _268, _338
-    case /*_600,*/ Accord, Accord_Coupe, Accord_Crosstour, Accord_Hybrid, Accord_Sedan, Acty, Civic, Civic_Coupe, Civic_del_Sol, Civic_Hatchback,Civic_Sedan, Civic_Sedan_Hybrid, Civic_Type_R,Civic_Sedan_EX,Civic_Sedan_LX
-    
+    case  Accord, Accord_Coupe, Accord_Crosstour, Accord_Hybrid, Accord_Sedan, Acty, Civic, Civic_Coupe, Civic_del_Sol, Civic_Hatchback,Civic_Sedan, Civic_Sedan_Hybrid, Civic_Type_R, Clarity_Plug_In_Hybrid, CRV, CRV_Hybrid, CRZ, Crosstour, CRX, Del_Sol, Element, Fit, HRV, Insight, Odyssey, Passport, Pilot, Prelude, Prologue, Ridgeline, S2000, Stepwgn
+    case Commodore
+    case H1, H2, H3, H3T
+    case Accent, Azera, Elantra, Elantra_Coupe, Elantra_GT, Elantra_Hybrid, Elantra_N, Elantra_Touring, Entourage, Equus, Genesis, Genesis_Coupe, IONIQ, IONIQ_5, IONIQ_5N, IONIQ_6, Kona, Kona_Electric, Kona_N, NEXO, Palisade, Santa_Cruz, Santa_Fe, Santa_Fe_Hybrid, Santa_fe_Plug_In_Hybrid, Santa_Fe_Sport, Santa_Fe_XL, Sonata, Sonata_Hybrid, Sonata_Plug_In_Hybrid, Tiburon, Tucson, Tucson_Hybrid, Tucson_Plug_In_Hybrid, Veloster, Veloster_N, Venue, Veracruz
+    case Grenadier
+    case EX, FX, G, I, JX35, M56x, Q45, Q50, Q60, Q70, Q70L, QX, QX30, QX50, QX55, QX56, QX60, QX70, QX80
+    case Roadster_D
+    case  _1110, _1310, KB_2, MXT, Scout, Scout_II
     var id: Self {
         self
     }
@@ -117,7 +123,8 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     case Eagle, Edsel, Excalibur
     case Factory_Five_Racing, Fargo, Farrari, Fiat, Fisker, Ford, Franklin, Freightliner
     case Genesis, Geo, GMC
-    case Hino, Holden, Honda
+    case Hino, Holden, Honda, Hudson, Hummer, Hyundai
+    case INEOS, Infiniti, Intermeccanica, International
  
     
     var models: [Model] {
@@ -230,7 +237,21 @@ enum VehicleMake: String, CaseIterable, Identifiable {
         case .Holden:
             return [.Other]
         case .Honda:
-            return[.Civic, .Civic_Coupe, .Civic_del_Sol, .Civic_Hatchback, .Civic_Sedan, .Civic_Sedan_EX, .Civic_Sedan_LX, .Civic_Type_R, .Other]
+            return[._600, .Accord, .Accord_Coupe, .Accord_Crosstour, .Accord_Hybrid, .Accord_Sedan, .Acty, .Civic, .Civic_Coupe, .Civic_del_Sol, .Civic_Hatchback, .Civic_Sedan, .Civic_Sedan_Hybrid, .Civic_Type_R, .Clarity_Plug_In_Hybrid, .CRV, .CRV_Hybrid, .CRZ, .Crosstour, .CRX, .Del_Sol, .Element, .Fit, .HRV, .Insight, .Odyssey, .Passport, .Pilot, .Prelude, .Prologue, .Ridgeline, .S2000, .Stepwgn, .Other]
+        case .Hudson:
+            return [.Commodore, .Other]
+        case .Hummer:
+            return [.H1, .H2, .H3, .H3T, .Other]
+        case .Hyundai:
+            return [.Accent, .Azera, .Elantra, .Elantra_Coupe, .Elantra_GT, .Elantra_Hybrid, .Elantra_N, .Elantra_Touring, .Entourage, .Equus, .Genesis, .Genesis_Coupe, .IONIQ, .IONIQ_5, .IONIQ_5N, .IONIQ_6, .Kona, .Kona_Electric, .Kona_N, .NEXO, .Palisade, .Santa_Cruz, .Santa_Fe, .Santa_Fe_Hybrid, .Santa_fe_Plug_In_Hybrid, .Santa_Fe_Sport, .Santa_Fe_XL, .Sonata, .Sonata_Hybrid, .Sonata_Plug_In_Hybrid, .Tiburon, .Tucson, .Tucson_Hybrid, .Tucson_Plug_In_Hybrid, .Veloster, .Veloster_N, .Venue, .Veracruz, .Other]
+        case .INEOS:
+            return [.Grenadier, .Other]
+        case .Infiniti:
+            return [.EX, .FX, .G, .I, .JX35, .M, .M56x, .Q45, .Q50, .Q60, .Q70, .Q70L, .QX, .QX30, .QX50, .QX55, .QX56, .QX60, .QX70, .QX80, .Other]
+        case .Intermeccanica:
+            return [.Roadster_D, .Other]
+        case .International:
+            return [._100, ._1110, ._1310, .KB_2, .MXT, .Scout, .Scout_II, .Other]
         }
         
     }
@@ -239,7 +260,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     }
 }
 enum Alphbets: String, CaseIterable, Identifiable {
-    case A,B,C,D,E,F,G,H//,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z
+    case A,B,C,D,E,F,G,H,I//,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z
  
     var makes: [VehicleMake] {
         switch self {
@@ -256,9 +277,11 @@ enum Alphbets: String, CaseIterable, Identifiable {
         case .F:
             return[.Factory_Five_Racing, .Fargo ,.Farrari, .Fiat, .Fisker, .Ford, .Franklin, .Freightliner]
         case .G:
-            return []
+            return [.Genesis, .Geo, .GMC]
         case .H:
-            return[.Honda]
+            return[.Hino, .Holden, .Honda, .Hudson, .Hummer, .Hyundai]
+        case .I:
+            return [.INEOS, .Infiniti, .Intermeccanica, .International]
         }
     }
     var id: Self {

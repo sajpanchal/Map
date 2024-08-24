@@ -11,10 +11,10 @@ struct SettingsView: View {
 
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var setting: FetchedResults<Settings>
-    @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[]) var vehicles: FetchedResults<Vehicle>
+    @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[NSSortDescriptor(keyPath: \Vehicle.isActive, ascending: false)]) var vehicles: FetchedResults<Vehicle>
     @StateObject var locationDataManager: LocationDataManager
     @State var vIndex = 0
-    @State var vehicle: Vehicle?
+    @State var vehicle: Vehicle = Vehicle()
     @State var fuelType: FuelTypes = .Gas
     @State var distanceMode: DistanceModes = .km
     @State var fuelMode: FuelModes = .Litre
@@ -35,35 +35,49 @@ struct SettingsView: View {
                 .sheet(isPresented: $showGarage,  content: {GarageView(locationDataManager: locationDataManager, showGarage: $showGarage)})
 //                NavigationLink("Go to Your Garage", destination: GarageView(locationDataManager: locationDataManager))
                 Section(header:Text("Vehicle Selection")) {
-                    Picker("Select Vehicle", selection: $vIndex) {
+                    Picker("Select Vehicle", selection: $vehicle) {
                         List {
-                            ForEach(vehicles.indices, id: \.self) { v in
-                              VehicleListItem(v: v)
+                            ForEach(vehicles, id: \.uniqueID) { v in
+                               
+                                VStack {
+                                    Text(v.getVehicleText + " " + v.getFuelEngine).tag(v)
+                                        .fontWeight(.bold)
+                                        .font(Font.system(size: 18))
+                                        .foregroundStyle(skyColor)
+                                    
+                                    Text(v.getYear).tag(v)
+                                        .fontWeight(.semibold)
+                                        .font(Font.system(size: 14))
+                                        .foregroundStyle(Color.gray)
+                                }
+                                .tag(v)
+                                
+                            
                             }
                         }
                     }
-                    .onChange(of: vIndex) {
-                        fuelType = FuelTypes(rawValue: vehicles[vIndex].getFuelEngine) ?? .Gas
+                    .onChange(of: vehicle) {
+                        fuelType = FuelTypes(rawValue: vehicle.fuelEngine ?? "Gas") ?? .Gas
                     }
                     .pickerStyle(.inline)
                 }
-                if !vehicles.isEmpty {
-                    Section(header: Text("Fuel Type")) {
-                        if vehicles[vIndex].getFuelEngine != "Hybrid" {
-                            Picker("Select type", selection: $fuelType) {
-                                Text(vehicles[vIndex].getFuelEngine)
-                            }
-                        }
-                        else {
-                            Picker("Fuel", selection: $fuelType) {
-                                ForEach(FuelTypes.allCases) { type in
-                                    Text(type.rawValue.capitalized)
-                                }
-                            }
-                            .pickerStyle(.segmented)
-                        }
-                    }
-                }
+//                if !vehicles.isEmpty {
+//                    Section(header: Text("Fuel Type")) {
+//                        if vehicle.getFuelEngine != "Hybrid" {
+//                            Picker("Select type", selection: $fuelType) {
+//                                Text(vehicle.getFuelEngine)
+//                            }
+//                        }
+//                        else {
+//                            Picker("Fuel", selection: $fuelType) {
+//                                ForEach(FuelTypes.allCases) { type in
+//                                    Text(type.rawValue.capitalized)
+//                                }
+//                            }
+//                            .pickerStyle(.segmented)
+//                        }
+//                    }
+//                }
                 Section(header: Text("Distance Unit")) {
                     Picker("Select Unit", selection: $distanceMode) {
                         ForEach(DistanceModes.allCases) { unit in
@@ -170,7 +184,7 @@ struct SettingsView: View {
              AddCarImage()             
             }
             .sheet(isPresented: $showAddVehicleForm, content: {
-                AddVehicleForm(showAddVehicleForm: $showAddVehicleForm)
+                AddVehicleForm(vehicle: $vehicle, showAddVehicleForm: $showAddVehicleForm, locationDataManager: locationDataManager)
             })
             .padding(.top, 10)
             }
@@ -182,16 +196,21 @@ struct SettingsView: View {
     }
     
     func getActiveVehicle() {
+        print("get active vehicle")
         if let object = setting.first {
             if let v = object.vehicle {
                 vehicle = v
             }
         }
-        if let object = vehicle {
-            locationDataManager.odometer = object.odometer
-            locationDataManager.trip = object.trip
+        if vehicle.make != nil {
+            locationDataManager.odometer = vehicle.odometer
+            locationDataManager.trip = vehicle.trip
         }
-        vIndex = vehicles.firstIndex(where: {$0.isActive}) ?? vIndex
+        if vehicles.first(where: {$0.isActive}) != nil {
+            vIndex = vehicles.firstIndex(where: {$0.isActive})!
+            vehicle = vehicles.first(where: {$0.isActive})!
+        }
+       
     }
     func loadSettings() {
         if setting.first != nil {
@@ -216,19 +235,24 @@ struct SettingsView: View {
     }
     
     func updateActiveVehicle() {
+       
         if !vehicles.isEmpty {
             for i in vehicles.indices {
-                if i != vIndex {
+                if vehicles[i] != vehicle {
                     vehicles[i].isActive = false
                 }
                 else {
                     vehicles[i].isActive = true
-                    vehicle = vehicles[i]
-                    locationDataManager.index = i
-                    locationDataManager.odometer = vehicles[i].odometer
-                    locationDataManager.trip = vehicles[i].trip
+                    //vehicle = vehicles[i]
+                    
+                   
                 }                
             }
+            print("update settings")
+            print("vehicle[\(vehicles.firstIndex(of: vehicle))]: \(vehicle.getVehicleText)")
+            locationDataManager.vehicle = vehicle
+            locationDataManager.odometer = vehicle.odometer
+            locationDataManager.trip = vehicle.trip
             Vehicle.saveContext(viewContext: viewContext)
           
         }

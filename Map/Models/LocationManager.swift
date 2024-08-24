@@ -13,7 +13,7 @@ import SwiftUI
 class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     ///locationManager object is instantiated in a class
     var locationManager = CLLocationManager()
-    @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[]) var vehicles: FetchedResults<Vehicle>
+    @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[NSSortDescriptor(keyPath: \Vehicle.isActive, ascending: false)]) var vehicles: FetchedResults<Vehicle>
     ///this is a object property that will reflect the user location authorization status. it is set as a type-alieas @published. which makes updates to swiftui if this object is used in that swiftui view.
     ///property storing userlocation
     @Published var userlocation: CLLocation?
@@ -36,6 +36,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     @Published var trip: CLLocationDistance = 0.0
     var results: [Vehicle] = []
     var index: Int?
+    var vehicle: Vehicle?
     ///overriding the initializer of NSObject class
     override init() {
         ///execute the parent class initializer first
@@ -44,8 +45,15 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         locationManager.delegate = self
         locationManager.pausesLocationUpdatesAutomatically = false
         do {
-            self.results = try viewContext.fetch(NSFetchRequest(entityName: "Vehicle")) as [Vehicle]
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Vehicle")
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "isActive", ascending: false)]
+            self.results = try viewContext.fetch(fetchRequest) as [Vehicle]
+            //viewContext.
             self.index = self.results.firstIndex(where: {$0.isActive})
+            if self.index != nil {
+                self.vehicle = results[index!]
+            }
+         
             for i in results {
                 print(i.type)
                 print(i.odometer)
@@ -113,8 +121,9 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         ///if locations array is not nil and has the first location of the user, get the last user location, also check if the remainingDistance is not nil
         if let lastUserLocation = locations.last {
          ///check if the distance updated is greater than 0.01 meters and make sure distance is greater than 0.
-            if  self.userlocation!.distance(from: lastUserLocation)/1000 >= 0.05 {
+            if  self.userlocation!.distance(from: lastUserLocation)/1000 >= 0.01 {
                 print("manager:",self.trip)
+              
                 ///subtract the remaining distance from it self by the distance travelled by the user.
 ///                remainingDistance! -= (userlocation!.distance(from: lastUserLocation)/1000)
                 ///update the lastLocation variable with the latest user location recevied by location manager.
@@ -122,11 +131,33 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                 self.distance = self.userlocation!.distance(from: lastUserLocation)/1000
               
                 self.distanceText = String(format: "%.1f",self.distance)
-                if let i = index {
-                    self.results[i].odometer += self.userlocation!.distance(from: lastUserLocation)/1000
-                    self.results[i].trip += self.userlocation!.distance(from: lastUserLocation)/1000
-                    print(self.results[i].odometer)
-                        Vehicle.saveContext(viewContext: viewContext)
+                if let v = vehicle {
+                    print(v.getVehicleText)
+                    if let i = results.firstIndex(of: v) {
+                        print("Vehicle[\(i)]: \(results[i].getVehicleText)")
+                        self.results[i].odometer += self.userlocation!.distance(from: lastUserLocation)/1000
+                        self.results[i].trip += self.userlocation!.distance(from: lastUserLocation)/1000
+                        print(self.results[i].odometer)
+                            Vehicle.saveContext(viewContext: viewContext)
+                    }
+                    else {
+                        do {
+                            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Vehicle")
+                            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "isActive", ascending: false)]
+                            self.results = try viewContext.fetch(fetchRequest) as [Vehicle]
+                            //viewContext.
+                            self.index = self.results.firstIndex(where: {$0.isActive})
+                            for i in results {
+                                print(i.type)
+                                print(i.odometer)
+                                
+                            }
+                        }
+                        catch {
+                            print("error")
+                        }
+                    }
+                 
                             
                         
                 }

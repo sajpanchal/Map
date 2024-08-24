@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AutoStatsView: View {
     @Environment (\.colorScheme) var bgMode: ColorScheme
+    @Environment(\.managedObjectContext) private var viewContext
     @StateObject var locationDataManager: LocationDataManager
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
@@ -151,6 +152,7 @@ struct AutoStatsView: View {
                         }
                     }
                 }
+               
                 .frame(width: geo.size.width, height: geo.size.height - 40)
                 .navigationTitle("Auto Summary")
             }

@@ -9,8 +9,11 @@ import SwiftUI
 
 struct AddVehicleForm: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[NSSortDescriptor(keyPath: \Vehicle.isActive, ascending: false)]) var vehicles: FetchedResults<Vehicle>
     @State var vehicleType: VehicleTypes = .Car
     @State var vehicleMake: VehicleMake = .AC
+    @State var textVehicleMake = ""
+    @State var textVehicleModel = ""
     @State var alphabet: Alphbets = .A
     @State var model: Model = .Ace
     @State var year = (Calendar.current.dateComponents([.year], from: Date())).year!
@@ -19,8 +22,11 @@ struct AddVehicleForm: View {
     @State var fuelType = FuelTypes.Gas
     @State var odometer = "0"
     @State var trip = "0.0"
-    @State var vehicle: AutoVehicle?
+    @Binding var vehicle: Vehicle
     @Binding var showAddVehicleForm: Bool
+    @StateObject var locationDataManager: LocationDataManager
+    
+    //@Binding var vIndex: Int
     var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
     var lightGreenColor = Color(red: 0.723, green: 1.0, blue: 0.856)
    
@@ -36,30 +42,50 @@ struct AddVehicleForm: View {
                     }
                 }
                 Section("Vehicle Make") {
+                    
+                        TextField("Enter/Select your vehicle make", text: $textVehicleMake)
+                }
+                Section("") {
                     HStack {
                         Picker("Select Make", selection: $alphabet) {
                             ForEach(Alphbets.allCases) { alpha in
                                 Text(alpha.rawValue)
                             }
                         }
+                        .frame(width: 40)
                         .onChange(of:$alphabet.id) {
                             model = alphabet.makes.first!.models.first!
                             vehicleMake = alphabet.makes.first!
+                            textVehicleMake = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
                         }
                         .pickerStyle(.wheel)
                         Picker("", selection:$vehicleMake) {
                             ForEach(alphabet.makes) { make in
-                                Text(make.rawValue)
+                                Text(make.rawValue.replacingOccurrences(of: "_", with: " "))
                             }
+                        }
+                        .onChange(of: $vehicleMake.id) {
+                            textVehicleMake = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
+                            textVehicleModel = vehicleMake.models.first!.rawValue.replacingOccurrences(of: "_", with: " ")
                         }
                         .pickerStyle(.wheel)
                     }
                 }
                 Section("Vehicle Model") {
+               
+                        TextField("Enter/Select your vehicle model", text: $textVehicleModel)
+                       
+                    
+                   
+                }
+                Section("") {
                     Picker("Select Model", selection: $model) {
                         ForEach(vehicleMake.models, id: \.id) { model in
                             Text(model.rawValue.replacingOccurrences(of: "_", with: " "))
                         }
+                    }
+                    .onChange(of: model.id) {
+                        textVehicleModel = model.rawValue.replacingOccurrences(of: "_", with: " ")
                     }
                     .pickerStyle(.wheel)
                 }
@@ -74,7 +100,7 @@ struct AddVehicleForm: View {
                 Section("Fuel Engine Type") {
                     Picker("Select Type", selection:$fuelType) {
                         ForEach(FuelTypes.allCases) { type in
-                            Text(type.rawValue)
+                            Text(type.rawValue.replacingOccurrences(of: "_", with: " "))
                         }
                     }
                     .pickerStyle(.segmented)
@@ -101,27 +127,32 @@ struct AddVehicleForm: View {
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets())
             }
+            .onAppear {
+                textVehicleMake = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
+                textVehicleModel = model.rawValue.replacingOccurrences(of: "_", with: " ")
+            }
             .navigationTitle("Add New Vehicle")
         }
     }
     func addVehicle() {
-        let vehicle = Vehicle(context: viewContext)
-        vehicle.uniqueID = UUID()
-        vehicle.fuelEngine = fuelType.rawValue
-        vehicle.make = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
-        vehicle.model = model.rawValue.replacingOccurrences(of: "_", with: " ")
-        vehicle.type = vehicleType.rawValue
-        vehicle.isActive = false
-        vehicle.year = Int16(year)
-        vehicle.odometer = Double(odometer) ?? 0
-        vehicle.trip = Double(trip) ?? 0
+        let newVehicle = Vehicle(context: viewContext)
+        newVehicle.uniqueID = UUID()
+        newVehicle.fuelEngine = fuelType.rawValue
+        newVehicle.make = textVehicleMake
+        newVehicle.model = textVehicleModel
+        newVehicle.type = vehicleType.rawValue
+        newVehicle.isActive = false
+        newVehicle.year = Int16(year)
+        newVehicle.odometer = Double(odometer) ?? 0
+        newVehicle.trip = Double(trip) ?? 0
         
         showAddVehicleForm = false
-       
+        vehicle = vehicles.first(where: {$0.isActive}) ?? Vehicle()
+        locationDataManager.results.append(vehicle)
         Vehicle.saveContext(viewContext: viewContext)
     }
 }
 
 #Preview {
-    AddVehicleForm(showAddVehicleForm: .constant(false))
+    AddVehicleForm(vehicle: .constant(Vehicle()), showAddVehicleForm: .constant(false), locationDataManager: LocationDataManager())
 }
