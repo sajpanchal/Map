@@ -17,10 +17,7 @@ struct DirectionsListView: View {
     @Binding var showDirectionsList: Bool
     @Binding var height: CGFloat
     @Binding var nextInstruction: String
-    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
-    var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
-    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
-    var lightRedColor = Color(red:1.0, green:0.654, blue:0.663)
+
     var body: some View {
         ///
         VStack {
@@ -47,7 +44,7 @@ struct DirectionsListView: View {
                                     .padding(.bottom, 5)
                                     .font(.title2)
                                     .fontWeight(.black)
-                                    .foregroundStyle(redColor)
+                                    .foregroundStyle(Color(AppColors.invertRed.rawValue))
                             }
                             Spacer()
                             ///display the instruction string.

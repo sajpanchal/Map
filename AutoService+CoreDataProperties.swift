@@ -28,6 +28,7 @@ extension AutoService {
     public var getTimeStamp: String {
         timeStamp?.formatted(date: .long, time: .complete) ?? Date().formatted(date: .long, time: .complete)
     }
+
 }
 
 extension AutoService : Identifiable {

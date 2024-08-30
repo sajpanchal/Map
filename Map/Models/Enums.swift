@@ -7,6 +7,31 @@
 
 import Foundation
 
+enum AppColors: String {
+    case yellow = "ylwColor"
+    case invertYellow = "invertYlwColor"
+    case red = "rdColor"
+    case darkRed = "darkRdColor"
+    case lightRed = "lightRdColor"
+    case invertRed = "invertRdColor"
+    case orange = "orngColor"
+    case invertOrange = "invertOrngColor"
+    case purple = "prplColor"
+    case invertPurple = "invertPrplColor"
+    case green = "grnColor"
+    case invertGreen = "invertGrnColor"
+    case sky = "skyColor"
+    case invertSky = "invertSkyColor"
+    case lightSky = "lightSkyColor"
+    case darkSky = "darkSkyColor"
+    case pink = "pnkColor"
+    case invertPink = "invertPnkColor"
+    case lightBlue = "lightBluColor"
+    case darkBlue = "darkBlueColor"
+    case blueColor = "bluColor"
+    case invertBlueColor = "invertBluColor"
+}
+
 //enum type to be used to track the status of MapView
 enum MapViewStatus {
     case navigating, centeredToUserLocation, inNavigationCentered, showingDirections, notCentered, inNavigationNotCentered, idle, showingDirectionsNotCentered
@@ -107,6 +132,27 @@ enum Model: String, CaseIterable, Identifiable {
     case EX, FX, G, I, JX35, M56x, Q45, Q50, Q60, Q70, Q70L, QX, QX30, QX50, QX55, QX56, QX60, QX70, QX80
     case Roadster_D
     case  _1110, _1310, KB_2, MXT, Scout, Scout_II
+    case NRR, Rodeo, Trooper, VehiCross
+    case _340, E_Pace, E_Type, F_Pace, F_Type, F_Type_R, I_Pace, Mark_II, S_Type, SS100, Vanden_Plas, X_Type, XE, XF, XFR, XFR_S, XJ, XJ_Series_Sedan, XJ12, XJ6, XJ8, XJL, XJR, XJRS, XJS, XJS_Convertible, XJS_Coupe, XJSC, XK, XKE, XKR
+    case _4WD_Trucks, Cherokee, CJ, CJ_4WD, CJ_5, CJ_7, Comanche_Pickup, Commander, Compass, DJ, Gladiator, Grand_Cherokee, Grand_Cherokee_L, Grand_Cherokee_WK, Grand_Wagoneer, Grand_Wagoneer_L, J10, Liberty, Patriot, Renegade, Scrambler_4WD, TJ, Wagoneer, Wagoneer_L, Wagoneer_Limited, Wagoneer_S, Wrangler, Wrangler_JK_Unlimited
+    case Interceptor
+    case Commando
+    case GS_6, Revero
+    case Amanti, Borrego, Cadenza, Carnival, EV6, EV9, Forte, Forte_5_Door, Forte_Koup, Forte5, k5, K900, Magentis, Niro, Niro_EV, Niro_Plug_In_Hybrid, Optima, Optima_Hybrid, Optima_PHEV, Rio, Rio_5_Door, Rio5, Rondo, Sedona, Seltos, Sorento, Sorento_Hybrid, Sorento_Plug_In_Hybrid, Soul, Soul_EV, Spectra, Spectra_5, Sportage, Sportage_Hybrid, Sportage_Plug_In_Hybrid, Stinger, Telluride
+    case Samara
+    case _400, Aventador, Countach, Diablo, Gallardo, Huracan, Huracan_EVO, Huracan_Spyder, Murcielago, Sian_KFP_37, Urus
+    case Scorpion, Ypsilon
+    case Defender, Discovery, Discovery_Series_II, Discovery_Sport, Freelander, LR2, LR3, LR4, Range_Rover, Range_Rover_Evoque, Range_Rover_Sport, Range_Rover_Velar, Series_I, Series_II, Series_IIA, Series_III
+    case CT, ES, GS, GS_F, GX, GX_550, HS, IS, IS_500, IS_C, IS_F, LC, LS, LS_500, LX, LX_600, NX, RC, RC_F, RX, RX_350H, RX_500H, RZ, SC, TX, TX_350, UX, UX_300H
+    case Aviator, Corsair, Limousine, Mark_IV, Mark_LT, Mark_V, Mark_VI, Mark_VII, Mark_VIII, MKC, MKS, MKT, MKX, MKZ, Nautilus, Navigator, Premiere, Town_Car, Zephyr
+    case Elan, Elise, Emira, Esprit, Europa, Evora, Evora_400, Exige, Seven
+    case Air
+    case _228, _4200_GT, Ghibi, GranCabrio, GranSport, GranTurismo, Granturismo_Convertible, Grecale, Grecale_Folgore, Levante, MC_20, Merak, Quattroporte, Spyder
+    case _57, _62
+    case _2WD_Pickup, _626, _B_Series, Bongo, CX_3, CX_30, CX_5, CX_50, CX_7, CX_70_MHEV, CX_70_PHEV, CX_9, CX_90, CX_90_MHEV, CX_90_PHEV, Mazda_2, Mazda_3, Mazda_5, Mazda_6, Mazda_Speed, Mazda_Speed3, Mazda_Speed6, Miata_MX5, MPV, MX_30, MX_5, MX_6, Protege, Protege_5, RX_3, RX_7, RX_8, Tribute
+    case _12C, _12C_Spider, _540C, _570GT, _570S, _600LT, _650S, _675LT, _720S, _750S, _750S_Spider, _765LT, Artura, MP4_12C, Senna, Senna_GTR
+    case AMG_GT, AMG_GTS, C_Class, CLA_Class, CLS_Class, E_Class, G_Class, GLC_Class, CLE_Class, S_Class, SL_Class
+    case _190_Series, _200_Series, _220, _230, _240_Series, _280_series, _300_Series, _350_Series, _380_Series, _400_Series, _420_Series, _450_Series, _500_Series, _540_Series, _560_Series, _600_Series, A_Class, AMG_GLE_53, AMG_GLS_63, AMG_GT_R, AMG_GT_S, B_Class, CL_Class, CLA, CLE, CLK_Class, CLS, EQB, EQE, EQS, eSprinter_Cargo_Van, G_CLass, Gazelle, GL_Class, GLA, GLB, GLB250, GLC, GLE, GLK_Class, GLS, M_Class, Maybach, Metris_Cargo_Van, Metris_Passenger_Van, R_Class, S63_E_AMG, SLC_Class, SLK_Class, SLR_Class, SLS_AMG, Sprinter_4500, Sprinter_Cab_Chassis, Sprinter_Cargo_Van, Sprinter_Passenger_Van, Unimog
     var id: Self {
         self
     }
@@ -124,7 +170,11 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     case Factory_Five_Racing, Fargo, Farrari, Fiat, Fisker, Ford, Franklin, Freightliner
     case Genesis, Geo, GMC
     case Hino, Holden, Honda, Hudson, Hummer, Hyundai
-    case INEOS, Infiniti, Intermeccanica, International
+    case INEOS, Infiniti, Intermeccanica, International, Isuzu
+    case Jaguar, Jeep, Jensen, Jensen_Healey
+    case Kaiser, Karma, Kia
+    case Lada, Lamborghini, Lancia, Land_Rover, Lexus, Lincoln, Lotus, Lucid
+    case Manic, Maserati, Maybach, Mazda, McLaren, Mercedes_AMG, Mercedes_Benz
  
     
     var models: [Model] {
@@ -252,7 +302,54 @@ enum VehicleMake: String, CaseIterable, Identifiable {
             return [.Roadster_D, .Other]
         case .International:
             return [._100, ._1110, ._1310, .KB_2, .MXT, .Scout, .Scout_II, .Other]
+        case .Isuzu:
+            return [.NRR, .Rodeo, .Trooper, .VehiCross, .Other]
+        case .Jaguar:
+            return [._340, .E_Pace, .E_Type, .F_Pace, .F_Type, .F_Type_R, .I_Pace, .Mark_II, .S_Type, .SS100, .Vanden_Plas, .X_Type, .XE, .XF, .XFR, .XFR_S, .XJ, .XJ_Series_Sedan, .XJ12, .XJ6, .XJ8, .XJL, .XJR, .XJRS, .XJS, .XJS_Convertible, .XJS_Coupe, .XJSC, .XK, .XKE, .XKR, .Other]
+        case .Jeep:
+            return [._4WD_Trucks, .Cherokee, .CJ, .CJ_4WD, .CJ_5, .CJ_7, .Comanche_Pickup, .Commander, .Compass, .DJ, .Gladiator, .Grand_Cherokee, .Grand_Cherokee_L, .Grand_Cherokee_WK, .Grand_Wagoneer, .Grand_Wagoneer_L, .J10, .Liberty, .Patriot, .Renegade, .Scrambler_4WD, .TJ, .Wagoneer, .Wagoneer_L, .Wagoneer_Limited, .Wagoneer_S, .Wrangler, .Wrangler_JK_Unlimited, .Other]
+        case .Jensen:
+            return [.Interceptor, .Other]
+        case .Jensen_Healey:
+            return [.Roadster, .Other]
+        case .Kaiser:
+            return [.Commando, .Other]
+        case .Karma:
+            return [.GS_6, .Revero, .Other]
+        case .Kia:
+            return [.Amanti, .Borrego, .Cadenza, .Carnival, .EV6, .EV9, .Forte, .Forte_5_Door, .Forte_Koup, .Forte5, .k5, .K900, .Magentis, .Niro, .Niro_EV, .Niro_Plug_In_Hybrid, .Optima, .Optima_Hybrid, .Optima_PHEV, .Rio, .Rio_5_Door, .Rio5, .Rondo, .Sedona, .Seltos, .Sorento, .Sorento_Hybrid, .Sorento_Plug_In_Hybrid, .Soul, .Soul_EV, .Spectra, .Spectra_5, .Sportage, .Sportage_Hybrid, .Sportage_Plug_In_Hybrid, .Stinger, .Telluride]
+        case .Lada:
+            return [.Samara, .Other]
+        case .Lamborghini:
+            return [._350, ._400, .Aventador, .Countach, .Diablo, .Gallardo, .Huracan, .Huracan_EVO, .Huracan_Spyder, .Murcielago, .Sian_KFP_37, .Urus, .Other]
+        case .Lancia:
+            return [.Scorpion, .Ypsilon, .Other]
+        case .Land_Rover:
+            return [.Defender, .Discovery, .Discovery_Series_II, .Discovery_Sport, .Freelander, .LR2, .LR3, .LR4, .Range_Rover, .Range_Rover_Evoque, .Range_Rover_Sport, .Range_Rover_Velar, .Series_I, .Series_II, .Series_IIA, .Series_III, .Other]
+        case .Lexus:
+            return [.CT, .ES, .GS, .GS_F, .GX, .GX_550, .HS, .IS, .IS_500, .IS_C, .IS_F, .LC, .LS, .LS_500, .LX, .LX_600, .NX, .RC, .RC_F, .RX, .RX_350H, .RX_500H, .RZ, .SC, .TX, .TX_350, .UX, .UX_300H, .Other]
+        case .Lincoln:
+            return [.Aviator, .Continental, .Corsair, .Limousine, .LS, .Mark_IV, .Mark_LT, .Mark_V, .Mark_VI, .Mark_VII, .Mark_VIII, .MKC, .MKS, .MKT, .MKX, .MKZ, .Nautilus, .Navigator, .Premiere, .Town_Car, .Zephyr, .Other]
+        case .Lotus:
+            return [.Elan, .Elise, .Emira, .Esprit, .Europa, .Evora, .Evora_400, .Exige, .Seven, .Other]
+        case .Lucid:
+            return [.Air, .Other]
+        case .Manic:
+            return [.GT, .Other]
+        case .Maserati:
+            return [._228, ._4200_GT, .Coupe, .Ghibi, .GranCabrio, .GranSport, .GranTurismo, .Granturismo_Convertible, .Grecale, .Grecale_Folgore, .Levante, .MC_20, .Merak, .Quattroporte, .Spyder, .Other]
+        case .Maybach:
+            return [._57, ._62, .Other]
+        case .Mazda:
+            return [._2WD_Pickup, ._626, ._B_Series, .Bongo, .CX_3, .CX_30, .CX_5, .CX_50, .CX_7, .CX_70_MHEV, .CX_70_PHEV, .CX_9, .CX_90, .CX_90_MHEV, .CX_90_PHEV, .Mazda_2, .Mazda_3, .Mazda_5, .Mazda_6, .Mazda_Speed, .Mazda_Speed3, .Mazda_Speed6, .Miata_MX5, .MPV, .MX_30, .MX_5, .MX_6, .Protege, .Protege_5, .RX_3, .RX_7, .RX_8, .Tribute, .Other]
+        case .McLaren:
+            return [._12C, ._12C_Spider, ._540C, ._570GT, ._570S, ._600LT, ._650S, ._675LT, ._720S, ._750S, ._750S_Spider, ._765LT, .Artura, .GT, .MP4_12C, .Senna, .Senna_GTR, .Other]
+        case .Mercedes_AMG:
+            return [.AMG_GT, .AMG_GTS, .C_Class, .CLA_Class, .CLS_Class, .E_Class, .G_Class, .GLC_Class, .CLE_Class, .S_Class, .SL_Class, .Other]
+        case .Mercedes_Benz:
+            return [._190_Series, ._200_Series, ._220, ._230, ._240_Series, ._250, ._280_series, ._300_Series, ._350_Series, ._380_Series,. _400_Series, ._420_Series, ._450_Series, ._500_Series, ._540_Series, ._560_Series, ._600_Series, .A_Class, .AMG_GLE_53, .AMG_GLS_63, .AMG_GT, .AMG_GT_R, .AMG_GT_S, .B_Class, .C_Class, .CL_Class, .CLA, .CLE, .CLK_Class, .CLS, .E_Class, .EQB, .EQE, .EQS, .eSprinter_Cargo_Van, .G_CLass, .Gazelle, .GL_Class, .GLA, .GLB, .GLB250, .GLC, .GLE, .GLK_Class, .GLS, .M_Class, .Maybach, .Metris_Cargo_Van, .Metris_Passenger_Van, .R_Class, .S_Class, .S63_E_AMG, .SL_Class, .SLC_Class, .SLK_Class, .SLR_Class, .SLS_AMG, .Sprinter, .Sprinter_4500, .Sprinter_Cab_Chassis, .Sprinter_Cargo_Van, .Sprinter_Passenger_Van, .Unimog, .Other]
         }
+        
         
     }
     var id: Self {
@@ -260,7 +357,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     }
 }
 enum Alphbets: String, CaseIterable, Identifiable {
-    case A,B,C,D,E,F,G,H,I//,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z
+    case A,B,C,D,E,F,G,H,I,J,K,L//,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z
  
     var makes: [VehicleMake] {
         switch self {
@@ -281,7 +378,13 @@ enum Alphbets: String, CaseIterable, Identifiable {
         case .H:
             return[.Hino, .Holden, .Honda, .Hudson, .Hummer, .Hyundai]
         case .I:
-            return [.INEOS, .Infiniti, .Intermeccanica, .International]
+            return [.INEOS, .Infiniti, .Intermeccanica, .International, .Isuzu]
+        case .J:
+            return [.Jaguar, .Jeep, .Jensen, .Jensen_Healey]
+        case .K:
+            return [.Kaiser, .Karma, .Kia]
+        case .L:
+            return[.Lada, .Lamborghini, .Lancia, .Land_Rover, .Lexus, .Lincoln, .Lotus, .Lucid]
         }
     }
     var id: Self {

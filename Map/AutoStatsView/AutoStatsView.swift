@@ -18,26 +18,18 @@ struct AutoStatsView: View {
     @State var showServiceHistoryView = false
     @State var showFuellingEntryform = false
     @State var showServiceEntryForm = false
+    
   
-    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
-    var lightRedColor = Color(red:1.0, green:0.654, blue:0.663)
-    
-    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
-    var lightGreenColor = Color(red: 0.723, green: 1.0, blue: 0.856)
-    
-    var orangeColor = Color(red: 0.975, green: 0.505, blue: 0.076)
-    var lightOrangeColor = Color(red: 1.0, green: 0.85, blue: 0.7)
-    
-    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
-    var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
-    
-    var yellowColor = Color(red:1.0, green: 0.80, blue: 0.0)
-    var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.84)
-    
-    var purpleColor = Color(red: 0.396, green: 0.381, blue: 0.905)
-    var lightPurpleColor = Color(red:0.725,green:0.721, blue:1.0)
-    
-    let dateFomatter = DateFormatter()
+    let currentYear: String = {
+        let components = DateComponents()
+        if let year = Calendar.current.dateComponents([.year], from: Date()).year {
+            return String(year)
+        }
+        else {
+            return ""
+        }
+       
+    }()
     let numberFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
                formatter.numberStyle = .decimal
@@ -66,24 +58,32 @@ struct AutoStatsView: View {
             NavigationStack {
                 List {
                     if let vehicle = vehicles.first(where: {$0.isActive}) {
-                        Section("Dashboard") {
+                        Section {
                             LazyHGrid(rows: rows) {
-                                DashGridItemView(title: "ODOMETER", foreGroundColor: purpleColor, backGroundColor: lightPurpleColor, numericText: settings.first!.getDistanceUnit == "km" ? numberFormatter.string(for: vehicle.odometer) ?? "--" : numberFormatter.string(for: vehicle.getOdometerMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
-                                DashGridItemView(title: "LAST FUELLING", foreGroundColor: yellowColor, backGroundColor: lightYellowColor, numericText: deciNumberFormatter.string(for: vehicle.getFuellings.first?.volume ?? 0) ?? "--", unitText: settings.first?.getFuelVolumeUnit ?? "", geometricSize: geo.size)
-                                DashGridItemView(title: "FUEL COST", foreGroundColor: orangeColor, backGroundColor: lightOrangeColor, numericText: currencyFormatter.string(for: vehicle.fuelCost) ?? "--", unitText: "Year 2024", geometricSize: geo.size)
-                                DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: skyColor, backGroundColor: lightSkyColor, numericText: settings.first!.getDistanceUnit == "km" ?
+                                DashGridItemView(title: "ODOMETER", foreGroundColor: Color(AppColors.invertPurple.rawValue), backGroundColor: Color(AppColors.purple.rawValue), numericText: settings.first!.getDistanceUnit == "km" ? numberFormatter.string(for: vehicle.odometer) ?? "--" : numberFormatter.string(for: vehicle.getOdometerMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
+                                DashGridItemView(title: "LAST FUELLING", foreGroundColor: Color(AppColors.invertYellow.rawValue), backGroundColor: Color(AppColors.yellow.rawValue), numericText: deciNumberFormatter.string(for: vehicle.getFuellings.first?.volume ?? 0) ?? "--", unitText: settings.first?.getFuelVolumeUnit ?? "", geometricSize: geo.size)
+                                DashGridItemView(title: "FUEL COST", foreGroundColor: Color(AppColors.invertOrange.rawValue), backGroundColor: Color(AppColors.orange.rawValue), numericText: currencyFormatter.string(for: vehicle.getfuelCost) ?? "--", unitText: currentYear, geometricSize: geo.size)
+                                DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: Color(AppColors.invertSky.rawValue), backGroundColor: Color(AppColors.sky.rawValue), numericText: settings.first!.getDistanceUnit == "km" ?
                                                  deciNumberFormatter.string(for: vehicle.trip) ?? "--" :  deciNumberFormatter.string(for: vehicle.getTripMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
-                                DashGridItemView(title: "MILEAGE", foreGroundColor: greenColor, backGroundColor: lightGreenColor, numericText: deciNumberFormatter.string(for: getFuelEfficiency(efficiency: vehicle.fuelEfficiency)) ?? "--", unitText: settings.first?.getFuelEfficiencyUnit ?? "", geometricSize: geo.size)
-                                DashGridItemView(title: "REPAIR COST", foreGroundColor: redColor    , backGroundColor: lightRedColor, numericText: currencyFormatter.string(for: vehicle.serviceCost) ?? "--",  unitText: "Year 2024", geometricSize: geo.size)
+                                DashGridItemView(title: "MILEAGE", foreGroundColor: Color(AppColors.invertGreen.rawValue), backGroundColor:Color(AppColors.green.rawValue), numericText: deciNumberFormatter.string(for: getFuelEfficiency(efficiency: vehicle.fuelEfficiency)) ?? "--", unitText: settings.first?.getFuelEfficiencyUnit ?? "", geometricSize: geo.size)
+                                DashGridItemView(title: "REPAIR COST", foreGroundColor: Color(AppColors.invertRed.rawValue)    , backGroundColor: Color(AppColors.red.rawValue), numericText: currencyFormatter.string(for: vehicle.getServiceCost) ?? "--",  unitText: currentYear, geometricSize: geo.size)
                             }
                         }
-                        .padding(10)
+                       //
+                    header: {
+                        Text("Dashboard")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .padding(.top, 15)
+                    }
+                    .padding(10)
                     }
                  
                     if let vehicle = vehicles.first(where:{$0.isActive}) {
                         Section {
                             ScrollView {
-                                NewEntryStackView(width: geo.size.width)
+                                NewEntryStackView(foregroundColor: Color(AppColors.yellow.rawValue), width: geo.size.width)
+                                    .foregroundStyle(Color(AppColors.invertYellow.rawValue))
                                 .onTapGesture {
                                     showFuellingEntryform.toggle()
                                 }
@@ -92,7 +92,7 @@ struct AutoStatsView: View {
                                 })
                                 ForEach(vehicle.getFuellings, id:\.self.uniqueID) { fuelData in
                                     if vehicle.getFuellings.firstIndex(of: fuelData)! <= 2 {
-                                        CustomListView(date: fuelData.date!, text1: ("Fuel Station",fuelData.location!), text2:("Volume", settings.first!.getFuelVolumeUnit == "Litre" ? (String(format:"%.2f",fuelData.volume) + "L") : (String(format:"%.2f",fuelData.getVolumeGallons) + "GL")), text3: ("Cost","$" + String(format:"%.2f",fuelData.cost)), text4: settings.first!.getDistanceUnit == "km" ? String(format:"%.1f", fuelData.lasttrip) + " km" : String(format:"%.1f", fuelData.getLastTripMiles) + " miles" , timeStamp: "Updated on: " + fuelData.getTimeStamp, width: geo.size.width)
+                                        CustomListView(date: fuelData.date!, text1: ("Fuel Station",fuelData.location!), text2:("Volume", settings.first!.getFuelVolumeUnit == "Litre" ? (String(format:"%.2f",fuelData.volume) + "L") : (String(format:"%.2f",fuelData.getVolumeGallons) + "GL")), text3: ("Cost","$" + String(format:"%.2f",fuelData.cost)), text4: settings.first!.getDistanceUnit == "km" ? String(format:"%.1f", fuelData.lasttrip) + " km" : String(format:"%.1f", fuelData.getLastTripMiles) + " miles" , timeStamp: "Updated on: " + fuelData.getTimeStamp, fuelEntry: true, width: geo.size.width)
                                     }
                                 }
                             }
@@ -102,6 +102,8 @@ struct AutoStatsView: View {
                             VStack {
                                 HStack(spacing: 0) {
                                     Text("Fuelling History")
+                                        .font(.title2)
+                                        .fontWeight(.bold)
                                     Spacer()
                                 }
                                 HStack(spacing: 0) {
@@ -118,7 +120,8 @@ struct AutoStatsView: View {
         
                         Section {
                             ScrollView {
-                                NewEntryStackView(width: geo.size.width)
+                                NewEntryStackView(foregroundColor: Color(AppColors.red.rawValue), width: geo.size.width)
+                                    .foregroundStyle(Color(AppColors.invertRed.rawValue))
                                 .onTapGesture {
                                     showServiceEntryForm.toggle()
                                 }
@@ -127,7 +130,7 @@ struct AutoStatsView: View {
                                 })
                                 ForEach(vehicle.getServices, id: \.self.uniqueID) { autoService in
                                     if vehicle.getServices.firstIndex(of: autoService)! <= 2 {
-                                        CustomListView(date: autoService.date!, text1: ("Auto Shop",autoService.location!), text2: ("",""), text3: ("Cost","$" + String(format:"%.2f",autoService.cost)), text4: "", timeStamp: "Updated on: " + autoService.getTimeStamp, width: geo.size.width)
+                                        CustomListView(date: autoService.date!, text1: ("Auto Shop",autoService.location!), text2: ("",""), text3: ("Cost","$" + String(format:"%.2f",autoService.cost)), text4: "", timeStamp: "Updated on: " + autoService.getTimeStamp, fuelEntry: false, width: geo.size.width)
                                     }
                                 }
                             }
@@ -137,6 +140,8 @@ struct AutoStatsView: View {
                             VStack {
                                 HStack(spacing: 0) {
                                     Text("Service History")
+                                        .font(.title2)
+                                        .fontWeight(.bold)
                                     Spacer()
                                 }
                                 HStack(spacing: 0) {

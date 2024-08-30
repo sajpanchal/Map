@@ -10,7 +10,7 @@ import SwiftUI
 struct NavigationButton: View {
     var imageName: String
     var title: String
-    
+    var foregroundColor: Color
     var body: some View {
         ///button appearance
         VStack {
@@ -18,9 +18,9 @@ struct NavigationButton: View {
             Image(systemName: imageName)
                 .font(.title)
                 .fontWeight(.black)
-                .foregroundStyle(Color.white)
+                .foregroundStyle(foregroundColor)
             Text(title)
-                .foregroundStyle(.white)
+                .foregroundStyle(foregroundColor)
                 .font(.caption2)
                 .fontWeight(.bold)
         }
@@ -29,5 +29,5 @@ struct NavigationButton: View {
 }
 
 #Preview {
-    NavigationButton(imageName: "", title: "")
+    NavigationButton(imageName: "", title: "", foregroundColor: .clear)
 }

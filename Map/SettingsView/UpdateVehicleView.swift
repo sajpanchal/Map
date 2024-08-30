@@ -21,16 +21,16 @@ struct UpdateVehicleView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State var vIndex = 0
     @StateObject var locationDataManager: LocationDataManager
-    var settings: Settings
+  
     @State var distanceMode: DistanceModes = .km
     @State var fuelMode: FuelModes = .Litre
     @State var efficiencyModes = ["km/L", "L/100km", "miles/L","L/100Miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
     @State var efficiencyMode = 0
     @State var showAddVehicleForm = false
     @Binding var showGarage: Bool
+    var settings: Settings
     var vehicle: Vehicle
-    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
-    var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
+    
     var body: some View {
         NavigationStack {
             Form {
@@ -178,9 +178,9 @@ struct UpdateVehicleView: View {
                         saveSettings(for: vehicle)
                         showGarage = false
                     } label: {
-                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: lightSkyColor)
+                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.blueColor.rawValue))
                     }
-                    .background(skyColor)
+                    .background(Color(AppColors.invertBlueColor.rawValue))
                     .buttonStyle(BorderlessButtonStyle())
                     .cornerRadius(100)
                 }
@@ -193,6 +193,7 @@ struct UpdateVehicleView: View {
          
         }
         .onAppear {           
+            print("update vehicle view")
             fillForm()
         }
     }
@@ -234,5 +235,5 @@ struct UpdateVehicleView: View {
 }
 
 #Preview {
-    UpdateVehicleView(locationDataManager: LocationDataManager(), settings: Settings(), showGarage: .constant(false), vehicle: (Vehicle()))
+    UpdateVehicleView(locationDataManager: LocationDataManager(), showGarage: .constant(false), settings: Settings(), vehicle: (Vehicle()))
 }

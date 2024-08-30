@@ -27,24 +27,22 @@ struct InitialSettingsView: View {
     @State var efficiencyModes = ["km/L", "L/100km", "miles/L","L/100Miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
     @State var efficiencyMode = 0
     @State var showAddVehicleForm = false
-    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
-    var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
     
     var body: some View {
         NavigationStack {
             Form {
                 Section("Vehicle Type") {
                     Picker("Select Type", selection: $vehicleType) {
-                        ForEach(VehicleTypes.allCases) { type in
-                            Text(type.rawValue)
+                        ForEach(VehicleTypes.allCases) { thisVehicleType in
+                            Text(thisVehicleType.rawValue)
                         }
                     }
                 }
                 Section("Vehicle Make") {
                     HStack {
                         Picker("Select Make", selection: $alphabet) {
-                            ForEach(Alphbets.allCases) { alpha in
-                                Text(alpha.rawValue)
+                            ForEach(Alphbets.allCases) { thisAlphabet in
+                                Text(thisAlphabet.rawValue)
                             }
                         }
                         .onChange(of:$alphabet.id) {
@@ -62,8 +60,8 @@ struct InitialSettingsView: View {
                 }
                 Section("Vehicle Model") {
                     Picker("Select Model", selection: $model) {
-                        ForEach(vehicleMake.models, id: \.id) { model in
-                            Text(model.rawValue.replacingOccurrences(of: "_", with: " "))
+                        ForEach(vehicleMake.models, id: \.id) { thisModel in
+                            Text(thisModel.rawValue.replacingOccurrences(of: "_", with: " "))
                         }
                     }                   
                     .pickerStyle(.wheel)
@@ -78,8 +76,8 @@ struct InitialSettingsView: View {
                 }
                 Section("Fuel Engine Type") {
                     Picker("Select Type", selection:$fuelType) {
-                        ForEach(FuelTypes.allCases) { type in
-                            Text(type.rawValue)
+                        ForEach(FuelTypes.allCases) { thisFuelType in
+                            Text(thisFuelType.rawValue)
                         }
                     }
                     .pickerStyle(.segmented)
@@ -94,16 +92,16 @@ struct InitialSettingsView: View {
                 }
                 Section(header: Text("Fuel Type")) {
                     Picker("Fuel", selection: $fuelType) {
-                        ForEach(FuelTypes.allCases) { type in
-                            Text(type.rawValue.capitalized)
+                        ForEach(FuelTypes.allCases) { thisFuelType in
+                            Text(thisFuelType.rawValue.capitalized)
                         }
                     }
                     .pickerStyle(.segmented)
                 }
                 Section(header: Text("Distance Unit")) {
                     Picker("Select Unit", selection: $distanceMode) {
-                        ForEach(DistanceModes.allCases) { unit in
-                            Text(unit.rawValue.capitalized)
+                        ForEach(DistanceModes.allCases) { thisDistanceUnit in
+                            Text(thisDistanceUnit.rawValue.capitalized)
                         }
                     }
                     .pickerStyle(.segmented)
@@ -111,8 +109,8 @@ struct InitialSettingsView: View {
                 if fuelType == .Gas {
                     Section(header: Text("Fuel Volume Unit")) {
                         Picker("Select Unit", selection: $fuelMode) {
-                            ForEach(FuelModes.allCases) { unit in
-                                Text(unit.rawValue.capitalized)
+                            ForEach(FuelModes.allCases) { thisFuelMode in
+                                Text(thisFuelMode.rawValue.capitalized)
                             }
                         }
                         .pickerStyle(.segmented)
@@ -172,9 +170,9 @@ struct InitialSettingsView: View {
                     addVehicle(for: vehicle)
                     saveSettings(for: vehicle)                      
                     } label: {
-                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: lightSkyColor)
+                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.pink.rawValue))
                     }
-                    .background(skyColor)
+                    .background(Color(AppColors.invertPink.rawValue))
                     .buttonStyle(BorderlessButtonStyle())
                     .cornerRadius(100)
                 }

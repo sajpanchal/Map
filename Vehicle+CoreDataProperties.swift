@@ -64,15 +64,48 @@ extension Vehicle {
     public var getFuellings: [AutoFuelling] {
         let set = fuellings as? Set<AutoFuelling> ?? []
         return set.sorted {
-            $0.timeStamp! > $1.timeStamp!
+            $0.date! > $1.date!
         }
     }
     
     public var getServices: [AutoService] {
         let set = services as? Set<AutoService> ?? []
         return set.sorted {
-            $0.timeStamp! > $1.timeStamp!
+            $0.date! > $1.date!
         }
+    }
+    
+    public var getServiceCost: Double {
+        var cost = 0.0
+        let set = services as? Set<AutoService>
+        if let services = set {
+                      
+            let sorted = services.sorted(by:  {$0.timeStamp ?? Date() > $1.timeStamp ?? Date()})
+            let filtered = sorted.filter({Calendar.current.component(.year, from: $0.date!) == Calendar.current.component(.year, from: Date())})
+            
+            for thisService in filtered {
+                cost += thisService.cost
+            }
+            return cost
+        }
+       
+        return 0.0
+           
+    }
+    public var getfuelCost: Double {
+        var cost = 0.0
+        let set = fuellings as? Set<AutoFuelling>
+        if let fuellings = set {
+                       
+            let sorted = fuellings.sorted(by:  {$0.timeStamp ?? Date() > $1.timeStamp ?? Date()})
+            let filtered = sorted.filter({Calendar.current.component(.year, from: $0.date!) == Calendar.current.component(.year, from: Date())})
+            
+            for thisfuelling in filtered {
+                cost += thisfuelling.cost
+            }
+            return cost
+        }
+        return 0.0
     }
     
     static func saveContext(viewContext: NSManagedObjectContext) {

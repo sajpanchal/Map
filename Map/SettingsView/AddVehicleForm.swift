@@ -26,30 +26,25 @@ struct AddVehicleForm: View {
     @Binding var showAddVehicleForm: Bool
     @StateObject var locationDataManager: LocationDataManager
     
-    //@Binding var vIndex: Int
-    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
-    var lightGreenColor = Color(red: 0.723, green: 1.0, blue: 0.856)
-   
-    
+       
     var body: some View {
         NavigationStack {
             Form {
                 Section("Vehicle Type") {
                     Picker("Select Type", selection: $vehicleType) {
-                        ForEach(VehicleTypes.allCases) { type in
-                            Text(type.rawValue)
+                        ForEach(VehicleTypes.allCases) { thisVehicleType in
+                            Text(thisVehicleType.rawValue)
                         }
                     }
                 }
                 Section("Vehicle Make") {
-                    
-                        TextField("Enter/Select your vehicle make", text: $textVehicleMake)
+                    TextField("Enter/Select your vehicle make", text: $textVehicleMake)
                 }
                 Section("") {
                     HStack {
                         Picker("Select Make", selection: $alphabet) {
-                            ForEach(Alphbets.allCases) { alpha in
-                                Text(alpha.rawValue)
+                            ForEach(Alphbets.allCases) { thisAlphabet in
+                                Text(thisAlphabet.rawValue)
                             }
                         }
                         .frame(width: 40)
@@ -72,16 +67,12 @@ struct AddVehicleForm: View {
                     }
                 }
                 Section("Vehicle Model") {
-               
-                        TextField("Enter/Select your vehicle model", text: $textVehicleModel)
-                       
-                    
-                   
+                    TextField("Enter/Select your vehicle model", text: $textVehicleModel)
                 }
                 Section("") {
                     Picker("Select Model", selection: $model) {
-                        ForEach(vehicleMake.models, id: \.id) { model in
-                            Text(model.rawValue.replacingOccurrences(of: "_", with: " "))
+                        ForEach(vehicleMake.models, id: \.id) {thisModel in
+                            Text(thisModel.rawValue.replacingOccurrences(of: "_", with: " "))
                         }
                     }
                     .onChange(of: model.id) {
@@ -99,8 +90,8 @@ struct AddVehicleForm: View {
                 }
                 Section("Fuel Engine Type") {
                     Picker("Select Type", selection:$fuelType) {
-                        ForEach(FuelTypes.allCases) { type in
-                            Text(type.rawValue.replacingOccurrences(of: "_", with: " "))
+                        ForEach(FuelTypes.allCases) { thisFuelType in
+                            Text(thisFuelType.rawValue.replacingOccurrences(of: "_", with: " "))
                         }
                     }
                     .pickerStyle(.segmented)
@@ -116,11 +107,10 @@ struct AddVehicleForm: View {
                 VStack {
                     Button {
                        addVehicle()
-                   
                     } label: {
-                        FormButton(imageName: "car.fill", text: "Add Vehicle", color: lightGreenColor)
+                        FormButton(imageName: "car.fill", text: "Add Vehicle", color: Color(AppColors.green.rawValue))
                     }
-                    .background(greenColor)
+                    .background(Color(AppColors.invertGreen.rawValue))
                     .buttonStyle(BorderlessButtonStyle())
                     .cornerRadius(100)
                 }

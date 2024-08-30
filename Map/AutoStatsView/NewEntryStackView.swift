@@ -8,15 +8,26 @@
 import SwiftUI
 
 struct NewEntryStackView: View {
+    @Environment (\.colorScheme) var bgMode: ColorScheme
+    var foregroundColor: Color
     var width: CGFloat
     var body: some View {
         Group {
             VStack {
                 HStack {
-                    Image(systemName: "plus.square.fill")
-                        .font(.system(size: 40))
+                    ZStack {
+                        Rectangle()
+                            .frame(width: 30, height: 30)
+                            .foregroundStyle(foregroundColor)
+                        Image(systemName: "plus.square.fill")
+                            .font(.system(size: 40))
+                          
+                    }
+                    
                     Spacer()
                     Text("New Entry")
+                        .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
+                        .font(.system(size: 18, weight: .bold))
                     Spacer()
                 }
             }
@@ -31,5 +42,5 @@ struct NewEntryStackView: View {
 }
 
 #Preview {
-    NewEntryStackView(width: 0.0)
+    NewEntryStackView(foregroundColor: .clear, width: 0.0)
 }

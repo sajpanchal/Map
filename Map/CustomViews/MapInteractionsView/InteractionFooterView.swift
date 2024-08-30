@@ -40,8 +40,8 @@ struct InteractionFooterView: View {
     @Binding var isRouteSelectTapped: Bool
     @Binding var tappedAnnotation: MKAnnotation?
     @Binding var height: Double
-    var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50)
-    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50)
+//    var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(AppColors.invertSky.rawValue), Color(AppColors.sky.rawValue)]), center: .center, startRadius: 1, endRadius: 50)
+//    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(AppColors.invertRed.rawValue), Color(AppColors.red.rawValue)]), center: .center, startRadius: 1, endRadius: 50)
     var body: some View {
         VStack {
             ///if map is navigating
@@ -70,8 +70,8 @@ struct InteractionFooterView: View {
                 if mapViewStatus != .inNavigationNotCentered && mapViewStatus != .navigating && mapViewStatus != .showingDirections && localSearch.status == .locationSelected {
                     ///routes button. On tap of it change the map action to show directions and make the throughfare nil for it to update it when starting a navigation
                     Button(action: { mapViewAction = .showDirections; locationDataManager.throughfare = nil },
-                           label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes")})
-                    .background(blueRadialGradient)
+                           label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes", foregroundColor: Color(AppColors.lightSky.rawValue))})
+                    .background(Color(AppColors.darkSky.rawValue).gradient)
                     .cornerRadius(15)
                     .padding(5)
                 }
@@ -115,11 +115,11 @@ struct InteractionFooterView: View {
                         ///if map is navigating
                         isMapInNavigationMode().0 ?
                         ///change the button appearance with stop text and xmark symbol
-                        NavigationButton(imageName: "xmark", title: "Stop") :
+                        NavigationButton(imageName: "xmark", title: "Stop", foregroundColor: Color(AppColors.lightRed.rawValue)) :
                         ///if it is not navigating then change the text with navigate and arrows symbol with blue background.
-                        NavigationButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", title: "Navigate")
+                        NavigationButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", title: "Navigate", foregroundColor: Color(AppColors.lightSky.rawValue))
                     })
-                    .background(isMapInNavigationMode().0 ? redRadialGradient : blueRadialGradient)
+                    .background(isMapInNavigationMode().0 ? Color(AppColors.darkRed.rawValue).gradient : Color(AppColors.darkSky.rawValue).gradient)
                     .cornerRadius(15)
                     .padding(5)
                 }

@@ -17,20 +17,18 @@ struct UpdateServiceEntry: View {
     @State var cost: String = ""
     @State var date: Date = Date()
     @State var isButtonTapped = false
-    //@Binding var showServiceEntryForm: Bool
     var serviceEntry: AutoService
-    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
-    var lightRedColor = Color(red:1.0, green:0.654, blue:0.663)
     enum ServiceTypes: String, CaseIterable, Identifiable {
         case service, repair, bodyWork, wash
         var id: Self {
             self
         }
     }
+    
     var body: some View {
         NavigationStack {
             Form {
-                Section(header:Text("Auto Shop Location:").font(Font.system(size: 15))) {
+                Section(header:Text("Shop Name").fontWeight(.bold)) {
                     TextField("Enter name of the location", text: $location)
                         .onTapGesture {
                             isButtonTapped = false
@@ -48,7 +46,7 @@ struct UpdateServiceEntry: View {
                     }
                     
                 }
-                Section(header:Text("Auto Service Type:").font(Font.system(size: 15))) {
+                Section(header:Text("Service Type").fontWeight(.bold)) {
                     Picker("Select type", selection: $type) {
                         ForEach(ServiceTypes.allCases) { service in
                             Text(service.rawValue.capitalized)
@@ -56,12 +54,12 @@ struct UpdateServiceEntry: View {
                     }
                     .pickerStyle(.palette)
                 }
-                Section(header: Text("Auto Service Description:").font(Font.system(size: 15))) {
+                Section(header: Text("Description").fontWeight(.bold)) {
                     TextEditor(text: $description)
                         .font(Font.system(size:14))
                         .frame(height: 70)
                 }
-                Section(header:Text("Auto Service Cost:").font(Font.system(size: 15))) {
+                Section(header:Text("Cost").fontWeight(.bold)) {
                     TextField("Enter total cost", text: $cost)
                         .keyboardType(.decimalPad)
                         .onTapGesture {
@@ -78,7 +76,7 @@ struct UpdateServiceEntry: View {
                             .foregroundStyle(.red)
                     }
                 }
-                Section(header: Text("Date of Auto Service:").font(Font.system(size: 15))) {
+                Section(header: Text("Date of Service") .fontWeight(.bold)) {
                     DatePicker("Set Date", selection: $date, displayedComponents: [.date])
                     if date > Date() {
                         Text("Future date is not acceptable!")
@@ -98,9 +96,9 @@ struct UpdateServiceEntry: View {
                             isButtonTapped = true
                        
                         } label: {
-                            FormButton(imageName: "plus.square.fill", text: "Add Entry", color: lightRedColor)
+                            FormButton(imageName: "plus.square.fill", text: "Add Entry", color: Color(AppColors.red.rawValue))
                         }
-                        .background(redColor)
+                        .background(Color(AppColors.invertRed.rawValue))
                         .buttonStyle(BorderlessButtonStyle())
                         .cornerRadius(100)
                     }

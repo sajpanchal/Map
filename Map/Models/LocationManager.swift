@@ -47,7 +47,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         do {
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Vehicle")
             fetchRequest.sortDescriptors = [NSSortDescriptor(key: "isActive", ascending: false)]
-            self.results = try viewContext.fetch(fetchRequest) as [Vehicle]
+            self.results = try viewContext.fetch(fetchRequest) as? [Vehicle] ?? []
             //viewContext.
             self.index = self.results.firstIndex(where: {$0.isActive})
             if self.index != nil {
@@ -144,7 +144,8 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                         do {
                             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Vehicle")
                             fetchRequest.sortDescriptors = [NSSortDescriptor(key: "isActive", ascending: false)]
-                            self.results = try viewContext.fetch(fetchRequest) as [Vehicle]
+                            
+                            self.results = try viewContext.fetch(fetchRequest) as? [Vehicle] ?? []
                             //viewContext.
                             self.index = self.results.firstIndex(where: {$0.isActive})
                             for i in results {

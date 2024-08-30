@@ -15,64 +15,66 @@ struct CustomListView: View {
     var text3: (String, String)
     var text4: String
     var timeStamp: String
-    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
-    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
-    var yellowColor = Color(red:1.0, green: 0.80, blue: 0.0)    
-    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
+    var fuelEntry: Bool
+//    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
+//    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
+//    var yellowColor = Color(red:1.0, green: 0.80, blue: 0.0)    
+//    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
     var width: CGFloat
     var body: some View {
         Group {
             VStack {
                 Text(date.formatted(date: .long, time: .omitted))
-                    .font(.system(size: 14))
+                    .font(.system(size: 16))
                     .fontWeight(.black)
                     .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                     Spacer()
                 HStack {
                     VStack {
                         Text(text1.0)
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                         Text(text1.1)
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundStyle(redColor)
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(Color(AppColors.invertBlueColor.rawValue))
+                           
                     }
-                    .frame(width: 100)
+              //      .frame(width: 100)
                     if !text2.1.isEmpty {
                         Spacer()
                         VStack {
                             Text(text2.0)
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(.system(size: 14, weight: .semibold))
                                 .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                             Text(text2.1)
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundStyle(yellowColor)
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(Color(AppColors.invertYellow.rawValue))
                         }
                     }
                     Spacer()
                     VStack {
                         Text(text3.0)
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                         Text(text3.1)
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundStyle(greenColor)
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(fuelEntry ? Color(AppColors.invertOrange.rawValue) : Color(AppColors.invertRed.rawValue))
                     }
                 }
                 if !text4.isEmpty {
                     Spacer()
                     HStack {
                         Text("Trip Summary")
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                         Text(text4)
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundStyle(skyColor)
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(Color(AppColors.invertSky.rawValue))
                     }
                 }
                Spacer()
                 Text(timeStamp)
-                    .font(.system(size: 8))
+                    .font(.system(size: 10))
                     .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
             }
             .padding(.horizontal,10)
@@ -85,5 +87,5 @@ struct CustomListView: View {
 }
 
 #Preview {
-    CustomListView(date: Date(), text1: ("",""), text2: ("",""), text3: ("",""), text4: "", timeStamp: "", width: 50)
+    CustomListView(date: Date(), text1: ("",""), text2: ("",""), text3: ("",""), text4: "", timeStamp: "", fuelEntry: false, width: 50)
 }

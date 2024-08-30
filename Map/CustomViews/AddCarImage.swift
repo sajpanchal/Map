@@ -12,17 +12,20 @@ struct AddCarImage: View {
         ZStack {
             Image(systemName: "car.fill")
                 .font(Font.system(size:30))
+                .foregroundStyle(Color(.systemBlue))
 
             VStack {
                 HStack {
                     ZStack {
                         Circle()
-                         
-                            .foregroundStyle(Color(UIColor.systemBackground))
+                            .foregroundStyle(.background)
+                           
                           
                         Image(systemName:"plus.circle.fill")
                             .font(Font.system(size:14))
                             .fontWeight(.black)
+                            .foregroundStyle(Color(.systemBlue))
+                            
                     }
                    
                                                    

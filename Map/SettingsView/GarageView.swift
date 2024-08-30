@@ -14,18 +14,18 @@ struct GarageView: View {
     @StateObject var locationDataManager: LocationDataManager
     @State var carText = ""
     @Binding var showGarage: Bool
-    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
+
     var body: some View {
         NavigationStack {
             List {
-                ForEach(vehicles, id: \.self.uniqueID) { vehicle in
-                    NavigationLink(destination: UpdateVehicleView(locationDataManager: locationDataManager, settings: setting.first!, showGarage: $showGarage, vehicle: vehicle), label: {                    
+                ForEach(vehicles, id: \.self.uniqueID) { thisVehicle in
+                    NavigationLink(destination: UpdateVehicleView(locationDataManager: locationDataManager, showGarage: $showGarage, settings: setting.first!, vehicle: thisVehicle), label: {
                         VStack {
-                            Text(vehicle.getVehicleText + " " + vehicle.getFuelEngine)
+                            Text(thisVehicle.getVehicleText + " " + thisVehicle.getFuelEngine)
                                 .fontWeight(.bold)
                                 .font(Font.system(size: 18))
-                                .foregroundStyle(skyColor)
-                            Text(vehicle.getYear)
+                                .foregroundStyle(Color(AppColors.invertBlueColor.rawValue))
+                            Text(thisVehicle.getYear)
                                 .fontWeight(.semibold)
                                 .font(Font.system(size: 14))
                                 .foregroundStyle(Color.gray)
@@ -40,6 +40,9 @@ struct GarageView: View {
                     }
                 })
             }
+            .onAppear(perform: {
+                print("garage view")
+            })
             .padding(.top,20)
             .navigationTitle("Your Auto Garage")
         }

@@ -12,22 +12,17 @@ struct FuellingEntryForm: View {
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: Settings.entity(), sortDescriptors: []) var settings: FetchedResults<Settings>
     @StateObject var locationDatamanager: LocationDataManager
-    
     @State var location = ""
     @State var amount = ""
     @State var cost = ""
     @State var date: Date = Date()
     @State var isTapped = false
-    
     @Binding var showFuellingEntryform: Bool
-    
-    var yellowColor = Color(red:1.0, green: 0.80, blue: 0.0)
-    var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.84)
     
     var body: some View {
         NavigationStack {
             Form {
-                Section(header:Text("Fuel Station:").font(Font.system(size: 15))) {
+                Section(header:Text("Fuel Station").fontWeight(.bold)) {
                     TextField("Enter Location", text:$location)
                         .onTapGesture {
                             isTapped = false
@@ -44,7 +39,7 @@ struct FuellingEntryForm: View {
                     }
                 }
                 
-                Section(header:Text("Fuel Volume in \(settings.first!.getFuelVolumeUnit):").font(Font.system(size: 15))) {
+                Section(header:Text("Fuel Volume in \(settings.first!.getFuelVolumeUnit)").fontWeight(.bold)) {
                     TextField("Enter Amount", text: $amount)
                         .keyboardType(.decimalPad)
                         .onTapGesture {
@@ -61,7 +56,7 @@ struct FuellingEntryForm: View {
                             .foregroundStyle(.red)
                     }
                 }
-                Section(header:Text("Fuel Cost:").font(Font.system(size: 15))) {
+                Section(header:Text("Fuel Cost").fontWeight(.bold)) {
                     TextField("Enter Cost", text: $cost)
                         .keyboardType(.decimalPad)
                         .onTapGesture {
@@ -78,7 +73,7 @@ struct FuellingEntryForm: View {
                             .foregroundStyle(.red)
                     }
                 }
-                Section(header: Text("Date:").font(Font.system(size: 15))) {
+                Section(header: Text("Date").fontWeight(.bold)) {
                     DatePicker("Fuelling Day", selection: $date, displayedComponents:[.date])
                     if date > Date() {
                         Text("Future date is not acceptable!")
@@ -103,9 +98,9 @@ struct FuellingEntryForm: View {
                             isTapped = true
                             showFuellingEntryform = !isTextFieldEntryValid()
                         } label: {
-                            FormButton(imageName: "plus.square.fill", text: "Add Entry", color: lightYellowColor)
+                            FormButton(imageName: "plus.square.fill", text: "Add Entry", color: Color(AppColors.yellow.rawValue))
                         }
-                        .background(yellowColor)
+                        .background(Color(AppColors.invertYellow.rawValue))
                         .buttonStyle(BorderlessButtonStyle())
                         .cornerRadius(100)
                     }
@@ -137,7 +132,6 @@ struct FuellingEntryForm: View {
         fuelling.timeStamp = Date()
         fuelling.location = location
         fuelling.lasttrip = index != nil ? vehicles[index!].trip : 0.0
-    
         fuelling.volume = settings.first!.getFuelVolumeUnit == "Litre" ? Double(amount) ?? 0 : (Double(amount) ?? 0) * 0.264
         vehicle.addToFuellings(fuelling)
     }
@@ -147,11 +141,13 @@ struct FuellingEntryForm: View {
         locationDatamanager.trip = 0.00
         vehicles[index].trip = 0
     }
+    
     func calculateFuelCost(for vehicle: Vehicle, at index: Int) {
         for fuel in vehicle.getFuellings {
             vehicles[index].fuelCost += fuel.cost
         }
     }
+    
     func calculateFuelEfficiency(for vehicle: Vehicle, at index: Int) {
         let fuellings = vehicle.getFuellings.filter({$0.lasttrip != 0})
         var fuelVolume = 0.0

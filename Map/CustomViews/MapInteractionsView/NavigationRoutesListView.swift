@@ -31,11 +31,11 @@ struct NavigationRoutesListView: View {
     @Binding var nextStepLocation: CLLocation?
     ///bounded property stores an array of tuples with a list of instructions and its distances by each step.
     @Binding var stepInstructions: [(String, Double)]
-    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50)
-    var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50)
-    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
-    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
-    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
+//    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(AppColors.invertRed.rawValue), Color(AppColors.red.rawValue)]), center: .center, startRadius: 1, endRadius: 50)
+//    var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(AppColors.invertSky.rawValue), Color(AppColors.sky.rawValue)]), center: .center, startRadius: 1, endRadius: 50)
+//    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
+//    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
+//    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
     var body: some View {
         ForEach(routeData.reversed(), id: \.id) { route in
             ///enclose the content in HStack
@@ -47,21 +47,21 @@ struct NavigationRoutesListView: View {
                     Text(route.travelTime)
                         .fontWeight(.bold)
                         .font(Font.system(size: 25))
-                        .foregroundStyle(greenColor)
+                        .foregroundStyle(Color(AppColors.invertGreen.rawValue))
                     ///show the distane and title at the bottom enclosed in HStack
                     HStack {
                         Text(route.distance)
                             .fontWeight(.bold)
                             .font(Font.system(size: 16))
-                            .foregroundStyle(redColor)
+                            .foregroundStyle(Color(AppColors.invertRed.rawValue))
                         Text("  via")
                             .fontWeight(.regular)
                             .font(Font.system(size: 16))
-                            .foregroundStyle(skyColor)
+                            .foregroundStyle(Color(AppColors.invertSky.rawValue))
                         Text(route.title)
                             .fontWeight(.bold)
                             .font(Font.system(size: 16))
-                            .foregroundStyle(skyColor)
+                            .foregroundStyle(Color(AppColors.invertSky.rawValue))
                     }
                 }
                 Spacer()
@@ -72,12 +72,12 @@ struct NavigationRoutesListView: View {
                         ///if map is navigating
                         isMapInNavigationMode().0 ?
                         ///change the button appearance with stop text and xmark symbol
-                        NavigationButton(imageName: "xmark", title: "Stop") :
+                        NavigationButton(imageName: "xmark", title: "Stop", foregroundColor: Color(AppColors.lightRed.rawValue)) :
                         ///if it is not navigating then change the text with navigate and arrows symbol with blue background.
-                        NavigationButton(imageName: "steeringwheel", title: "Go")
+                        NavigationButton(imageName: "steeringwheel", title: "Go", foregroundColor: Color(AppColors.lightSky.rawValue))
                         
                     })
-                    .background(isMapInNavigationMode().0 ? redRadialGradient : blueRadialGradient)
+                    .background(isMapInNavigationMode().0 ? Color(AppColors.darkRed.rawValue).gradient : Color(AppColors.darkSky.rawValue).gradient)
                     .cornerRadius(10)
                     .padding(0)
                     
@@ -89,12 +89,12 @@ struct NavigationRoutesListView: View {
                         ///if map is navigating
                         isMapInNavigationMode().0 ?
                         ///change the button appearance with stop text and xmark symbol
-                        NavigationButton(imageName: "xmark", title: "Stop") :
+                        NavigationButton(imageName: "xmark", title: "Stop", foregroundColor: Color(AppColors.lightRed.rawValue)) :
                         ///if it is not navigating then change the text with navigate and arrows symbol with blue background.
-                        NavigationButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", title: "Navigate")
+                        NavigationButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", title: "Navigate", foregroundColor: Color(AppColors.lightSky.rawValue))
                         
                     })
-                    .background(isMapInNavigationMode().0 ? redRadialGradient : blueRadialGradient)
+                    .background(isMapInNavigationMode().0 ? Color(AppColors.darkRed.rawValue).gradient : Color(AppColors.darkSky.rawValue).gradient)
                     .cornerRadius(10)
                     .padding(0)
                     .disabled(true)

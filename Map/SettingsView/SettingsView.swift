@@ -23,86 +23,78 @@ struct SettingsView: View {
     @State var showAddVehicleForm = false
     @State var carText = ""
     @State var showGarage = false
-    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
-    var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
  
     var body: some View {
         NavigationStack {
             Form {
                 Button(action: {
                     showGarage = true
-                }, label: {Text("Show My Garage")})
+                }, label: {
+                    HStack {
+                        Image(systemName: "door.garage.double.bay.closed")
+                            .foregroundStyle(.invertBlu)
+                            .font(Font.system(size: 25))
+                        Spacer()
+                        Text("Open My Garage")
+                            .font(.system(size: 20, weight: .bold))
+                        Spacer()
+                        
+                    }})
                 .sheet(isPresented: $showGarage,  content: {GarageView(locationDataManager: locationDataManager, showGarage: $showGarage)})
-//                NavigationLink("Go to Your Garage", destination: GarageView(locationDataManager: locationDataManager))
-                Section(header:Text("Vehicle Selection")) {
-                    Picker("Select Vehicle", selection: $vehicle) {
+             
+                    Picker(selection: $vehicle) {
                         List {
-                            ForEach(vehicles, id: \.uniqueID) { v in
-                               
+                            ForEach(vehicles, id: \.uniqueID) { thisVehicle in
                                 VStack {
-                                    Text(v.getVehicleText + " " + v.getFuelEngine).tag(v)
+                                    Text(thisVehicle.getVehicleText + " " + thisVehicle.getFuelEngine).tag(thisVehicle)
                                         .fontWeight(.bold)
                                         .font(Font.system(size: 18))
-                                        .foregroundStyle(skyColor)
+                                        .foregroundStyle(Color(AppColors.invertBlueColor.rawValue))
                                     
-                                    Text(v.getYear).tag(v)
+                                    Text(thisVehicle.getYear).tag(thisVehicle)
                                         .fontWeight(.semibold)
                                         .font(Font.system(size: 14))
                                         .foregroundStyle(Color.gray)
                                 }
-                                .tag(v)
-                                
-                            
+                                .tag(thisVehicle)
                             }
                         }
                     }
+            label: {
+                Text("Vehicle Selection")
+                    .fontWeight(.bold)
+            }
                     .onChange(of: vehicle) {
                         fuelType = FuelTypes(rawValue: vehicle.fuelEngine ?? "Gas") ?? .Gas
                     }
                     .pickerStyle(.inline)
-                }
-//                if !vehicles.isEmpty {
-//                    Section(header: Text("Fuel Type")) {
-//                        if vehicle.getFuelEngine != "Hybrid" {
-//                            Picker("Select type", selection: $fuelType) {
-//                                Text(vehicle.getFuelEngine)
-//                            }
-//                        }
-//                        else {
-//                            Picker("Fuel", selection: $fuelType) {
-//                                ForEach(FuelTypes.allCases) { type in
-//                                    Text(type.rawValue.capitalized)
-//                                }
-//                            }
-//                            .pickerStyle(.segmented)
-//                        }
-//                    }
-//                }
-                Section(header: Text("Distance Unit")) {
+                
+            
+                Section(header: Text("Distance Unit").fontWeight(.bold)) {
                     Picker("Select Unit", selection: $distanceMode) {
-                        ForEach(DistanceModes.allCases) { unit in
-                            Text(unit.rawValue.capitalized)
+                        ForEach(DistanceModes.allCases) { thisDistanceUnit in
+                            Text(thisDistanceUnit.rawValue.capitalized)
                         }
                     }
                     .pickerStyle(.segmented)
                 }
                 if !vehicles.isEmpty {
                     if fuelType == .Gas && (vehicles[vIndex].getFuelEngine == "Gas" || vehicles[vIndex].getFuelEngine == "Hybrid") {
-                        Section(header: Text("Fuel Volume Unit")) {
+                        Section(header: Text("Fuel Volume Unit").fontWeight(.bold)) {
                             Picker("Select Unit", selection: $fuelMode) {
-                                ForEach(FuelModes.allCases) { unit in
-                                    Text(unit.rawValue.capitalized)
+                                ForEach(FuelModes.allCases) { thisVolumeUnit in
+                                    Text(thisVolumeUnit.rawValue.capitalized)
                                 }
                             }
                             .pickerStyle(.segmented)
                         }
                     }
                     if fuelType == .Gas && (vehicles[vIndex].getFuelEngine == "Gas" || vehicles[vIndex].getFuelEngine == "Hybrid"){
-                        Section(header: Text("Fuel Efficiency Unit")) {
+                        Section(header: Text("Fuel Efficiency Unit").fontWeight(.bold)) {
                             if fuelMode == .Litre {
                                 if distanceMode == .km {
                                     Picker("Select Unit", selection: $efficiencyMode) {
-                                        ForEach(efficiencyModes.indices, id: \.self) {index in
+                                        ForEach(efficiencyModes.indices, id: \.self) { index in
                                             if index < 2 {
                                                 Text(efficiencyModes[index])
                                             }
@@ -115,11 +107,10 @@ struct SettingsView: View {
                                 }
                                 else {
                                     Picker("Select Unit", selection: $efficiencyMode) {
-                                        ForEach(efficiencyModes.indices, id: \.self) {index in
+                                        ForEach(efficiencyModes.indices, id: \.self) { index in
                                             if index > 1 && index < 4 {
                                                 Text(efficiencyModes[index])
                                             }
-                                               
                                         }
                                     }
                                     .onAppear(perform: {
@@ -127,7 +118,6 @@ struct SettingsView: View {
                                     })
                                     .pickerStyle(.segmented)
                                 }
-                                
                             }
                             else if fuelMode == .Gallon {
                                 if distanceMode == .km {
@@ -139,7 +129,6 @@ struct SettingsView: View {
                                         }
                                     }
                                     .onAppear(perform: {
-                                
                                         efficiencyMode = efficiencyMode.isMultiple(of: 2) ? 4 : 5
                                     })
                                     .pickerStyle(.segmented)
@@ -163,18 +152,19 @@ struct SettingsView: View {
                 }
                 VStack {
                     Button {
-                       updateActiveVehicle()
+                        updateActiveVehicle()
                         saveSettings()
                     } label: {
-                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: lightSkyColor)
+                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.blueColor.rawValue))
                     }
-                    .background(skyColor)
+                    .background(Color(AppColors.invertBlueColor.rawValue))
                     .buttonStyle(BorderlessButtonStyle())
                     .cornerRadius(100)
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets())
             }
+            .tint(Color(AppColors.invertBlueColor.rawValue))
             .navigationTitle("Settings")
             .toolbar {
                 Button {
@@ -213,13 +203,11 @@ struct SettingsView: View {
        
     }
     func loadSettings() {
-        if setting.first != nil {
-            efficiencyModes[efficiencyMode]
+        if setting.first != nil {           
             efficiencyMode = efficiencyModes.firstIndex(of: setting.first!.getFuelEfficiencyUnit) ?? 0
             distanceMode = DistanceModes(rawValue: setting.first!.getDistanceUnit) ?? .km
             fuelMode = FuelModes(rawValue: setting.first!.getFuelVolumeUnit) ?? .Litre
             fuelType = FuelTypes(rawValue: setting.first!.getAutoEngineType) ??  .Gas
-            
         }
     }
     
@@ -235,7 +223,6 @@ struct SettingsView: View {
     }
     
     func updateActiveVehicle() {
-       
         if !vehicles.isEmpty {
             for i in vehicles.indices {
                 if vehicles[i] != vehicle {
@@ -243,24 +230,19 @@ struct SettingsView: View {
                 }
                 else {
                     vehicles[i].isActive = true
-                    //vehicle = vehicles[i]
-                    
-                   
                 }                
             }
-            print("update settings")
-            print("vehicle[\(vehicles.firstIndex(of: vehicle))]: \(vehicle.getVehicleText)")
+//            print("update settings")
+//            print("vehicle[\(vehicles.firstIndex(of: vehicle))]: \(vehicle.getVehicleText)")
             locationDataManager.vehicle = vehicle
             locationDataManager.odometer = vehicle.odometer
             locationDataManager.trip = vehicle.trip
             Vehicle.saveContext(viewContext: viewContext)
-          
         }
         else {
-            print("no vehicles added yet")
+//            print("no vehicles added yet")
         }
     }
-        
 }
 
 #Preview {

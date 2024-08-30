@@ -14,13 +14,14 @@ struct DashGridItemView: View {
     var numericText: String
     var unitText: String
     var geometricSize: CGSize
+    @Environment (\.colorScheme) var bgMode: ColorScheme
     var body: some View {
         GridRow {
             VStack {
                 Text(title)
                     .fontWeight(.semibold)
                     .font(.system(size: 15))
-                    .foregroundStyle(foreGroundColor)
+                    .foregroundStyle(.gray)
                 VStack {
                     Text(numericText)
                         .fontWeight(.bold)
@@ -33,7 +34,8 @@ struct DashGridItemView: View {
                      
                 }
                 .frame(width: (geometricSize.width/2 - 30), height: (geometricSize.width/3) - 60)
-                .background(backGroundColor.gradient)
+                //.background(backGroundColor.gradient)
+                .background(bgMode == .dark ? Color(UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)) : Color(UIColor(red: 0.96, green: 0.96, blue: 0.96, alpha: 1.0)))
                 .cornerRadius(10)
             }
         }

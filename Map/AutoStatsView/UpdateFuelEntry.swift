@@ -12,8 +12,6 @@ struct UpdateFuelEntry: View {
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: AutoFuelling.entity(), sortDescriptors: []) var fuelEntries: FetchedResults<AutoFuelling>
     @FetchRequest(entity: Settings.entity(), sortDescriptors: []) var settings: FetchedResults<Settings>
-    //@StateObject var locationDatamanager: LocationDataManager
-    
     @State var location = ""
     @State var amount = ""
     @State var cost = ""
@@ -21,13 +19,10 @@ struct UpdateFuelEntry: View {
     @State var isTapped = false
     var fuelEntry: AutoFuelling
 
-    
-    var yellowColor = Color(red:1.0, green: 0.80, blue: 0.0)
-    var lightYellowColor = Color(red:0.938, green: 1.0, blue: 0.84)
     var body: some View {
         NavigationStack {
             Form {
-                Section(header:Text("Fuel Station:").font(Font.system(size: 15))) {
+                Section(header:Text("Fuel Station").fontWeight(.bold)) {
                     TextField("Enter Location", text:$location)
                         .onTapGesture {
                             isTapped = false
@@ -43,7 +38,7 @@ struct UpdateFuelEntry: View {
                             .foregroundStyle(.red)
                     }
                 }
-                Section(header:Text("Fuel Volume in \(settings.first!.getFuelVolumeUnit):").font(Font.system(size: 15))) {
+                Section(header:Text("Fuel Volume in \(settings.first!.getFuelVolumeUnit)").fontWeight(.bold)) {
                     TextField("Enter Amount", text: $amount)
                         .keyboardType(.decimalPad)
                         .onTapGesture {
@@ -85,26 +80,26 @@ struct UpdateFuelEntry: View {
                             .foregroundStyle(.red)
                     }
                 }
-                if let vehicle = vehicles.first(where: {$0.isActive}) {
+                if let activeVehicle = vehicles.first(where: {$0.isActive}) {
                     VStack {
                         Button {
                             if isTextFieldEntryValid() {
-                                let index = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID})
+                                let index = vehicles.firstIndex(where: {$0.uniqueID == activeVehicle.uniqueID})
                                 
-                                addFuellingEntry(for: vehicle, at: index)
+                                addFuellingEntry(for: activeVehicle, at: index)
                                                                
                                 if  let i = index {
                                     resetTripData(at: i)
-                                    calculateFuelCost(for: vehicle, at: i)
-                                    calculateFuelEfficiency(for: vehicle, at: i)
+                                    calculateFuelCost(for: activeVehicle, at: i)
+                                    calculateFuelEfficiency(for: activeVehicle, at: i)
                                 }
                             }
                             isTapped = true
                          
                         } label: {
-                            FormButton(imageName: "plus.square.fill", text: "Update Entry", color: lightYellowColor)
+                            FormButton(imageName: "plus.square.fill", text: "Update Entry", color: Color(AppColors.yellow.rawValue))
                         }
-                        .background(yellowColor)
+                        .background(Color(AppColors.invertYellow.rawValue))
                         .buttonStyle(BorderlessButtonStyle())
                         .cornerRadius(100)
                     }
@@ -143,21 +138,19 @@ struct UpdateFuelEntry: View {
             
             fuelEntries[i].volume = settings.first!.getFuelVolumeUnit == "Litre" ? Double(amount) ?? 0 : (Double(amount) ?? 0) * 0.264
         }
-       // AutoFuelling.
         Vehicle.saveContext(viewContext: viewContext)
-        
     }
     
     func resetTripData(at index: Int) {
         vehicles[index].fuelCost = 0
-       // locationDatamanager.trip = 0.00
-        //vehicles[index].trip = 0
     }
+    
     func calculateFuelCost(for vehicle: Vehicle, at index: Int) {
         for fuel in vehicle.getFuellings {
             vehicles[index].fuelCost += fuel.cost
         }
     }
+    
     func calculateFuelEfficiency(for vehicle: Vehicle, at index: Int) {
         let fuellings = vehicle.getFuellings.filter({$0.lasttrip != 0})
         var fuelVolume = 0.0

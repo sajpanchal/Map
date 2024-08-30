@@ -16,10 +16,7 @@ struct DirectionsView: View {
     @State var expandedDirectionsViewHeight: CGFloat = 0
     @Binding var nextInstruction: String
     @Binding var stepInstructions: [(String, Double)]
-    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
-    var lightSkyColor = Color(red:0.657, green:0.961, blue: 1.0)
-    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
-    var lightRedColor = Color(red:1.0, green:0.654, blue:0.663)
+
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
