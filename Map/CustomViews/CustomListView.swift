@@ -16,10 +16,7 @@ struct CustomListView: View {
     var text4: String
     var timeStamp: String
     var fuelEntry: Bool
-//    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
-//    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
-//    var yellowColor = Color(red:1.0, green: 0.80, blue: 0.0)    
-//    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
+
     var width: CGFloat
     var body: some View {
         Group {

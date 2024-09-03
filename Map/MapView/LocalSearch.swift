@@ -55,6 +55,7 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
             })
         }
     }
+
     ///method will be called when cancel button is tapped.
     func cancelLocationSearch() {
         ///create a request object
@@ -84,24 +85,31 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
         ///asnc task
         Task {
             ///start the location search and get the response
-            let response = try await MKLocalSearch(request: request).start()
-            await MainActor.run {
-                ///response will be having mapItems which is having placemarks for each locations matched by location title and subtitle
-                self.suggestedLocations = response.mapItems.compactMap {
-                    ///create an annotation object
-                    let annotation = MKPointAnnotation()
-                    ///assign the annotation object the coordinates of the mapitem placemark
-                    annotation.coordinate = $0.placemark.coordinate
-                    ///assign the annotation object a title of the placemark object to be displayed on map.
-                    if let title = $0.placemark.title, let name = $0.name {
-                        annotation.title = title.contains(name) ?  title : (name + "\n" + title)
-                    }           
-                    ///set the flag false once response is processed.
-                    status = subTitle == "Search Nearby" ? .showingNearbyLocations : .locationSelected
-                    ///return the annotation object and append it to suggestedLocations array. (Usually for each response there will be only one mapItem matching with the title and subtitle.)
-                    return annotation
+            do {
+                let response = try await MKLocalSearch(request: request).start()
+                
+                await MainActor.run {
+                    ///response will be having mapItems which is having placemarks for each locations matched by location title and subtitle
+                    self.suggestedLocations = response.mapItems.compactMap {
+                        ///create an annotation object
+                        let annotation = MKPointAnnotation()
+                        ///assign the annotation object the coordinates of the mapitem placemark
+                        annotation.coordinate = $0.placemark.coordinate
+                        ///assign the annotation object a title of the placemark object to be displayed on map.
+                        if let title = $0.placemark.title, let name = $0.name {
+                            annotation.title = title.contains(name) ?  title : (name + "\n" + title)
+                        }
+                        ///set the flag false once response is processed.
+                        status = subTitle == "Search Nearby" ? .showingNearbyLocations : .locationSelected
+                        ///return the annotation object and append it to suggestedLocations array. (Usually for each response there will be only one mapItem matching with the title and subtitle.)
+                        return annotation
+                    }
                 }
             }
+            catch {
+                print(error.localizedDescription)
+            }
+            
         }
     }
     
