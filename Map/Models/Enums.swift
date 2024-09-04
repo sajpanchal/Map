@@ -56,6 +56,7 @@ enum LocalSearchStatus {
     case localSearchResultsAppear
     case showingNearbyLocations
     case searchBarActive
+    case localSearchFailed
 }
 enum ServiceTypes: String, CaseIterable, Identifiable {
     case service, repair, bodyWork, wash

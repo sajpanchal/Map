@@ -429,6 +429,9 @@ extension MapView {
     func handleLocationSearch(in uiView: MKMapView, at searchedLocations: [MKAnnotation]?, for status: LocalSearchStatus) {
       //  print(status)
         switch status {
+        case .localSearchFailed:
+            break
+            
         case .localSearchCancelled:
             DispatchQueue.main.async {
                ///remove the annotations

@@ -81,6 +81,30 @@ struct Map: View {
                             if !$localSearch.results.isEmpty {
                                 AddressListView(localSearch: localSearch, searchedLocationText: $searchedLocationText)
                             }
+                            else if localSearch.status == .localSearchFailed {
+                                HStack {
+                                    Spacer()
+                                    VStack {
+                                        HStack {
+                                            Image(systemName: "network.slash")
+                                                .foregroundStyle(.invertRd)
+                                                .font(.system(size: 30))
+                                            Text("No Network")
+                                                .font(.system(size: 30))
+                                                .foregroundStyle(.gray)
+                                        }
+                                         Text("Please check your network connection or try again.")
+                                             .foregroundStyle(.gray)
+                                             .font(.caption)
+                                    }
+                                   
+                                    Spacer()
+                                }
+                                .padding(.vertical,40)
+                                
+                                .background(bgMode == .dark ? Color.black : Color.white)
+                             
+                            }
                             Spacer()
                         }
                         
