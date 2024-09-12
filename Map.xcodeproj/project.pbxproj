@@ -43,6 +43,8 @@
 		726754502A7C077500CE6F46 /* MapSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7267544F2A7C077500CE6F46 /* MapSwiftUI.swift */; };
 		726A77DA2B486ABE0095B047 /* NavigationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 726A77D92B486ABE0095B047 /* NavigationButton.swift */; };
 		7271514D2A7D53B200B20767 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7271514C2A7D53B200B20767 /* LocationManager.swift */; };
+		7274A4E52C8B559B00C929CC /* NetworkAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7274A4E42C8B559B00C929CC /* NetworkAlertView.swift */; };
+		7274A4E72C8B566F00C929CC /* SearchProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7274A4E62C8B566F00C929CC /* SearchProgressView.swift */; };
 		727996302C1F3E4D00F323B4 /* AutoStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7279962F2C1F3E4D00F323B4 /* AutoStatsView.swift */; };
 		727996332C1F3EDE00F323B4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727996322C1F3EDE00F323B4 /* SettingsView.swift */; };
 		727F5E072B34C748000ECCB7 /* LocalSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727F5E062B34C748000ECCB7 /* LocalSearch.swift */; };
@@ -132,6 +134,8 @@
 		7267544F2A7C077500CE6F46 /* MapSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSwiftUI.swift; sourceTree = "<group>"; };
 		726A77D92B486ABE0095B047 /* NavigationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationButton.swift; sourceTree = "<group>"; };
 		7271514C2A7D53B200B20767 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		7274A4E42C8B559B00C929CC /* NetworkAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkAlertView.swift; sourceTree = "<group>"; };
+		7274A4E62C8B566F00C929CC /* SearchProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchProgressView.swift; sourceTree = "<group>"; };
 		7279962F2C1F3E4D00F323B4 /* AutoStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoStatsView.swift; sourceTree = "<group>"; };
 		727996322C1F3EDE00F323B4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		727F5E062B34C748000ECCB7 /* LocalSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocalSearch.swift; path = ../MapView/LocalSearch.swift; sourceTree = "<group>"; };
@@ -234,6 +238,8 @@
 				72BF3DCC2C5153A9005395B4 /* AddCarImage.swift */,
 				72BF3DCE2C5157CD005395B4 /* CustomListView.swift */,
 				728181FC2C52A6F400D8F3AA /* VehicleListItem.swift */,
+				7274A4E42C8B559B00C929CC /* NetworkAlertView.swift */,
+				7274A4E62C8B566F00C929CC /* SearchProgressView.swift */,
 			);
 			path = CustomViews;
 			sourceTree = "<group>";
@@ -520,6 +526,7 @@
 				721E4BA52C569EED00C3C769 /* UpdateFuelEntry.swift in Sources */,
 				7223439E2A8FD6ED00DC7120 /* MapProgressView.swift in Sources */,
 				726754252A7C004000CE6F46 /* ContentView.swift in Sources */,
+				7274A4E52C8B559B00C929CC /* NetworkAlertView.swift in Sources */,
 				72EDE4142B2631D800578B8A /* DirectionHeaderView.swift in Sources */,
 				72A8BC262C29C7EB00E0D7B2 /* ServiceEntryForm.swift in Sources */,
 				72A6D14F2BD01B8000A33A0A /* PolylinePoint.swift in Sources */,
@@ -549,6 +556,7 @@
 				726A77DA2B486ABE0095B047 /* NavigationButton.swift in Sources */,
 				72BF3DCD2C5153A9005395B4 /* AddCarImage.swift in Sources */,
 				7246B2132C27284A00086BFB /* FuellingEntryForm.swift in Sources */,
+				7274A4E72C8B566F00C929CC /* SearchProgressView.swift in Sources */,
 				726754232A7C004000CE6F46 /* MapApp.swift in Sources */,
 				7222C2282C1C98F30029E26F /* InteractionFooterView.swift in Sources */,
 				722DABAE2BADF267004447FE /* RouteData.swift in Sources */,

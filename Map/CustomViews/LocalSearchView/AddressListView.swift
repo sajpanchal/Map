@@ -39,7 +39,7 @@ struct AddressListView: View {
                 ///on tap of this list item the code in the braces will be executed to get that location in the map
                 .onTapGesture {
                     ///set the flag to true to indicate search for the locations is in progress.
-                    localSearch.status = .localSearchInProgress
+                    localSearch.status = .locationSelected
                     ///this method will pin the given location in the map.
                     localSearch.getPlace(from: suggestion)
                     ///replace the partial searched text with the complete title received from selected location

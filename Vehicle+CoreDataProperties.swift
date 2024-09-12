@@ -89,7 +89,7 @@ extension Vehicle {
             return cost
         }
        
-        return 0.0
+        return cost
            
     }
     public var getfuelCost: Double {
@@ -105,7 +105,7 @@ extension Vehicle {
             }
             return cost
         }
-        return 0.0
+        return cost
     }
     
     static func saveContext(viewContext: NSManagedObjectContext) {

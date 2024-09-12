@@ -17,8 +17,7 @@ struct RouteETAStackView: View {
     @Binding var addressViewHeight: CGFloat
     ///variable that stores and displayes the distance remaining from the current location to destination
     var remainingDistance: String
-//    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
-//    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
+    
     var body: some View {
         ///enclose the ETA texts in HStack
         HStack {

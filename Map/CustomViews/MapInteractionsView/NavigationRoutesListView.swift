@@ -31,11 +31,7 @@ struct NavigationRoutesListView: View {
     @Binding var nextStepLocation: CLLocation?
     ///bounded property stores an array of tuples with a list of instructions and its distances by each step.
     @Binding var stepInstructions: [(String, Double)]
-//    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(AppColors.invertRed.rawValue), Color(AppColors.red.rawValue)]), center: .center, startRadius: 1, endRadius: 50)
-//    var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(AppColors.invertSky.rawValue), Color(AppColors.sky.rawValue)]), center: .center, startRadius: 1, endRadius: 50)
-//    var greenColor = Color(red: 0.257, green: 0.756, blue: 0.346)
-//    var redColor = Color(red:0.861, green: 0.194, blue:0.0)
-//    var skyColor = Color(red:0.031, green:0.739, blue:0.861)
+
     var body: some View {
         ForEach(routeData.reversed(), id: \.id) { route in
             ///enclose the content in HStack

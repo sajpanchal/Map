@@ -402,14 +402,14 @@ enum FuelTypes: String, CaseIterable, Identifiable  {
     }
 }
 
-enum DistanceModes: String, CaseIterable, Identifiable  {
+enum DistanceUnit: String, CaseIterable, Identifiable  {
     case km
     case miles
     var id: Self {
         self
     }
 }
-enum FuelModes: String, CaseIterable, Identifiable  {
+enum FuelUnit: String, CaseIterable, Identifiable  {
     case Litre
     case Gallon
     var id: Self {

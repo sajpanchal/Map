@@ -78,32 +78,14 @@ struct Map: View {
                                 .padding(.top, 10)
                                 .background(bgMode == .dark ? Color.black : Color.white)
                             ///if search results are avialable, show them in the listview on top of everything in zstack view.
-                            if !$localSearch.results.isEmpty {
+                            if !$localSearch.results.isEmpty && localSearch.status != .localSearchCancelled {
                                 AddressListView(localSearch: localSearch, searchedLocationText: $searchedLocationText)
                             }
+                            else if localSearch.status == .localSearchInProgress && $localSearch.results.isEmpty {
+                                 SearchProgressView()
+                            }
                             else if localSearch.status == .localSearchFailed {
-                                HStack {
-                                    Spacer()
-                                    VStack {
-                                        HStack {
-                                            Image(systemName: "network.slash")
-                                                .foregroundStyle(.invertRd)
-                                                .font(.system(size: 30))
-                                            Text("No Network")
-                                                .font(.system(size: 30))
-                                                .foregroundStyle(.gray)
-                                        }
-                                         Text("Please check your network connection or try again.")
-                                             .foregroundStyle(.gray)
-                                             .font(.caption)
-                                    }
-                                   
-                                    Spacer()
-                                }
-                                .padding(.vertical,40)
-                                
-                                .background(bgMode == .dark ? Color.black : Color.white)
-                             
+                               NetworkAlertView()
                             }
                             Spacer()
                         }

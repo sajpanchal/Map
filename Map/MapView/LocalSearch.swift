@@ -34,15 +34,23 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
         ///string typed for search
         searchableText = withSearchText
         ///if it is empty return the call to a function
-        guard searchableText.isEmpty == false else { return }
+        guard searchableText.isEmpty == false else {
+            results.removeAll()
+            return
+        }
         ///set the region for the search request object to search for.
         request.region = inRegion
         ///set the query fragment for search completer so it can generate the completed search results.
         locationSearchCompleter.queryFragment = searchableText
+        status = .localSearchInProgress
        
         }
     ///when search completer updates the array of completed search for a given searched text this method will be called.
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        if searchableText.isEmpty {
+            results.removeAll()
+        }
+      
         ///async task
         Task { @MainActor in
             ///completer has a results property that has the array of completion search results with location name and address. here we are mapping the reuslts to our AddressResults array that is going to be displayed in a listview of the search bar.

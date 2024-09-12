@@ -61,7 +61,7 @@ struct SearchFieldView: View {
     ///method to start or stp the location search
     func handleLocationSearch(forUserInput text:String) {
         ///if location is selected or search is cancelled
-        guard localSearch.status == .searchBarActive || localSearch.status == .localSearchResultsAppear else {
+        guard localSearch.status == .searchBarActive || localSearch.status == .localSearchResultsAppear || localSearch.status == .localSearchInProgress || localSearch.status == .localSearchFailed  else {
            ///un-focus the search field
             enableSearchFieldFocus = false
             ///stop the location search

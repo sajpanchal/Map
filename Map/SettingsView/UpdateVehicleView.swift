@@ -22,8 +22,8 @@ struct UpdateVehicleView: View {
     @State var vIndex = 0
     @StateObject var locationDataManager: LocationDataManager
   
-    @State var distanceMode: DistanceModes = .km
-    @State var fuelMode: FuelModes = .Litre
+    @State var distanceUnit: DistanceUnit = .km
+    @State var fuelUnit: FuelUnit = .Litre
     @State var efficiencyModes = ["km/L", "L/100km", "miles/L","L/100Miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
     @State var efficiencyMode = 0
     @State var showAddVehicleForm = false
@@ -105,8 +105,8 @@ struct UpdateVehicleView: View {
                     .pickerStyle(.segmented)
                 }
                 Section(header: Text("Distance Unit")) {
-                    Picker("Select Unit", selection: $distanceMode) {
-                        ForEach(DistanceModes.allCases) { unit in
+                    Picker("Select Unit", selection: $distanceUnit) {
+                        ForEach(DistanceUnit.allCases) { unit in
                             Text(unit.rawValue.capitalized)
                         }
                     }
@@ -115,8 +115,8 @@ struct UpdateVehicleView: View {
                  
                 if fuelType == .Gas {
                     Section(header: Text("Fuel Volume Unit")) {
-                        Picker("Select Unit", selection: $fuelMode) {
-                            ForEach(FuelModes.allCases) { unit in
+                        Picker("Select Unit", selection: $fuelUnit) {
+                            ForEach(FuelUnit.allCases) { unit in
                                 Text(unit.rawValue.capitalized)
                             }
                         }
@@ -125,8 +125,8 @@ struct UpdateVehicleView: View {
                 }
                 if fuelType == .Gas {
                     Section(header: Text("Fuel Efficiency Unit")) {
-                        if fuelMode == .Litre {
-                            if distanceMode == .km {
+                        if fuelUnit == .Litre {
+                            if distanceUnit == .km {
                                 Picker("Select Unit", selection: $efficiencyMode) {
                                     ForEach(efficiencyModes.indices, id: \.self) {index in
                                         if index < 2 {
@@ -147,8 +147,8 @@ struct UpdateVehicleView: View {
                                 .pickerStyle(.segmented)
                             }
                         }
-                        else if fuelMode == .Gallon {
-                            if distanceMode == .km {
+                        else if fuelUnit == .Gallon {
+                            if distanceUnit == .km {
                                 Picker("Select Unit", selection: $efficiencyMode) {
                                     ForEach(efficiencyModes.indices, id: \.self) { index in
                                         if index > 3 && index < 6 {
@@ -214,8 +214,8 @@ struct UpdateVehicleView: View {
         let settings = Settings(context: viewContext)
         settings.vehicle = vehicle
         settings.autoEngineType = fuelType.rawValue
-        settings.distanceUnit = distanceMode.rawValue
-        settings.fuelVolumeUnit = fuelMode.rawValue
+        settings.distanceUnit = distanceUnit.rawValue
+        settings.fuelVolumeUnit = fuelUnit.rawValue
         settings.fuelEfficiencyUnit = efficiencyModes[efficiencyMode]
         Settings.saveContext(viewContext: viewContext)
     }
@@ -228,8 +228,8 @@ struct UpdateVehicleView: View {
         fuelType = FuelTypes(rawValue: vehicle.getFuelEngine) ?? .Gas
         odometer = String(vehicle.odometer)
         trip = String(vehicle.trip)
-        distanceMode = DistanceModes(rawValue: settings.getDistanceUnit) ?? .km
-        fuelMode = FuelModes(rawValue: settings.getFuelVolumeUnit) ?? .Litre
+        distanceUnit = DistanceUnit(rawValue: settings.getDistanceUnit) ?? .km
+        fuelUnit = FuelUnit(rawValue: settings.getFuelVolumeUnit) ?? .Litre
         efficiencyMode = efficiencyModes.firstIndex(where: {$0 == settings.fuelEfficiencyUnit}) ?? 0
     }
 }

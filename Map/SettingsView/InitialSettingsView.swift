@@ -22,8 +22,8 @@ struct InitialSettingsView: View {
     @State var trip = "0.0"
     @State var vIndex = 0   
     @State var settings: Settings?
-    @State var distanceMode: DistanceModes = .km
-    @State var fuelMode: FuelModes = .Litre
+    @State var distanceUnit: DistanceUnit = .km
+    @State var fuelUnit: FuelUnit = .Litre
     @State var efficiencyModes = ["km/L", "L/100km", "miles/L","L/100Miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
     @State var efficiencyMode = 0
     @State var showAddVehicleForm = false
@@ -99,8 +99,8 @@ struct InitialSettingsView: View {
                     .pickerStyle(.segmented)
                 }
                 Section(header: Text("Distance Unit")) {
-                    Picker("Select Unit", selection: $distanceMode) {
-                        ForEach(DistanceModes.allCases) { thisDistanceUnit in
+                    Picker("Select Unit", selection: $distanceUnit) {
+                        ForEach(DistanceUnit.allCases) { thisDistanceUnit in
                             Text(thisDistanceUnit.rawValue.capitalized)
                         }
                     }
@@ -108,8 +108,8 @@ struct InitialSettingsView: View {
                 }
                 if fuelType == .Gas {
                     Section(header: Text("Fuel Volume Unit")) {
-                        Picker("Select Unit", selection: $fuelMode) {
-                            ForEach(FuelModes.allCases) { thisFuelMode in
+                        Picker("Select Unit", selection: $fuelUnit) {
+                            ForEach(FuelUnit.allCases) { thisFuelMode in
                                 Text(thisFuelMode.rawValue.capitalized)
                             }
                         }
@@ -118,8 +118,8 @@ struct InitialSettingsView: View {
                 }
                 if fuelType == .Gas {
                     Section(header: Text("Fuel Efficiency Unit")) {
-                        if fuelMode == .Litre {
-                            if distanceMode == .km {
+                        if fuelUnit == .Litre {
+                            if distanceUnit == .km {
                                 Picker("Select Unit", selection: $efficiencyMode) {
                                     ForEach(efficiencyModes.indices, id: \.self) {index in
                                         if index < 2 {
@@ -140,8 +140,8 @@ struct InitialSettingsView: View {
                                 .pickerStyle(.segmented)
                             }
                         }
-                        else if fuelMode == .Gallon {
-                            if distanceMode == .km {
+                        else if fuelUnit == .Gallon {
+                            if distanceUnit == .km {
                                 Picker("Select Unit", selection: $efficiencyMode) {
                                     ForEach(efficiencyModes.indices, id: \.self) { index in
                                         if index > 3 && index < 6 {
@@ -200,8 +200,8 @@ struct InitialSettingsView: View {
         let settings = Settings(context: viewContext)
         settings.vehicle = vehicle
         settings.autoEngineType = fuelType.rawValue
-        settings.distanceUnit = distanceMode.rawValue
-        settings.fuelVolumeUnit = fuelMode.rawValue
+        settings.distanceUnit = distanceUnit.rawValue
+        settings.fuelVolumeUnit = fuelUnit.rawValue
         settings.fuelEfficiencyUnit = efficiencyModes[efficiencyMode]
         Settings.saveContext(viewContext: viewContext)
     }
