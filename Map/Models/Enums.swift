@@ -393,10 +393,17 @@ enum Alphbets: String, CaseIterable, Identifiable {
     }
 }
 
-enum FuelTypes: String, CaseIterable, Identifiable  {
+enum EngineType: String, CaseIterable, Identifiable  {
     case Gas
     case EV
     case Hybrid
+    var id: Self {
+        self
+    }
+}
+enum FuelMode: String, CaseIterable, Identifiable {
+    case Gas
+    case EV
     var id: Self {
         self
     }

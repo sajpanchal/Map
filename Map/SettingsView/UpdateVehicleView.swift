@@ -15,7 +15,7 @@ struct UpdateVehicleView: View {
     @State var year = (Calendar.current.dateComponents([.year], from: Date())).year!
     @State var index = 0
     @State var range = 1900..<(Calendar.current.dateComponents([.year], from: Date())).year! + 1
-    @State var fuelType = FuelTypes.Gas
+    @State var engineType = EngineType.Gas
     @State var odometer = "0"
     @State var trip = "0.0"
     @Environment(\.managedObjectContext) private var viewContext
@@ -81,8 +81,8 @@ struct UpdateVehicleView: View {
                     .pickerStyle(.wheel)
                 }
                 Section("Fuel Engine Type") {
-                    Picker("Select Type", selection:$fuelType) {
-                        ForEach(FuelTypes.allCases) { type in
+                    Picker("Select Type", selection:$engineType) {
+                        ForEach(EngineType.allCases) { type in
                             Text(type.rawValue)
                         }
                     }
@@ -97,8 +97,8 @@ struct UpdateVehicleView: View {
                         .keyboardType(.decimalPad)
                 }
                 Section(header: Text("Fuel Type")) {
-                    Picker("Fuel", selection: $fuelType) {
-                        ForEach(FuelTypes.allCases) { type in
+                    Picker("Fuel", selection: $engineType) {
+                        ForEach(EngineType.allCases) { type in
                             Text(type.rawValue.capitalized)
                         }
                     }
@@ -113,7 +113,7 @@ struct UpdateVehicleView: View {
                     .pickerStyle(.segmented)
                 }
                  
-                if fuelType == .Gas {
+                if engineType == .Gas {
                     Section(header: Text("Fuel Volume Unit")) {
                         Picker("Select Unit", selection: $fuelUnit) {
                             ForEach(FuelUnit.allCases) { unit in
@@ -123,7 +123,7 @@ struct UpdateVehicleView: View {
                         .pickerStyle(.segmented)
                     }
                 }
-                if fuelType == .Gas {
+                if engineType == .Gas {
                     Section(header: Text("Fuel Efficiency Unit")) {
                         if fuelUnit == .Litre {
                             if distanceUnit == .km {
@@ -205,7 +205,7 @@ struct UpdateVehicleView: View {
         vehicle.year = Int16(year)
         vehicle.odometer = Double(odometer) ?? 0
         vehicle.trip = Double(trip) ?? 0
-        vehicle.fuelEngine = fuelType.rawValue
+        vehicle.fuelEngine = engineType.rawValue
         vehicle.type = vehicleType.rawValue
         vehicle.isActive = true
         Vehicle.saveContext(viewContext: viewContext)
@@ -213,7 +213,7 @@ struct UpdateVehicleView: View {
     func saveSettings(for vehicle: Vehicle) {
         let settings = Settings(context: viewContext)
         settings.vehicle = vehicle
-        settings.autoEngineType = fuelType.rawValue
+        settings.autoEngineType = engineType.rawValue
         settings.distanceUnit = distanceUnit.rawValue
         settings.fuelVolumeUnit = fuelUnit.rawValue
         settings.fuelEfficiencyUnit = efficiencyModes[efficiencyMode]
@@ -225,7 +225,7 @@ struct UpdateVehicleView: View {
         model = Model(rawValue: vehicle.getModel) ?? .ATS
         year = Int(vehicle.year)
         alphabet = Alphbets(rawValue: String(vehicleMake.rawValue.first ?? "A").uppercased()) ?? .A
-        fuelType = FuelTypes(rawValue: vehicle.getFuelEngine) ?? .Gas
+        engineType = EngineType(rawValue: vehicle.getFuelEngine) ?? .Gas
         odometer = String(vehicle.odometer)
         trip = String(vehicle.trip)
         distanceUnit = DistanceUnit(rawValue: settings.getDistanceUnit) ?? .km

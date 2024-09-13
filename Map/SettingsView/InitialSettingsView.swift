@@ -17,7 +17,7 @@ struct InitialSettingsView: View {
     @State var year = (Calendar.current.dateComponents([.year], from: Date())).year!
     @State var index = 0
     @State var range = 1900..<(Calendar.current.dateComponents([.year], from: Date())).year! + 1
-    @State var fuelType = FuelTypes.Gas
+    @State var fuelType = EngineType.Gas
     @State var odometer = "0"
     @State var trip = "0.0"
     @State var vIndex = 0   
@@ -76,7 +76,7 @@ struct InitialSettingsView: View {
                 }
                 Section("Fuel Engine Type") {
                     Picker("Select Type", selection:$fuelType) {
-                        ForEach(FuelTypes.allCases) { thisFuelType in
+                        ForEach(EngineType.allCases) { thisFuelType in
                             Text(thisFuelType.rawValue)
                         }
                     }
@@ -92,7 +92,7 @@ struct InitialSettingsView: View {
                 }
                 Section(header: Text("Fuel Type")) {
                     Picker("Fuel", selection: $fuelType) {
-                        ForEach(FuelTypes.allCases) { thisFuelType in
+                        ForEach(EngineType.allCases) { thisFuelType in
                             Text(thisFuelType.rawValue.capitalized)
                         }
                     }

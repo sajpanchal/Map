@@ -20,8 +20,10 @@ struct SettingsView: View {
     @State var vehicleIndex = 0
     ///instaintiate the empty vehicle object to prevent picker view to throw error.
     @State var vehicle: Vehicle = Vehicle()
-    ///enum type to store fuel type of vehicle
-    @State var fuelType: FuelTypes = .Gas
+    ///enum type to store engine type of vehicle
+    @State var engineType: EngineType = .Gas
+    ///enum type to store fuel mode  of vehicle
+    @State var fuelMode: FuelMode = .Gas
     ///enum type to store the distance unit
     @State var distanceUnit: DistanceUnit = .km
     ///enum type to store the fuel unit.
@@ -84,7 +86,8 @@ struct SettingsView: View {
                     }
                 ///on change of the vehicle selection change the fuel type value
                     .onChange(of: vehicle) {
-                        fuelType = FuelTypes(rawValue: vehicle.fuelEngine ?? "Gas") ?? .Gas
+                        engineType = EngineType(rawValue: vehicle.fuelEngine ?? "Gas") ?? .Gas
+                        fuelMode = (engineType == .EV) ? .EV : .Gas
                     }
                     .pickerStyle(.inline)
                 ///picker for selecting distnace unit
@@ -96,10 +99,20 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.segmented)
                 }
+                if engineType == .Hybrid {
+                    Section(header: Text("Engine Type").fontWeight(.bold)) {
+                        Picker("Select Type", selection: $fuelMode) {
+                            ForEach(FuelMode.allCases) { thisFuelType in
+                                Text(thisFuelType.rawValue.capitalized)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                    }
+                }
                 ///if vehciles record is not empty
                 if !vehicles.isEmpty {
                     ///if the vehicle type is gas or hybrid
-                    if fuelType == .Gas && (vehicles[vehicleIndex].getFuelEngine == "Gas" || vehicles[vehicleIndex].getFuelEngine == "Hybrid") {
+                    if fuelMode == .Gas && (vehicles[vehicleIndex].getFuelEngine == "Gas" || vehicles[vehicleIndex].getFuelEngine == "Hybrid") {
                         ///picker for fuel unit selection
                         Section(header: Text("Fuel Volume Unit").fontWeight(.bold)) {
                             Picker("Select Unit", selection: $fuelUnit) {
@@ -109,6 +122,8 @@ struct SettingsView: View {
                             }
                             .pickerStyle(.segmented)
                         }
+                      
+                       
                         ///picker for fuel efficiency unit selection
                         Section(header: Text("Fuel Efficiency Unit").fontWeight(.bold)) {
                             ///if fuel unit is selected to litre
@@ -267,7 +282,7 @@ struct SettingsView: View {
             ///get the enum value of the fuel volume unit of the corresponding fuel unit saved in the settings and assign it to the state variable
             fuelUnit = FuelUnit(rawValue: thisSetting.getFuelVolumeUnit) ?? .Litre
             ///get the enum value of the engine type of the corresponding engine type saved in the settings and assign it to the state variable
-            fuelType = FuelTypes(rawValue: thisSetting.getAutoEngineType) ?? .Gas
+            engineType = EngineType(rawValue: thisSetting.getAutoEngineType) ?? .Gas
         }
     }
     
@@ -282,7 +297,7 @@ struct SettingsView: View {
             ///store the fuel unit from  enum's string value
             settings.first?.fuelVolumeUnit = fuelUnit.rawValue
             ///store the engine type from  enum's string value
-            settings.first?.autoEngineType = fuelType.rawValue
+            settings.first?.autoEngineType = engineType.rawValue
             ///store the currently active vehicle object from state varaible
             settings.first?.vehicle = vehicle
             ///save the records to the entity to the viewcontext parent store.
