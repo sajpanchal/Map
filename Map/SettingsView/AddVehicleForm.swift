@@ -25,9 +25,9 @@ struct AddVehicleForm: View {
     ///state variable stores model enum type.
     @State var model: Model = .Ace
     ///state variable stores vehicle manufacturing year as Int type
-    @State var year = (Calendar.current.dateComponents([.year], from: Date())).year ?? 2000
+    @State var year = (Calendar.current.dateComponents([.year], from: Date())).year ?? 1900
     ///state variable stores vehicle year range as Range type
-    @State var yearRange = 1900..<((Calendar.current.dateComponents([.year], from: Date())).year ?? 2000) + 1
+    @State var yearRange = 1900..<((Calendar.current.dateComponents([.year], from: Date())).year ?? 1900) + 1
     ///state variable stores engineType enum value
     @State var engineType = EngineType.Gas
     ///state variable to store odometer value in string format for textfield to display/update.

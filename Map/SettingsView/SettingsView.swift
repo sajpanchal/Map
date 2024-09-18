@@ -85,9 +85,11 @@ struct SettingsView: View {
                             .fontWeight(.bold)
                     }
                 ///on change of the vehicle selection change the fuel type value
-                    .onChange(of: vehicle) {
+                    .onChange(of: vehicle.id) {
                         engineType = EngineType(rawValue: vehicle.fuelEngine ?? "Gas") ?? .Gas
                         fuelMode = (engineType == .EV) ? .EV : .Gas
+                        print(fuelMode.rawValue)
+                        print(engineType.rawValue)
                     }
                     .pickerStyle(.inline)
                 ///picker for selecting distnace unit
@@ -112,7 +114,7 @@ struct SettingsView: View {
                 ///if vehciles record is not empty
                 if !vehicles.isEmpty {
                     ///if the vehicle type is gas or hybrid
-                    if fuelMode == .Gas && (vehicles[vehicleIndex].getFuelEngine == "Gas" || vehicles[vehicleIndex].getFuelEngine == "Hybrid") {
+                    if fuelMode == .Gas {
                         ///picker for fuel unit selection
                         Section(header: Text("Fuel Volume Unit").fontWeight(.bold)) {
                             Picker("Select Unit", selection: $fuelUnit) {
@@ -193,6 +195,39 @@ struct SettingsView: View {
                                     .pickerStyle(.segmented)
                                 }
                             }
+                        }
+                    }
+                    else {
+                        Section(header: Text("Fuel Efficiency Unit").fontWeight(.bold)) {
+                            if distanceUnit == .km {
+                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                    ForEach(efficiencyUnits.indices, id: \.self) { index in
+                                        if index == 8 {
+                                            Text(efficiencyUnits[index])
+                                        }
+                                    }
+                                }
+                                ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                .onAppear(perform: {
+                                    efficiencyUnitIndex = 8
+                                })
+                                .pickerStyle(.segmented)
+                            }
+                            else {
+                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                    ForEach(efficiencyUnits.indices, id: \.self) {index in
+                                        if index == 9 {
+                                            Text(efficiencyUnits[index])
+                                        }
+                                    }
+                                }
+                                ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                .onAppear(perform: {
+                                    efficiencyUnitIndex = 9
+                                })
+                                .pickerStyle(.segmented)
+                        }
+                     
                         }
                     }
                 }

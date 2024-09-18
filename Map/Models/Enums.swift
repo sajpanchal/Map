@@ -154,6 +154,14 @@ enum Model: String, CaseIterable, Identifiable {
     case _12C, _12C_Spider, _540C, _570GT, _570S, _600LT, _650S, _675LT, _720S, _750S, _750S_Spider, _765LT, Artura, MP4_12C, Senna, Senna_GTR
     case AMG_GT, AMG_GTS, C_Class, CLA_Class, CLS_Class, E_Class, G_Class, GLC_Class, CLE_Class, S_Class, SL_Class
     case _190_Series, _200_Series, _220, _230, _240_Series, _280_series, _300_Series, _350_Series, _380_Series, _400_Series, _420_Series, _450_Series, _500_Series, _540_Series, _560_Series, _600_Series, A_Class, AMG_GLE_53, AMG_GLS_63, AMG_GT_R, AMG_GT_S, B_Class, CL_Class, CLA, CLE, CLK_Class, CLS, EQB, EQE, EQS, eSprinter_Cargo_Van, G_CLass, Gazelle, GL_Class, GLA, GLB, GLB250, GLC, GLE, GLK_Class, GLS, M_Class, Maybach, Metris_Cargo_Van, Metris_Passenger_Van, R_Class, S63_E_AMG, SLC_Class, SLK_Class, SLR_Class, SLS_AMG, Sprinter_4500, Sprinter_Cab_Chassis, Sprinter_Cargo_Van, Sprinter_Passenger_Van, Unimog
+    case Caliente, Capri, Comet, Cougar, Cyclone, Grand_Marquis, M1, M100, Marauder, Medalist, Monarch, Montclair, Montego, Monterey, Park_Lane, Sable, Turnpike_Cruiser, Woody_Wagon
+    case F, Magnette, MGA, MGB, Midget, TD, TF
+    case _3_Door, _5_Door, Clubman, Convertible, Countryman, Paceman
+    case _3000GT, Delica, Diamante, Eclipse, Eclipse_Cross, Endeavor, Galant, GTO, i_MiEV, Lancer, Lancer_Ralliart, Mirage, Mirage_G4, Montero, Montero_Sport, Outlander, Outlander_PHEV, Pajero, Pajero_IO, RVR
+    case Minor
+    case DX, SE
+    case Metropolitan_1500, Series_Six
+    case _240SX, _300ZX, _350Z, _370Z, Altima, Ariya, Armada, Axxess, Cab_and_Chassis, Cube, Elgrand, Fairlady, Frontier, GTR, Hardbody_2WD, Juke, Kicks, Kicks_Play, Leaf, Maxima, Micra, Murano, Murano_CrossCabriolet, NV, NV_2500, NV_3500, NV_Cargo, NV200, NV200_Compact_Cargo, Pathfinder, Pathfinder_Armada, Qashqai, Quest, Roque, Sentra, Slivia, Skyline, Stagea, Terrano, Titan, Titan_XD, Trucks_4WD, Van, Versa, Versa_Note, X_Trail, Xterra, Z
     var id: Self {
         self
     }
@@ -175,7 +183,8 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     case Jaguar, Jeep, Jensen, Jensen_Healey
     case Kaiser, Karma, Kia
     case Lada, Lamborghini, Lancia, Land_Rover, Lexus, Lincoln, Lotus, Lucid
-    case Manic, Maserati, Maybach, Mazda, McLaren, Mercedes_AMG, Mercedes_Benz
+    case Manic, Maserati, Maybach, Mazda, McLaren, Mercedes_AMG, Mercedes_Benz, Mercury, MG, Mini, Mitsubishi, Morgan, Morris, MV_1
+    case Nash, Nissan
  
     
     var models: [Model] {
@@ -349,6 +358,24 @@ enum VehicleMake: String, CaseIterable, Identifiable {
             return [.AMG_GT, .AMG_GTS, .C_Class, .CLA_Class, .CLS_Class, .E_Class, .G_Class, .GLC_Class, .CLE_Class, .S_Class, .SL_Class, .Other]
         case .Mercedes_Benz:
             return [._190_Series, ._200_Series, ._220, ._230, ._240_Series, ._250, ._280_series, ._300_Series, ._350_Series, ._380_Series,. _400_Series, ._420_Series, ._450_Series, ._500_Series, ._540_Series, ._560_Series, ._600_Series, .A_Class, .AMG_GLE_53, .AMG_GLS_63, .AMG_GT, .AMG_GT_R, .AMG_GT_S, .B_Class, .C_Class, .CL_Class, .CLA, .CLE, .CLK_Class, .CLS, .E_Class, .EQB, .EQE, .EQS, .eSprinter_Cargo_Van, .G_CLass, .Gazelle, .GL_Class, .GLA, .GLB, .GLB250, .GLC, .GLE, .GLK_Class, .GLS, .M_Class, .Maybach, .Metris_Cargo_Van, .Metris_Passenger_Van, .R_Class, .S_Class, .S63_E_AMG, .SL_Class, .SLC_Class, .SLK_Class, .SLR_Class, .SLS_AMG, .Sprinter, .Sprinter_4500, .Sprinter_Cab_Chassis, .Sprinter_Cargo_Van, .Sprinter_Passenger_Van, .Unimog, .Other]
+        case .Mercury:
+            return [.Caliente, .Capri, .Comet, .Cougar, .Custom, .Cyclone, .Eight, .Grand_Marquis, .M1, .M100, .Marauder, .Medalist, .Meteor, .Monarch, .Montclair, .Montego, .Monterey, .Park_Lane, .Sable, .Turnpike_Cruiser, .Voyager, .Woody_Wagon, .Zephyr, .Other]
+        case .MG:
+            return [.F, .Magnette, .MGA, .MGB, .Midget, .TD, .TF, .Other]
+        case .Mini:
+            return [._3_Door, ._5_Door, .Clubman, .Convertible, .Countryman, .Coupe, .Paceman, .Roadster, .Other]
+        case .Mitsubishi:
+            return [._3000GT, .Delica, .Diamante, .Eclipse, .Eclipse_Cross, .Endeavor, .Galant, .GTO, .i_MiEV, .Lancer, .Lancer_Ralliart, .Mirage, .Mirage_G4, .Montero, .Montero_Sport, .Outlander, .Outlander_PHEV, .Pajero, .Pajero_IO, .RVR, .Other]
+        case .Morgan:
+            return [.Roadster, .Other]
+        case .Morris:
+            return [.Minor, .Other]
+        case .MV_1:
+            return [.DX, .SE, .Other]
+        case .Nash:
+            return [.Metropolitan_1500, .Series_Six, .Other]
+        case .Nissan:
+            return [._240SX, ._300ZX, ._350Z, ._370Z, .Altima, .Ariya, .Armada, .Axxess, .Cab_and_Chassis, .Cube, .Elgrand, .Fairlady, .Frontier, .GTR, .Hardbody_2WD, .Juke, .Kicks, .Kicks_Play, .Leaf, .Maxima, .Micra, .Murano, .Murano_CrossCabriolet, .NV, .NV_2500, .NV_3500, .NV_Cargo, .NV200, .NV200_Compact_Cargo, .NX, .Pathfinder, .Pathfinder_Armada, .Qashqai, .Quest, .Roque, .Safari, .Sentra, .Slivia, .Skyline, .Stagea, .Terrano, .Titan, .Titan_XD, .Trucks_4WD, .Van, .Versa, .Versa_Note, .X_Trail, .Xterra, .Z]
         }
         
         
@@ -358,7 +385,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     }
 }
 enum Alphbets: String, CaseIterable, Identifiable {
-    case A,B,C,D,E,F,G,H,I,J,K,L//,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z
+    case A,B,C,D,E,F,G,H,I,J,K,L,M,N//,O,P,Q,R,S,T,U,V,W,X,Y,Z
  
     var makes: [VehicleMake] {
         switch self {
@@ -386,6 +413,10 @@ enum Alphbets: String, CaseIterable, Identifiable {
             return [.Kaiser, .Karma, .Kia]
         case .L:
             return[.Lada, .Lamborghini, .Lancia, .Land_Rover, .Lexus, .Lincoln, .Lotus, .Lucid]
+        case .M:
+            return [.Manic, .Maserati, .Maybach, .Mazda, .McLaren, .Mercedes_AMG, .Mercedes_Benz, .Mercury, .MG, .Mini, .Mitsubishi, .Morgan, .Morris, .MV_1]
+        case .N:
+            return [.Nash, .Nissan]
         }
     }
     var id: Self {
