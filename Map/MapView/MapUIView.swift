@@ -167,7 +167,8 @@ struct MapView: UIViewRepresentable {
            
                       
                     }
-                parent.handleLocationSearch(in: mapView, at: parent.localSearch.suggestedLocations, for: parent.localSearch.status)
+                
+                parent.handleLocationSearch(in: mapView, for: parent.localSearch.status)
                     break
                 ///idle in showdirections  mode.
                 case .idleInshowDirections:
@@ -283,6 +284,7 @@ struct MapView: UIViewRepresentable {
             ///map in idle mode.
             case .idle:
           //  print(self.mapViewStatus)
+            
                 ///if status is not updated
             if self.mapViewStatus != .idle && self.mapViewStatus != .notCentered {
                     DispatchQueue.main.async {
@@ -297,7 +299,7 @@ struct MapView: UIViewRepresentable {
                        
                     }
                 }
-            self.handleLocationSearch(in: uiView, at: self.localSearch.suggestedLocations, for: self.localSearch.status)
+            self.handleLocationSearch(in: uiView, for: self.localSearch.status)
                 break
             ///idle in showdirections  mode.
             case .idleInshowDirections:
@@ -342,7 +344,7 @@ struct MapView: UIViewRepresentable {
                     }
                 }
             
-            self.handleLocationSearch(in: uiView, at: self.localSearch.suggestedLocations, for: self.localSearch.status)
+            self.handleLocationSearch(in: uiView, for: self.localSearch.status)
                 break
             ///in navigation mode center map to userlocation
             case .inNavigationCenterToUserLocation:
@@ -426,13 +428,27 @@ struct MapView: UIViewRepresentable {
 ///extension of MapView Struct
 extension MapView {
     ///method to handle location search interface,
-    func handleLocationSearch(in uiView: MKMapView, at searchedLocations: [MKAnnotation]?, for status: LocalSearchStatus) {
+    func handleLocationSearch(in uiView: MKMapView, for status: LocalSearchStatus) {
       //  print(status)
         switch status {
         case .localSearchFailed:
+           // print("failed")
             break
+        case .locationUnselected:
+           /// localSearch.suggestedLocations = nil
+            if !uiView.overlays.isEmpty {
+                DispatchQueue.main.async {
+                    localSearch.suggestedLocations = nil
+                    ///make sure there are no overlays while only destination is selected yet and not the directions requested.
+                    uiView.removeOverlays(uiView.overlays)
+                    uiView.removeAnnotations(uiView.annotations)
+                    ///reset the flag.
+                }
+            }
             
+            break
         case .localSearchCancelled:
+          //  print("cancelled")
             DispatchQueue.main.async {
                ///remove the annotations
                uiView.removeAnnotations(uiView.annotations)
@@ -440,15 +456,21 @@ extension MapView {
                uiView.removeOverlays(uiView.overlays)
            }
         case .localSearchInProgress:
+            DispatchQueue.main.async {
+                localSearch.suggestedLocations = nil
+            }
+           // print("in progress")
             break
         case .localSearchResultsAppear:
             DispatchQueue.main.async {
+           //     print("results appear")
                 self.clearEntities(from: uiView)
             }
             break
         case .locationSelected:
-         
-            guard let locations = searchedLocations else {
+            print("location selected")
+            //key
+            guard let locations = localSearch.suggestedLocations else {
                 DispatchQueue.main.async {
                     ///make sure there are no overlays while only destination is selected yet and not the directions requested.
                     uiView.removeOverlays(uiView.overlays)
@@ -460,6 +482,7 @@ extension MapView {
                 break
             }
             if uiView.annotations.count <= 1 {
+                print("annotating")
                 MapViewAPI.annotateLocation(in: uiView, at: location.coordinate, for: location)
             }
             if !uiView.overlays.isEmpty {
@@ -471,7 +494,7 @@ extension MapView {
             }
             
         case .showingNearbyLocations:
-            guard let locations = searchedLocations else {
+            guard let locations = localSearch.suggestedLocations else {
                 return
             }
            
@@ -493,6 +516,7 @@ extension MapView {
                 }
             }
         case .searchBarActive:
+            print("active")
             break
         }
     }

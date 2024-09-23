@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NewEntryStackView: View {
-    @Environment (\.colorScheme) var bgMode: ColorScheme
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     var foregroundColor: Color
     var width: CGFloat
     var body: some View {

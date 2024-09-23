@@ -190,12 +190,13 @@ struct InteractionFooterView: View {
         case .navigating, .inNavigationCentered, .inNavigationNotCentered:
             ///make map to switch to idle mode.
             mapViewAction = .idle
+        
             ///clear the trave titme text
             self.routeTravelTime = ""
             ///clear the route distanc text
             routeDistance = ""
             ///keep the destination selected pinned to map.
-            localSearch.status = .locationSelected
+            localSearch.status = .locationUnselected
             ///remove all the instructions from the array that shows them in a listview.
             stepInstructions.removeAll()
             ///clear the instruction text

@@ -67,7 +67,7 @@ struct AddVehicleForm: View {
                         }
                         .frame(width: 40)
                         ///on change of alphabet ID.
-                        .onChange(of:$alphabet.id) {
+                        .onChange(of:alphabet.id) {
                             ///check if the given alphabet has the first make.
                             guard let thisVehicleMake = alphabet.makes.first else {
                                 return
@@ -91,7 +91,7 @@ struct AddVehicleForm: View {
                             }
                         }
                         ///on change of vehicle make ID
-                        .onChange(of: $vehicleMake.id) {
+                        .onChange(of: vehicleMake.id) {
                             ///update the vehicle make text with formated vehicle make string
                             textVehicleMake = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
                             ///check if the first model of vehicle make is available

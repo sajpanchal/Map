@@ -29,9 +29,22 @@ struct SearchFieldView: View {
                 ///this is the text field where user types the location search string
                 TextField("Search for a location", text: $searchedLocationText)
                     .focused($enableSearchFieldFocus)
+                    .onChange(of: enableSearchFieldFocus) {
+                        if enableSearchFieldFocus {
+                            localSearch.status = .searchBarActive
+                        }
+                        else {
+                        
+                        }
+                    }
                     ///when the text in a searchable field changes this method will be called and it will perform a method put inside perform parameter.
                     .onChange(of: searchedLocationText) {
                         ///this method will initiate or terminate the location search.
+                        if localSearch.status == .localSearchCancelled {
+                        //    localSearch.status = .localSearchInProgress
+                        }
+                        
+                      print("Changed")
                         handleLocationSearch(forUserInput: searchedLocationText)
                     }
                 ///on tap it will call a method to prepare searchfield.
@@ -60,24 +73,35 @@ struct SearchFieldView: View {
     
     ///method to start or stp the location search
     func handleLocationSearch(forUserInput text:String) {
+        
         ///if location is selected or search is cancelled
-        guard localSearch.status == .searchBarActive || localSearch.status == .localSearchResultsAppear || localSearch.status == .localSearchInProgress || localSearch.status == .localSearchFailed  else {
-           ///un-focus the search field
-            enableSearchFieldFocus = false
-            ///stop the location search
+        guard localSearch.status == .searchBarActive || localSearch.status == .localSearchResultsAppear || localSearch.status == .localSearchInProgress || localSearch.status == .localSearchFailed || localSearch.status == .locationUnselected  else {
+             
+                ///un-focus the search field
+                 enableSearchFieldFocus = false
+                 print("not found")
+                 ///stop the location search
+            ///
+        
             localSearch.cancelLocationSearch()
+            
+           
             ///and return from a function
             return
         }
+       
         ///if search is on then keep the search field in focus
-        enableSearchFieldFocus = true
+     
+        print(enableSearchFieldFocus)
         ///keep calling the startLocalsearch() of observable object localSearch with its searchLocations array as observed property. this will update Map swiftUI view on every change in searchLocations.
         localSearch.startLocalSearch(withSearchText: text, inRegion: region)
+        enableSearchFieldFocus = localSearch.status != .locationSelected  ? true : false
        
     }
     ///when searchfield is tapped this function will be executed.
     func prepareSearchfield() {
-        ///location is not selected when we are starting a search.
+        ///location is not selected when we are starting a search
+        print("active on tap")
         localSearch.status = .searchBarActive
         ///this variable is a focusstate type, this is going to be passed to focus() modifier of our searchfield and is responsible to enable and disable the focus.
         enableSearchFieldFocus = true

@@ -51,6 +51,7 @@ enum Errors: String {
 
 enum LocalSearchStatus {
     case locationSelected
+    case locationUnselected
     case localSearchInProgress
     case localSearchCancelled
     case localSearchResultsAppear

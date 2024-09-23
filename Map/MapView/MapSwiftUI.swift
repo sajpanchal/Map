@@ -74,13 +74,16 @@ struct Map: View {
                     .opacity(isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction) ? 0.3 : 1.0)
                     if !isMapInNavigationMode(for: mapViewStatus).0 || isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction) {
                         VStack(spacing: 0) {
-                            SearchFieldView(searchedLocationText: $searchedLocationText, region: locationDataManager.region, localSearch: localSearch)
-                                .padding(.top, 10)
-                                .background(bgMode == .dark ? Color.black : Color.white)
-                            ///if search results are avialable, show them in the listview on top of everything in zstack view.
-                            if !$localSearch.results.isEmpty && localSearch.status != .localSearchCancelled {
-                                AddressListView(localSearch: localSearch, searchedLocationText: $searchedLocationText)
-                            }
+                           
+                                SearchFieldView(searchedLocationText: $searchedLocationText, region: locationDataManager.region, localSearch: localSearch)
+                                    .padding(.top, 10)
+                                    .background(bgMode == .dark ? Color.black : Color.white)
+                                ///if search results are avialable, show them in the listview on top of everything in zstack view.
+                                if !$localSearch.results.isEmpty && localSearch.status != .localSearchCancelled && localSearch.status != .locationSelected && localSearch.status != .showingNearbyLocations  {
+                                    AddressListView(localSearch: localSearch, searchedLocationText: $searchedLocationText)
+                                }
+                            
+                            
                             else if localSearch.status == .localSearchInProgress && $localSearch.results.isEmpty {
                                  SearchProgressView()
                             }

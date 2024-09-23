@@ -36,27 +36,28 @@ struct SettingsView: View {
     @State var showAddVehicleForm = false
     ///flag to show the auto garage view.
     @State var showGarage = false
- 
+    var colors = [AppColors.invertRed.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue]
     var body: some View {
     
         NavigationStack {
             Form {
                 ///button to access the garage screen
-                Button(action: {
-                    showGarage = true
-                }, label: {
-                    HStack {
-                        Image(systemName: "door.garage.double.bay.closed")
-                            .foregroundStyle(.invertBlu)
-                            .font(Font.system(size: 25))
-                        Spacer()
-                        Text("Open My Garage")
-                            .font(.system(size: 20, weight: .bold))
-                        Spacer()
-                        
-                    }})
-                ///if the button is tapped the flag will be set and it will show the content which is garageview.
-                .sheet(isPresented: $showGarage,  content: {GarageView(locationDataManager: locationDataManager, showGarage: $showGarage)})
+                VStack {
+                    Button(action: {
+                        showGarage = true
+                    }, label: {
+                        FormButton(imageName:  "door.garage.double.bay.closed", text: "My Garage", color: Color(AppColors.yellow.rawValue))
+                        })
+                    .background(Color(AppColors.invertYellow.rawValue))
+                    .tint(Color(AppColors.invertYellow.rawValue))
+                    .buttonStyle(BorderlessButtonStyle())
+                    .cornerRadius(100)
+                    ///if the button is tapped the flag will be set and it will show the content which is garageview.
+                    .sheet(isPresented: $showGarage,  content: {GarageView(locationDataManager: locationDataManager, showGarage: $showGarage)})
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+               
                     ///picker for vehicles.
                     Picker(selection: $vehicle) {
                         ///iist of vehciles
@@ -67,7 +68,8 @@ struct SettingsView: View {
                                     Text(thisVehicle.getVehicleText + " " + thisVehicle.getFuelEngine).tag(thisVehicle)
                                         .fontWeight(.bold)
                                         .font(Font.system(size: 18))
-                                        .foregroundStyle(Color(AppColors.invertBlueColor.rawValue))
+                                        //.foregroundStyle(Color(AppColors.invertBlueColor.rawValue))
+                                        .foregroundStyle(Color(colors[vehicles.firstIndex(where: {$0 == thisVehicle}) ?? 0]))
                                     
                                     Text(thisVehicle.getYear).tag(thisVehicle)
                                         .fontWeight(.semibold)

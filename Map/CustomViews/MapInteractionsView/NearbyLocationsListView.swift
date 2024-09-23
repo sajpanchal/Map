@@ -34,6 +34,7 @@ struct NearbyLocationsListView: View {
                             .foregroundStyle(.gray)
                     }
                         .onTapGesture(perform: {
+                            print("Tapped")
                          tappedAnnotation = suggestion
                             height = 200.0
                         })
