@@ -371,8 +371,10 @@ struct MapView: UIViewRepresentable {
             ///show directions mode
             case .showDirections:
                 ///show the directions for a given destination by drawing overlays.
+            
                 guard let suggestedLocations = localSearch.suggestedLocations else {
                     DispatchQueue.main.async {
+                        print("locations not found")
                         ///clear the entities from mapview
                         self.clearEntities(from: uiView)
                         ///make the map view to go in idle mode
@@ -380,13 +382,16 @@ struct MapView: UIViewRepresentable {
                      }
                     return
                 }
+            
             DispatchQueue.main.async {
                 self.locationDataManager.enableGeocoding = true
             }
             if mapViewStatus != .showingDirections {
                 if localSearch.status == .showingNearbyLocations {
+                   
                     uiView.removeAnnotations(uiView.annotations)
                     if let annotation = self.tappedAnnotation {
+                        print("showing directions")
                         uiView.addAnnotation(annotation)
                     }
                    
@@ -450,6 +455,7 @@ extension MapView {
         case .localSearchCancelled:
           //  print("cancelled")
             DispatchQueue.main.async {
+                self.tappedAnnotation = nil
                ///remove the annotations
                uiView.removeAnnotations(uiView.annotations)
                ///remove the overlays
@@ -468,7 +474,7 @@ extension MapView {
             }
             break
         case .locationSelected:
-            print("location selected")
+            //print("location selected")
             //key
             guard let locations = localSearch.suggestedLocations else {
                 DispatchQueue.main.async {
@@ -494,17 +500,22 @@ extension MapView {
             }
             
         case .showingNearbyLocations:
+           // print("showing nearby....")
             guard let locations = localSearch.suggestedLocations else {
                 return
             }
            
             if self.tappedAnnotation != nil {
-               // print("centering")
-                uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: self.tappedAnnotation!.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
+              //  print("centering")
+                DispatchQueue.main.async {
+                   uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: self.tappedAnnotation!.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
+                }
             }
             else {
                 for searchedLocation in locations {
-                    MapViewAPI.annotateLocations(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
+               
+                        MapViewAPI.annotateLocations(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
+                    
                     
                 }
             }

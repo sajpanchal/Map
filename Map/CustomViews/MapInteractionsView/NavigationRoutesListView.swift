@@ -68,9 +68,9 @@ struct NavigationRoutesListView: View {
                         ///if map is navigating
                         isMapInNavigationMode().0 ?
                         ///change the button appearance with stop text and xmark symbol
-                        NavigationButton(imageName: "xmark", title: "Stop", foregroundColor: Color(AppColors.lightRed.rawValue)) :
+                        NavigationButton(imageName: "xmark", title: "Stop", foregroundColor: Color(AppColors.lightRed.rawValue), size: 50) :
                         ///if it is not navigating then change the text with navigate and arrows symbol with blue background.
-                        NavigationButton(imageName: "steeringwheel", title: "Go", foregroundColor: Color(AppColors.lightSky.rawValue))
+                        NavigationButton(imageName: "steeringwheel", title: "Go", foregroundColor: Color(AppColors.lightSky.rawValue), size: 50)
                         
                     })
                     .background(isMapInNavigationMode().0 ? Color(AppColors.darkRed.rawValue).gradient : Color(AppColors.darkSky.rawValue).gradient)
@@ -85,9 +85,9 @@ struct NavigationRoutesListView: View {
                         ///if map is navigating
                         isMapInNavigationMode().0 ?
                         ///change the button appearance with stop text and xmark symbol
-                        NavigationButton(imageName: "xmark", title: "Stop", foregroundColor: Color(AppColors.lightRed.rawValue)) :
+                        NavigationButton(imageName: "xmark", title: "Stop", foregroundColor: Color(AppColors.lightRed.rawValue), size: 50) :
                         ///if it is not navigating then change the text with navigate and arrows symbol with blue background.
-                        NavigationButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", title: "Navigate", foregroundColor: Color(AppColors.lightSky.rawValue))
+                        NavigationButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", title: "Navigate", foregroundColor: Color(AppColors.lightSky.rawValue), size: 50)
                         
                     })
                     .background(isMapInNavigationMode().0 ? Color(AppColors.darkRed.rawValue).gradient : Color(AppColors.darkSky.rawValue).gradient)

@@ -16,36 +16,56 @@ struct NearbyLocationsListView: View {
     @Binding var mapViewAction: MapViewAction
     @Binding var tappedAnnotation: MKAnnotation?
     @Binding var height: Double
- //   var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(AppColors.invertRed.rawValue), Color(AppColors.red.rawValue)]), center: .center, startRadius: 1, endRadius: 50)
+    @State var selection: String = ""
+ 
     var body: some View {
-        List {
-            ForEach(localSearch.suggestedLocations!, id: \.title) { suggestion in
-                HStack {
-                    VStack {
-                        HStack {
-                            Text(suggestion.title!!.split(separator: "\n").first!)
-                                .font(.caption)
-                                .fontWeight(.black)
-                            Spacer()
-                        }
-                      
-                        Text(suggestion.title!!.split(separator: "\n").last!)
-                            .font(.caption2)
-                            .foregroundStyle(.gray)
-                    }
-                        .onTapGesture(perform: {
-                            print("Tapped")
-                         tappedAnnotation = suggestion
-                            height = 200.0
-                        })
-                    Spacer()
-                    Button(action: { tappedAnnotation = suggestion; mapViewAction = .showDirections; locationDataManager.throughfare = nil },
-                           label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes", foregroundColor: Color(AppColors.lightSky.rawValue))})
-                    .buttonStyle(.plain)
-                    .background(Color(AppColors.darkSky.rawValue))
-                    .cornerRadius(10)
+        if let locations = localSearch.suggestedLocations {
+            ScrollView {
+                ForEach(locations, id: \.title) { suggestion in
+                     VStack {
+                         HStack {
+                             VStack {
+                                 HStack {
+                                     Text(suggestion.title!!.split(separator: "\n").first!)
+                                         .font(.caption)
+                                         .fontWeight(.black)
+                                     Spacer()
+                                 }
+                                 HStack {
+                                     Text(suggestion.title!!.split(separator: "\n").last!)
+                                         .font(.caption2)
+                                         .foregroundStyle(.gray)
+                                     Spacer()
+                                 }
+                             }
+                           
+                             
+                             Spacer()
+                             Button(action: { tappedAnnotation = suggestion; mapViewAction = .showDirections; locationDataManager.throughfare = nil; print("button tapped") },
+                                    label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes", foregroundColor: Color(AppColors.lightSky.rawValue), size: 60)})
+                             .buttonStyle(.plain)
+                             .background(Color(AppColors.darkSky.rawValue))
+                             .cornerRadius(10)
+                         }
+                         .padding(15)
+                         .background()
+                         .cornerRadius(10)
+                         .tag(suggestion.hash)
+                         .onTapGesture {
+                             print("Tapped")
+                             DispatchQueue.main.async {
+                                 tappedAnnotation = suggestion
+                             }
+                             height = 200.0
+                         }
+                         Divider()
+                     }
+                     .tag(suggestion.hash)
                 }
-            }           
+            }
+        }
+        else {
+            Text("Sorry")
         }
     }
 }

@@ -11,6 +11,7 @@ struct NavigationButton: View {
     var imageName: String
     var title: String
     var foregroundColor: Color
+    var size: CGFloat
     var body: some View {
         ///button appearance
         VStack {
@@ -24,10 +25,10 @@ struct NavigationButton: View {
                 .font(.caption2)
                 .fontWeight(.bold)
         }
-        .frame(width: 50, height: 50)
+        .frame(width: size, height: size)
     }
 }
 
 #Preview {
-    NavigationButton(imageName: "", title: "", foregroundColor: .clear)
+    NavigationButton(imageName: "", title: "", foregroundColor: .clear, size: 50)
 }
