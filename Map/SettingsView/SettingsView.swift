@@ -36,7 +36,7 @@ struct SettingsView: View {
     @State var showAddVehicleForm = false
     ///flag to show the auto garage view.
     @State var showGarage = false
-    var colors = [AppColors.invertRed.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue]
+    var colors = [AppColors.invertPink.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue]
     var body: some View {
     
         NavigationStack {
@@ -46,10 +46,10 @@ struct SettingsView: View {
                     Button(action: {
                         showGarage = true
                     }, label: {
-                        FormButton(imageName:  "door.garage.double.bay.closed", text: "My Garage", color: Color(AppColors.yellow.rawValue))
+                        FormButton(imageName:  "door.garage.double.bay.closed", text: "My Garage", color: Color(AppColors.red.rawValue))
                         })
-                    .background(Color(AppColors.invertYellow.rawValue))
-                    .tint(Color(AppColors.invertYellow.rawValue))
+                    .background(Color(AppColors.invertRed.rawValue))
+                    .tint(Color(AppColors.invertRed.rawValue))
                     .buttonStyle(BorderlessButtonStyle())
                     .cornerRadius(100)
                     ///if the button is tapped the flag will be set and it will show the content which is garageview.

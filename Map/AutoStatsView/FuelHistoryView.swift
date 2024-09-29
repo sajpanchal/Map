@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FuelHistoryView: View {
     @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
-    @Environment (\.colorScheme) var bgMode: ColorScheme
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
 
     var vehicle: Vehicle
@@ -62,7 +62,7 @@ struct FuelHistoryView: View {
                                             .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                                         Text("$" + String(format:"%.2f",fuelData.cost))
                                             .font(.system(size: 14, weight: .bold))
-                                            .foregroundStyle(Color(AppColors.invertGreen.rawValue))
+                                            .foregroundStyle(Color(AppColors.invertOrange.rawValue))
                                     }
                                 }
                                 Spacer()

@@ -66,7 +66,7 @@ struct AutoStatsView: View {
                                 DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: Color(AppColors.invertSky.rawValue), backGroundColor: Color(AppColors.sky.rawValue), numericText: settings.first!.getDistanceUnit == "km" ?
                                                  deciNumberFormatter.string(for: vehicle.trip) ?? "--" :  deciNumberFormatter.string(for: vehicle.getTripMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
                                 DashGridItemView(title: "MILEAGE", foreGroundColor: Color(AppColors.invertGreen.rawValue), backGroundColor:Color(AppColors.green.rawValue), numericText: deciNumberFormatter.string(for: getFuelEfficiency(efficiency: vehicle.fuelEfficiency)) ?? "--", unitText: settings.first?.getFuelEfficiencyUnit ?? "", geometricSize: geo.size)
-                                DashGridItemView(title: "REPAIR COST", foreGroundColor: Color(AppColors.invertRed.rawValue)    , backGroundColor: Color(AppColors.red.rawValue), numericText: currencyFormatter.string(for: vehicle.getServiceCost) ?? "--",  unitText: currentYear, geometricSize: geo.size)
+                                DashGridItemView(title: "SERVICE COST", foreGroundColor: Color(AppColors.invertRed.rawValue)    , backGroundColor: Color(AppColors.red.rawValue), numericText: currencyFormatter.string(for: vehicle.getServiceCost) ?? "--",  unitText: currentYear, geometricSize: geo.size)
                             }
                         }
                        //
@@ -110,7 +110,10 @@ struct AutoStatsView: View {
                                     Spacer()
                                     Button(action: {
                                         showFuelHistoryView.toggle()
-                                    }, label: {Text("View More").font(.system(size: 12))})
+                                    }, label: { Text("View More").font(.system(size: 12)).fontWeight(.bold).padding(10).foregroundStyle(Color(AppColors.yellow.rawValue))})
+                                    .background(Color(AppColors.invertYellow.rawValue))
+                                    .buttonStyle(BorderlessButtonStyle())
+                                    .cornerRadius(10)
                                     .sheet(isPresented: $showFuelHistoryView, content: {
                                         FuelHistoryView(vehicle: vehicle)
                                     })
@@ -148,7 +151,10 @@ struct AutoStatsView: View {
                                     Spacer()
                                     Button(action: {
                                         showServiceHistoryView.toggle()
-                                    }, label: {Text("View More").font(.system(size: 12))})
+                                    }, label: {Text("View More").font(.system(size: 12)).fontWeight(.bold).padding(10).foregroundStyle(Color(AppColors.red.rawValue))})
+                                    .background(Color(AppColors.invertRed.rawValue))
+                                    .buttonStyle(BorderlessButtonStyle())
+                                    .cornerRadius(10)
                                     .sheet(isPresented: $showServiceHistoryView, content: {
                                         ServiceHistoryView(vehicle: vehicle)
                                     })

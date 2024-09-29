@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ServiceHistoryView: View {
-    @Environment (\.colorScheme) var bgMode: ColorScheme
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
 
     var vehicle: Vehicle
@@ -42,7 +42,7 @@ struct ServiceHistoryView: View {
                                         .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                                     Text("$" + String(format:"%.2f",autoService.cost))
                                         .font(.system(size: 14, weight: .bold))
-                                        .foregroundStyle(Color(AppColors.invertGreen.rawValue))
+                                        .foregroundStyle(Color(AppColors.invertRed.rawValue))
                                 }
                            
                             }
