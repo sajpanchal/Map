@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DirectionsView: View {
     ////environment variable to get the color mode of the phone
-    @Environment (\.colorScheme) var bgMode: ColorScheme
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     @Binding var instruction: String
     @Binding var nextStepDistance: String
     @Binding var showDirectionsList: Bool

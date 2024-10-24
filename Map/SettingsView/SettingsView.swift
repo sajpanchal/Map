@@ -65,12 +65,11 @@ struct SettingsView: View {
                             ///iterate through the all vehicles uniquely identified by this ID.
                             ForEach(vehicles, id: \.uniqueID) { thisVehicle in
                                 VStack {
-                                    Text(thisVehicle.getVehicleText + " " + thisVehicle.getFuelEngine).tag(thisVehicle)
+                                    Text(thisVehicle.getVehicleText + " " + "(" + thisVehicle.getFuelEngine + " Engine)").tag(thisVehicle)
                                         .fontWeight(.bold)
                                         .font(Font.system(size: 18))
                                         //.foregroundStyle(Color(AppColors.invertBlueColor.rawValue))
                                         .foregroundStyle(Color(colors[vehicles.firstIndex(where: {$0 == thisVehicle}) ?? 0]))
-                                    
                                     Text(thisVehicle.getYear).tag(thisVehicle)
                                         .fontWeight(.semibold)
                                         .font(Font.system(size: 14))
@@ -90,8 +89,16 @@ struct SettingsView: View {
                     .onChange(of: vehicle.id) {
                         engineType = EngineType(rawValue: vehicle.fuelEngine ?? "Gas") ?? .Gas
                         fuelMode = (engineType == .EV) ? .EV : .Gas
-                        print(fuelMode.rawValue)
-                        print(engineType.rawValue)
+                        ///on change of vehicle, if given vehicle is EV type
+                        if engineType == .EV {
+                            ///set fuel unit to percent
+                            fuelUnit = .Percent
+                        }
+                        ///if vehicle is gas engine type
+                        else {
+                            ///set fuel unit to litre
+                            fuelUnit = .Litre
+                        }
                     }
                     .pickerStyle(.inline)
                 ///picker for selecting distnace unit
@@ -103,11 +110,26 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.segmented)
                 }
+                ///if fuel engine is hybrid type
                 if engineType == .Hybrid {
+                    ///show picker to select engine mode
                     Section(header: Text("Engine Type").fontWeight(.bold)) {
                         Picker("Select Type", selection: $fuelMode) {
                             ForEach(FuelMode.allCases) { thisFuelType in
                                 Text(thisFuelType.rawValue.capitalized)
+                            }
+                        }
+                        ///on change of fuel mode
+                        .onChange(of: fuelMode) {
+                            ///if fuel mode is set to EV
+                            if fuelMode == .EV {
+                                ///set fuel unit to percent
+                                fuelUnit = .Percent
+                            }
+                            ///else if fuel mode is set to gas
+                            else {
+                                ///set fuel unit to litre
+                                fuelUnit = .Litre
                             }
                         }
                         .pickerStyle(.segmented)
@@ -121,12 +143,14 @@ struct SettingsView: View {
                         Section(header: Text("Fuel Volume Unit").fontWeight(.bold)) {
                             Picker("Select Unit", selection: $fuelUnit) {
                                 ForEach(FuelUnit.allCases) { thisVolumeUnit in
-                                    Text(thisVolumeUnit.rawValue.capitalized)
+                                    ///if fuel unit is not percent
+                                    if thisVolumeUnit != .Percent {
+                                        Text(thisVolumeUnit.rawValue.capitalized)
+                                    }
                                 }
                             }
                             .pickerStyle(.segmented)
-                        }
-                      
+                        }                      
                        
                         ///picker for fuel efficiency unit selection
                         Section(header: Text("Fuel Efficiency Unit").fontWeight(.bold)) {
@@ -200,6 +224,18 @@ struct SettingsView: View {
                         }
                     }
                     else {
+                        ///picker for fuel unit selection
+                        Section(header: Text("Fuel Volume Unit").fontWeight(.bold)) {
+                            Picker("Select Unit", selection: $fuelUnit) {
+                                ForEach(FuelUnit.allCases) { thisVolumeUnit in
+                                    ///if the fuel unit is percent
+                                    if thisVolumeUnit == .Percent {
+                                        Text(thisVolumeUnit.rawValue.capitalized)
+                                    }
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                        }
                         Section(header: Text("Fuel Efficiency Unit").fontWeight(.bold)) {
                             if distanceUnit == .km {
                                 Picker("Select Unit", selection: $efficiencyUnitIndex) {
@@ -229,7 +265,6 @@ struct SettingsView: View {
                                 })
                                 .pickerStyle(.segmented)
                         }
-                     
                         }
                     }
                 }
@@ -304,8 +339,17 @@ struct SettingsView: View {
         }
         ///update the odometer of the location manager with the odometer of the currently active vehicle
         locationDataManager.odometer = vehicle.odometer
-        /// ///update the trip odometer of the location manager with the trip odometer of the currently active vehicle
-        locationDataManager.trip = vehicle.trip
+        ///update the odometer of the location manager with the odometer of the currently active vehicle
+        locationDataManager.odometerMiles = vehicle.odometerMiles
+         ///update the trip odometer of the location manager with the trip odometer of the currently active vehicle
+        if settings.first!.distanceUnit == "km" {
+            locationDataManager.trip = vehicle.trip
+            locationDataManager.tripMiles =  locationDataManager.trip * 0.62
+        }
+        else {
+            locationDataManager.tripMiles = vehicle.tripMiles
+            locationDataManager.trip = vehicle.trip / 0.62
+        }
     }
     
     ///method to load the latest saved settings from the system
@@ -359,14 +403,54 @@ struct SettingsView: View {
             else {
                 ///set that vehicle as active
                 vehicles[index].isActive = true
+                vehicles[index].fuelMode = fuelMode.rawValue
+            }
+        }
+        ///get the index of the vehicle which is active
+        if let i = vehicles.firstIndex(where: {$0.isActive}) {
+            ///if fuel engine is hybrid type and fuel mode is not set the gas type
+            if vehicles[i].fuelEngine == "Hybrid" && vehicles[i].fuelMode != "Gas" {
+                ///set the hybrid EV engine trip odometers
+                ///if distance unit is km
+                if distanceUnit == .km {
+                    ///trip hybrid EV in miles
+                    vehicles[i].tripHybridEVMiles = vehicle.tripHybridEV * 0.62
+                }
+                else {
+                    ///trip hybrid EV in km
+                    vehicles[i].tripHybridEV = vehicle.tripHybridEVMiles / 0.62
+                }
+            }
+            ///if fuel engine is not hybrid or if hybrid but gas type
+            else {
+                ///if distance unit is set to km
+                if distanceUnit == .km {
+                    ///trip in miles
+                    vehicles[i].tripMiles = vehicle.trip * 0.62
+                }
+                else {
+                    ///trip in km
+                    vehicles[i].trip = vehicle.tripMiles / 0.62
+                }
             }
         }
         ///set the active vehicle as location manager's vehicle
         locationDataManager.vehicle = vehicle
         ///set the active vehicle's odometer as location manager's odometer
         locationDataManager.odometer = vehicle.odometer
-        ///set the active vehicle's trip odometer as location manager's trip odometer
-        locationDataManager.trip = vehicle.trip
+        ///set the active vehicle's trip odometer as location manager's trip odometer based on set unit
+        if settings.first!.distanceUnit == "km" {
+            ///trip in km
+            locationDataManager.trip = vehicle.trip
+            ///trip in miles
+            locationDataManager.tripMiles =  locationDataManager.trip * 0.62
+        }
+        else {
+            ///trip in miles
+            locationDataManager.tripMiles = vehicle.tripMiles
+            ///trip in km
+            locationDataManager.trip = locationDataManager.tripMiles / 0.62
+        }
         ///save the changes to the entities of the viewcontext to the parent store.
         Vehicle.saveContext(viewContext: viewContext)
                         

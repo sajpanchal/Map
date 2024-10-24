@@ -2,7 +2,7 @@
 //  Vehicle+CoreDataProperties.swift
 //  Map
 //
-//  Created by saj panchal on 2024-07-20.
+//  Created by saj panchal on 2024-10-06.
 //
 //
 
@@ -16,30 +16,56 @@ extension Vehicle {
         return NSFetchRequest<Vehicle>(entityName: "Vehicle")
     }
 
+    @NSManaged public var batteryCapacity: Double
     @NSManaged public var fuelCost: Double
+    @NSManaged public var fuelEfficiency: Double
     @NSManaged public var fuelEngine: String?
+    @NSManaged public var fuelMode: String?
     @NSManaged public var isActive: Bool
     @NSManaged public var make: String?
     @NSManaged public var model: String?
     @NSManaged public var odometer: Double
     @NSManaged public var serviceCost: Double
     @NSManaged public var trip: Double
+    @NSManaged public var tripHybridEV: Double
+    @NSManaged public var tripMiles: Double
     @NSManaged public var type: String?
     @NSManaged public var uniqueID: UUID?
     @NSManaged public var year: Int16
-    @NSManaged public var fuelEfficiency: Double
+    @NSManaged public var tripHybridEVMiles: Double
+    @NSManaged public var odometerMiles: Double
     @NSManaged public var fuellings: NSSet?
     @NSManaged public var services: NSSet?
-    
     public var getFuelEngine: String {
         fuelEngine ?? "N/A"
     }
-    
+    public var getFuelMode: String {
+        if fuelMode == nil {
+            if fuelEngine == "Gas" {
+                return "Gas"
+            }
+            else if fuelEngine == "EV" {
+                return "Ev"
+            }
+            else {
+                return "Gas"
+            }
+        }
+        else {
+            return fuelMode ?? "Gas"
+        }
+    }
     public var getOdometerMiles: Double {
         odometer * 0.62
     }
     public var getTripMiles: Double {
         trip * 0.62
+    }
+    public var getTripKm: Double {
+        tripMiles / 0.62
+    }
+    public var getTripHybridEVMiles: Double {
+        tripHybridEV * 0.62
     }
     public var getMake: String {
         make ?? "N/A"
@@ -59,6 +85,10 @@ extension Vehicle {
     }
     public var getFuelEfficiencyMiles: Double {
         fuelEfficiency * 0.62
+    }
+    
+    public var getBatteryCapacity: String {
+        batteryCapacity == 0.0 ? "40.0" : String(batteryCapacity)
     }
     
     public var getFuellings: [AutoFuelling] {
@@ -116,8 +146,6 @@ extension Vehicle {
             fatalError(error.localizedDescription)
         }
     }
-
-
 }
 
 // MARK: Generated accessors for fuellings

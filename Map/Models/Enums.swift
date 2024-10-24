@@ -163,6 +163,30 @@ enum Model: String, CaseIterable, Identifiable {
     case DX, SE
     case Metropolitan_1500, Series_Six
     case _240SX, _300ZX, _350Z, _370Z, Altima, Ariya, Armada, Axxess, Cab_and_Chassis, Cube, Elgrand, Fairlady, Frontier, GTR, Hardbody_2WD, Juke, Kicks, Kicks_Play, Leaf, Maxima, Micra, Murano, Murano_CrossCabriolet, NV, NV_2500, NV_3500, NV_Cargo, NV200, NV200_Compact_Cargo, Pathfinder, Pathfinder_Armada, Qashqai, Quest, Roque, Sentra, Slivia, Skyline, Stagea, Terrano, Titan, Titan_XD, Trucks_4WD, Van, Versa, Versa_Note, X_Trail, Xterra, Z
+    case _442, _88, _98, _98_Regency_Elite, Alero, Custom_Cruiser, Cutlass, Cutlass_Supreme, Intrigue, Omega, Starfire, Toronado, Touring
+    case Caribbean
+    case Lima
+    case _106
+    case Barracuda, Belvedere, Breeze, Cambridge, Duster, GTX, PD_Deluxe, Road_Runner, Satellite, Scamp, Sport_Fury, Valiant
+    case _1, _2
+    case  _2_Plus_2, Acadian, Beaumont, Bonneville, Chieftain, Fiero, Firebird, Firefly, G3, G5, G6, G8, Grand_AM, Grand_LeMans, Grand_Prix, Grand_Ville, Laurentian, LeMans, Montana, Montana_SV6, Parisienne, Pursuit, Solstice, Star_Chief, Streamliner, Sunfire, Tempest, Torrent, Trans_Sport, Vibe, Wave
+    case _356, _718_Boxster, _718_Cayman, _718_Spyder, _911, _911_America_Roadster, _911_Carrera_GTS, _911_GT3, _911_GT3_RS, _911_Targa_4, _911T, _914, _924, _928, _928_S4, _944, _951, _964, _968, Boxster, Carrera_GT, Cayenne, Cayman, Macan, Panamera, Speedster, Taycan
+    case  _1500, _1500_Classic,  _4500, _5500, _5500_HD_Chassis, Promaster, Promaster_1500, Promaster_2500, Promaster_3500, ProMaster_Cargo_Van, ProMaster_City, Promaster_City_Wagon, ProMaster_Window_Van, Ram_5500_Cab_Chassis, Ram_CV, Wagon
+    case _4
+    case R1S, R1T
+    case Black_Badge_Cullinan, Corniche, Cullinan, Dawn, Ghost, Phantom, Phantom_Coupe, Silver_Shadow, Silver_Spirit, Silver_Spur, Silver_Wraith, Spectre, Wraith
+    case P5
+    case _9_2X, _9_3, _9_5, _9_7X, _900, _9000
+    case _4DR_Wagon, Astra, Aura, Ion, L200, SC1, Sky, SL, Vue
+    case FR_S, iM, iQ, tC, xB, xD
+    case Leon
+    case EQ_Fortwo, fortwo, fortwo_Electric_Drive
+    case C8_Laviolette
+    case Vanguard
+    case Bullet
+    case Champion, Hawk
+    
+    
     var id: Self {
         self
     }
@@ -186,6 +210,10 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     case Lada, Lamborghini, Lancia, Land_Rover, Lexus, Lincoln, Lotus, Lucid
     case Manic, Maserati, Maybach, Mazda, McLaren, Mercedes_AMG, Mercedes_Benz, Mercury, MG, Mini, Mitsubishi, Morgan, Morris, MV_1
     case Nash, Nissan
+    case Oldsmobile
+    case Packard, Panther, Peugeot, Plymouth, Polestar, Pontiac, Porsche
+    case Ram, Rambler, Renault, Rivian, Rolls_Royce, Rover
+    case Saab, Saturn, Scion, Seat, Shelby, Smart, Spyker, Standard, Sterling, Studebaker
  
     
     var models: [Model] {
@@ -377,6 +405,54 @@ enum VehicleMake: String, CaseIterable, Identifiable {
             return [.Metropolitan_1500, .Series_Six, .Other]
         case .Nissan:
             return [._240SX, ._300ZX, ._350Z, ._370Z, .Altima, .Ariya, .Armada, .Axxess, .Cab_and_Chassis, .Cube, .Elgrand, .Fairlady, .Frontier, .GTR, .Hardbody_2WD, .Juke, .Kicks, .Kicks_Play, .Leaf, .Maxima, .Micra, .Murano, .Murano_CrossCabriolet, .NV, .NV_2500, .NV_3500, .NV_Cargo, .NV200, .NV200_Compact_Cargo, .NX, .Pathfinder, .Pathfinder_Armada, .Qashqai, .Quest, .Roque, .Safari, .Sentra, .Slivia, .Skyline, .Stagea, .Terrano, .Titan, .Titan_XD, .Trucks_4WD, .Van, .Versa, .Versa_Note, .X_Trail, .Xterra, .Z]
+        case .Oldsmobile:
+            return  [._442, ._88, ._98, ._98_Regency_Elite, .Alero, .Custom_Cruiser, .Cutlass, .Cutlass_Supreme, .Intrigue, .Omega, .Starfire, .Toronado, .Touring, .Other]
+        case .Packard:
+            return [.Caribbean, .Other]
+        case .Panther:
+            return [.Lima, .Other]
+        case .Peugeot:
+            return [._106, .Other]
+        case .Plymouth:
+            return [.Barracuda, .Belvedere, .Breeze, .Cambridge, .Deluxe, .Duster, .GTX, .PD_Deluxe, .Prowler, .Road_Runner, .Satellite, .Scamp, .Sport_Fury, .Suburban, .Valiant]
+        case .Polestar:
+            return [._1, ._2, .Other]
+        case .Pontiac:
+            return [._2_Plus_2, .Acadian, .Beaumont, .Bonneville, .Chieftain, .Fiero, .Firebird, .Firefly, .G3, .G5, .G6, .G8, .Grand_AM, .Grand_LeMans, .Grand_Prix, .Grand_Ville, .GTO, .Laurentian, .LeMans, .Montana, .Montana_SV6, .Parisienne, .Pathfinder, .Pursuit, .Solstice, .Star_Chief, .Streamliner, .Sunfire, .Tempest, .Torrent, .Trans_Sport, .Vibe, .Wave, .Other]
+        case .Porsche:
+            return [._356, ._718_Boxster, ._718_Cayman, ._718_Spyder, ._911, ._911_America_Roadster, ._911_Carrera_GTS, ._911_GT3, ._911_GT3_RS, ._911_Targa_4, ._911T, ._914, ._924, ._928, ._928_S4, ._944, ._951, ._964, ._968, .Boxster, .Carrera_GT, .Cayenne, .Cayman, .Macan, .Panamera, .Speedster, .Taycan, .Other]
+        case .Ram:
+            return [._100, ._150, ._1500, ._1500_Classic, ._250, ._2500, ._350, ._3500, ._4500, ._5500, ._5500_HD_Chassis, .Dakota, .Promaster, .Promaster_1500, .Promaster_2500, .Promaster_3500, .ProMaster_Cargo_Van, .ProMaster_City, .Promaster_City_Wagon, .ProMaster_Window_Van, .Ram_5500_Cab_Chassis, .Ram_CV, .SRT_10, .Wagon, .Other]
+        case .Rambler:
+            return [.Other]
+        case .Renault:
+            return [._4, .Spider, .Other]
+        case .Rivian:
+            return [.R1S, .R1T, .Other]
+        case .Rolls_Royce:
+            return [.Black_Badge_Cullinan, .Corniche, .Cullinan, .Dawn, .Ghost, .Phantom, .Phantom_Coupe, .Silver_Shadow, .Silver_Spirit, .Silver_Spur, .Silver_Wraith, .Spectre, .Wraith]
+        case .Rover:
+            return [.P5, .Other]
+        case .Saab:
+            return [._9_2X, ._9_3, ._9_5, ._9_7X, ._900, ._9000, .Other]
+        case .Saturn:
+            return [._4DR_Wagon, .Astra, .Aura, .Ion, .L200, .SC1, .Sky, .SL, .Vue, .Other]
+        case .Scion:
+            return [.FR_S, .iM, .iQ, .tC, .xB, .xD, .Other]
+        case .Seat:
+            return [.Leon, .Other]
+        case .Shelby:
+            return [.Cobra, .F_150, .GT, .Other]
+        case .Smart:
+            return [.EQ_Fortwo, .fortwo, .fortwo_Electric_Drive, .Roadster, .Other]
+        case .Spyker:
+            return [.C8_Laviolette, .Other]
+        case .Standard:
+            return [.Vanguard, .Other]
+        case .Sterling:
+            return [._360, .Bullet, .Other]
+        case .Studebaker:
+            return [.Champion, .Commander, .Hawk, .Other]
         }
         
         
@@ -386,7 +462,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     }
 }
 enum Alphbets: String, CaseIterable, Identifiable {
-    case A,B,C,D,E,F,G,H,I,J,K,L,M,N//,O,P,Q,R,S,T,U,V,W,X,Y,Z
+    case A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,R//,S,T,U,V,W,X,Y,Z
  
     var makes: [VehicleMake] {
         switch self {
@@ -418,6 +494,12 @@ enum Alphbets: String, CaseIterable, Identifiable {
             return [.Manic, .Maserati, .Maybach, .Mazda, .McLaren, .Mercedes_AMG, .Mercedes_Benz, .Mercury, .MG, .Mini, .Mitsubishi, .Morgan, .Morris, .MV_1]
         case .N:
             return [.Nash, .Nissan]
+        case .O:
+            return [.Oldsmobile]
+        case .P:
+            return [.Packard, .Panther, .Peugeot, .Plymouth, .Polestar, .Pontiac, .Porsche]
+        case .R:
+            return [.Ram, .Rambler, .Renault, .Rivian, .Rolls_Royce, .Rover]
         }
     }
     var id: Self {
@@ -451,6 +533,7 @@ enum DistanceUnit: String, CaseIterable, Identifiable  {
 enum FuelUnit: String, CaseIterable, Identifiable  {
     case Litre
     case Gallon
+    case Percent = "%"
     var id: Self {
         self
     }

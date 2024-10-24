@@ -12,7 +12,7 @@ import MapKit
 ///this view is responsible to show and update the mapview buttons, alerts, and footer view with buttons.
 struct MapInteractionsView: View {
     ///environment variable to get the color mode of the phone
-    @Environment (\.colorScheme) var bgMode: ColorScheme
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     ///bounded property to store map status
     @Binding var mapViewStatus: MapViewStatus
     ///bounded property to store map action to be performed

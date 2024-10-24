@@ -10,7 +10,7 @@ import CoreLocation
 
 struct NavigationRoutesListView: View {
     ///environment variable to get the color mode of the phone
-    @Environment (\.colorScheme) var bgMode: ColorScheme
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     @Binding var routeData: [RouteData]
     @Binding var isRouteSelectTapped: Bool
     ///bounded property to store map status

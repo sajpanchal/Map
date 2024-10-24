@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NetworkAlertView: View {
-    @Environment (\.colorScheme) var bgMode: ColorScheme
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     var body: some View {
         HStack {
             Spacer()

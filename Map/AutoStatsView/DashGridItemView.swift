@@ -14,7 +14,7 @@ struct DashGridItemView: View {
     var numericText: String
     var unitText: String
     var geometricSize: CGSize
-    @Environment (\.colorScheme) var bgMode: ColorScheme
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     var body: some View {
         GridRow {
             VStack {

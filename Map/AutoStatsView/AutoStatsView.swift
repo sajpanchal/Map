@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AutoStatsView: View {
-    @Environment (\.colorScheme) var bgMode: ColorScheme
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject var locationDataManager: LocationDataManager
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
@@ -18,7 +18,7 @@ struct AutoStatsView: View {
     @State var showServiceHistoryView = false
     @State var showFuellingEntryform = false
     @State var showServiceEntryForm = false
-    
+    @State var efficiency: Double = 0
   
     let currentYear: String = {
         let components = DateComponents()
@@ -60,25 +60,66 @@ struct AutoStatsView: View {
                     if let vehicle = vehicles.first(where: {$0.isActive}) {
                         Section {
                             LazyHGrid(rows: rows) {
-                                DashGridItemView(title: "ODOMETER", foreGroundColor: Color(AppColors.invertPurple.rawValue), backGroundColor: Color(AppColors.purple.rawValue), numericText: settings.first!.getDistanceUnit == "km" ? numberFormatter.string(for: vehicle.odometer) ?? "--" : numberFormatter.string(for: vehicle.getOdometerMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
-                                DashGridItemView(title: "LAST FUELLING", foreGroundColor: Color(AppColors.invertYellow.rawValue), backGroundColor: Color(AppColors.yellow.rawValue), numericText: deciNumberFormatter.string(for: vehicle.getFuellings.first?.volume ?? 0) ?? "--", unitText: settings.first?.getFuelVolumeUnit ?? "", geometricSize: geo.size)
+                                DashGridItemView(title: "ODOMETER", foreGroundColor: Color(AppColors.invertPurple.rawValue), backGroundColor: Color(AppColors.purple.rawValue), numericText: settings.first!.getDistanceUnit == "km" ? numberFormatter.string(for: vehicle.odometer) ?? "--" : numberFormatter.string(for: vehicle.odometerMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
+                                ///get the first fuelling entry from fuellings array of this vehicle filtered by the current fuel mode.
+                                if let fuellingEntry = vehicle.getFuellings.filter({$0.fuelType == vehicle.fuelMode}).first {
+                                    ///if fuel unit is in litre show value in litre
+                                    if settings.first!.getFuelVolumeUnit == "Litre" {
+                                        DashGridItemView(title: "LAST FUELLING", foreGroundColor: Color(AppColors.invertYellow.rawValue), backGroundColor: Color(AppColors.yellow.rawValue), numericText: deciNumberFormatter.string(for: fuellingEntry.litre != 0 ? fuellingEntry.litre : fuellingEntry.getVolumeLitre) ?? "--", unitText: settings.first?.getFuelVolumeUnit ?? "", geometricSize: geo.size)
+                                    }
+                                    ///if fuel unit is in gallon show value in gallon
+                                    else if settings.first!.getFuelVolumeUnit == "Gallon" {
+                                        DashGridItemView(title: "LAST FUELLING", foreGroundColor: Color(AppColors.invertYellow.rawValue), backGroundColor: Color(AppColors.yellow.rawValue), numericText: deciNumberFormatter.string(for: fuellingEntry.gallon != 0 ? fuellingEntry.gallon : fuellingEntry.getVolumeGallons) ?? "--", unitText: settings.first?.getFuelVolumeUnit ?? "", geometricSize: geo.size)
+                                    }
+                                    ///if fuel unit is in percent show value in percent
+                                    else {
+                                        DashGridItemView(title: "LAST FUELLING", foreGroundColor: Color(AppColors.invertYellow.rawValue), backGroundColor: Color(AppColors.yellow.rawValue), numericText: deciNumberFormatter.string(for: fuellingEntry.percent) ?? "--" , unitText: settings.first?.getFuelVolumeUnit ?? "", geometricSize: geo.size)
+                                    }
+                                }
+                                ///if no records found keep it empty
+                                else {
+                                    DashGridItemView(title: "LAST FUELLING", foreGroundColor: Color(AppColors.invertYellow.rawValue), backGroundColor: Color(AppColors.yellow.rawValue), numericText: "--" , unitText: settings.first?.getFuelVolumeUnit ?? "", geometricSize: geo.size)
+                                }
                                 DashGridItemView(title: "FUEL COST", foreGroundColor: Color(AppColors.invertOrange.rawValue), backGroundColor: Color(AppColors.orange.rawValue), numericText: currencyFormatter.string(for: vehicle.getfuelCost) ?? "--", unitText: currentYear, geometricSize: geo.size)
-                                DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: Color(AppColors.invertSky.rawValue), backGroundColor: Color(AppColors.sky.rawValue), numericText: settings.first!.getDistanceUnit == "km" ?
-                                                 deciNumberFormatter.string(for: vehicle.trip) ?? "--" :  deciNumberFormatter.string(for: vehicle.getTripMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
-                                DashGridItemView(title: "MILEAGE", foreGroundColor: Color(AppColors.invertGreen.rawValue), backGroundColor:Color(AppColors.green.rawValue), numericText: deciNumberFormatter.string(for: getFuelEfficiency(efficiency: vehicle.fuelEfficiency)) ?? "--", unitText: settings.first?.getFuelEfficiencyUnit ?? "", geometricSize: geo.size)
+                                ///if the fuel engine is hybrid
+                                if vehicle.fuelEngine == "Hybrid" {
+                                    ///if fuel mode is set the gas engine mode, show the trips for gas mode
+                                    if vehicle.fuelMode == "Gas" {
+                                        DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: Color(AppColors.invertSky.rawValue), backGroundColor: Color(AppColors.sky.rawValue), numericText: settings.first!.getDistanceUnit == "km" ?
+                                                         deciNumberFormatter.string(for: vehicle.trip) ?? "--" :  deciNumberFormatter.string(for: vehicle.tripMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
+                                    }
+                                    ///if fuel mode is set the EV engine mode, show the trips for EV mode
+                                    else {
+                                        DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: Color(AppColors.invertSky.rawValue), backGroundColor: Color(AppColors.sky.rawValue), numericText: settings.first!.getDistanceUnit == "km" ?
+                                                         deciNumberFormatter.string(for: vehicle.tripHybridEV) ?? "--" :  deciNumberFormatter.string(for: vehicle.tripHybridEVMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
+                                    }
+                                }
+                                ///if the fuel engine is not hybrid show the trip in given distance format.
+                                else {
+                                    DashGridItemView(title: "TRIP SINCE FUELLING", foreGroundColor: Color(AppColors.invertSky.rawValue), backGroundColor: Color(AppColors.sky.rawValue), numericText: settings.first!.getDistanceUnit == "km" ?
+                                                     deciNumberFormatter.string(for: vehicle.trip) ?? "--" :  deciNumberFormatter.string(for: vehicle.tripMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
+                                }
+                                DashGridItemView(title: "MILEAGE", foreGroundColor: Color(AppColors.invertGreen.rawValue), backGroundColor:Color(AppColors.green.rawValue), numericText: deciNumberFormatter.string(for: efficiency) ?? "--", unitText: settings.first?.getFuelEfficiencyUnit ?? "", geometricSize: geo.size)
                                 DashGridItemView(title: "SERVICE COST", foreGroundColor: Color(AppColors.invertRed.rawValue)    , backGroundColor: Color(AppColors.red.rawValue), numericText: currencyFormatter.string(for: vehicle.getServiceCost) ?? "--",  unitText: currentYear, geometricSize: geo.size)
                             }
+                            .onAppear {
+                                efficiency = getFuelEfficiency()
+                            }
+                            .onChange(of: showFuellingEntryform) {
+                                efficiency = getFuelEfficiency()
+                            }
+                            .onChange(of: showFuelHistoryView) {
+                                efficiency = getFuelEfficiency()
+                            }
                         }
-                       //
-                    header: {
-                        Text("Dashboard")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .padding(.top, 15)
+                        header: {
+                            Text("Dashboard")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .padding(.top, 15)
+                        }
+                        .padding(10)
                     }
-                    .padding(10)
-                    }
-                 
                     if let vehicle = vehicles.first(where:{$0.isActive}) {
                         Section {
                             ScrollView {
@@ -90,9 +131,17 @@ struct AutoStatsView: View {
                                 .sheet(isPresented: $showFuellingEntryform, content: {
                                     FuellingEntryForm(locationDatamanager: LocationDataManager(), showFuellingEntryform: $showFuellingEntryform)
                                 })
-                                ForEach(vehicle.getFuellings, id:\.self.uniqueID) { fuelData in
-                                    if vehicle.getFuellings.firstIndex(of: fuelData)! <= 2 {
-                                        CustomListView(date: fuelData.date!, text1: ("Fuel Station",fuelData.location!), text2:("Volume", settings.first!.getFuelVolumeUnit == "Litre" ? (String(format:"%.2f",fuelData.volume) + "L") : (String(format:"%.2f",fuelData.getVolumeGallons) + "GL")), text3: ("Cost","$" + String(format:"%.2f",fuelData.cost)), text4: settings.first!.getDistanceUnit == "km" ? String(format:"%.1f", fuelData.lasttrip) + " km" : String(format:"%.1f", fuelData.getLastTripMiles) + " miles" , timeStamp: "Updated on: " + fuelData.getTimeStamp, fuelEntry: true, width: geo.size.width)
+                                ForEach(vehicle.getFuellings.filter({$0.fuelType == vehicle.fuelMode}), id:\.self.uniqueID) { fuelData in
+                                    if vehicle.getFuellings.filter({$0.fuelType == vehicle.fuelMode}).firstIndex(of: fuelData)! <= 2 {
+                                        if settings.first!.getFuelVolumeUnit == "Litre" {
+                                            CustomListView(date: fuelData.getDateString, text1: ("Fuel Station",fuelData.location!), text2:("Volume", (String(format:"%.2f",fuelData.litre != 0.0 ? fuelData.litre : fuelData.getVolumeLitre) + "L")), text3: ("Cost","$" + String(format:"%.2f",fuelData.cost)), text4: settings.first!.getDistanceUnit == "km" ? String(format:"%.1f", fuelData.lasttrip) + " km" : String(format:"%.1f", fuelData.getLastTripMiles) + " miles" , timeStamp: "Updated on: " + fuelData.getTimeStamp, fuelEntry: true, width: geo.size.width)
+                                        }
+                                        else if settings.first!.getFuelVolumeUnit == "Gallon" {
+                                            CustomListView(date: fuelData.getDateString, text1: ("Fuel Station",fuelData.location!), text2:("Volume", (String(format:"%.2f",fuelData.gallon != 0.0 ? fuelData.gallon : fuelData.getVolumeGallons) + "GL")), text3: ("Cost","$" + String(format:"%.2f",fuelData.cost)), text4: settings.first!.getDistanceUnit == "km" ? String(format:"%.1f", fuelData.lasttrip) + " km" : String(format:"%.1f", fuelData.getLastTripMiles) + " miles" , timeStamp: "Updated on: " + fuelData.getTimeStamp, fuelEntry: true, width: geo.size.width)
+                                        }
+                                        else  {
+                                            CustomListView(date: fuelData.getDateString, text1: ("Fuel Station",fuelData.location!), text2:("Volume", (String(format:"%.2f",fuelData.percent) + "%")), text3: ("Cost","$" + String(format:"%.2f",fuelData.cost)), text4: settings.first!.getDistanceUnit == "km" ? String(format:"%.1f", fuelData.lasttrip) + " km" : String(format:"%.1f", fuelData.getLastTripMiles) + " miles" , timeStamp: "Updated on: " + fuelData.getTimeStamp, fuelEntry: true, width: geo.size.width)
+                                        }
                                     }
                                 }
                             }
@@ -133,11 +182,11 @@ struct AutoStatsView: View {
                                 })
                                 ForEach(vehicle.getServices, id: \.self.uniqueID) { autoService in
                                     if vehicle.getServices.firstIndex(of: autoService)! <= 2 {
-                                        CustomListView(date: autoService.date!, text1: ("Auto Shop",autoService.location!), text2: ("",""), text3: ("Cost","$" + String(format:"%.2f",autoService.cost)), text4: "", timeStamp: "Updated on: " + autoService.getTimeStamp, fuelEntry: false, width: geo.size.width)
+                                        CustomListView(date: autoService.getDateString, text1: ("Auto Shop",autoService.location!), text2: ("",""), text3: ("Cost","$" + String(format:"%.2f",autoService.cost)), text4: "", timeStamp: "Updated on: " + autoService.getTimeStamp, fuelEntry: false, width: geo.size.width)
                                     }
                                 }
                             }
-                            .frame(width:geo.size.width - 20,height: geo.size.height/1.5)
+                            .frame(width:geo.size.width - 20, height: geo.size.height/1.5)
                         }
                     header: {
                             VStack {
@@ -163,38 +212,84 @@ struct AutoStatsView: View {
                         }
                     }
                 }
-               
+                
                 .frame(width: geo.size.width, height: geo.size.height - 40)
                 .navigationTitle("Auto Summary")
             }
         }
     }
-    
-    func getFuelEfficiency(efficiency: Double) -> Double {
-        switch settings.first!.fuelEfficiencyUnit {
-        case "km/L":
-            return efficiency
-        case "L/100km":
-            return 100/efficiency
-        case "miles/L":
-            return 0.62 * efficiency
-        case "L/100Miles":
-            return 100/(0.62 * efficiency)
-        case "km/gl":
-            return efficiency * 3.785
-        case "miles/gl":
-            return efficiency * 2.352
-        case "gl/100km":
-            return efficiency * 26.417
-        case "gl/100miles":
-            return (100/efficiency) * (0.2641/0.6213)
-        case "km/kwh":
-            return 0
-        case "miles/kwh":
-            return 0
-        default:
+    ///function to get the vehicle fuel efficiency
+    func getFuelEfficiency() -> Double {
+        ///get the first vehicle from entity of vehicles which is currently active.
+        guard let vehicle = vehicles.first(where: {$0.isActive}) else {
             return 0
         }
+        ///get the first settings object from settings entity
+        guard let setting = settings.first else {
+            return 0
+        }
+        ///local variable to calculate accumulated vehicle trips
+        var accumulatedTrip = 0.0
+        ///local variable to calculate accumulated fuel volume
+        var accumulatedFuelVolume = 0.0
+        ///iterate through the fuelling entries filtered by vehicle fuel mode (gas or ev)
+        for fuelling in vehicle.getFuellings.filter({$0.fuelType == vehicle.fuelMode}) {
+            ///if the distance unit is set to km
+            if setting.distanceUnit == "km" {
+                ///caculate the trip total in km
+                accumulatedTrip += fuelling.lasttrip != 0 ? fuelling.lasttrip : fuelling.getLastTripKm
+            }
+            ///if the distance unit is set to miles
+            else if setting.distanceUnit == "miles" {
+                ///calculate the trip total in miles. if trip in miles is 0 then get it converted from trip in km.
+                accumulatedTrip += fuelling.lastTripMiles != 0 ?  fuelling.lastTripMiles :  fuelling.getLastTripMiles
+            }
+            ///if the fuel volume is set to litre
+            if setting.getFuelVolumeUnit == "Litre" {
+                ///calculate the fuelling volume total in litre
+                accumulatedFuelVolume += fuelling.litre != 0 ? fuelling.litre : fuelling.getVolumeLitre
+            }
+            ///if the fuel volume is set to gallon
+            else if setting.getFuelVolumeUnit == "Gallon" {
+                ///calculate the fuelling volume total in gallon
+                accumulatedFuelVolume += fuelling.gallon != 0 ? fuelling.gallon : fuelling.getVolumeGallons
+            }
+            ///if the fuel volume  unit is set to percentage
+            else {
+                ///calculate the fuel volume in  % of  battery charged.
+                accumulatedFuelVolume += (fuelling.percent * vehicle.batteryCapacity)/100
+            }
+            
+        }
+        ///now calcuate the fuel efficiency from the accumulated trip divided by fuel volume.
+        vehicle.fuelEfficiency = accumulatedTrip/accumulatedFuelVolume
+      ///return the value.
+        return (accumulatedTrip/accumulatedFuelVolume)
+//        switch settings.first!.fuelEfficiencyUnit {
+//        case "km/L":
+//            
+//            return efficiency
+//        case "L/100km":
+//            return 100/efficiency
+//        case "miles/L":
+//            return 0.62 * efficiency
+//        case "L/100Miles":
+//            return 100/(0.62 * efficiency)
+//        case "km/gl":
+//            return efficiency * 3.785
+//        case "miles/gl":
+//            return efficiency * 2.352
+//        case "gl/100km":
+//            return efficiency * 26.417
+//        case "gl/100miles":
+//            return (100/efficiency) * (0.2641/0.6213)
+//        case "km/kwh":
+//            return (efficiency)
+//        case "miles/kwh":
+//            return 0
+//        default:
+//            return 0
+//        }
     }
 }
 

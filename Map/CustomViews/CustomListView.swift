@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct CustomListView: View {
-    @Environment (\.colorScheme) var bgMode: ColorScheme
-    var date: Date
+    @Environment(\.colorScheme) var bgMode: ColorScheme
+    var date: String
     var text1: (String,String)
     var text2: (String, String)
     var text3: (String, String)
@@ -21,7 +21,7 @@ struct CustomListView: View {
     var body: some View {
         Group {
             VStack {
-                Text(date.formatted(date: .long, time: .omitted))
+                Text(date)
                     .font(.system(size: 16))
                     .fontWeight(.black)
                     .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
@@ -84,5 +84,5 @@ struct CustomListView: View {
 }
 
 #Preview {
-    CustomListView(date: Date(), text1: ("",""), text2: ("",""), text3: ("",""), text4: "", timeStamp: "", fuelEntry: false, width: 50)
+    CustomListView(date: Date().formatted(), text1: ("",""), text2: ("",""), text3: ("",""), text4: "", timeStamp: "", fuelEntry: false, width: 50)
 }

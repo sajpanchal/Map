@@ -24,7 +24,9 @@ extension AutoService {
     @NSManaged public var timeStamp: Date?
     @NSManaged public var type: String?
     @NSManaged public var vehicle: Vehicle?
-
+    public var getDateString: String {
+        date?.formatted(date: .long, time: .omitted) ?? Date().formatted(date: .long, time: .omitted)
+    }
     public var getTimeStamp: String {
         timeStamp?.formatted(date: .long, time: .complete) ?? Date().formatted(date: .long, time: .complete)
     }
