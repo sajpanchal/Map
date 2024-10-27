@@ -263,33 +263,14 @@ struct AutoStatsView: View {
         }
         ///now calcuate the fuel efficiency from the accumulated trip divided by fuel volume.
         vehicle.fuelEfficiency = accumulatedTrip/accumulatedFuelVolume
+        if let efficiencyUnit = settings.first!.fuelEfficiencyUnit {
+            if efficiencyUnit == "L/100km" || efficiencyUnit == "L/100miles" || efficiencyUnit == "gl/100km" || efficiencyUnit == "gl/100miles" {
+                vehicle.fuelEfficiency = 100/vehicle.fuelEfficiency
+            }
+        }
       ///return the value.
-        return (accumulatedTrip/accumulatedFuelVolume)
-//        switch settings.first!.fuelEfficiencyUnit {
-//        case "km/L":
-//            
-//            return efficiency
-//        case "L/100km":
-//            return 100/efficiency
-//        case "miles/L":
-//            return 0.62 * efficiency
-//        case "L/100Miles":
-//            return 100/(0.62 * efficiency)
-//        case "km/gl":
-//            return efficiency * 3.785
-//        case "miles/gl":
-//            return efficiency * 2.352
-//        case "gl/100km":
-//            return efficiency * 26.417
-//        case "gl/100miles":
-//            return (100/efficiency) * (0.2641/0.6213)
-//        case "km/kwh":
-//            return (efficiency)
-//        case "miles/kwh":
-//            return 0
-//        default:
-//            return 0
-//        }
+        return vehicle.fuelEfficiency
+
     }
 }
 

@@ -164,7 +164,7 @@ struct AddVehicleForm: View {
                         TextField("Enter the odometer readings", text: $odometer)
                             .onChange(of: odometer) {
                                 if let odometerDouble = Double(odometer) {
-                                    odometerMiles = String(odometerDouble * 0.62)
+                                    odometerMiles = String(odometerDouble * 0.6214)
                                 }
                             }
                             .keyboardType(.numberPad)
@@ -176,7 +176,7 @@ struct AddVehicleForm: View {
                         TextField("Enter the odometer readings", text: $odometerMiles)
                             .onChange(of: odometerMiles) {
                                 if let odometerMilesDouble = Double(odometerMiles) {
-                                    odometer = String(odometerMilesDouble / 0.62)
+                                    odometer = String(odometerMilesDouble / 0.6214)
                                 }
                             }
                             .keyboardType(.numberPad)
@@ -191,7 +191,7 @@ struct AddVehicleForm: View {
                           
                                 .onChange(of: trip) {
                                     if let tripDouble = Double(trip) {
-                                        tripMiles = String(tripDouble * 0.62)
+                                        tripMiles = String(tripDouble * 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)
@@ -202,7 +202,7 @@ struct AddVehicleForm: View {
                             TextField("Enter the Trip readings", text: $tripMiles)
                                 .onChange(of: tripMiles) {
                                     if let tripMilesDouble = Double(tripMiles) {
-                                        trip = String(tripMilesDouble / 0.62)
+                                        trip = String(tripMilesDouble / 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)
@@ -215,7 +215,7 @@ struct AddVehicleForm: View {
                             TextField("Enter the Trip readings", text: $trip)
                                 .onChange(of: trip) {
                                     if let tripDouble = Double(trip) {
-                                        tripMiles = String(tripDouble * 0.62)
+                                        tripMiles = String(tripDouble * 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)
@@ -226,7 +226,7 @@ struct AddVehicleForm: View {
                             TextField("Enter the Trip readings", text: $tripMiles)
                                 .onChange(of: tripMiles) {
                                     if let tripMilesDouble = Double(tripMiles) {
-                                        trip = String(tripMilesDouble / 0.62)
+                                        trip = String(tripMilesDouble / 0.6214)
                                     }
                                    
                                 }
@@ -238,7 +238,7 @@ struct AddVehicleForm: View {
                             TextField("Enter the Trip readings", text: $tripHybridEV)
                                 .onChange(of: tripHybridEV) {
                                     if let tripDouble = Double(tripHybridEV) {
-                                        tripHybridEVMiles = String(tripDouble * 0.62)
+                                        tripHybridEVMiles = String(tripDouble * 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)
@@ -249,7 +249,7 @@ struct AddVehicleForm: View {
                             TextField("Enter the Trip readings", text: $tripHybridEVMiles)
                                 .onChange(of: tripHybridEVMiles) {
                                     if let tripMilesDouble = Double(tripHybridEVMiles) {
-                                        tripHybridEV = String(tripMilesDouble / 0.62)
+                                        tripHybridEV = String(tripMilesDouble / 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)
@@ -310,23 +310,23 @@ struct AddVehicleForm: View {
         ///set vehicle trip odometer
         if settings.first!.distanceUnit == "km" {
             newVehicle.trip = Double(trip) ?? 0.0
-            newVehicle.tripMiles =   newVehicle.trip * 0.62
+            newVehicle.tripMiles =   newVehicle.trip * 0.6214
         }
         else {
             newVehicle.tripMiles = Double(tripMiles) ?? 0.0
-            newVehicle.trip = newVehicle.tripMiles / 0.62
+            newVehicle.trip = newVehicle.tripMiles / 0.6214
         }
       
         if engineType == .Hybrid {
             if settings.first!.distanceUnit == "km" {
                 ///set vehicle trip odometer
                 newVehicle.tripHybridEV = Double(tripHybridEV) ?? 0.0
-                newVehicle.tripHybridEVMiles = newVehicle.tripHybridEV * 0.62
+                newVehicle.tripHybridEVMiles = newVehicle.tripHybridEV * 0.6214
             }
             else {
                 ///set vehicle trip odometer
                 newVehicle.tripHybridEVMiles = Double(tripHybridEVMiles) ?? 0.0
-                newVehicle.tripHybridEV = newVehicle.tripHybridEVMiles / 0.62
+                newVehicle.tripHybridEV = newVehicle.tripHybridEVMiles / 0.6214
             }
            
         }

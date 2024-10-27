@@ -192,7 +192,7 @@ struct InitialSettingsView: View {
                                 .onChange(of: odometer) {
                                     ///convert the odometer in km to miles
                                     if let odometerDouble = Double(odometer) {
-                                        odometerMiles = String(odometerDouble * 0.62)
+                                        odometerMiles = String(odometerDouble * 0.6214)
                                     }
                                 }
                                 .keyboardType(.numberPad)
@@ -204,7 +204,7 @@ struct InitialSettingsView: View {
                                 .onChange(of: trip) {
                                     ///convert the trip in km to miles
                                     if let tripDouble = Double(trip) {
-                                        tripMiles = String(tripDouble * 0.62)
+                                        tripMiles = String(tripDouble * 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)
@@ -217,7 +217,7 @@ struct InitialSettingsView: View {
                                     .onChange(of: tripHybridEV) {
                                         ///convert the trip in km to miles
                                         if let tripDouble = Double(tripHybridEV) {
-                                            tripHybridEVMiles = String(tripDouble * 0.62)
+                                            tripHybridEVMiles = String(tripDouble * 0.6214)
                                         }
                                     }
                                     .keyboardType(.decimalPad)
@@ -232,7 +232,7 @@ struct InitialSettingsView: View {
                                 .onChange(of: odometerMiles) {
                                     ///convert the odometer in miles to km.
                                     if let odometerMilesDouble = Double(odometerMiles) {
-                                        odometer = String(odometerMilesDouble / 0.62)
+                                        odometer = String(odometerMilesDouble / 0.6214)
                                     }
                                 }
                                 .keyboardType(.numberPad)
@@ -244,7 +244,7 @@ struct InitialSettingsView: View {
                                 .onChange(of: tripMiles) {
                                     ///convert the trip in miles to km.
                                     if let tripMilesDouble = Double(tripMiles) {
-                                        trip = String(tripMilesDouble / 0.62)
+                                        trip = String(tripMilesDouble / 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)
@@ -257,7 +257,7 @@ struct InitialSettingsView: View {
                                     .onChange(of: tripHybridEVMiles) {
                                         ///convert the trip in miles to km.
                                         if let tripMilesDouble = Double(tripHybridEVMiles) {
-                                            tripHybridEV = String(tripMilesDouble / 0.62)
+                                            tripHybridEV = String(tripMilesDouble / 0.6214)
                                         }
                                     }
                                     .keyboardType(.decimalPad)
@@ -438,26 +438,26 @@ struct InitialSettingsView: View {
             ///set vehicle trip odometer in decimal format
             vehicle.trip = Double(trip) ?? 0
             ///set vehicle trip odometer in decimal format
-            vehicle.tripMiles =  vehicle.trip * 0.62
+            vehicle.tripMiles =  vehicle.trip * 0.6214
         }
         else {
             ///set vehicle trip odometer in decimal format
             vehicle.tripMiles = Double(tripMiles) ?? 0
             ///set vehicle trip odometer in decimal format
-            vehicle.trip = vehicle.tripMiles / 0.62
+            vehicle.trip = vehicle.tripMiles / 0.6214
         }
         if engineType == .Hybrid {
             if distanceUnit == .km {
                 ///set vehicle trip odometer in decimal format
                 vehicle.tripHybridEV = Double(tripHybridEV) ?? 0
                 ///set vehicle trip odometer in decimal format
-                vehicle.tripHybridEVMiles =  vehicle.tripHybridEV * 0.62
+                vehicle.tripHybridEVMiles =  vehicle.tripHybridEV * 0.6214
             }
             else {
                 ///set vehicle trip odometer in decimal format
                 vehicle.tripHybridEVMiles = Double(tripHybridEVMiles) ?? 0
                 ///set vehicle trip odometer in decimal format
-                vehicle.tripHybridEV = vehicle.tripHybridEVMiles / 0.62
+                vehicle.tripHybridEV = vehicle.tripHybridEVMiles / 0.6214
             }
         }
 

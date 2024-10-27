@@ -162,7 +162,7 @@ struct UpdateVehicleView: View {
                         TextField("Enter the odometer readings", text: $odometer)
                             .onChange(of: odometer) {
                                 if let odometerDouble = Double(odometer) {
-                                    odometerMiles = String(odometerDouble * 0.62)
+                                    odometerMiles = String(odometerDouble * 0.6214)
                                 }
                             }
                             .keyboardType(.numberPad)
@@ -174,7 +174,7 @@ struct UpdateVehicleView: View {
                         TextField("Enter the odometer readings", text: $odometerMiles)
                             .onChange(of: odometerMiles) {
                                 if let odometerMilesDouble = Double(odometerMiles) {
-                                    odometer = String(odometerMilesDouble / 0.62)
+                                    odometer = String(odometerMilesDouble / 0.6214)
                                 }
                             }
                             .keyboardType(.numberPad)
@@ -188,7 +188,7 @@ struct UpdateVehicleView: View {
                             TextField("Enter the Trip readings", text: $trip)
                                 .onChange(of: trip) {
                                     if let tripDouble = Double(trip) {
-                                        tripMiles = String(tripDouble * 0.62)
+                                        tripMiles = String(tripDouble * 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)
@@ -200,7 +200,7 @@ struct UpdateVehicleView: View {
                             TextField("Enter the Trip readings", text: $tripMiles)
                                 .onChange(of: tripMiles) {
                                     if let tripMilesDouble = Double(tripMiles) {
-                                        trip = String(tripMilesDouble / 0.62)
+                                        trip = String(tripMilesDouble / 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)
@@ -216,7 +216,7 @@ struct UpdateVehicleView: View {
                                 .onChange(of: trip) {
                                     print("changed trip: \(trip)")
                                     if let tripDouble = Double(trip) {
-                                        tripMiles = String(tripDouble * 0.62)
+                                        tripMiles = String(tripDouble * 0.6214)
                                         print("tripMiles:\(tripMiles)")
                                     }
                                    
@@ -230,7 +230,7 @@ struct UpdateVehicleView: View {
                             TextField("Enter the Trip readings", text: $tripMiles)
                                 .onChange(of: tripMiles) {
                                     if let tripMilesDouble = Double(tripMiles) {
-                                        trip = String(tripMilesDouble / 0.62)
+                                        trip = String(tripMilesDouble / 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)
@@ -243,7 +243,7 @@ struct UpdateVehicleView: View {
                             TextField("Enter the Trip readings", text: $tripHybridEV)
                                 .onChange(of: tripHybridEV) {
                                     if let tripDouble = Double(tripHybridEV) {
-                                        tripHybridEVMiles = String(tripDouble * 0.62)
+                                        tripHybridEVMiles = String(tripDouble * 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)
@@ -255,7 +255,7 @@ struct UpdateVehicleView: View {
                             TextField("Enter the Trip readings", text: $tripHybridEVMiles)
                                 .onChange(of: tripHybridEVMiles) {
                                     if let tripMilesDouble = Double(tripHybridEVMiles) {
-                                        tripHybridEV = String(tripMilesDouble / 0.62)
+                                        tripHybridEV = String(tripMilesDouble / 0.6214)
                                     }
                                 }
                                 .keyboardType(.decimalPad)

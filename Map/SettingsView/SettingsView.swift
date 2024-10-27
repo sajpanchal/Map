@@ -29,7 +29,7 @@ struct SettingsView: View {
     ///enum type to store the fuel unit.
     @State var fuelUnit: FuelUnit = .Litre
     ///efficiency units array
-    @State var efficiencyUnits = ["km/L", "L/100km", "miles/L","L/100Miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
+    @State var efficiencyUnits = ["km/L", "L/100km", "miles/L","L/100miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
     ///efficiency unit index
     @State var efficiencyUnitIndex = 0
     ///flag to show/hide add vehicle form
@@ -344,11 +344,11 @@ struct SettingsView: View {
          ///update the trip odometer of the location manager with the trip odometer of the currently active vehicle
         if settings.first!.distanceUnit == "km" {
             locationDataManager.trip = vehicle.trip
-            locationDataManager.tripMiles =  locationDataManager.trip * 0.62
+            locationDataManager.tripMiles =  locationDataManager.trip * 0.6214
         }
         else {
             locationDataManager.tripMiles = vehicle.tripMiles
-            locationDataManager.trip = vehicle.trip / 0.62
+            locationDataManager.trip = vehicle.trip / 0.6214
         }
     }
     
@@ -414,11 +414,11 @@ struct SettingsView: View {
                 ///if distance unit is km
                 if distanceUnit == .km {
                     ///trip hybrid EV in miles
-                    vehicles[i].tripHybridEVMiles = vehicle.tripHybridEV * 0.62
+                    vehicles[i].tripHybridEVMiles = vehicle.tripHybridEV * 0.6214
                 }
                 else {
                     ///trip hybrid EV in km
-                    vehicles[i].tripHybridEV = vehicle.tripHybridEVMiles / 0.62
+                    vehicles[i].tripHybridEV = vehicle.tripHybridEVMiles / 0.6214
                 }
             }
             ///if fuel engine is not hybrid or if hybrid but gas type
@@ -426,11 +426,11 @@ struct SettingsView: View {
                 ///if distance unit is set to km
                 if distanceUnit == .km {
                     ///trip in miles
-                    vehicles[i].tripMiles = vehicle.trip * 0.62
+                    vehicles[i].tripMiles = vehicle.trip * 0.6214
                 }
                 else {
                     ///trip in km
-                    vehicles[i].trip = vehicle.tripMiles / 0.62
+                    vehicles[i].trip = vehicle.tripMiles / 0.6214
                 }
             }
         }
@@ -443,13 +443,13 @@ struct SettingsView: View {
             ///trip in km
             locationDataManager.trip = vehicle.trip
             ///trip in miles
-            locationDataManager.tripMiles =  locationDataManager.trip * 0.62
+            locationDataManager.tripMiles =  locationDataManager.trip * 0.6214
         }
         else {
             ///trip in miles
             locationDataManager.tripMiles = vehicle.tripMiles
             ///trip in km
-            locationDataManager.trip = locationDataManager.tripMiles / 0.62
+            locationDataManager.trip = locationDataManager.tripMiles / 0.6214
         }
         ///save the changes to the entities of the viewcontext to the parent store.
         Vehicle.saveContext(viewContext: viewContext)

@@ -29,11 +29,11 @@ extension AutoFuelling {
     @NSManaged public var lastTripMiles: Double
     @NSManaged public var vehicle: Vehicle?
     public var getLastTripMiles: Double {
-        lasttrip * 0.62
+        lasttrip * 0.6214
     }
     
     public var getLastTripKm: Double {
-        lastTripMiles / 0.62
+        lastTripMiles / 0.6214
     }
     public var getVolumeGallons: Double {
         litre / 3.785

@@ -226,14 +226,14 @@ struct FuellingEntryForm: View {
                     ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in km)
                     fuelling.lasttrip = index != nil ? vehicles[index!].trip : 0.0
                     ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in miles)
-                    fuelling.lastTripMiles = fuelling.lasttrip * 0.62
+                    fuelling.lastTripMiles = fuelling.lasttrip * 0.6214
                 }
                 ///if distance unit is set in miles.
                 else {
                     ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in miles)
                     fuelling.lastTripMiles = index != nil ? vehicles[index!].tripMiles : 0.0
                     ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in km)
-                    fuelling.lasttrip = fuelling.lastTripMiles / 0.62
+                    fuelling.lasttrip = fuelling.lastTripMiles / 0.6214
                 }
             }
             ///if hyrid vehicle is currently set to ev engine mode
@@ -251,14 +251,14 @@ struct FuellingEntryForm: View {
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in km)
                 fuelling.lasttrip = index != nil ? vehicles[index!].trip : 0.0
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in miles)
-                fuelling.lastTripMiles = fuelling.lasttrip * 0.62
+                fuelling.lastTripMiles = fuelling.lasttrip * 0.6214
             }
             ///if distance unit is set in miles.
             else {
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in miles)
                 fuelling.lastTripMiles = index != nil ? vehicles[index!].tripMiles : 0.0
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in km)
-                fuelling.lasttrip = fuelling.lastTripMiles / 0.62
+                fuelling.lasttrip = fuelling.lastTripMiles / 0.6214
             }
         }
         ///set the fuel type field to the set fuel mode for that vehicle (gas or EV)

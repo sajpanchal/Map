@@ -84,7 +84,7 @@ struct UpdateFuelEntry: View {
                                 ///on change of tripkm variable, update fuel entry lasttrip in km
                                 fuelEntry.lasttrip = Double(tripKm) ?? 0
                                 ///on change of tripkm variable, update fuel entry lasttrip in miles
-                                fuelEntry.lastTripMiles = fuelEntry.lasttrip * 0.62
+                                fuelEntry.lastTripMiles = fuelEntry.lasttrip * 0.6214
                             }
                             .keyboardType(.decimalPad)
                             .onTapGesture {
@@ -206,13 +206,13 @@ struct UpdateFuelEntry: View {
             if settings.first!.getDistanceUnit == "km" {
                 ///set the last trip in fuel entry entity record in km.
                 fuelEntries[i].lasttrip = Double(tripKm) ?? 0.0
-                fuelEntries[i].lastTripMiles = fuelEntries[i].lasttrip * 0.62
+                fuelEntries[i].lastTripMiles = fuelEntries[i].lasttrip * 0.6214
             }
             ///if the distance unit is in miles.
             else {
                 ///set the last trip in fuel entry entity record in miles.
                 fuelEntries[i].lastTripMiles = Double(tripMiles) ?? 0.0
-                fuelEntries[i].lasttrip = fuelEntries[i].lastTripMiles / 0.62
+                fuelEntries[i].lasttrip = fuelEntries[i].lastTripMiles / 0.6214
             }
             ///if the fuel volume unit is in litre
             if settings.first!.getFuelVolumeUnit == "Litre" {

@@ -155,11 +155,11 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                         ///start updating the odometer of the active vehicle in km.
                         self.results[i].odometer += self.userlocation!.distance(from: lastUserLocation)/1000
                         ///start updating the odometer of the active vehicle in miles.
-                        self.results[i].odometerMiles =  self.results[i].odometer * 0.62
+                        self.results[i].odometerMiles =  self.results[i].odometer * 0.6214
                         ///start updating the trip odometer of the active vehicle in km.
                         self.results[i].trip += self.userlocation!.distance(from: lastUserLocation)/1000
                         ///start updating the trip odometer of the active vehicle in miles.
-                        self.results[i].tripMiles = self.results[i].trip * 0.62
+                        self.results[i].tripMiles = self.results[i].trip * 0.6214
                         ///save view context
                         Vehicle.saveContext(viewContext: viewContext)
                     }

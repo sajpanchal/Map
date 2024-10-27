@@ -56,16 +56,16 @@ extension Vehicle {
         }
     }
     public var getOdometerMiles: Double {
-        odometer * 0.62
+        odometer * 0.6214
     }
     public var getTripMiles: Double {
-        trip * 0.62
+        trip * 0.6214
     }
     public var getTripKm: Double {
-        tripMiles / 0.62
+        tripMiles / 0.6214
     }
     public var getTripHybridEVMiles: Double {
-        tripHybridEV * 0.62
+        tripHybridEV * 0.6214
     }
     public var getMake: String {
         make ?? "N/A"
@@ -84,7 +84,7 @@ extension Vehicle {
         String(year)
     }
     public var getFuelEfficiencyMiles: Double {
-        fuelEfficiency * 0.62
+        fuelEfficiency * 0.6214
     }
     
     public var getBatteryCapacity: String {
