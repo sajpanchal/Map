@@ -13,12 +13,15 @@ struct UpdateFuelEntry: View {
     @FetchRequest(entity: AutoFuelling.entity(), sortDescriptors: []) var fuelEntries: FetchedResults<AutoFuelling>
     @FetchRequest(entity: Settings.entity(), sortDescriptors: []) var settings: FetchedResults<Settings>
     @State var location = ""
-    @State var amount = ""
-    @State var cost = ""
+    @State var amount = 0.0
+    @State var percentBeforeCharge = 0
+    @State var percentAfterCharge = 0
+    @State var cost = 0.0
     @State var date: Date = Date()
     @State var isTapped = false
-    @State var tripKm = ""
-    @State var tripMiles = ""
+    @State var tripKm = 0.0
+    @State var tripMiles = 0.0
+    @Binding var showFuelHistoryView: Bool
     var fuelEntry: AutoFuelling
 
     var body: some View {
@@ -40,49 +43,92 @@ struct UpdateFuelEntry: View {
                             .foregroundStyle(.red)
                     }
                 }
-                Section(header:Text("Fuel Volume in \(settings.first!.getFuelVolumeUnit)").fontWeight(.bold)) {
-                    TextField("Enter Amount", text: $amount)
-                        .keyboardType(.decimalPad)
-                        .onTapGesture {
-                            isTapped = false
+                
+                Section(header:Text("EV Battery charge in \(settings.first!.getFuelVolumeUnit)").fontWeight(.bold)) {
+                    if settings.first!.getFuelVolumeUnit != "%" {
+                        TextField("Enter Amount", value: $amount, format: .number)
+                            .keyboardType(.decimalPad)
+                            .onTapGesture {
+                                isTapped = false
+                            }
+                        if amount == 0.0 && isTapped {
+                            Text("This field can not be empty!")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
                         }
-                    if amount.isEmpty && isTapped {
-                        Text("This field can not be empty!")
-                            .font(.caption2)
-                            .foregroundStyle(.red)
+                        else if amount < 0 && isTapped {
+                            Text("Please enter the valid text entry!")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                        }
                     }
-                    else if Double(amount) == nil && isTapped {
-                        Text("Please enter the valid text entry!")
-                            .font(.caption2)
-                            .foregroundStyle(.red)
+                    else {
+                        ///fill volume in % of charge before start
+                        TextField("Enter % before charge", value: $percentBeforeCharge, format: .number)
+                            .keyboardType(.numberPad)
+                        ///on tap of the textfield
+                            .onTapGesture {
+                                isTapped = false
+                            }
+                        ///if value is not number type and textfield is not active.
+                        if (percentBeforeCharge >= 100 || percentBeforeCharge < 0) && isTapped {
+                            Text("Please enter the valid percentage value between 0-99%")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                        }
+                        ///fill volume in % of charge after finish
+                        TextField("Enter % after charge", value: $percentAfterCharge, format: .number)
+                            .keyboardType(.numberPad)
+                            .onTapGesture {
+                                isTapped = false
+                            }
+                        ///if the variable is not set and textfield is not active.
+                        if percentAfterCharge == 0 && isTapped {
+                            Text("This field can not be empty!")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                        }
+                        ///if charging before is greater than charging after.
+                        else if percentBeforeCharge >= percentAfterCharge {
+                            Text("charging percent before charging can't be more than or equal to after charging percent!")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                        }
+                        ///if value is not number type and textfield is not active.
+                        else if (percentAfterCharge > 100 || percentAfterCharge <= 0) && isTapped {
+                            Text("Please enter the valid percentage value between 1-100%.")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                        }
                     }
+                    
                 }
-                Section(header:Text("Fuel Cost:").font(Font.system(size: 15))) {
-                    TextField("Enter Cost", text: $cost)
+                Section(header:Text("Fuel Cost").fontWeight(.bold)) {
+                    TextField("Enter Cost", value: $cost, format: .number)
                         .keyboardType(.decimalPad)
                         .onTapGesture {
                             isTapped = false
                         }
-                    if cost.isEmpty && isTapped {
+                    if cost == 0.0 && isTapped {
                         Text("This field can not be empty!")
                             .font(.caption2)
                             .foregroundStyle(.red)
                     }
-                    else if Double(cost) == nil && isTapped {
+                    else if cost < 0 && isTapped {
                         Text("Please enter the valid text entry!")
                             .font(.caption2)
                             .foregroundStyle(.red)
                     }
                 }
                 ///textfield to update the trip distance
-                Section(header:Text("Trip Distance in \(settings.first!.getDistanceUnit)").font(Font.system(size: 15))) {
+                Section(header:Text("Trip Distance in \(settings.first!.getDistanceUnit)").fontWeight(.bold)) {
                     ///if the distance unit is in km
                     if settings.first!.distanceUnit == "km" {
                         ///show the textfield to enter trip in km
-                        TextField("Enter Distance", text: $tripKm)
+                        TextField("Enter Distance", value: $tripKm, format: .number)
                             .onChange(of: tripKm) {
                                 ///on change of tripkm variable, update fuel entry lasttrip in km
-                                fuelEntry.lasttrip = Double(tripKm) ?? 0
+                                fuelEntry.lasttrip = tripKm
                                 ///on change of tripkm variable, update fuel entry lasttrip in miles
                                 fuelEntry.lastTripMiles = fuelEntry.lasttrip * 0.6214
                             }
@@ -91,29 +137,19 @@ struct UpdateFuelEntry: View {
                                 ///on tap of the textfield clear the isTapped flag detecting the submit button tap.
                                 isTapped = false
                             }
-                        if tripKm.isEmpty && isTapped {
-                            Text("This field can not be empty!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                        else if Double(tripKm) == nil && isTapped {
+                       if tripKm <= 0 && isTapped {
                             Text("Please enter the valid text entry!")
                                 .font(.caption2)
                                 .foregroundStyle(.red)
                         }
                     }
                     else {
-                        TextField("Enter Distance", text: $tripMiles)
+                        TextField("Enter Distance", value: $tripMiles, format: .number)
                             .keyboardType(.decimalPad)
                             .onTapGesture {
                                 isTapped = false
                             }
-                        if tripMiles.isEmpty && isTapped {
-                            Text("This field can not be empty!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                        else if Double(tripKm) == nil && isTapped {
+                       if tripMiles <= 0.0 && isTapped {
                             Text("Please enter the valid text entry!")
                                 .font(.caption2)
                                 .foregroundStyle(.red)
@@ -141,6 +177,7 @@ struct UpdateFuelEntry: View {
                                     calculateFuelCost(for: activeVehicle, at: i)
                                     calculateFuelEfficiency(for: activeVehicle, at: i)
                                 }
+                                showFuelHistoryView = false
                             }
                             isTapped = true
                          
@@ -163,75 +200,79 @@ struct UpdateFuelEntry: View {
             ///if the fuel unit is in litre
             if settings.first!.getFuelVolumeUnit == "Litre" {
                 ///set the fuel amount field with the previously set value in a given fuel entry prop.
-                amount = fuelEntry.litre != 0.0 ? String(fuelEntry.litre) : String(fuelEntry.getVolumeLitre)
+                amount = fuelEntry.litre != 0.0 ? fuelEntry.litre : fuelEntry.getVolumeLitre
             }
             ///if the fuel unit is in gallon
             else if settings.first!.getFuelVolumeUnit == "Gallon" {
                 ///set the fuel amount field with the previously set value in a given fuel entry prop.
-                amount = fuelEntry.gallon != 0.0 ? String(fuelEntry.gallon) : String(fuelEntry.getVolumeGallons)
+                amount = fuelEntry.gallon != 0.0 ? fuelEntry.gallon : fuelEntry.getVolumeGallons
             }
             ///if the fuel unit is in %
             else if settings.first!.getFuelVolumeUnit == "%" {
                 ///set the fuel amount field with the previously set value in a given fuel entry prop.
-                amount = String(fuelEntry.percent)
+                amount = fuelEntry.percent
+                percentBeforeCharge = 0
+                percentAfterCharge = Int(amount)
             }
             ///set the fuel cost field to previously set cost
-            cost = String(fuelEntry.cost)
+            cost = fuelEntry.cost
             date = fuelEntry.date ?? Date()
             ///set tripkm field to string formatted trip recorded in fuel entry field
-            tripKm = String(fuelEntry.lasttrip)
+            tripKm = fuelEntry.lasttrip
             ///set tripMiles field to string formatted trip recorded in fuel entry field
-            tripMiles = String(fuelEntry.lastTripMiles)
+            tripMiles = fuelEntry.lastTripMiles
         })
     }
     func isTextFieldEntryValid() -> Bool {
-        if location.isEmpty || amount.isEmpty || cost.isEmpty {
-            return false
-        }
-        if Double(amount) == nil || Double(cost) == nil || Double(location) != nil {
+        if location.isEmpty || cost <= 0 || (percentAfterCharge <= 0 && percentBeforeCharge <= 0 && amount <= 0) || (tripKm <= 0 && tripMiles <= 0) {
             return false
         }
         if date > Date() {
+            return false
+        }
+        
+        if settings.first!.getFuelVolumeUnit == "%" && (percentAfterCharge > 100 || percentBeforeCharge >= 100 || percentAfterCharge < percentBeforeCharge || percentAfterCharge == percentBeforeCharge) {
             return false
         }
         return true
     }
     func addFuellingEntry(for vehicle: Vehicle, at index: Int?) {
         if let i = fuelEntries.firstIndex(where: {$0.uniqueID == fuelEntry.uniqueID && $0.vehicle == vehicle}) {           
-            fuelEntries[i].cost = Double(cost) ?? 0
+            fuelEntries[i].cost = cost
             fuelEntries[i].date = date
             fuelEntries[i].timeStamp = Date()
             fuelEntries[i].location = location
             ///if the distance unit is in km.
             if settings.first!.getDistanceUnit == "km" {
                 ///set the last trip in fuel entry entity record in km.
-                fuelEntries[i].lasttrip = Double(tripKm) ?? 0.0
+                fuelEntries[i].lasttrip = tripKm
                 fuelEntries[i].lastTripMiles = fuelEntries[i].lasttrip * 0.6214
             }
             ///if the distance unit is in miles.
             else {
                 ///set the last trip in fuel entry entity record in miles.
-                fuelEntries[i].lastTripMiles = Double(tripMiles) ?? 0.0
+                fuelEntries[i].lastTripMiles = tripMiles
                 fuelEntries[i].lasttrip = fuelEntries[i].lastTripMiles / 0.6214
             }
             ///if the fuel volume unit is in litre
             if settings.first!.getFuelVolumeUnit == "Litre" {
                 ///set the fuel entry field litre property
-                fuelEntries[i].litre = Double(amount) ?? 0
+                fuelEntries[i].litre = amount
                 ///convert from litre to gallon and set the fuel entry field gallon property
                 fuelEntries[i].gallon = fuelEntries[i].litre/3.785
             }
             ///if the fuel volume unit is in gallon
             else if settings.first!.getFuelVolumeUnit == "Gallon" {
                 ///set the fuel entry field gallon property
-                fuelEntries[i].gallon = Double(amount) ?? 0
+                fuelEntries[i].gallon = amount
                 ///convert from gallon to litre and set the fuel entry field litre property
                 fuelEntries[i].litre = fuelEntries[i].gallon * 3.785
             }
             ///if the fuel volume unit is in %
             else if settings.first!.getFuelVolumeUnit == "%" {
+                amount = Double(percentAfterCharge - percentBeforeCharge)
                 ///set the fuel entry field % property
-                fuelEntries[i].percent = Double(amount) ?? 0
+                fuelEntries[i].percent = amount
             }
         }
         Vehicle.saveContext(viewContext: viewContext)
@@ -290,5 +331,5 @@ struct UpdateFuelEntry: View {
 }
 
 #Preview {
-    UpdateFuelEntry( fuelEntry: AutoFuelling())
+    UpdateFuelEntry(showFuelHistoryView: .constant(false), fuelEntry: AutoFuelling())
 }

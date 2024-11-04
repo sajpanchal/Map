@@ -14,7 +14,7 @@ struct ServiceEntryForm: View {
     @State var location: String = ""
     @State var type: ServiceTypes = .service
     @State var description: String = ""
-    @State var cost: String = ""
+    @State var cost = 0.0
     @State var date: Date = Date()
     @State var isButtonTapped = false
     @Binding var showServiceEntryForm: Bool
@@ -54,17 +54,17 @@ struct ServiceEntryForm: View {
                         .frame(height: 70)
                 }
                 Section(header:Text("Cost").fontWeight(.bold)) {
-                    TextField("Enter total cost", text: $cost)
+                    TextField("Enter total cost", value: $cost, format: .number)
                         .keyboardType(.decimalPad)
                         .onTapGesture {
                             isButtonTapped = false
                         }
-                    if cost.isEmpty && isButtonTapped {
+                    if cost == 0 && isButtonTapped {
                         Text("This field can not be empty!")
                             .font(.caption2)
                             .foregroundStyle(.red)
                     }
-                    else if Double(cost) == nil && isButtonTapped {
+                    else if cost < 0 && isButtonTapped {
                         Text("Please enter the valid text entry!")
                             .font(.caption2)
                             .foregroundStyle(.red)
@@ -106,7 +106,7 @@ struct ServiceEntryForm: View {
     
     func addServiceEntry(service: AutoService) {
         service.uniqueID = UUID()
-        service.cost = Double(cost) ?? 0
+        service.cost = cost
         service.details = description
         service.location = location
         service.type = type.rawValue.capitalized
@@ -126,10 +126,10 @@ struct ServiceEntryForm: View {
     }
     
     func isTextFieldEntryValid() -> Bool {
-        if location.isEmpty || cost.isEmpty {
+        if location.isEmpty || cost == 0 {
             return false
         }
-        if Double(location) != nil || Double(cost) == nil {
+        if Double(location) != nil || cost < 0 {
             return false
         }
         if date > Date() {

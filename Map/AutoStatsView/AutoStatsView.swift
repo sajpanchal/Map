@@ -164,7 +164,7 @@ struct AutoStatsView: View {
                                     .buttonStyle(BorderlessButtonStyle())
                                     .cornerRadius(10)
                                     .sheet(isPresented: $showFuelHistoryView, content: {
-                                        FuelHistoryView(vehicle: vehicle)
+                                        FuelHistoryView(showFuelHistoryView: $showFuelHistoryView, vehicle: vehicle)
                                     })
                                 }
                             }
@@ -205,7 +205,7 @@ struct AutoStatsView: View {
                                     .buttonStyle(BorderlessButtonStyle())
                                     .cornerRadius(10)
                                     .sheet(isPresented: $showServiceHistoryView, content: {
-                                        ServiceHistoryView(vehicle: vehicle)
+                                        ServiceHistoryView(showServiceHistoryView: $showServiceHistoryView, vehicle: vehicle)
                                     })
                                 }
                             }

@@ -231,9 +231,9 @@ class MapViewAPI {
           return
         }
         if parent.tappedAnnotation != nil {
-            print(parent.tappedAnnotation?.title, "is not nil")
+            
         }
-        print(targetLocation.title)
+      
         
         getETA(to: targetLocation.coordinate, in: &parent, with: mapView)
         ///if there is any route available then get the first one otherwise exit the fuction.

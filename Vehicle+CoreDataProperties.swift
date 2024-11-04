@@ -87,8 +87,8 @@ extension Vehicle {
         fuelEfficiency * 0.6214
     }
     
-    public var getBatteryCapacity: String {
-        batteryCapacity == 0.0 ? "40.0" : String(batteryCapacity)
+    public var getBatteryCapacity: Double{
+        batteryCapacity == 0.0 ? 40.0 : batteryCapacity
     }
     
     public var getFuellings: [AutoFuelling] {

@@ -10,7 +10,7 @@ import SwiftUI
 struct ServiceHistoryView: View {
     @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
-
+    @Binding var showServiceHistoryView: Bool
     var vehicle: Vehicle
     var body: some View {
         NavigationStack {
@@ -18,7 +18,7 @@ struct ServiceHistoryView: View {
             List {
                
                 ForEach(vehicle.getServices, id: \.self.uniqueID) { autoService in
-                    NavigationLink(destination: UpdateServiceEntry(serviceEntry: autoService), label:  {
+                    NavigationLink(destination: UpdateServiceEntry(serviceEntry: autoService, showServiceHistoryView: $showServiceHistoryView), label:  {
                         VStack {
                             Text(autoService.date!.formatted(date: .long, time: .omitted))
                                 .font(.system(size: 12))
@@ -71,5 +71,5 @@ struct ServiceHistoryView: View {
 }
 
 #Preview {
-    ServiceHistoryView(vehicle: Vehicle())
+    ServiceHistoryView(showServiceHistoryView: .constant(false), vehicle: Vehicle())
 }

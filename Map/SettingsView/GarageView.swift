@@ -20,6 +20,7 @@ struct GarageView: View {
     @State var vehicleTitle = ""
     ///binding flag to show/hide garageView.
     @Binding var showGarage: Bool
+    @State var showAlert = false
     var colors = [AppColors.invertRed.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue]
 
     var body: some View {
@@ -41,18 +42,28 @@ struct GarageView: View {
                             }
                      })
                     }
+                   
                     ///on swipe left delete the given vehicle from the list
                     .onDelete(perform: { indexSet in
                         ///here indexSet is a set of indexes that to be deleted. in our case it will be only an array of one element.
                         for i in indexSet {
                             ///get the vehicle at a given indexset.
                             let vehicle = vehicles[i]
-                            ///delete the vehicle from the viewcontext.
-                            viewContext.delete(vehicle)
-                            ///save the changes made to viewcontext in the core data store.
-                            Vehicle.saveContext(viewContext: viewContext)
+                            if vehicles.first(where: {$0.isActive}) != vehicle {
+                                ///delete the vehicle from the viewcontext.
+                                viewContext.delete(vehicle)
+                                ///save the changes made to viewcontext in the core data store.
+                                Vehicle.saveContext(viewContext: viewContext)
+                            }
+                            else {
+                                showAlert = true
+                            }
+                          
                         }
                     })
+                }
+                .alert(isPresented: $showAlert) {
+                    Alert(title: Text("Can't delete this Vehicle"), message: Text("Active vehicle can't be deleted! Please change the active vehicle first to delete this vehicle."), dismissButton: .default(Text("Okay")))
                 }
                 .onAppear(perform: {
                     print("garage view")

@@ -14,14 +14,14 @@ struct FuellingEntryForm: View {
     @StateObject var locationDatamanager: LocationDataManager
     @State var location = ""
     ///state variable to store litre of fuel
-    @State var litre = ""
+    @State var litre = 0.0
     ///state variable to store litre of fuel
-    @State var gallon = ""
+    @State var gallon = 0.0
     ///state variable to store the % of ev battery charged before charging it.
-    @State var percentBeforeCharge = ""
+    @State var percentBeforeCharge = 0.0
     ///state variable to store the % of ev battery charged after charging it.
-    @State var percentAfterCharge = ""
-    @State var cost = ""
+    @State var percentAfterCharge = 0.0
+    @State var cost = 0.0
     @State var date: Date = Date()
     @State var isTapped = false
     @Binding var showFuellingEntryform: Bool
@@ -50,21 +50,15 @@ struct FuellingEntryForm: View {
                     ///if the fuel volume unit is set to litre
                     if settings.first!.getFuelVolumeUnit == "Litre" {
                         ///fill volume in litre
-                        TextField("Enter Fuel Volume", text: $litre)
+                        TextField("Enter Fuel Volume", value: $litre, format: .number)
                             .keyboardType(.decimalPad)
                             ///on tap of the textfield
                             .onTapGesture {
                                 isTapped = false
                             }
                         ///if the variable is not set and textfield is not active.
-                        if litre.isEmpty && isTapped {
-                            Text("This field can not be empty!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                        ///if value is not number type and textfield is not active.
-                        else if Double(litre) == nil && isTapped {
-                            Text("Please enter the valid text entry!")
+                        if litre == 0.0 && isTapped {
+                            Text("fuel volume can't be 0!")
                                 .font(.caption2)
                                 .foregroundStyle(.red)
                         }
@@ -72,21 +66,15 @@ struct FuellingEntryForm: View {
                     ///if the fuel volume unit is set to gallon
                     else if settings.first!.getFuelVolumeUnit == "Gallon" {
                         ///fill volume in gallon
-                        TextField("Enter Fuel Volume", text: $gallon)
+                        TextField("Enter Fuel Volume", value: $gallon, format: .number)
                             .keyboardType(.decimalPad)
                         ///on tap of the textfield
                             .onTapGesture {
                                 isTapped = false
                             }
                         ///if the variable is not set and textfield is not active.
-                        if gallon.isEmpty && isTapped {
-                            Text("This field can not be empty!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                        ///if value is not number type and textfield is not active.
-                        else if Double(gallon) == nil && isTapped {
-                            Text("Please enter the valid text entry!")
+                        if gallon == 0.0 && isTapped {
+                            Text("fuel volume can't be 0!")
                                 .font(.caption2)
                                 .foregroundStyle(.red)
                         }
@@ -94,45 +82,39 @@ struct FuellingEntryForm: View {
                     ///if the fuel volume unit is set to %.
                     else {
                         ///fill volume in % of charge before start
-                        TextField("Enter % of battery Charge before starting charge", text: $percentBeforeCharge)
-                            .keyboardType(.decimalPad)
+                        TextField("Enter % before charge", value: $percentBeforeCharge, format: .number)
+                            .keyboardType(.numberPad)
                         ///on tap of the textfield
                             .onTapGesture {
                                 isTapped = false
                             }
-                        ///if the variable is not set and textfield is not active.
-                        if percentBeforeCharge.isEmpty && isTapped {
-                            Text("This field can not be empty!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
                         ///if value is not number type and textfield is not active.
-                        else if Double(percentBeforeCharge) == nil && isTapped {
-                            Text("Please enter the valid text entry!")
+                        if (percentBeforeCharge >= 100 || percentBeforeCharge < 0) && isTapped {
+                            Text("Please enter the valid percentage value between 0-99%")
                                 .font(.caption2)
                                 .foregroundStyle(.red)
                         }
                         ///fill volume in % of charge after finish
-                        TextField("Enter  % of battery Charge after finishing charge", text: $percentAfterCharge)
-                            .keyboardType(.decimalPad)
+                        TextField("Enter % after charge", value: $percentAfterCharge, format: .number)
+                            .keyboardType(.numberPad)
                             .onTapGesture {
                                 isTapped = false
                             }
                         ///if the variable is not set and textfield is not active.
-                        if percentAfterCharge.isEmpty && isTapped {
+                        if percentAfterCharge == 0 && isTapped {
                             Text("This field can not be empty!")
                                 .font(.caption2)
                                 .foregroundStyle(.red)
                         }
-                        ///if value is not number type and textfield is not active.
-                        else if Double(percentAfterCharge) == nil && isTapped {
-                            Text("Please enter the valid text entry!")
+                        ///if charging before is greater than charging after.
+                        else if percentBeforeCharge >= percentAfterCharge && isTapped {
+                            Text("charging percent before charging can't be more than or equal to after charging percent!")
                                 .font(.caption2)
                                 .foregroundStyle(.red)
                         }
-                        ///if charging before is greater than charging after.
-                        else if Double(percentBeforeCharge) ?? 0  >= Double(percentAfterCharge) ?? 1 {
-                            Text("charing percent before charging can't be more than or equal to after charging percent!")
+                        ///if value is not number type and textfield is not active.
+                        else if (percentAfterCharge > 100 || percentAfterCharge <= 0) && isTapped {
+                            Text("Please enter the valid percentage value between 1-100%.")
                                 .font(.caption2)
                                 .foregroundStyle(.red)
                         }
@@ -140,20 +122,14 @@ struct FuellingEntryForm: View {
                 }
                 ///fuel cost entry field
                 Section(header:Text("Fuel Cost").fontWeight(.bold)) {
-                    TextField("Enter Cost", text: $cost)
+                    TextField("Enter Cost", value: $cost, format: .number)
                         .keyboardType(.decimalPad)
                         .onTapGesture {
                             isTapped = false
                         }
                     ///if the variable is not set and textfield is not active.
-                    if cost.isEmpty && isTapped {
+                    if cost == 0.0 && isTapped {
                         Text("This field can not be empty!")
-                            .font(.caption2)
-                            .foregroundStyle(.red)
-                    }
-                    ///if value is not number type and textfield is not active.
-                    else if Double(cost) == nil && isTapped {
-                        Text("Please enter the valid text entry!")
                             .font(.caption2)
                             .foregroundStyle(.red)
                     }
@@ -198,13 +174,13 @@ struct FuellingEntryForm: View {
         }
     }
     func isTextFieldEntryValid() -> Bool {
-        if location.isEmpty || cost.isEmpty || (percentAfterCharge.isEmpty && percentBeforeCharge.isEmpty && litre.isEmpty && gallon.isEmpty) {
-            return false
-        }
-        if (Double(percentAfterCharge) == nil && Double(percentBeforeCharge) == nil && Double(litre) == nil && Double(gallon) == nil) || Double(cost) == nil || Double(location) != nil {
+        if location.isEmpty || cost <= 0 || (percentAfterCharge <= 0 && percentBeforeCharge <= 0 && litre <= 0 && gallon <= 0)  {
             return false
         }
         if date > Date() {
+            return false
+        }
+        if settings.first!.getFuelVolumeUnit == "%" && (percentAfterCharge > 100 || percentBeforeCharge >= 100 || percentAfterCharge < percentBeforeCharge || percentAfterCharge == percentBeforeCharge) {
             return false
         }
         return true
@@ -213,7 +189,7 @@ struct FuellingEntryForm: View {
     func addFuellingEntry(for vehicle: Vehicle, at index: Int?) {
         let fuelling = AutoFuelling(context: viewContext)
         fuelling.uniqueID = UUID()
-        fuelling.cost = Double(cost) ?? 0
+        fuelling.cost = cost
         fuelling.date = date
         fuelling.timeStamp = Date()
         fuelling.location = location
@@ -267,13 +243,13 @@ struct FuellingEntryForm: View {
         switch settings.first!.getFuelVolumeUnit {
             ///if it is in litre update the litre prop
         case "Litre":
-            fuelling.litre =  Double(litre) ?? 0
+            fuelling.litre = litre
             ///if it is in gallon update the gallon prop
         case "Gallon":
-            fuelling.gallon =  Double(gallon) ?? 0
+            fuelling.gallon = gallon
             ///if it is in % update the % prop.
         case "%":
-            fuelling.percent =  (Double(percentAfterCharge)  ?? 0) - (Double(percentBeforeCharge)  ?? 0)
+            fuelling.percent = percentAfterCharge - percentBeforeCharge
         default:
             print(" ")
         }

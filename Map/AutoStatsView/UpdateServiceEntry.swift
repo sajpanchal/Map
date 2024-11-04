@@ -14,10 +14,11 @@ struct UpdateServiceEntry: View {
     @State var location: String = ""
     @State var type: ServiceTypes = .service
     @State var description: String = ""
-    @State var cost: String = ""
+    @State var cost = 0.0
     @State var date: Date = Date()
     @State var isButtonTapped = false
     var serviceEntry: AutoService
+    @Binding var showServiceHistoryView: Bool
     enum ServiceTypes: String, CaseIterable, Identifiable {
         case service, repair, bodyWork, wash
         var id: Self {
@@ -60,17 +61,17 @@ struct UpdateServiceEntry: View {
                         .frame(height: 70)
                 }
                 Section(header:Text("Cost").fontWeight(.bold)) {
-                    TextField("Enter total cost", text: $cost)
+                    TextField("Enter total cost", value: $cost, format: .number)
                         .keyboardType(.decimalPad)
                         .onTapGesture {
                             isButtonTapped = false
                         }
-                    if cost.isEmpty && isButtonTapped {
+                    if cost == 0.0 && isButtonTapped {
                         Text("This field can not be empty!")
                             .font(.caption2)
                             .foregroundStyle(.red)
                     }
-                    else if Double(cost) == nil && isButtonTapped {
+                    else if cost < 0 && isButtonTapped {
                         Text("Please enter the valid text entry!")
                             .font(.caption2)
                             .foregroundStyle(.red)
@@ -92,6 +93,7 @@ struct UpdateServiceEntry: View {
                                     editServiceCost(at: index)
                                 }
                                 aggregateServiceCost(for: vehicle)
+                                showServiceHistoryView = false
                             }
                             isButtonTapped = true
                        
@@ -112,14 +114,14 @@ struct UpdateServiceEntry: View {
             location = serviceEntry.location ?? ""
             type = ServiceTypes(rawValue: serviceEntry.type!) ?? .service
             description = serviceEntry.details ?? ""
-            cost = String(serviceEntry.cost)
+            cost = serviceEntry.cost
             date = serviceEntry.date ?? Date()
             
         })
     }
     
     func editServiceCost(at index: Int) {
-        serviceEntries[index].cost = Double(cost) ?? 0
+        serviceEntries[index].cost = cost
         serviceEntries[index].details = description
         serviceEntries[index].location = location
         serviceEntries[index].type = type.rawValue.capitalized
@@ -140,10 +142,10 @@ struct UpdateServiceEntry: View {
     }
     
     func isTextFieldEntryValid() -> Bool {
-        if location.isEmpty || cost.isEmpty {
+        if location.isEmpty || cost == 0 {
             return false
         }
-        if Double(location) != nil || Double(cost) == nil {
+        if Double(location) != nil || cost < 0 {
             return false
         }
         if date > Date() {
@@ -154,5 +156,5 @@ struct UpdateServiceEntry: View {
 }
 
 #Preview {
-    UpdateServiceEntry(serviceEntry: AutoService())
+    UpdateServiceEntry(serviceEntry: AutoService(), showServiceHistoryView: .constant(false))
 }

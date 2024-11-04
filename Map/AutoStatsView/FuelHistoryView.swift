@@ -11,7 +11,7 @@ struct FuelHistoryView: View {
     @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
     @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
-
+    @Binding var showFuelHistoryView: Bool
     var vehicle: Vehicle
     var body: some View {
         NavigationStack {
@@ -21,7 +21,7 @@ struct FuelHistoryView: View {
                     ///iterate through the vehicle fuelling entries filtred by fuel mode (uniquely identified by its uniqueID) and display them in a list of navigation links.
                     ForEach(vehicle.getFuellings.filter({$0.fuelType == fuelMode}), id:\.self.uniqueID) { thisFuelEntry in
                         ///navigation list shows this fuel entry data as a label and a link to a form to update it on tap gesture.
-                        NavigationLink(destination: UpdateFuelEntry(fuelEntry: thisFuelEntry), label: {
+                        NavigationLink(destination: UpdateFuelEntry(showFuelHistoryView: $showFuelHistoryView ,fuelEntry: thisFuelEntry), label: {
                             ///vertical stack enclosing fuel entry data in text.
                             VStack {
                                 ///text to show date of fuelling
@@ -162,5 +162,5 @@ struct FuelHistoryView: View {
 }
 
 #Preview {
-    FuelHistoryView(vehicle: Vehicle())
+    FuelHistoryView(showFuelHistoryView: .constant(false), vehicle: Vehicle())
 }

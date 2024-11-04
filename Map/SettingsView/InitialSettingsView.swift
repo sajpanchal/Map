@@ -27,17 +27,17 @@ struct InitialSettingsView: View {
     ///state variable that stores vehicle engine type enum value
     @State var engineType = EngineType.Gas
     ///state variable stores the odometer readings value for the textfield
-    @State var odometer = "0"
+    @State var odometer = 0
     ///state variable stores the odometer readings value for the textfield
-    @State var odometerMiles = "0"
+    @State var odometerMiles = 0
     ///state variable stores the trip odometer readings value for the textfield
-    @State var trip = "0.0"
+    @State var trip = 0.0
     ///state variable stores the trip odometer readings value for the textfield
-    @State var tripMiles = "0.0"
+    @State var tripMiles = 0.0
     ///state variable stores the trip odometer readings value for the textfield
-    @State var tripHybridEV = "0.0"
+    @State var tripHybridEV = 0.0
     ///state variable stores the trip odometer readings value for the textfield
-    @State var tripHybridEVMiles = "0.0"
+    @State var tripHybridEVMiles = 0.0
     ///state variable stores the distance unit enum value
     @State var distanceUnit: DistanceUnit = .km
     ///state variable stores the fuel unit enum value
@@ -45,7 +45,7 @@ struct InitialSettingsView: View {
     ///state variable stores the fuel unit enum value
     @State var fuelMode: FuelMode = .Gas
     ///enum type to store the fuel unit.
-    @State var batteryCapacity: String = "40.0"
+    @State var batteryCapacity = 40.0
     ///array of fuel efficiencies.
     @State var efficiencyUnits = ["km/L", "L/100km", "miles/L","L/100Miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
     ///state variable stores the index of efficiencyUnits array
@@ -159,7 +159,7 @@ struct InitialSettingsView: View {
                 }
                 if engineType != .Gas {
                     Section(header: Text("EV Battery Capacity in KWh").fontWeight(.bold)) {
-                        TextField("Enter battery capacity in kwh", text: $batteryCapacity)
+                        TextField("Enter battery capacity in kwh", value: $batteryCapacity, format: .number)
                             .keyboardType(.decimalPad)
                     }
                 }
@@ -187,38 +187,35 @@ struct InitialSettingsView: View {
                     if distanceUnit == .km {
                         ///textfield to enter/update vehicle odometer readings
                         Section("Vehicle Odometer (in Km)") {
-                            TextField("Enter the odometer readings", text: $odometer)
+                            TextField("Enter the odometer readings", value: $odometer, format: .number)
                             ///on change of odometer
                                 .onChange(of: odometer) {
                                     ///convert the odometer in km to miles
-                                    if let odometerDouble = Double(odometer) {
-                                        odometerMiles = String(odometerDouble * 0.6214)
-                                    }
+                                    let odometerDouble = Double(odometer)
+                                    odometerMiles = Int(odometerDouble * 0.6214)
                                 }
                                 .keyboardType(.numberPad)
                         }
                         ///textfield to enter/update vehicle trip odometer readings
                         Section("Vehicle Trip (in Km)") {
-                            TextField("Enter the Trip readings", text: $trip)
+                            TextField("Enter the Trip readings", value: $trip, format: .number)
                             ///on change of trip
                                 .onChange(of: trip) {
                                     ///convert the trip in km to miles
-                                    if let tripDouble = Double(trip) {
-                                        tripMiles = String(tripDouble * 0.6214)
-                                    }
+                                    let tripDouble = Double(trip)
+                                    tripMiles = tripDouble * 0.6214
                                 }
                                 .keyboardType(.decimalPad)
                         }
                         if engineType == .Hybrid {
                             ///textfield to enter/update vehicle trip odometer readings
                             Section("Vehicle Trip for EV mode (in Km)") {
-                                TextField("Enter the Trip readings", text: $tripHybridEV)
+                                TextField("Enter the Trip readings", value: $tripHybridEV, format: .number)
                                 ///on change of trip
                                     .onChange(of: tripHybridEV) {
                                         ///convert the trip in km to miles
-                                        if let tripDouble = Double(tripHybridEV) {
-                                            tripHybridEVMiles = String(tripDouble * 0.6214)
-                                        }
+                                        let tripDouble = Double(tripHybridEV)
+                                        tripHybridEVMiles = tripDouble * 0.6214
                                     }
                                     .keyboardType(.decimalPad)
                             }
@@ -227,47 +224,40 @@ struct InitialSettingsView: View {
                     else {
                         ///textfield to enter/update vehicle odometer readings
                         Section("Vehicle Odometer (in Miles)") {
-                            TextField("Enter the odometer readings", text: $odometerMiles)
+                            TextField("Enter the odometer readings", value: $odometerMiles, format: .number)
                             ///on change of odometerMiles
                                 .onChange(of: odometerMiles) {
                                     ///convert the odometer in miles to km.
-                                    if let odometerMilesDouble = Double(odometerMiles) {
-                                        odometer = String(odometerMilesDouble / 0.6214)
-                                    }
+                                    let odometerMilesDouble = Double(odometerMiles)
+                                    odometer = Int(odometerMilesDouble / 0.6214)
                                 }
                                 .keyboardType(.numberPad)
                         }
                         ///textfield to enter/update vehicle trip odometer readings
                         Section("Vehicle Trip (in Miles)") {
-                            TextField("Enter the Trip readings", text: $tripMiles)
+                            TextField("Enter the Trip readings", value: $tripMiles, format: .number)
                             ///on change of tripMiles
                                 .onChange(of: tripMiles) {
                                     ///convert the trip in miles to km.
-                                    if let tripMilesDouble = Double(tripMiles) {
-                                        trip = String(tripMilesDouble / 0.6214)
-                                    }
+                                    let tripMilesDouble = Double(tripMiles)
+                                    trip = tripMilesDouble / 0.6214
                                 }
                                 .keyboardType(.decimalPad)
                         }
                         if engineType == .Hybrid {
                             ///textfield to enter/update vehicle trip odometer readings
                             Section("Vehicle Trip for EV mode (in Miles)") {
-                                TextField("Enter the Trip readings", text: $tripHybridEVMiles)
+                                TextField("Enter the Trip readings", value: $tripHybridEVMiles, format: .number)
                                 ///on change of tripMiles
                                     .onChange(of: tripHybridEVMiles) {
                                         ///convert the trip in miles to km.
-                                        if let tripMilesDouble = Double(tripHybridEVMiles) {
-                                            tripHybridEV = String(tripMilesDouble / 0.6214)
-                                        }
+                                        let tripMilesDouble = Double(tripHybridEVMiles)
+                                        tripHybridEV = tripMilesDouble / 0.6214
                                     }
                                     .keyboardType(.decimalPad)
                             }
                         }
                     }
-                
-                
-              
-               
                 ///if engine type of the vehicle is gas type
                 if fuelMode == .Gas {
                     ///picker for fuel volume unit selection
@@ -431,31 +421,31 @@ struct InitialSettingsView: View {
         ///set vehicle manufacturing year.
         vehicle.year = Int16(year)
         ///set vehicle odometer in decimal format
-        vehicle.odometer = Double(odometer) ?? 0
+        vehicle.odometer = Double(odometer)
         ///set vehicle odometer in decimal format
-        vehicle.odometerMiles = Double(odometerMiles) ?? 0
+        vehicle.odometerMiles = Double(odometerMiles)
         if distanceUnit == .km {
             ///set vehicle trip odometer in decimal format
-            vehicle.trip = Double(trip) ?? 0
+            vehicle.trip = trip
             ///set vehicle trip odometer in decimal format
             vehicle.tripMiles =  vehicle.trip * 0.6214
         }
         else {
             ///set vehicle trip odometer in decimal format
-            vehicle.tripMiles = Double(tripMiles) ?? 0
+            vehicle.tripMiles = tripMiles
             ///set vehicle trip odometer in decimal format
             vehicle.trip = vehicle.tripMiles / 0.6214
         }
         if engineType == .Hybrid {
             if distanceUnit == .km {
                 ///set vehicle trip odometer in decimal format
-                vehicle.tripHybridEV = Double(tripHybridEV) ?? 0
+                vehicle.tripHybridEV = tripHybridEV
                 ///set vehicle trip odometer in decimal format
                 vehicle.tripHybridEVMiles =  vehicle.tripHybridEV * 0.6214
             }
             else {
                 ///set vehicle trip odometer in decimal format
-                vehicle.tripHybridEVMiles = Double(tripHybridEVMiles) ?? 0
+                vehicle.tripHybridEVMiles = tripHybridEVMiles
                 ///set vehicle trip odometer in decimal format
                 vehicle.tripHybridEV = vehicle.tripHybridEVMiles / 0.6214
             }
@@ -465,7 +455,7 @@ struct InitialSettingsView: View {
         vehicle.fuelEngine = engineType.rawValue
         //
         if engineType != .Gas {
-            vehicle.batteryCapacity = Double(batteryCapacity) ?? 40
+            vehicle.batteryCapacity = batteryCapacity
         }
        
         ///set vehicle type in string format
