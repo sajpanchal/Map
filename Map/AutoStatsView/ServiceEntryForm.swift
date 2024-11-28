@@ -11,12 +11,12 @@ struct ServiceEntryForm: View {
  
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
-    @State var location: String = ""
-    @State var type: ServiceTypes = .service
-    @State var description: String = ""
-    @State var cost = 0.0
-    @State var date: Date = Date()
-    @State var isButtonTapped = false
+    @State private var location: String = ""
+    @State private var type: ServiceTypes = .service
+    @State private var description: String = ""
+    @State private var cost = 0.0
+    @State private var date: Date = Date()
+    @State private var isButtonTapped = false
     @Binding var showServiceEntryForm: Bool
    
     var body: some View {

@@ -6,15 +6,16 @@
 //
 
 import SwiftUI
-
+import Combine
 struct RouteETAStackView: View {
     ///bounded property to show or hide the footer expanded view
     @Binding var showAddressView: Bool
     ///this variable is going to store the address and name of the destination location.
     var destination: String
     @Binding var ETA: String
-    @State var height = 200.0
+    @State private var height = 200.0
     @Binding var addressViewHeight: CGFloat
+  //  var timer: Timer.TimerPublisher
     ///variable that stores and displayes the distance remaining from the current location to destination
     var remainingDistance: String
     
@@ -69,5 +70,5 @@ struct RouteETAStackView: View {
 }
 
 #Preview {
-    RouteETAStackView(showAddressView: .constant(false), destination: "", ETA: .constant(""), addressViewHeight: .constant(0.0), remainingDistance: "")
+    RouteETAStackView(showAddressView: .constant(false), destination: "", ETA: .constant(""), addressViewHeight: .constant(0.0)/*, timer: Timer.publish(every: 30, on: .main, in: .common)*/, remainingDistance: "")
 }

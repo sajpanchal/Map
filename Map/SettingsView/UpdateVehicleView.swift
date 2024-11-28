@@ -11,47 +11,47 @@ struct UpdateVehicleView: View {
     ///environment object that represents core data store's managed object context which tracks the changes made in entities.
     @Environment(\.managedObjectContext) private var viewContext
     ///state variable that stores vehicle type in enum format
-    @State var vehicleType: VehicleTypes = .Car
+    @State private var vehicleType: VehicleTypes = .Car
     ///state variable that stores vehicle make in enum format
-    @State var vehicleMake: VehicleMake = .AC
+    @State private var vehicleMake: VehicleMake = .AC
     ///state variable that stores alphabets in enum format
-    @State var alphabet: Alphbets = .A
+    @State private var alphabet: Alphbets = .A
     ///state variable that stores vehicle vehicleModel in enum format
-    @State var vehicleModel: Model = .Ace
+    @State private var vehicleModel: Model = .Ace
     ///state variable that stores vehicle manufacturing manufacturingYear.
-    @State var manufacturingYear = (Calendar.current.dateComponents([.year], from: Date())).year ?? 1900
+    @State private var manufacturingYear = (Calendar.current.dateComponents([.year], from: Date())).year ?? 1900
     ///state variable that stores vehicle manufacturing year range for picker
-    @State var manufacturingYearRange = 1900..<((Calendar.current.dateComponents([.year], from: Date())).year ?? 1900) + 1
+    @State private var manufacturingYearRange = 1900..<((Calendar.current.dateComponents([.year], from: Date())).year ?? 1900) + 1
     ///state variable that stores vehicle engine tyoe
-    @State var engineType = EngineType.Gas
+    @State private var engineType = EngineType.Gas
     ///enum type to store fuel mode  of vehicle
-    @State var fuelMode: FuelMode = .Gas
+    @State private var fuelMode: FuelMode = .Gas
     ///state variable to store battery capacity
-    @State var batteryCapacity = 40.0
+    @State private var batteryCapacity = 40.0
     ///state variable that stores vehicle odometer for textfield to display
-    @State var odometer = 0
+    @State private var odometer = 0
     ///state variable that stores vehicle odometer for textfield to display
-    @State var odometerMiles = 0
+    @State private var odometerMiles = 0
     ///state variable that stores vehicle trip odometer for textfield to display
-    @State var trip = 0.0
+    @State private var trip = 0.0
     ///state variable that stores vehicle trip odometer (miles) for textfield to display
-    @State var tripMiles = 0.0
+    @State private var tripMiles = 0.0
     ///state variable that stores vehicle trip odometer (EV) for textfield to display
-    @State var tripHybridEV = 0.0
+    @State private var tripHybridEV = 0.0
     ///state variable that stores vehicle trip odometer (EV in miles) )for textfield to display
-    @State var tripHybridEVMiles = 0.0
+    @State private var tripHybridEVMiles = 0.0
     ///state object that represents location data manager which is handling the location manager operations.
     @StateObject var locationDataManager: LocationDataManager
     ///state variable stores distance unit as enum type
-    @State var distanceUnit: DistanceUnit = .km
+    @State private var distanceUnit: DistanceUnit = .km
     ///state variable stores fuel unit as enum type
-    @State var fuelUnit: FuelUnit = .Litre
+    @State private var fuelUnit: FuelUnit = .Litre
     ///array of vehicle efficiency units.
-    @State var efficiencyUnits = ["km/L", "L/100km", "miles/L", "L/100Miles", "km/gl", "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
+    @State private var efficiencyUnits = ["km/L", "L/100km", "miles/L", "L/100Miles", "km/gl", "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
     ///index of vehicle efficiency units array
-    @State var efficiencyUnitIndex = 0
+    @State private var efficiencyUnitIndex = 0
     ///flag to show/hide add vehicle form
-    @State var showAddVehicleForm = false
+    @State private var showAddVehicleForm = false
     ///flag to show/hide garage view
     @Binding var showGarage: Bool
     ///variable that stores settings object of core data
@@ -400,7 +400,7 @@ struct UpdateVehicleView: View {
          
         }
         .onAppear {           
-            print("update vehicle view")
+           
             fillForm()
         }
     }

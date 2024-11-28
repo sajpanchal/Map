@@ -17,25 +17,26 @@ struct SettingsView: View {
     ///Location Data manager object.
     @StateObject var locationDataManager: LocationDataManager
     ///Index of the vehicle objects array
-    @State var vehicleIndex = 0
+    @State private var vehicleIndex = 0
     ///instaintiate the empty vehicle object to prevent picker view to throw error.
-    @State var vehicle: Vehicle = Vehicle()
+    @State private var vehicle: Vehicle = Vehicle()
     ///enum type to store engine type of vehicle
-    @State var engineType: EngineType = .Gas
+    @State private var engineType: EngineType = .Gas
     ///enum type to store fuel mode  of vehicle
-    @State var fuelMode: FuelMode = .Gas
+    @State private var fuelMode: FuelMode = .Gas
     ///enum type to store the distance unit
-    @State var distanceUnit: DistanceUnit = .km
+    @State private var distanceUnit: DistanceUnit = .km
     ///enum type to store the fuel unit.
-    @State var fuelUnit: FuelUnit = .Litre
+    @State private var fuelUnit: FuelUnit = .Litre
     ///efficiency units array
-    @State var efficiencyUnits = ["km/L", "L/100km", "miles/L","L/100miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
+    @State private var efficiencyUnits = ["km/L", "L/100km", "miles/L","L/100miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
     ///efficiency unit index
-    @State var efficiencyUnitIndex = 0
+    @State private var efficiencyUnitIndex = 0
     ///flag to show/hide add vehicle form
-    @State var showAddVehicleForm = false
+    @State private var showAddVehicleForm = false
     ///flag to show the auto garage view.
-    @State var showGarage = false
+    @State private var showGarage = false
+    ///array of colors
     var colors = [AppColors.invertPink.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue]
     var body: some View {
     
@@ -53,7 +54,9 @@ struct SettingsView: View {
                     .buttonStyle(BorderlessButtonStyle())
                     .cornerRadius(100)
                     ///if the button is tapped the flag will be set and it will show the content which is garageview.
-                    .sheet(isPresented: $showGarage,  content: {GarageView(locationDataManager: locationDataManager, showGarage: $showGarage)})
+                    .sheet(isPresented: $showGarage,  content: {
+                        GarageView(locationDataManager: locationDataManager, showGarage: $showGarage)
+                    })
                 }
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
@@ -68,7 +71,6 @@ struct SettingsView: View {
                                     Text(thisVehicle.getVehicleText + " " + "(" + thisVehicle.getFuelEngine + " Engine)").tag(thisVehicle)
                                         .fontWeight(.bold)
                                         .font(Font.system(size: 18))
-                                        //.foregroundStyle(Color(AppColors.invertBlueColor.rawValue))
                                         .foregroundStyle(Color(colors[vehicles.firstIndex(where: {$0 == thisVehicle}) ?? 0]))
                                     Text(thisVehicle.getYear).tag(thisVehicle)
                                         .fontWeight(.semibold)
@@ -150,8 +152,7 @@ struct SettingsView: View {
                                 }
                             }
                             .pickerStyle(.segmented)
-                        }                      
-                       
+                        }
                         ///picker for fuel efficiency unit selection
                         Section(header: Text("Fuel Efficiency Unit").fontWeight(.bold)) {
                             ///if fuel unit is selected to litre
@@ -236,8 +237,11 @@ struct SettingsView: View {
                             }
                             .pickerStyle(.segmented)
                         }
+                        ///section to select the fuel efficiency unit.
                         Section(header: Text("Fuel Efficiency Unit").fontWeight(.bold)) {
+                            ///if the distance unit is in km.
                             if distanceUnit == .km {
+                                ///show units for km
                                 Picker("Select Unit", selection: $efficiencyUnitIndex) {
                                     ForEach(efficiencyUnits.indices, id: \.self) { index in
                                         if index == 8 {
@@ -251,7 +255,9 @@ struct SettingsView: View {
                                 })
                                 .pickerStyle(.segmented)
                             }
+                            ///if the distance unit is in miles
                             else {
+                                ///show units for miles
                                 Picker("Select Unit", selection: $efficiencyUnitIndex) {
                                     ForEach(efficiencyUnits.indices, id: \.self) {index in
                                         if index == 9 {

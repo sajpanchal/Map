@@ -6,21 +6,22 @@
 //
 
 import SwiftUI
-
+import AVFoundation
 struct DirectionsView: View {
     ////environment variable to get the color mode of the phone
     @Environment(\.colorScheme) var bgMode: ColorScheme
     @Binding var instruction: String
     @Binding var nextStepDistance: String
     @Binding var showDirectionsList: Bool
-    @State var expandedDirectionsViewHeight: CGFloat = 0
+    @State private var expandedDirectionsViewHeight: CGFloat = 0
     @Binding var nextInstruction: String
     @Binding var stepInstructions: [(String, Double)]
-
+    ///locationDataManager is an instance of a class that has a delegate of LocationManager and its methods.
+    @StateObject var locationDataManager: LocationDataManager
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
-                    DirectionHeaderView(directionSign: getDirectionSign(for: instruction), nextStepDistance: nextStepDistance, instruction: instruction, showDirectionsList: $showDirectionsList, height: $expandedDirectionsViewHeight)
+                DirectionHeaderView(directionSign: getDirectionSign(for: instruction), nextStepDistance: nextStepDistance, instruction: instruction, showDirectionsList: $showDirectionsList, height: $expandedDirectionsViewHeight, locationDataManager: locationDataManager)
                     .gesture(DragGesture().onChanged(directionViewDragChanged)
                         .onEnded(directionViewDragEnded))
                 ZStack {
@@ -78,5 +79,5 @@ struct DirectionsView: View {
 }
 
 #Preview {
-    DirectionsView(instruction: .constant(""), nextStepDistance: .constant(""), showDirectionsList: .constant(false), nextInstruction: .constant(""), stepInstructions: .constant([]))
+    DirectionsView(instruction: .constant(""), nextStepDistance: .constant(""), showDirectionsList: .constant(false), nextInstruction: .constant(""), stepInstructions: .constant([]), locationDataManager: LocationDataManager())
 }

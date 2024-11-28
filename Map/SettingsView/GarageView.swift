@@ -17,10 +17,11 @@ struct GarageView: View {
     ///location manager state object
     @StateObject var locationDataManager: LocationDataManager
     ///vehicle title state variable
-    @State var vehicleTitle = ""
+    @State private var vehicleTitle = ""
     ///binding flag to show/hide garageView.
     @Binding var showGarage: Bool
-    @State var showAlert = false
+    ///state variable to show or hide alert on deletion of any active vehicle
+    @State private var showAlert = false
     var colors = [AppColors.invertRed.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue]
 
     var body: some View {
@@ -65,9 +66,6 @@ struct GarageView: View {
                 .alert(isPresented: $showAlert) {
                     Alert(title: Text("Can't delete this Vehicle"), message: Text("Active vehicle can't be deleted! Please change the active vehicle first to delete this vehicle."), dismissButton: .default(Text("Okay")))
                 }
-                .onAppear(perform: {
-                    print("garage view")
-                })
                 .padding(.top,20)
                 .navigationTitle("Your Auto Garage")
             }

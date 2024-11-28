@@ -14,11 +14,11 @@ struct AutoStatsView: View {
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
     let rows = [GridItem(spacing: 10, alignment: .topLeading), GridItem(spacing: 10, alignment: .topLeading), GridItem(spacing: 10, alignment: .topLeading)]
-    @State var showFuelHistoryView = false
-    @State var showServiceHistoryView = false
-    @State var showFuellingEntryform = false
-    @State var showServiceEntryForm = false
-    @State var efficiency: Double = 0
+    @State private var showFuelHistoryView = false
+    @State private var showServiceHistoryView = false
+    @State private var showFuellingEntryform = false
+    @State private var showServiceEntryForm = false
+    @State private var efficiency: Double = 0
   
     let currentYear: String = {
         let components = DateComponents()

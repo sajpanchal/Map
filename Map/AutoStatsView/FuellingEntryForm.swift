@@ -12,18 +12,18 @@ struct FuellingEntryForm: View {
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: Settings.entity(), sortDescriptors: []) var settings: FetchedResults<Settings>
     @StateObject var locationDatamanager: LocationDataManager
-    @State var location = ""
+    @State private var location = ""
     ///state variable to store litre of fuel
-    @State var litre = 0.0
+    @State private var litre = 0.0
     ///state variable to store litre of fuel
-    @State var gallon = 0.0
+    @State private var gallon = 0.0
     ///state variable to store the % of ev battery charged before charging it.
-    @State var percentBeforeCharge = 0.0
+    @State private var percentBeforeCharge = 0.0
     ///state variable to store the % of ev battery charged after charging it.
-    @State var percentAfterCharge = 0.0
-    @State var cost = 0.0
-    @State var date: Date = Date()
-    @State var isTapped = false
+    @State private var percentAfterCharge = 0.0
+    @State private var cost = 0.0
+    @State private var date: Date = Date()
+    @State private var isTapped = false
     @Binding var showFuellingEntryform: Bool
     
     var body: some View {

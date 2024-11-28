@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreLocation
 import MapKit
-
+import Combine
 ///this view is responsible to show and update the mapview buttons, alerts, and footer view with buttons.
 struct MapInteractionsView: View {
     ///environment variable to get the color mode of the phone
@@ -18,7 +18,7 @@ struct MapInteractionsView: View {
     ///bounded property to store map action to be performed
     @Binding var mapViewAction: MapViewAction
     ///bounded property to show or hide the footer expanded view
-    @State var showAddressView: Bool = false
+    @State private var showAddressView: Bool = false
     ///state object of Location manager to show the distance remaining from destination
     @StateObject var locationDataManager: LocationDataManager
     ///state object of local search to check if the destination location has been selected or not
@@ -42,7 +42,8 @@ struct MapInteractionsView: View {
     @Binding var ETA: String
     @Binding var isRouteSelectTapped: Bool
     @Binding var tappedAnnotation: MKAnnotation?
-    @State var height = 200.0
+    @State private var height = 200.0
+ //   var timer: Timer.TimerPublisher
 
 //    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50)
 //    var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50)
@@ -63,7 +64,7 @@ struct MapInteractionsView: View {
             ///if destination is selected this array won't be nil. so there has to be the footer needs to be displayed with the interation buttons for user to find routes and navigate.
             if localSearch.suggestedLocations != nil {
                 ///enclose the footer view along with expanded view in a VStack
-            InteractionFooterView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showAddressView: $showAddressView, destination: destination, locationDataManager: locationDataManager, localSearch: localSearch, routeTravelTime: $routeTravelTime, routeData: $routeData, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions, ETA: $ETA, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnotation, height: $height)
+                InteractionFooterView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, showAddressView: $showAddressView, destination: destination, locationDataManager: locationDataManager, localSearch: localSearch, routeTravelTime: $routeTravelTime, routeData: $routeData, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions, ETA: $ETA, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnotation, height: $height/*, timer: timer*/)
                 .background(bgMode == .dark ? Color.black.gradient : Color.white.gradient)
             }
         }
@@ -108,7 +109,8 @@ struct MapInteractionsView: View {
 }
 
 #Preview {
-    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""),remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation()))
+
+    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""),remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation())/*, timer: Timer.publish(every: 30, on: .main, in: .common)*/)
 }
 
 

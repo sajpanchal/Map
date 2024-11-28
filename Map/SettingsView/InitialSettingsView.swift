@@ -13,49 +13,49 @@ struct InitialSettingsView: View {
     ///state object that handles tasks of the location manger
     @StateObject var locationDataManager: LocationDataManager
     ///state variable that stores vehicle type enum value
-    @State var vehicleType: VehicleTypes = .Car
+    @State private var vehicleType: VehicleTypes = .Car
     ///state variable that stores vehicle make enum value
-    @State var vehicleMake: VehicleMake = .AC
+    @State private var vehicleMake: VehicleMake = .AC
     ///state variable that stores alphabets enum value
-    @State var alphabet: Alphbets = .A
+    @State private var alphabet: Alphbets = .A
     ///state variable that stores vehicle model enum value
-    @State var model: Model = .Ace
+    @State private var model: Model = .Ace
     ///state variable that stores vehicle manufacturing year.
-    @State var year = (Calendar.current.dateComponents([.year], from: Date())).year ?? 1900
+    @State private var year = (Calendar.current.dateComponents([.year], from: Date())).year ?? 1900
     ///state variable that stores the range of vehicle manufacturing year
-    @State var yearRange = 1900..<((Calendar.current.dateComponents([.year], from: Date())).year ?? 1900) + 1
+    @State private var yearRange = 1900..<((Calendar.current.dateComponents([.year], from: Date())).year ?? 1900) + 1
     ///state variable that stores vehicle engine type enum value
-    @State var engineType = EngineType.Gas
+    @State private var engineType = EngineType.Gas
     ///state variable stores the odometer readings value for the textfield
-    @State var odometer = 0
+    @State private var odometer = 0
     ///state variable stores the odometer readings value for the textfield
-    @State var odometerMiles = 0
+    @State private var odometerMiles = 0
     ///state variable stores the trip odometer readings value for the textfield
-    @State var trip = 0.0
+    @State private var trip = 0.0
     ///state variable stores the trip odometer readings value for the textfield
-    @State var tripMiles = 0.0
+    @State private var tripMiles = 0.0
     ///state variable stores the trip odometer readings value for the textfield
-    @State var tripHybridEV = 0.0
+    @State private var tripHybridEV = 0.0
     ///state variable stores the trip odometer readings value for the textfield
-    @State var tripHybridEVMiles = 0.0
+    @State private var tripHybridEVMiles = 0.0
     ///state variable stores the distance unit enum value
-    @State var distanceUnit: DistanceUnit = .km
+    @State private var distanceUnit: DistanceUnit = .km
     ///state variable stores the fuel unit enum value
-    @State var fuelUnit: FuelUnit = .Litre
+    @State private var fuelUnit: FuelUnit = .Litre
     ///state variable stores the fuel unit enum value
-    @State var fuelMode: FuelMode = .Gas
+    @State private var fuelMode: FuelMode = .Gas
     ///enum type to store the fuel unit.
-    @State var batteryCapacity = 40.0
+    @State private var batteryCapacity = 40.0
     ///array of fuel efficiencies.
-    @State var efficiencyUnits = ["km/L", "L/100km", "miles/L","L/100Miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
+    @State private var efficiencyUnits = ["km/L", "L/100km", "miles/L","L/100Miles", "km/gl",  "gl/100km", "miles/gl", "gl/100miles", "km/kwh", "miles/kwh"]
     ///state variable stores the index of efficiencyUnits array
-    @State var efficiencyUnitIndex = 0
+    @State private var efficiencyUnitIndex = 0
     ///state variable to hide/show the add vehicle form view.
-    @State var showAddVehicleForm = false
+    @State private var showAddVehicleForm = false
     ///state variable stores vehicle make in string format
-    @State var textVehicleMake = ""
+    @State private var textVehicleMake = ""
     ///state variable stores vehicle model in string format
-    @State var textVehicleModel = ""
+    @State private var textVehicleModel = ""
     
     var body: some View {
         NavigationStack {
@@ -406,6 +406,12 @@ struct InitialSettingsView: View {
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets())
+            }
+            .onAppear {
+                ///update textfield with the initial vehicle make
+                textVehicleMake = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
+                ///update textfield with the initial vehicle model
+                textVehicleModel = model.rawValue.replacingOccurrences(of: "_", with: " ")
             }
             .navigationTitle("Settings")
         }

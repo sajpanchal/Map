@@ -57,6 +57,7 @@
 		728A7CA62B90F282003AA218 /* GreetingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728A7CA52B90F282003AA218 /* GreetingsView.swift */; };
 		72928F9B2C481548007ED736 /* GarageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72928F9A2C481548007ED736 /* GarageView.swift */; };
 		72928F9D2C481763007ED736 /* UpdateVehicleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72928F9C2C481763007ED736 /* UpdateVehicleView.swift */; };
+		7295B88C2CE3AFCE00E9959A /* SpeechViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7295B88B2CE3AFCE00E9959A /* SpeechViewModel.swift */; };
 		72A6D14F2BD01B8000A33A0A /* PolylinePoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */; };
 		72A8BC242C29C3F600E0D7B2 /* AutoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A8BC232C29C3F600E0D7B2 /* AutoService.swift */; };
 		72A8BC262C29C7EB00E0D7B2 /* ServiceEntryForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */; };
@@ -148,6 +149,7 @@
 		728A7CA52B90F282003AA218 /* GreetingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreetingsView.swift; sourceTree = "<group>"; };
 		72928F9A2C481548007ED736 /* GarageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarageView.swift; sourceTree = "<group>"; };
 		72928F9C2C481763007ED736 /* UpdateVehicleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateVehicleView.swift; sourceTree = "<group>"; };
+		7295B88B2CE3AFCE00E9959A /* SpeechViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechViewModel.swift; sourceTree = "<group>"; };
 		72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolylinePoint.swift; sourceTree = "<group>"; };
 		72A8BC232C29C3F600E0D7B2 /* AutoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoService.swift; sourceTree = "<group>"; };
 		72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceEntryForm.swift; sourceTree = "<group>"; };
@@ -197,6 +199,7 @@
 		72053A832A95107500B1D3FC /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				7295B88B2CE3AFCE00E9959A /* SpeechViewModel.swift */,
 				7271514C2A7D53B200B20767 /* LocationManager.swift */,
 				727F5E062B34C748000ECCB7 /* LocalSearch.swift */,
 				727F5E082B34C7C8000ECCB7 /* AddressResult.swift */,
@@ -538,6 +541,7 @@
 				7271514D2A7D53B200B20767 /* LocationManager.swift in Sources */,
 				725181CA2C19F32E00757DD7 /* DirectionsView.swift in Sources */,
 				7218C7852C04D95A00986B0B /* ExpandDirectionsViewSymbol.swift in Sources */,
+				7295B88C2CE3AFCE00E9959A /* SpeechViewModel.swift in Sources */,
 				72608A682C14B22E00925696 /* RouteETAStackView.swift in Sources */,
 				727F5E072B34C748000ECCB7 /* LocalSearch.swift in Sources */,
 				72BF3DCF2C5157CD005395B4 /* CustomListView.swift in Sources */,
@@ -764,7 +768,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.7;
+				MARKETING_VERSION = 1.3.23;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MyMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -802,7 +806,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.7;
+				MARKETING_VERSION = 1.3.23;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MyMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -824,7 +828,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = S4G67KLBRN;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MapTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -844,7 +848,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = S4G67KLBRN;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MapTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

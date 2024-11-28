@@ -11,11 +11,11 @@ import MapKit
 ///a class that is used to handle the searchfield related actions such as starting a location search, showing results, autocomplete location search, annotating selected location in map and cancellation.
 class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
     ///variable that will store the results of autocomplete location search suggestions.
-    @Published var results: [AddressResult] = []
+     var results: [AddressResult] = []
     ///the variable to be used as a query text for locationSearchCompleter.
-    @Published var searchableText = ""
+     var searchableText = ""
     ///an array that will store the locations for a desired place (matching with location name and address)
-    @Published var suggestedLocations: [MKAnnotation]?
+     var suggestedLocations: [MKAnnotation]?
     ///flag to be set when search request is made and is still under process.
    // @Published var isSearchInProgress = false
     @Published var status: LocalSearchStatus = .localSearchCancelled
@@ -82,7 +82,6 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
         ///get the address subtitle
         let subTitle = address.subtitle
         if subTitle == "Search Nearby" {
-            print("search nearby")
             request.naturalLanguageQuery = title
         }
         else {
@@ -107,18 +106,18 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
                         ///assign the annotation object a title of the placemark object to be displayed on map.
                         if let title = $0.placemark.title, let name = $0.name {
                             annotation.title = title.contains(name) ?  title : (name + "\n" + title)
-                        }
-                        print("subtitle: ",subTitle)
+                        }                     
                         ///set the flag false once response is processed.
                         status = subTitle == "Search Nearby" ? .showingNearbyLocations : .locationSelected
-                        print("status:", status)
                         ///return the annotation object and append it to suggestedLocations array. (Usually for each response there will be only one mapItem matching with the title and subtitle.)
                         return annotation
                     }
                 }
             }
             catch {
-                status = .localSearchFailed
+                DispatchQueue.main.async {
+                    self.status = .localSearchFailed
+                }
             }
             
         }

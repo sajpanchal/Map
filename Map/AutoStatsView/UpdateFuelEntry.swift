@@ -12,15 +12,15 @@ struct UpdateFuelEntry: View {
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: AutoFuelling.entity(), sortDescriptors: []) var fuelEntries: FetchedResults<AutoFuelling>
     @FetchRequest(entity: Settings.entity(), sortDescriptors: []) var settings: FetchedResults<Settings>
-    @State var location = ""
-    @State var amount = 0.0
-    @State var percentBeforeCharge = 0
-    @State var percentAfterCharge = 0
-    @State var cost = 0.0
-    @State var date: Date = Date()
-    @State var isTapped = false
-    @State var tripKm = 0.0
-    @State var tripMiles = 0.0
+    @State private var location = ""
+    @State private var amount = 0.0
+    @State private var percentBeforeCharge = 0
+    @State private var percentAfterCharge = 0
+    @State private var cost = 0.0
+    @State private var date: Date = Date()
+    @State private var isTapped = false
+    @State private var tripKm = 0.0
+    @State private var tripMiles = 0.0
     @Binding var showFuelHistoryView: Bool
     var fuelEntry: AutoFuelling
 

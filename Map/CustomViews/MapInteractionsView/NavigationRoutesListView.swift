@@ -151,7 +151,7 @@ struct NavigationRoutesListView: View {
             ///make the next step location nil
             nextStepLocation = nil
             ///reseting the remainingDistance to nil
-            locationDataManager.remainingDistance = nil
+          //  locationDataManager.remainingDistance = nil
             UIApplication.shared.isIdleTimerDisabled = false
             break
         case .showingDirectionsNotCentered:

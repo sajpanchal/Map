@@ -62,8 +62,9 @@ struct MapView: UIViewRepresentable {
     @Binding var isRouteSelectTapped: Bool
     ///this variable holds the annotation object that is selected from the list of locations when user taps search nearby option.
     @Binding var tappedAnnotation: MKAnnotation?
-    @State var tripReset = false
-    @State var animated = true
+    @Binding var timeInterval: Bool
+    @State private var tripReset = false
+    @State private var animated = true
     @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var setting: FetchedResults<Settings>
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
    
@@ -151,7 +152,6 @@ struct MapView: UIViewRepresentable {
         @MainActor func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
             ///set the initial mapview region centered to current location
             MapViewAPI.setRegionIn(mapView: mapView, centeredAt: userLocation, parent: &parent)
-            
             ///check what mapviewaction is to be performed
             switch parent.mapViewAction {
                 ///map in idle mode.
@@ -164,7 +164,6 @@ struct MapView: UIViewRepresentable {
                             ///set the status to idle
                             parent.mapViewStatus = .idle
                         }
-           
                       
                     }
                 
@@ -247,7 +246,19 @@ struct MapView: UIViewRepresentable {
                     ///iterate through the routes
                     for route in MapViewAPI.routes {
                         ///extract the route travel time, distance, name and a uniue string from routes and append it to routeData along with unique id and tapped flag set/reset.
-                        parent.routeData.append(RouteData(id: UUID(),travelTime: String(format:"%.0f",(route.expectedTravelTime/60)) + " mins", distance: String(format:"%.1f",Double(route.distance/1000.0)) + " km", title: route.name , tapped: MapViewAPI.routes.firstIndex(of: route) == (MapViewAPI.routes.count - 1) ? true : false, uniqueString: route.polyline.title ?? "n/a"))
+                        let distance = route.distance < 1000 ? (round(Double(route.distance)/50) * 50.0) : Double(route.distance/1000.0)
+                        let distanceString = route.distance < 1000 ? String(format:"%.0f",distance) + " m" : String(format:"%.1f",distance) + " km"
+                        var ETA = ""
+                        if route.expectedTravelTime < 3600 {
+                            ETA =  String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
+                        }
+                        else {
+                                var mins = (route.expectedTravelTime)/60.0
+                                let hr = (mins/60)
+                                mins = mins.truncatingRemainder(dividingBy: 60)
+                                ETA = String(format:"%.0f", hr) + " hr" + " " + String(format:"%.0f", mins) + " mins"
+                        }
+                        parent.routeData.append(RouteData(id: UUID(),travelTime: ETA, distance: distanceString, title: route.name , tapped: MapViewAPI.routes.firstIndex(of: route) == (MapViewAPI.routes.count - 1) ? true : false, uniqueString: route.polyline.title ?? "n/a"))
                     }
                 }
                 if parent.isRouteSelectTapped {
@@ -280,6 +291,7 @@ struct MapView: UIViewRepresentable {
     
     ///this method will be executed whenever our UIViewController is going to be updated.UIViewController will be updated when our swiftui view MapView will be updated. Mapview will be updated when our @observedObject / @StateObject is updated.
      func updateUIView(_ uiView: MKMapView, context: Context) {
+        
         switch mapViewAction {
             ///map in idle mode.
             case .idle:
@@ -295,6 +307,7 @@ struct MapView: UIViewRepresentable {
                             uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
                             ///set the status to idle
                             self.mapViewStatus = .idle
+                            self.timeInterval = false
                         }
                        
                     }
@@ -362,6 +375,7 @@ struct MapView: UIViewRepresentable {
                      ///set the camera region centered to user location and follow it using heading updated.
                     MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: self.locationDataManager.userHeading, animated: animated)
                     DispatchQueue.main.async {
+                        self.timeInterval = true
                         ///navigate to the destination.
                         MapViewAPI.startNavigation(in: uiView, parent: &context.coordinator.parent)
                     }
@@ -374,7 +388,6 @@ struct MapView: UIViewRepresentable {
             
                 guard let suggestedLocations = localSearch.suggestedLocations else {
                     DispatchQueue.main.async {
-                        print("locations not found")
                         ///clear the entities from mapview
                         self.clearEntities(from: uiView)
                         ///make the map view to go in idle mode
@@ -391,7 +404,6 @@ struct MapView: UIViewRepresentable {
                    
                     uiView.removeAnnotations(uiView.annotations)
                     if let annotation = self.tappedAnnotation {
-                        print("showing directions")
                         uiView.addAnnotation(annotation)
                     }
                    
@@ -434,10 +446,8 @@ struct MapView: UIViewRepresentable {
 extension MapView {
     ///method to handle location search interface,
     func handleLocationSearch(in uiView: MKMapView, for status: LocalSearchStatus) {
-      //  print(status)
         switch status {
         case .localSearchFailed:
-           // print("failed")
             break
         case .locationUnselected:
            /// localSearch.suggestedLocations = nil
@@ -453,7 +463,6 @@ extension MapView {
             
             break
         case .localSearchCancelled:
-          //  print("cancelled")
             DispatchQueue.main.async {
                 self.tappedAnnotation = nil
                ///remove the annotations
@@ -465,17 +474,13 @@ extension MapView {
             DispatchQueue.main.async {
                 localSearch.suggestedLocations = nil
             }
-           // print("in progress")
             break
         case .localSearchResultsAppear:
             DispatchQueue.main.async {
-           //     print("results appear")
                 self.clearEntities(from: uiView)
             }
             break
         case .locationSelected:
-            //print("location selected")
-            //key
             guard let locations = localSearch.suggestedLocations else {
                 DispatchQueue.main.async {
                     ///make sure there are no overlays while only destination is selected yet and not the directions requested.
@@ -488,7 +493,6 @@ extension MapView {
                 break
             }
             if uiView.annotations.count <= 1 {
-                print("annotating")
                 MapViewAPI.annotateLocation(in: uiView, at: location.coordinate, for: location)
             }
             if !uiView.overlays.isEmpty {
@@ -500,13 +504,11 @@ extension MapView {
             }
             
         case .showingNearbyLocations:
-           // print("showing nearby....")
             guard let locations = localSearch.suggestedLocations else {
                 return
             }
            
             if self.tappedAnnotation != nil {
-              //  print("centering")
                 DispatchQueue.main.async {
                    uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: self.tappedAnnotation!.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
                 }
@@ -526,8 +528,7 @@ extension MapView {
                     ///reset the flag.
                 }
             }
-        case .searchBarActive:
-            print("active")
+        case .searchBarActive:           
             break
         }
     }

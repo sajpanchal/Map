@@ -89,9 +89,9 @@ class MapViewAPI {
         ///empty the array that displays entire list of step instructions in the DirectionsView's expanded view
         parent.stepInstructions.removeAll()
         ///set the distance prop on locationdatamanager to nil on reset. distance field is used to showing remaining distance
-        if parent.locationDataManager.remainingDistance != nil {
-            parent.locationDataManager.remainingDistance = nil
-        }
+//        if parent.locationDataManager.remainingDistance != nil {
+//            parent.locationDataManager.remainingDistance = nil
+//        }
         ///reset the properties of this instance class
         resetProps()
         DispatchQueue.main.async {
@@ -213,7 +213,7 @@ class MapViewAPI {
                     ///make the next step location nil
                     parent.nextStepLocation = nil
                     ///reseting the remainingDistance to nil
-                    parent.locationDataManager.remainingDistance = nil
+//                    parent.locationDataManager.remainingDistance = nil
                     ///enable the idelTimer used to trigger the screen sleep time once user has arrived to the destination
                     UIApplication.shared.isIdleTimerDisabled = false
                     ///make sure that map action is to center to the userlocation to exit the navigation mod.e
@@ -234,8 +234,11 @@ class MapViewAPI {
             
         }
       
-        
-        getETA(to: targetLocation.coordinate, in: &parent, with: mapView)
+        if parent.timeInterval == true {
+            getETA(to: targetLocation.coordinate, in: &parent, with: mapView)
+            print("getETA called")
+        }
+      
         ///if there is any route available then get the first one otherwise exit the fuction.
         guard let route = getSelectedRoute(for: mapView) else {
             return
@@ -247,18 +250,42 @@ class MapViewAPI {
                 ///skip the appending if instruction is empty
                 if !step.instructions.isEmpty {
                     ///append the instruction string and distance from current step to that step for which the instruction is being displayed to our array.
+                 //   let remainder = step.distance
                     parent.stepInstructions.append((step.instructions, step.distance))
                 }
             }
         }
+        var ETA = ""
+        if route.expectedTravelTime < 3600 {
+            ETA =  String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
+        }
+        else {
+            var mins = (route.expectedTravelTime)/60.0
+            let hr = (mins/60)
+            mins = mins.truncatingRemainder(dividingBy: 60)
+            ETA = String(format:"%.0f", hr) + " hr" + " " + String(format:"%.0f", mins) + " mins"
+        }
         /// set routeETA field with expected travel time extracted from a given route.
-        parent.routeTravelTime = String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
+        parent.routeTravelTime = ETA
         ///initiating props on first execution
         initiateProps(route: route, parent: &parent)
         ///get the address of the destination
        
-        ///format the remaining distance to be displayed in km
-        parent.remainingDistance = String(format:"%.1f", parent.locationDataManager.remainingDistance ?? Double(route.distance/1000.0)) + " km"
+        ///format the remaining distance to be displayed in km or meters
+        ///if remainingDistance is available
+        if let distance = remainingDistance {
+            ///if distance is less than 1000 m
+            if distance < 1000 {
+                ///show the distance in meters format
+                parent.remainingDistance = String(format:"%.0f", distance) + " m"
+            }
+            ///if distance is more than or equal to 1000 m
+            else {
+                ///show the distance in km format.
+                parent.remainingDistance = String(format:"%.1f", Double(distance/1000.0)) + " km"
+            }
+        }
+                
         ///set the destination field of mapview struct
         parent.destination = (targetLocation.title ?? "") ?? ""
         ///setting the routeDistance property with km format for display
@@ -294,7 +321,6 @@ class MapViewAPI {
                 ///get the first step and its index
                 if let firstStep = route.steps.first(where: {!$0.instructions.isEmpty}), let firstIndex = route.steps.firstIndex(of: firstStep) {
                     ///update the step instructions
-                    print("location is 20 m away and not exited yet!")
                     updateStepInstructions(step: firstStep, instruction: firstStep.instructions, parent: &parent, stepIndex: firstIndex, mapView: mapView)
                     updateNextStepInstruction(parent: &parent, route: route, at: firstIndex)
                 
@@ -364,13 +390,14 @@ class MapViewAPI {
             ///make throroughfare nil
             parent.locationDataManager.throughfare = nil
             ///method to perform re-routing to the current destination.
-            reRoutetoDestination(in: mapView, from: parent.locationDataManager.userlocation!.coordinate, to: targetLocation.coordinate, parent: &parent)
-            
+            if let userLocation = parent.locationDataManager.userlocation {
+                reRoutetoDestination(in: mapView, from: userLocation.coordinate, to: targetLocation.coordinate, parent: &parent)
+            }
         }
         ///transfer the ETA string to parent that is MapView for the display.
         parent.ETA = self.ETA ?? "--"
         ///update the remainingDistance prop of locationDataManager instance with the latest change.
-        parent.locationDataManager.remainingDistance = (remainingDistance ?? route.distance)/1000
+//        parent.locationDataManager.remainingDistance = (remainingDistance ?? route.distance)/1000
     }
         
     ///function that handles overlay tap events
@@ -509,9 +536,9 @@ extension MapViewAPI {
              }
          }
         ///get the initial distance remaining to destination from user location. that is route distance.
-         if parent.locationDataManager.remainingDistance == nil {
-               parent.locationDataManager.remainingDistance = Double(route.distance/1000.0)
-         }
+//         if parent.locationDataManager.remainingDistance == nil {
+//               parent.locationDataManager.remainingDistance = Double(route.distance/1000.0)
+//         }
         ///if the nextStep location is not available, get the location of the first step.
          if parent.nextStepLocation == nil {
              ///get the first step from the steps array
@@ -566,24 +593,22 @@ extension MapViewAPI {
     static func updateNextStepInstruction(parent: inout MapView, route: MKRoute, at index: Int) {
         var nextInstruction = ""
         nextInstructionIndex = index + 1
-       print("next instruction index : \(nextInstructionIndex)")
         if  nextInstructionIndex < route.steps.count  {
              nextInstruction = route.steps[nextInstructionIndex].instructions
-            print("nextInstruction: \(nextInstruction)")
             
         }
         else {
              nextInstruction = ""
         }
-      
         parent.nextInstruction = nextInstruction
     }
     ///method to calculate the distance from userlocation to next step.
     static func calculateDistance(from nextStepLocation:CLLocation, to userLocation: CLLocation, parent: inout MapView) {
         ///get the raw distance from userlocation to next step location
         let nextStepDistance = userLocation.distance(from: nextStepLocation)
-        ///convert the distance in Integer format which is divided by 10.
-        var intNextStepDistance = (Int(nextStepDistance)/10) * 10
+        ///divide the step distance by 10 and round up the result from decimal number to integer (near to 0 if less than 0.5 or  away if not) and multiply with 10 to get mutiples of 10.
+        let roundedDistance = round(nextStepDistance / 10) * 10.0
+        var intNextStepDistance = Int(roundedDistance)
         ///if the distance is less than 15 then set it to 0.
         intNextStepDistance = intNextStepDistance < 10 ? 0 : intNextStepDistance
         ///format the distance in meters if less than 1000 or in km otherwise.
@@ -612,18 +637,23 @@ extension MapViewAPI {
         ///create an instance of Request that is a property of MKDirections Object.
         let request = MKDirections.Request()
         ///set the source of the request as the current userlocation
-        request.source =  MKMapItem(placemark: MKPlacemark(coordinate: parent.locationDataManager.userlocation!.coordinate))
+        guard let userLocation =  parent.locationDataManager.userlocation else {
+            return
+        }
+        request.source =  MKMapItem(placemark: MKPlacemark(coordinate: userLocation.coordinate))
         ///set the destination of the request as the destination set by the user
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
         ///set the transport type as automobile
         request.transportType = .automobile
         ///create an instance of MKDirections with the configured request object
         let directions = MKDirections(request: request)
+        ///once directions request is sent, turn the timer to off to stop sending more getETA reuquests.
+        parent.timeInterval = false
         ///async task will execute the code non-sequentially. so if the code inside is taking time if will execute the other code and when the code is having a response it will be executed at that time.
         Task {
             ///call the async method of directions called calculateETA to get the ETA for our request and if response is found store it in reponse constant otherwise return the function call.
             guard let response = try? await directions.calculateETA() else {
-                return                
+                return
             }
            
             ///the following code is enclosed in MainActor.run method which will execute the code in mainactor's (locationmanager(didupdate:) method) thread.
@@ -685,13 +715,17 @@ extension MapViewAPI {
             ///get the change in distance preset number from a function based on user speed.
             let changePreset = setChangePreset(parent: parent)
             ///calculate the change in step distance
-            changeInStepDistance = latestStepDistance - previousStepDistance!
-            ///if the change in distance is equal to greater than preset update the previusStepDistance with latest one.
-            if abs(changeInStepDistance!) >= changePreset {
-                previousStepDistance = latestStepDistance
+            if let prevDist = previousStepDistance  {
+                changeInStepDistance = latestStepDistance - prevDist
             }
-            ///if the change in distance is more than or equal to change preset, flag the userOutOfRoute to true.
-            isUserOutofRoute = (changeInStepDistance! >= changePreset) ? true : false
+            if let change = changeInStepDistance  {
+                ///if the change in distance is equal to greater than preset update the previusStepDistance with latest one.
+                if abs(change) >= changePreset {
+                    previousStepDistance = latestStepDistance
+                }
+                ///if the change in distance is more than or equal to change preset, flag the userOutOfRoute to true.
+                isUserOutofRoute = (change >= changePreset) ? true : false
+            }
         }
         return
     }
@@ -759,7 +793,7 @@ extension MapViewAPI {
         }
         reRouted = true
     }
-    
+
     ///method to set the distance change preset based on user speed.
     static func setChangePreset(parent: MapView) -> Double {
         switch parent.locationDataManager.speed {
@@ -800,7 +834,6 @@ extension MapViewAPI {
             let renderer = mapView.renderer(for: thisOverlay) as? MKPolylineRenderer
             ///make sure renderer object is not nil
             if let renderer = renderer {
-                print("renderer")
                 ///get the title of the render polyline object
                 if overlay.title == thisOverlay.title {
                   
@@ -813,9 +846,14 @@ extension MapViewAPI {
                   
                     ///title of the polyline was set before with route distance and estimated travel time. here routedata will be extracting them and put them separately in an array.
                     let routeData = renderer.polyline.title?.split(separator: ", ") ?? []
-                    routeTravelTime = String(routeData.first!) + " mins"
-                    ///format the route distance and store it in routeDistance
-                    routeDistance = String(routeData.last!) + " km"
+                    if let travelTime = routeData.first {
+                        routeTravelTime = String(travelTime) + " mins"
+                    }
+                    if let distance = routeData.last {
+                        ///format the route distance and store it in routeDistance
+                        routeDistance = String(distance) + " km"
+                    }
+                   
                     ///get the index of a given route
                   
                 }
@@ -866,10 +904,16 @@ extension MapViewAPI {
     }
     
     static func isUserLocationOutOfRoute(in mapView : MKMapView, for currentStep: Int, with parent: inout MapView) {
-       
-      
+        var arr: [MKMapPoint] = []
+        if currentStep >= 0 && !pointsArray.isEmpty {
+             arr = convert(count: pointsArray[currentStep].count, data: pointsArray[currentStep])
+        }
+        
+    
         ///if the user point and pointsarray is available and curent step 0 or above.
-        if let userPoint = userPoint, currentStep >= 0, !pointsArray.isEmpty, let stepDistance = pointsArray[currentStep].sorted(by: {$0.distance(to: userPoint) > $1.distance(to: userPoint)}).first {
+        if let userPoint = userPoint, currentStep >= 0, !pointsArray.isEmpty, let stepDistance = arr.sorted(by: {$0.distance(to: userPoint) > $1.distance(to: userPoint)}).first {
+             
+            
             ///set the range preset for a given point in route overlay to detect the exit from it by the user.
             let exitPreset = setPreset(parent: parent, stepDistance: stepDistance.distance(to: userPoint), size: pointsArray[currentStep].count).0
             ///set the range preset for a given point in route overlay to check for user entry/exit once user enters into its range.
@@ -948,7 +992,10 @@ extension MapViewAPI {
                               ///  mapView.removeAnnotations(mapView.annotations)
                                 ///method to perform re-routing to the current destination.
                                 let targetLocation = parent.tappedAnnotation != nil ? parent.tappedAnnotation?.coordinate : parent.localSearch.suggestedLocations?.first?.coordinate
-                                reRoutetoDestination(in: mapView, from: parent.locationDataManager.userlocation!.coordinate, to: targetLocation, parent: &parent)
+                                if let userLocation = parent.locationDataManager.userlocation {
+                                    reRoutetoDestination(in: mapView, from: userLocation.coordinate, to: targetLocation, parent: &parent)
+                                }
+                               
                                 return
                             }
                             comment = "Step #\(currentStep) | dist = \(currentDist - prevDist)) | \(polylinePoints.count)"
@@ -990,6 +1037,13 @@ extension MapViewAPI {
         default:
             return (60, 120, 40)
         }
+    }
+    static func convert(count: Int, data: UnsafeBufferPointer<MKMapPoint>) -> [MKMapPoint] {
+        var arr: [MKMapPoint] = []
+        for x in data {
+            arr.append(x)
+        }
+        return arr
     }
 }
 

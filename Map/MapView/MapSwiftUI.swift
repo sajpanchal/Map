@@ -7,8 +7,6 @@
 
 import SwiftUI
 import MapKit
-//import AudioToolbox
-//import AVFoundation
 
 ///this view will observe the LocationDataManager and updates the MapViewController if data in Location Manager changes.
 struct Map: View {
@@ -17,47 +15,46 @@ struct Map: View {
     ///this will make our MapView update if any @published value in location manager changes.
     @StateObject var locationDataManager: LocationDataManager
     /// this variable is used to store the status of our mapview. it is bound to our MapView file
-    @State var mapViewStatus: MapViewStatus = .idle
+    @State private var mapViewStatus: MapViewStatus = .idle
     ///this variable is used to store the actions inputted by the user by tapping buttons or other gestures to mapView
-    @State var mapViewAction: MapViewAction = .idle
+    @State private var mapViewAction: MapViewAction = .idle
     ///enum type variable declaration
-    @State var mapError: Errors = .noError
+    @State private var mapError: Errors = .noError
     ///state variable for searchable text field to search for nearby locations in the map region
-    @State var searchedLocationText: String = ""
+    @State private var searchedLocationText: String = ""
     ///state variable to store the current instruction to display in the directions view.
-    @State var instruction: String = ""
-    @State var nextInstruction: String = ""
+    @State private var instruction: String = ""
+    @State private var nextInstruction: String = ""
     ///sending this variable to other swiftui views such as MapView and MapInterationView.
-    @State var nextStepLocation: CLLocation?
+    @State private var nextStepLocation: CLLocation?
     ///localSearch object is instantiated on rendering this view.
     @StateObject var localSearch: LocalSearch
-    //state variable storing the next step distance to be displayed in the directions view.
-    @State var nextStepDistance: String = ""
+    ///state variable storing the next step distance to be displayed in the directions view.
+    @State private var nextStepDistance: String = ""
     ///variable to show the selected route's travel time.
-    @State var routeTravelTime: String = ""
+    @State private var routeTravelTime: String = ""
     ///array of RouteData
-    @State var routeData: [RouteData] = []
+    @State private var routeData: [RouteData] = []
     ///variable to show the selected route's distance.
-    @State var routeDistance: String = ""
+    @State private var routeDistance: String = ""
     ///variable to show the distance remaining from the destination while in navigation.
-    @State var remainingDistance: String = ""
+    @State private var remainingDistance: String = ""
     ///variable to show the destination address in the expanded view.
-    @State var destination = ""
-  
+    @State private var destination = ""
     ///flag to show/hide the directions list view.
-    @State var showDirectionsList = false
+    @State private var showDirectionsList = false
     ///binding this variable of array type to ExpendedDirectionsView.
-    @State var stepInstructions: [(String, Double)] = []
+    @State private var stepInstructions: [(String, Double)] = []
     ///binding thi variable that diplays the arrival time to the destination.
-    @State var ETA: String = ""
+    @State private var ETA: String = ""
     ///flag used to show/hide greetings view.
-    @State var showGreetings: Bool = false
+    @State private var showGreetings: Bool = false
     ///flag used to determine if the routeSelection is tapped or not.
-    @State var isRouteSelectTapped: Bool = false
-    @State var tappedAnnoation: MKAnnotation?
-//    @Binding var vehicle: AutoVehicle?
-//    @Binding var vehicles: [AutoVehicle]
-   // let synthesizer = AVSpeechSynthesizer()
+    @State private var isRouteSelectTapped: Bool = false
+    @State private var tappedAnnoation: MKAnnotation?
+    @State private var timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
+    @State private var timeInterval = true
+
     var body: some View {
  
             ///ZStack is going to render swiftUI views in Z axis (i.e. from bottom to top)
@@ -65,7 +62,12 @@ struct Map: View {
                 ///grouping mapview and its associated buttons
                     Group() {
                     ///calling our custom struct that will render UIView for us in swiftui. we are passing the user coordinates that we have accessed from CLLocationManager in our locationDataManager class. we are also passing the state variable called tapped that is bound to the MapView.when any state property is passed to a binding property of its child component, it must be wrapped using $ symbol in prefix. we always declare a binding propery in a child component of the associated property from its parent.once the value is bound, a child component can read and write that value and any changes will be reflected in parent side.
-                        MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus,  instruction: $instruction, nextInstruction: $nextInstruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, routeTravelTime: $routeTravelTime, routeData: $routeData,  routeDistance: $routeDistance, remainingDistance: $remainingDistance, destination: $destination, stepInstructions: $stepInstructions, ETA: $ETA, showGreetings: $showGreetings, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnoation)
+                        MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus,  instruction: $instruction, nextInstruction: $nextInstruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, routeTravelTime: $routeTravelTime, routeData: $routeData,  routeDistance: $routeDistance, remainingDistance: $remainingDistance, destination: $destination, stepInstructions: $stepInstructions, ETA: $ETA, showGreetings: $showGreetings, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnoation, timeInterval: $timeInterval)
+                            .onReceive(timer, perform: { time in
+                                timeInterval.toggle()
+                                print("time")
+                                
+                            })
                     ///disable the mapview when track location button is tapped but tracking is not on yet.
                             .disabled(isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction))
                     ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged() action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag. we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
@@ -74,7 +76,6 @@ struct Map: View {
                     .opacity(isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction) ? 0.3 : 1.0)
                     if !isMapInNavigationMode(for: mapViewStatus).0 || isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction) {
                         VStack(spacing: 0) {
-                           
                                 SearchFieldView(searchedLocationText: $searchedLocationText, region: locationDataManager.region, localSearch: localSearch)
                                     .padding(.top, 10)
                                     .background(bgMode == .dark ? Color.black : Color.white)
@@ -82,20 +83,18 @@ struct Map: View {
                                 if !$localSearch.results.isEmpty && localSearch.status != .localSearchCancelled && localSearch.status != .locationSelected && localSearch.status != .showingNearbyLocations  {
                                     AddressListView(localSearch: localSearch, searchedLocationText: $searchedLocationText)
                                 }
-                            
-                            
-                            else if localSearch.status == .localSearchInProgress && $localSearch.results.isEmpty {
-                                 SearchProgressView()
-                            }
-                            else if localSearch.status == .localSearchFailed {
-                               NetworkAlertView()
-                            }
+                                else if localSearch.status == .localSearchInProgress && $localSearch.results.isEmpty {
+                                     SearchProgressView()
+                                }
+                                else if localSearch.status == .localSearchFailed {
+                                   NetworkAlertView()
+                                }
                             Spacer()
                         }
                         
                     }
                     else if isMapInNavigationMode(for: mapViewStatus).0  {
-                        DirectionsView(instruction: $instruction, nextStepDistance: $nextStepDistance, showDirectionsList: $showDirectionsList, nextInstruction: $nextInstruction, stepInstructions: $stepInstructions)
+                        DirectionsView(instruction: $instruction, nextStepDistance: $nextStepDistance, showDirectionsList: $showDirectionsList, nextInstruction: $nextInstruction, stepInstructions: $stepInstructions, locationDataManager: locationDataManager)
                     }
                     if showGreetings {
                         GreetingsView(showGreetings: $showGreetings, destination: $destination)

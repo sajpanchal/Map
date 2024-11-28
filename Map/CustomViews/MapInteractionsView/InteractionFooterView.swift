@@ -4,7 +4,7 @@
 //
 //  Created by saj panchal on 2024-06-14.
 //
-
+import Combine
 import SwiftUI
 import CoreLocation
 import MapKit
@@ -17,7 +17,7 @@ struct InteractionFooterView: View {
     @Binding var showAddressView: Bool
     ///this variable is going to store the address and name of the destination location.
     var destination: String
-    @State var addressViewHeight: CGFloat = 0
+    @State private var addressViewHeight: CGFloat = 0
     ///state object of Location manager to show the distance remaining from destination
     @StateObject var locationDataManager: LocationDataManager
     ///state object of local search to check if the destination location has been selected or not
@@ -40,6 +40,7 @@ struct InteractionFooterView: View {
     @Binding var isRouteSelectTapped: Bool
     @Binding var tappedAnnotation: MKAnnotation?
     @Binding var height: Double
+   // var timer: Timer.TimerPublisher
 //    var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(AppColors.invertSky.rawValue), Color(AppColors.sky.rawValue)]), center: .center, startRadius: 1, endRadius: 50)
 //    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(AppColors.invertRed.rawValue), Color(AppColors.red.rawValue)]), center: .center, startRadius: 1, endRadius: 50)
     var body: some View {
@@ -88,7 +89,7 @@ struct InteractionFooterView: View {
                         ///if map is navigating then show the remaining distance from the current location to the destination.
                         else if mapViewStatus == .navigating || mapViewStatus == .inNavigationNotCentered {
                             ///enclose the ETA texts in HStack
-                            RouteETAStackView(showAddressView: $showAddressView, destination: destination, ETA: $ETA, addressViewHeight: $addressViewHeight, remainingDistance: remainingDistance)
+                            RouteETAStackView(showAddressView: $showAddressView, destination: destination, ETA: $ETA, addressViewHeight: $addressViewHeight/*, timer: time*/, remainingDistance: remainingDistance)
                         }
                         else if localSearch.status == .showingNearbyLocations {
                             ExpandViewSymbol()
@@ -204,7 +205,7 @@ struct InteractionFooterView: View {
             ///make the next step location nil
             nextStepLocation = nil
             ///reseting the remainingDistance to nil
-            locationDataManager.remainingDistance = nil
+          //  locationDataManager.remainingDistance = nil
             UIApplication.shared.isIdleTimerDisabled = false
             break
         case .showingDirectionsNotCentered:
@@ -215,5 +216,5 @@ struct InteractionFooterView: View {
 }
 
 #Preview {
-    InteractionFooterView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), destination: "", locationDataManager: LocationDataManager(), localSearch: LocalSearch(), routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation()), height: .constant(0.0))
+    InteractionFooterView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), showAddressView: .constant(false), destination: "", locationDataManager: LocationDataManager(), localSearch: LocalSearch(), routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""), remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation()), height: .constant(0.0)/*, timer: Timer.publish(every: 30, on: .main, in: .common)*/)
 }

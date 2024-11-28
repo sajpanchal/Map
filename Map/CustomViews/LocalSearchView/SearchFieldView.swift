@@ -37,16 +37,19 @@ struct SearchFieldView: View {
                         
                         }
                     }
-                    ///when the text in a searchable field changes this method will be called and it will perform a method put inside perform parameter.
-                    .onChange(of: searchedLocationText) {
-                        ///this method will initiate or terminate the location search.
-                        if localSearch.status == .localSearchCancelled {
-                        //    localSearch.status = .localSearchInProgress
-                        }
-                        
-                      print("Changed")
-                        handleLocationSearch(forUserInput: searchedLocationText)
+                ///when the text in a searchable field changes this method will be called and it will perform a method put inside perform parameter.
+                .onChange(of: searchedLocationText) {
+                    ///this method will initiate or terminate the location search.
+                    if localSearch.status == .localSearchCancelled {
+                    //    localSearch.status = .localSearchInProgress
                     }
+                    
+                   
+                        self.handleLocationSearch(forUserInput: searchedLocationText)
+                    
+                  
+                }
+                   
                 ///on tap it will call a method to prepare searchfield.
                     .onTapGesture(perform: prepareSearchfield)
             }
@@ -79,7 +82,7 @@ struct SearchFieldView: View {
              
                 ///un-focus the search field
                  enableSearchFieldFocus = false
-                 print("not found")
+                
                  ///stop the location search
             ///
         
@@ -92,7 +95,7 @@ struct SearchFieldView: View {
        
         ///if search is on then keep the search field in focus
      
-        print(enableSearchFieldFocus)
+
         ///keep calling the startLocalsearch() of observable object localSearch with its searchLocations array as observed property. this will update Map swiftUI view on every change in searchLocations.
         localSearch.startLocalSearch(withSearchText: text, inRegion: region)
         enableSearchFieldFocus = localSearch.status != .locationSelected  ? true : false
@@ -101,10 +104,12 @@ struct SearchFieldView: View {
     ///when searchfield is tapped this function will be executed.
     func prepareSearchfield() {
         ///location is not selected when we are starting a search
-        print("active on tap")
-        localSearch.status = .searchBarActive
-        ///this variable is a focusstate type, this is going to be passed to focus() modifier of our searchfield and is responsible to enable and disable the focus.
-        enableSearchFieldFocus = true
+        DispatchQueue.main.async {
+            localSearch.status = .searchBarActive
+            ///this variable is a focusstate type, this is going to be passed to focus() modifier of our searchfield and is responsible to enable and disable the focus.
+            enableSearchFieldFocus = true
+        }
+       
     
     }
     ///when cancel button is tapped

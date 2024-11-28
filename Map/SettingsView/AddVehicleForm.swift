@@ -14,37 +14,37 @@ struct AddVehicleForm: View {
     @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[NSSortDescriptor(keyPath: \Vehicle.isActive, ascending: false)]) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
     ///state variable stores vehicletype enum
-    @State var vehicleType: VehicleTypes = .Car
+    @State private var vehicleType: VehicleTypes = .Car
     ///state variable stores vehiclemake enum
-    @State var vehicleMake: VehicleMake = .AC
+    @State private var vehicleMake: VehicleMake = .AC
     ///state variable stores vehicle make in string format
-    @State var textVehicleMake = ""
+    @State private var textVehicleMake = ""
     ///state variable stores vehicle model in string format
-    @State var textVehicleModel = ""
+    @State private var textVehicleModel = ""
     ///state variable stores alphabet enum type.
-    @State var alphabet: Alphbets = .A
+    @State private var alphabet: Alphbets = .A
     ///state variable stores model enum type.
-    @State var model: Model = .Ace
+    @State private var model: Model = .Ace
     ///state variable stores vehicle manufacturing year as Int type
-    @State var year = (Calendar.current.dateComponents([.year], from: Date())).year ?? 1900
+    @State private var year = (Calendar.current.dateComponents([.year], from: Date())).year ?? 1900
     ///state variable stores vehicle year range as Range type
-    @State var yearRange = 1900..<((Calendar.current.dateComponents([.year], from: Date())).year ?? 1900) + 1
+    @State private var yearRange = 1900..<((Calendar.current.dateComponents([.year], from: Date())).year ?? 1900) + 1
     ///state variable stores engineType enum value
-    @State var engineType = EngineType.Gas
+    @State private var engineType = EngineType.Gas
     ///state variable stores the battery capacity
-    @State var batteryCapacity = 40.0
+    @State private var batteryCapacity = 40.0
     ///state variable to store odometer value (km) in string format for textfield to display/update.
-    @State var odometer = 0
+    @State private var odometer = 0
     ///state variable to store odometer value (miles) in string format for textfield to display/update.
-    @State var odometerMiles = 0
+    @State private var odometerMiles = 0
     ///state variable to store trip odometer (km) value in string format for textfield to display/update.
-    @State var trip = 0.0
+    @State private var trip = 0.0
     ///state variable to store trip odometer (miles) value in string format for textfield to display/update.
-    @State var tripMiles = 0.0
+    @State private var tripMiles = 0.0
     ///state variable to store trip odometer for hybrid EV engine (km)  value in string format for textfield to display/update.
-    @State var tripHybridEV = 0.0
+    @State private var tripHybridEV = 0.0
     ///state variable to store trip odometer for hybrid EV engine (miles) value in string format for textfield to display/update.
-    @State var tripHybridEVMiles = 0.0
+    @State private var tripHybridEVMiles = 0.0
     ///binding variable that updates this view on change of vehicle data type values.
     @Binding var vehicle: Vehicle
     ///binding variable that shows/hides  this view on change of bool value.

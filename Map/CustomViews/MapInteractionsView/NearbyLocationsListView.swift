@@ -16,7 +16,7 @@ struct NearbyLocationsListView: View {
     @Binding var mapViewAction: MapViewAction
     @Binding var tappedAnnotation: MKAnnotation?
     @Binding var height: Double
-    @State var selection: String = ""
+    @State private var selection: String = ""
  
     var body: some View {
         if let locations = localSearch.suggestedLocations {
@@ -41,7 +41,7 @@ struct NearbyLocationsListView: View {
                            
                              
                              Spacer()
-                             Button(action: { tappedAnnotation = suggestion; mapViewAction = .showDirections; locationDataManager.throughfare = nil; print("button tapped") },
+                             Button(action: { tappedAnnotation = suggestion; mapViewAction = .showDirections; locationDataManager.throughfare = nil; },
                                     label: { NavigationButton(imageName: "arrow.triangle.swap", title: "Routes", foregroundColor: Color(AppColors.lightSky.rawValue), size: 60)})
                              .buttonStyle(.plain)
                              .background(Color(AppColors.darkSky.rawValue))
@@ -51,8 +51,7 @@ struct NearbyLocationsListView: View {
                          .background()
                          .cornerRadius(10)
                          .tag(suggestion.hash)
-                         .onTapGesture {
-                             print("Tapped")
+                         .onTapGesture {                            
                              DispatchQueue.main.async {
                                  tappedAnnotation = suggestion
                              }

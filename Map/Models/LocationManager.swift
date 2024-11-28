@@ -16,28 +16,26 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[NSSortDescriptor(keyPath: \Vehicle.isActive, ascending: false)]) var vehicles: FetchedResults<Vehicle>
     ///this is a object property that will reflect the user location authorization status. it is set as a type-alieas @published. which makes updates to swiftui if this object is used in that swiftui view.
     ///property storing userlocation
-    @Published var userlocation: CLLocation?
+    var userlocation: CLLocation?
     ///property storing user heading relative to magnetic north.
-    @Published var userHeading: CLHeading?
+    var userHeading: CLHeading?
     ///region instance for setting up the visible region in the map with centered location and zoom level configured based on needs.
     @Published var region: MKCoordinateRegion = MKCoordinateRegion()
-    ///remaining distance from the userlocation to the destination while in navigation
-    @Published var remainingDistance: CLLocationDistance?
     ///speed of the user
     var viewContext = CoreDataStack.shared.persistantContainer.viewContext
-    @Published var speed: Int = 0
+    var speed: Int = 0
     ///throughfare i.e. street name of the current location received by reverse geocoding.
-    @Published var throughfare: String?
+    var throughfare: String?
     ///flag to be used for enabling and disabling the reverse geocoding
-    @Published var enableGeocoding = true
-    @Published var distance: CLLocationDistance = 0.0
-    @Published var distanceText: String = "0.0 km"
-    @Published var odometer: CLLocationDistance = 0.0
+    var enableGeocoding = true
+    var distance: CLLocationDistance = 0.0
+    var distanceText: String = "0.0 km"
+    var odometer: CLLocationDistance = 0.0
     ///local variable to store odometer in miles
-    @Published var odometerMiles: CLLocationDistance = 0.0
-    @Published var trip: CLLocationDistance = 0.0
+    var odometerMiles: CLLocationDistance = 0.0
+    var trip: CLLocationDistance = 0.0
     ///local variable to store trip odometer in miles.
-    @Published var tripMiles: CLLocationDistance = 0.0
+    var tripMiles: CLLocationDistance = 0.0
     var results: [Vehicle] = []
     ///settings array.
     var settings: [Settings] = []
@@ -63,12 +61,12 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
             self.settings = try viewContext.fetch(settingsFetchRequest) as? [Settings] ?? []
             ///viewContext.
             self.index = self.results.firstIndex(where: {$0.isActive})
-            if self.index != nil {
-                self.vehicle = results[index!]
+            if let activeIndex = self.index {
+                self.vehicle = results[activeIndex]
             }
         }
         catch {
-            print("error")
+            print(error.localizedDescription)
         }
         locationManager.allowsBackgroundLocationUpdates = true
         locationManager.showsBackgroundLocationIndicator = true
@@ -109,29 +107,16 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         if userlocation == nil {
             userlocation = locations.first
         }
-        ///if the troughfare is nil and user location is available
-        if (self.throughfare == nil && self.userlocation != nil) || enableGeocoding {
-            ///task is a struct type of swift that allows execution of the code asynchronously
-            Task(operation: {
-                ///request the reverse geocoding for current location and it will return the placemarks for this location
-                if let placemarks = try? await CLGeocoder().reverseGeocodeLocation(self.userlocation!) {
-                    ///get the first placemark from an array
-                    if let placemark = placemarks.first {
-                        ///retrieve the thoroughfare for that placemark. which will be a street name.
-                        await MainActor.run {
-                            self.throughfare = placemark.thoroughfare
-                        }
-                    }
-                }
-            })
+        guard let thisUserLocation = userlocation else {
+            return
         }
         ///if locations array is not nil and has the first location of the user, get the last user location, also check if the remainingDistance is not nil
         if let lastUserLocation = locations.last {
          ///check if the distance updated is greater than 0.01 meters and make sure distance is greater than 0.
-            if  self.userlocation!.distance(from: lastUserLocation)/1000 >= 0.01 {
-
+           
+            if thisUserLocation.distance(from: lastUserLocation)/1000 >= 0.01 {
                 ///update the lastLocation variable with the latest user location recevied by location manager.
-                self.distance = self.userlocation!.distance(from: lastUserLocation)/1000
+                self.distance = thisUserLocation.distance(from: lastUserLocation)/1000
                 self.distanceText = String(format: "%.1f",self.distance)
                 ///if the vehicle is not nil
                 if let activeVehicle = vehicle {
@@ -153,11 +138,11 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                     ///if the index of the active vehicle is found
                     if let i = results.firstIndex(of: activeVehicle) {
                         ///start updating the odometer of the active vehicle in km.
-                        self.results[i].odometer += self.userlocation!.distance(from: lastUserLocation)/1000
+                        self.results[i].odometer += thisUserLocation.distance(from: lastUserLocation)/1000
                         ///start updating the odometer of the active vehicle in miles.
                         self.results[i].odometerMiles =  self.results[i].odometer * 0.6214
                         ///start updating the trip odometer of the active vehicle in km.
-                        self.results[i].trip += self.userlocation!.distance(from: lastUserLocation)/1000
+                        self.results[i].trip += thisUserLocation.distance(from: lastUserLocation)/1000
                         ///start updating the trip odometer of the active vehicle in miles.
                         self.results[i].tripMiles = self.results[i].trip * 0.6214
                         ///save view context
@@ -177,7 +162,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                             
                         }
                         catch {
-                            print("error")
+                            print(error.localizedDescription)
                         }
                     }
                 }
@@ -187,7 +172,13 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                 self.distance = 0.0
             }
             ///calculate the speed of the user
-            self.speed = Int(self.userlocation!.speed * 3.6)
+            if thisUserLocation.speed >= 0 {
+                self.speed = Int(thisUserLocation.speed * 3.6)
+            }
+            else {
+                self.speed = 0
+            }
+            print("Speed:\(self.speed)")
             ///set the region of the map with a center at last user coordinates and zoomed to 1000 meters.
             region = MKCoordinateRegion(center: lastUserLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
         }
