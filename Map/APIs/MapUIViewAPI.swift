@@ -45,6 +45,8 @@ class MapViewAPI {
     static var comment = ""
     ///flag to determine if the rerouting was already performed.
     static var reRouted = false
+    ///static variable to store the distance unit.
+    static var distanceUnit: DistanceUnit = .km
     
     ///this method will accept the mapView, userLocation class instances. here mapView struct instance as inout parameter. inout parameter allows us to make func parameter mutable i.e. we can change the value of the parameter in a function directly and changes will be reflected outside the function after execution.
     static func setRegionIn(mapView: MKMapView, centeredAt userLocation: MKUserLocation, parent: inout MapView) {
@@ -236,7 +238,6 @@ class MapViewAPI {
       
         if parent.timeInterval == true {
             getETA(to: targetLocation.coordinate, in: &parent, with: mapView)
-            print("getETA called")
         }
       
         ///if there is any route available then get the first one otherwise exit the fuction.
@@ -249,9 +250,10 @@ class MapViewAPI {
             for step in route.steps {
                 ///skip the appending if instruction is empty
                 if !step.instructions.isEmpty {
+                    ///format the distance in string with a given distance unit annotation.
+                    let formattedDistance = distanceUnit == .miles ? convertToMiles(from: step.distance) : getFormattedDistance(from: step.distance)
                     ///append the instruction string and distance from current step to that step for which the instruction is being displayed to our array.
-                 //   let remainder = step.distance
-                    parent.stepInstructions.append((step.instructions, step.distance))
+                    parent.stepInstructions.append((step.instructions, formattedDistance))
                 }
             }
         }
@@ -269,27 +271,32 @@ class MapViewAPI {
         parent.routeTravelTime = ETA
         ///initiating props on first execution
         initiateProps(route: route, parent: &parent)
-        ///get the address of the destination
-       
-        ///format the remaining distance to be displayed in km or meters
+        ///format the remaining distance to be displayed in km/ meters or miles/ft
         ///if remainingDistance is available
         if let distance = remainingDistance {
-            ///if distance is less than 1000 m
-            if distance < 1000 {
-                ///show the distance in meters format
-                parent.remainingDistance = String(format:"%.0f", distance) + " m"
+            ///if the distance unit is in miles
+            if distanceUnit == .miles {
+                ///convert the distance to miles with string formated text and distance unit symbol
+                parent.remainingDistance = convertToMilesETA(from: distance)
             }
-            ///if distance is more than or equal to 1000 m
             else {
-                ///show the distance in km format.
-                parent.remainingDistance = String(format:"%.1f", Double(distance/1000.0)) + " km"
+                ///if distance is less than 1000 m
+                if distance < 1000 {
+                    ///show the distance in meters format
+                    parent.remainingDistance = String(format:"%.0f", distance) + " m"
+                }
+                ///if distance is more than or equal to 1000 m
+                else {
+                    ///show the distance in km format.
+                    parent.remainingDistance = String(format:"%.1f", Double(distance/1000.0)) + " km"
+                }
             }
         }
                 
         ///set the destination field of mapview struct
         parent.destination = (targetLocation.title ?? "") ?? ""
-        ///setting the routeDistance property with km format for display
-        parent.routeDistance = String(format:"%.1f",Double(route.distance/1000.0)) + " km"
+        ///setting the routeDistance property with km/miles format for display
+        parent.routeDistance = distanceUnit == .miles ? convertToMiles(from: route.distance) : String(format:"%.1f",Double(route.distance/1000.0)) + " km"
         ///iterate through the route steps
         for step in route.steps {
       
@@ -363,7 +370,6 @@ class MapViewAPI {
                         else {
                             ///initate the instruction for the first step to be displayed with the current location street name and the next one.
                             thoroughfare = "Starting at \(parent.locationDataManager.throughfare ?? "your location") towards \(streetName)"
-                           
                         }
                     }
                     
@@ -446,7 +452,12 @@ class MapViewAPI {
                     ///format the travel time and store it in routeTravelTime
                     parent.routeTravelTime = String(routeData.first!) + " mins"
                     ///format the route distance and store it in routeDistance
-                    parent.routeDistance = String(routeData.last!) + " km"
+                    if let dist = routeData.last {
+                        ///get the distance string converted to numeric format and get the distance in meters.
+                        let number = Double(dist) ?? 0.0 * 100.0
+                        ///store the total distance from user to the destination in miles or km.
+                        parent.routeDistance = distanceUnit == .miles ? convertToMiles(from: number) : dist + " km"
+                    }
                     ///get the index of a given route
                     index = counter
                 }
@@ -535,10 +546,7 @@ extension MapViewAPI {
                  
              }
          }
-        ///get the initial distance remaining to destination from user location. that is route distance.
-//         if parent.locationDataManager.remainingDistance == nil {
-//               parent.locationDataManager.remainingDistance = Double(route.distance/1000.0)
-//         }
+       
         ///if the nextStep location is not available, get the location of the first step.
          if parent.nextStepLocation == nil {
              ///get the first step from the steps array
@@ -611,8 +619,14 @@ extension MapViewAPI {
         var intNextStepDistance = Int(roundedDistance)
         ///if the distance is less than 15 then set it to 0.
         intNextStepDistance = intNextStepDistance < 10 ? 0 : intNextStepDistance
-        ///format the distance in meters if less than 1000 or in km otherwise.
-        parent.nextStepDistance = nextStepDistance < 1000 ? String(intNextStepDistance) + " m" : String(format:"%.1f",(nextStepDistance/1000)) + " km"
+        if distanceUnit == .miles {
+            ///format the distance in miles/ft
+            parent.nextStepDistance = convertToMilesETA(from: nextStepDistance)
+        }
+        else {
+            ///format the distance in meters if less than 1000 or in km otherwise.
+            parent.nextStepDistance = nextStepDistance < 1000 ? String(intNextStepDistance) + " m" : String(format:"%.1f",(nextStepDistance/1000)) + " km"
+        }
         
         if parent.instruction.contains("destination") {
             if let shortAddress = parent.destination.split(separator: ",").first {
@@ -700,7 +714,13 @@ extension MapViewAPI {
             return
         }
         ///if step distance is in km format, convert it to meters format.
-        latestStepDistance = parent.nextStepDistance.split(separator: " ").last == "km" ? (latestStepDistance * 1000) :  latestStepDistance
+        if distanceUnit == .miles {
+            ///convert the latest distance from miles to meters or from ft to meters.
+            latestStepDistance = parent.nextStepDistance.split(separator: " ").last == "mi" ? (latestStepDistance * 1609) : latestStepDistance/3.281
+        }
+        else {
+            latestStepDistance = parent.nextStepDistance.split(separator: " ").last == "km" ? (latestStepDistance * 1000) : latestStepDistance
+        }
         ///if previously recorded step distance is nil
         if previousStepDistance == nil {
             ///set the latest available step distance as previous step distance.
@@ -849,13 +869,13 @@ extension MapViewAPI {
                     if let travelTime = routeData.first {
                         routeTravelTime = String(travelTime) + " mins"
                     }
+                    ///if the route data has last element available
                     if let distance = routeData.last {
+                        ///convert the string distance to number and get it in meters.
+                        let number = Double(distance) ?? 0.0 * 100.0
                         ///format the route distance and store it in routeDistance
-                        routeDistance = String(distance) + " km"
+                        routeDistance = distanceUnit == .miles ? convertToMiles(from: number) : (distance) + " km"
                     }
-                   
-                    ///get the index of a given route
-                  
                 }
                 ///if title of the render is not matching with a requested title
                 else {
@@ -865,7 +885,6 @@ extension MapViewAPI {
                         ///keep the trasparency to 50%
                         renderer.alpha = 0.5
                     }
-                  
                 }
                 ///increment the counter
                 counter += 1
@@ -912,8 +931,6 @@ extension MapViewAPI {
     
         ///if the user point and pointsarray is available and curent step 0 or above.
         if let userPoint = userPoint, currentStep >= 0, !pointsArray.isEmpty, let stepDistance = arr.sorted(by: {$0.distance(to: userPoint) > $1.distance(to: userPoint)}).first {
-             
-            
             ///set the range preset for a given point in route overlay to detect the exit from it by the user.
             let exitPreset = setPreset(parent: parent, stepDistance: stepDistance.distance(to: userPoint), size: pointsArray[currentStep].count).0
             ///set the range preset for a given point in route overlay to check for user entry/exit once user enters into its range.
@@ -1044,6 +1061,112 @@ extension MapViewAPI {
             arr.append(x)
         }
         return arr
+    }
+    static func getFormattedDistance(from distance: CLLocationDistance) -> String {
+        if distance > 1000 {
+            ///convert distance from meters to km
+            let km = distance/1000
+            ///round up the double to whole number
+            let roundedDistance = round((km * 10.0) / 5) * 0.5
+            ///check if the diffence between the decimal and integer is not 0.5
+            if abs(roundedDistance - Double(Int(roundedDistance))) != 0.5 {
+                ///convert whole double to integer if it is not a decimal
+                let wholeDistance = Int(roundedDistance)
+                return String(wholeDistance) + " km"
+            }
+            ///if it is decimal number send the rounded number
+            else {
+                let wholeDistance = roundedDistance
+                return String(wholeDistance) + " km"
+            }
+        }
+        ///if step instruction distance is not containing km sign.
+        else {
+            let roundedDistance = round(distance/50) * 50.0
+            let wholeDistance = Int(roundedDistance)
+            return String(wholeDistance) + " m"
+        }
+    }
+    static func convertToMiles(from distance: CLLocationDistance) -> String {
+        ///if the distance is greater than 320 m.
+        if distance > 320 {
+            ///convert to km
+            let km = distance/1000
+            ///convert to miles
+            let miles = km/1.609
+            ///if distances is greater than 1 miles
+            if miles > 1.0 {
+                ///round up the distance with precision of +-0.5 miles
+                let roundedMiles = round((miles * 10.0) / 5) * 0.5
+                ///check if the rounded miles is a whole number or not
+                if abs(roundedMiles - Double(Int(roundedMiles))) != 0.5 {
+                    ///if it is not a whole number convert it to a whole number
+                    let wholeDistance = Int(roundedMiles)
+                    return String(wholeDistance) + " mi"
+                }
+                ///if it is a whole number
+                else {
+                    ///get the number and format the string.
+                    let wholeDistance = roundedMiles
+                    return String(wholeDistance) + " mi"
+                }
+            }
+            ///if miles distance is  more than 1.0 simply return the decimal value.
+            else {
+                return String(format: "%.1f", miles) + " mi"
+            }
+        }
+        ///if distance is less than 320 meters.
+        else {
+            ///convert distance to feet.
+            let ft = distance * 3.281
+            ///round up the feet with precision of +-10 feets
+            let wholeFt = round(ft / 10) * 10.0
+            ///check if the rounded number is in multiples of 0.5 or not
+            if abs(wholeFt - Double(Int(wholeFt))) != 0.5 {
+                ///if not, convert it to whole number
+                let wholeDistance = Int(wholeFt)
+                ///convert it to string with unit annotation
+                return String(wholeDistance) + " ft"
+            }
+            else {
+                ///get the whole number
+                let wholeDistance = wholeFt
+                ///convert it to string with unit annotation
+                return String(wholeDistance) + " ft"
+            }
+        }
+    }
+    
+    static func convertToMilesETA(from distance: CLLocationDistance) -> String {
+        ///if the distance is greater than 320 m.
+        if distance > 320 {
+            ///convert to km
+            let km = distance/1000
+            ///convert to miles
+            let miles = km/1.609
+            ///format distance to decimal with 0.1 mi precison and unit annotation.
+            return String(format: "%.1f", miles) + " mi"
+        }
+        else {
+            ///convert distance to feet.
+            let ft = distance * 3.281
+            ///round up the feet with precision of +-10 feets
+            let wholeFt = round(ft / 10) * 10.0
+            ///check if the rounded number is in multiples of 0.5 or not
+            if abs(wholeFt - Double(Int(wholeFt))) != 0.5 {
+                ///if not, convert it to whole number
+                let wholeDistance = Int(wholeFt)
+                ///convert it to string with unit annotation
+                return String(wholeDistance) + " ft"
+            }
+            else {
+                ///get the whole number
+                let wholeDistance = wholeFt
+                ///convert it to string with unit annotation
+                return String(wholeDistance) + " ft"
+            }
+        }
     }
 }
 

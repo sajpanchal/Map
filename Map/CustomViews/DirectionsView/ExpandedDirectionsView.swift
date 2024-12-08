@@ -12,7 +12,7 @@ struct DirectionsListView: View {
     ///environment variable to get the current color mode of the phone
     @Environment(\.colorScheme) var bgMode: ColorScheme
     ///a variable stores an array of tuple types with each pair having a step instructions and distance from current step.
-    var stepInstructions: [(String, Double)]
+    var stepInstructions: [(String, String)]
     ///bounded property that is used to show or hide this view.
     @Binding var showDirectionsList: Bool
     @Binding var height: CGFloat
@@ -40,7 +40,7 @@ struct DirectionsListView: View {
                                         .foregroundStyle(.gray)
                                 }
                                 ///convert the distance to string and do proper formating and display the returned string.
-                                Text(convertToString(from:stepInstruction.1))
+                                Text(stepInstruction.1)
                                     .padding(.bottom, 5)
                                     .font(.title2)
                                     .fontWeight(.black)

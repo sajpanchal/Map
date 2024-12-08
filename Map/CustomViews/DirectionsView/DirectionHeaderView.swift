@@ -242,31 +242,60 @@ struct DirectionHeaderView: View {
     
     ///function to get distance from the next step in numbers
     func getDistanceInNumber(distance: String) -> Double {
+        print("Distance String:", distance)
         ///create a local step distance variable
         var thisStepDistance = 0.0
-        ///if distance is in km
-        if distance.contains("km") {
-            ///split the step distance string by space
-            let stepDistanceSplits = distance.split(separator: " ")
-            ///get the first splited text from an array of splits, which represents step distance
-            let stepDistanceText = String(stepDistanceSplits[0])
-            ///convert string formated distance to number
-            if let dist = Double(stepDistanceText) {
-                ///convert km to meters
-                thisStepDistance = dist * 1000
+        ///if distance unit is set to miles.
+        if MapViewAPI.distanceUnit == .miles {
+            ///if distance is in miles
+            if distance.contains("mi") {
+                ///split the step distance string by space
+                let stepDistanceSplits = distance.split(separator: " ")
+                ///get the first splited text from an array of splits, which represents step distance
+                let stepDistanceText = String(stepDistanceSplits[0])
+                ///convert string formated distance to number
+                if let dist = Double(stepDistanceText) {
+                    ///convert miles to meters
+                    thisStepDistance = dist * 1609
+                }
             }
-          
+            ///if distance is in feet
+            else {
+                ///split the step distance string by space
+                let stepDistanceSplits = distance.split(separator: " ")
+                ///get the first splited text from an array of splits, which represents step distance
+                let stepDistanceText = String(stepDistanceSplits[0])
+                ///convert string formated distance to number
+                if let dist = Double(stepDistanceText) {
+                    ///assign the value to local variable in meters
+                    thisStepDistance = dist / 3.281
+                }
+            }
         }
-        ///if distance is in meters.
         else {
-            ///split the step distance string by space
-            let stepDistanceSplits = distance.split(separator: " ")
-            ///get the first splited text from an array of splits, which represents step distance
-            let stepDistanceText = String(stepDistanceSplits[0])
-            ///convert string formated distance to number
-            if let dist = Double(stepDistanceText) {
-                ///assign the value to local variable
-                thisStepDistance = dist
+            ///if distance is in km
+            if distance.contains("km") {
+                ///split the step distance string by space
+                let stepDistanceSplits = distance.split(separator: " ")
+                ///get the first splited text from an array of splits, which represents step distance
+                let stepDistanceText = String(stepDistanceSplits[0])
+                ///convert string formated distance to number
+                if let dist = Double(stepDistanceText) {
+                    ///convert km to meters
+                    thisStepDistance = dist * 1000
+                }
+            }
+            ///if distance is in meters.
+            else {
+                ///split the step distance string by space
+                let stepDistanceSplits = distance.split(separator: " ")
+                ///get the first splited text from an array of splits, which represents step distance
+                let stepDistanceText = String(stepDistanceSplits[0])
+                ///convert string formated distance to number
+                if let dist = Double(stepDistanceText) {
+                    ///assign the value to local variable
+                    thisStepDistance = dist
+                }
             }
         }
         ///return the converted distance
@@ -280,7 +309,7 @@ struct DirectionHeaderView: View {
         utteranceDistance = getUtteranceDistance()
         ///get the range preset from the utteranceDistance received on first appearance of the instruction.
         range = nextStepRange(distance: nextStepDistance)
-        if getDistanceInNumber(distance: nextStepDistance) < 80 {
+        if getDistanceInNumber(distance: nextStepDistance) < 80 && locationDataManager.speed > 36 {
             return
         }
         ///start voice navigation with the utterance.
@@ -332,27 +361,61 @@ struct DirectionHeaderView: View {
     func getUtteranceDistance() -> String {
         ///get the distance numbers from string distance
         var distanceNumbers = getDistanceInNumber(distance: nextStepDistance)
-        ///if step instruction distance is containing km sign.
-        if nextStepDistance.contains("km") {
-            ///convert distance from meters to km
-            distanceNumbers = distanceNumbers/1000
-            ///round up the double to whole number
-            let roundedDistance = round((distanceNumbers * 10.0) / 5) * 0.5
-            ///convert whole double to integer
-            if abs(roundedDistance - Double(Int(roundedDistance))) != 0.5 {
-                let wholeDistance = Int(roundedDistance)
-                return String(wholeDistance) + "km"
+        ///if distance unit set is in miles
+        if MapViewAPI.distanceUnit == .miles {
+            ///get the nextsetp distance string as utterance distance
+            ///if step instruction distance is containing km sign.
+            if nextStepDistance.contains("mi") {
+                ///convert distance from meters to km
+                distanceNumbers = distanceNumbers/1609
+                if distanceNumbers > 1.0 {
+                    ///round up the double to whole number
+                    let roundedDistance = round((distanceNumbers * 10.0) / 5) * 0.5
+                    ///convert whole double to integer
+                    if abs(roundedDistance - Double(Int(roundedDistance))) != 0.5 {
+                        let wholeDistance = Int(roundedDistance)
+                        return String(wholeDistance) + "mi"
+                    }
+                    else {
+                        let wholeDistance = roundedDistance
+                        return String(wholeDistance) + "mi"
+                    }
+                }
+                else {
+                    return String(format: "%.1f", distanceNumbers) + "mi"
+                }
             }
+            ///if step instruction distance is not containing km sign.
             else {
-                let wholeDistance = roundedDistance
-                return String(wholeDistance) + "km"
+                distanceNumbers = distanceNumbers * 3.281
+                let roundedDistance = round(distanceNumbers/50) * 50.0
+                let wholeDistance = Int(roundedDistance)
+                return String(wholeDistance) + "ft"
             }
         }
-        ///if step instruction distance is not containing km sign.
         else {
-            let roundedDistance = round(distanceNumbers/50) * 50.0
-            let wholeDistance = Int(roundedDistance)
-            return String(wholeDistance) + "m"
+            ///if step instruction distance is containing km sign.
+            if nextStepDistance.contains("km") {
+                ///convert distance from meters to km
+                distanceNumbers = distanceNumbers/1000
+                ///round up the double to whole number
+                let roundedDistance = round((distanceNumbers * 10.0) / 5) * 0.5
+                ///convert whole double to integer
+                if abs(roundedDistance - Double(Int(roundedDistance))) != 0.5 {
+                    let wholeDistance = Int(roundedDistance)
+                    return String(wholeDistance) + "km"
+                }
+                else {
+                    let wholeDistance = roundedDistance
+                    return String(wholeDistance) + "km"
+                }
+            }
+            ///if step instruction distance is not containing km sign.
+            else {
+                let roundedDistance = round(distanceNumbers/50) * 50.0
+                let wholeDistance = Int(roundedDistance)
+                return String(wholeDistance) + "m"
+            }
         }
     }
 }

@@ -35,14 +35,12 @@ struct InteractionFooterView: View {
     ///bounded property stores the location object of the next step.
     @Binding var nextStepLocation: CLLocation?
     ///bounded property stores an array of tuples with a list of instructions and its distances by each step.
-    @Binding var stepInstructions: [(String, Double)]
+    @Binding var stepInstructions: [(String, String)]
     @Binding var ETA: String
     @Binding var isRouteSelectTapped: Bool
     @Binding var tappedAnnotation: MKAnnotation?
     @Binding var height: Double
-   // var timer: Timer.TimerPublisher
-//    var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(AppColors.invertSky.rawValue), Color(AppColors.sky.rawValue)]), center: .center, startRadius: 1, endRadius: 50)
-//    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(AppColors.invertRed.rawValue), Color(AppColors.red.rawValue)]), center: .center, startRadius: 1, endRadius: 50)
+
     var body: some View {
         VStack {
             ///if map is navigating

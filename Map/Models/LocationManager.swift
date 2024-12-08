@@ -177,8 +177,7 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
             }
             else {
                 self.speed = 0
-            }
-            print("Speed:\(self.speed)")
+            }         
             ///set the region of the map with a center at last user coordinates and zoomed to 1000 meters.
             region = MKCoordinateRegion(center: lastUserLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
         }

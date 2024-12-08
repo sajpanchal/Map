@@ -21,8 +21,6 @@ struct MapView: UIViewRepresentable {
     
     typealias UIViewType = MKMapView
     ///this property is bound to the tapped property of Map SwiftUI. it will be true when re-center button is pressed from Map SwiftUI.
-//    @Binding var vehicle: AutoVehicle?
-//    @Binding var vehicles: [AutoVehicle]
     @Environment(\.managedObjectContext) private var viewContext
     @Binding var mapViewAction: MapViewAction
     ///this property holds the error codes that we have defined in enum type in Map SwiftUI file.
@@ -51,7 +49,7 @@ struct MapView: UIViewRepresentable {
     ///address of the destination
     @Binding var destination: String
     ///an array of tuple storing step instruction and distance between the steps.
-    @Binding var stepInstructions: [(String, Double)]
+    @Binding var stepInstructions: [(String, String)]
     ///temportily storing the region instance
     var region: MKCoordinateRegion?
     ///string to display the ETA for a given destination
@@ -137,8 +135,14 @@ struct MapView: UIViewRepresentable {
                 let routeData = renderer.polyline.title?.split(separator: ", ") ?? []
                 ///set the travel time
                 parent.routeTravelTime = String(routeData.first ?? "") + " mins"
-                ///set the distance
-                parent.routeDistance = String(routeData.last ?? "") + " km"
+                ///get the last element of route data
+                if let distance = routeData.last {
+                    ///convert the distance from string to number and get it in meters.
+                    let number = Double(distance) ?? 0.0 * 100.0
+                    ///format the distance in miles or km.
+                    parent.routeDistance = MapViewAPI.distanceUnit == .miles ? MapViewAPI.convertToMiles(from: number) : String(distance) + " km"
+                }
+               
             }
             ///if route renderer is other than selected
             else {
@@ -247,7 +251,18 @@ struct MapView: UIViewRepresentable {
                     for route in MapViewAPI.routes {
                         ///extract the route travel time, distance, name and a uniue string from routes and append it to routeData along with unique id and tapped flag set/reset.
                         let distance = route.distance < 1000 ? (round(Double(route.distance)/50) * 50.0) : Double(route.distance/1000.0)
-                        let distanceString = route.distance < 1000 ? String(format:"%.0f",distance) + " m" : String(format:"%.1f",distance) + " km"
+                        var distanceString = ""
+                        ///if distance unit is in miles
+                        if MapViewAPI.distanceUnit == .miles {
+                            ///convert the distance to formated string in miles/ft
+                            distanceString = MapViewAPI.convertToMiles(from: route.distance)
+                        }
+                        ///if distance unit is not in miles
+                        else {
+                            ///convert the distance to formated string in km/meters
+                            distanceString = route.distance < 1000 ? String(format:"%.0f",distance) + " m" : String(format:"%.1f",distance) + " km"
+                        }
+                        
                         var ETA = ""
                         if route.expectedTravelTime < 3600 {
                             ETA =  String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
@@ -423,7 +438,7 @@ struct MapView: UIViewRepresentable {
                 ///iterate through the routes
                 for route in MapViewAPI.routes {
                     ///extract the route travel time, distance, name and a uniue string from routes and append it to routeData along with unique id and tapped flag set/reset.
-                    routeData.append(RouteData(id: UUID(),travelTime: String(format:"%.0f",(route.expectedTravelTime/60)) + " mins", distance: String(format:"%.1f",Double(route.distance/1000.0)) + " km", title: route.name, tapped: MapViewAPI.routes.firstIndex(of: route) == (MapViewAPI.routes.count - 1) ? true : false, uniqueString: route.polyline.title ?? "n/a"))
+                    routeData.append(RouteData(id: UUID(),travelTime: String(format:"%.0f",(route.expectedTravelTime/60)) + " mins", distance: MapViewAPI.distanceUnit == .miles ? MapViewAPI.convertToMiles(from: route.distance) : String(format:"%.1f",Double(route.distance/1000.0)) + " km", title: route.name, tapped: MapViewAPI.routes.firstIndex(of: route) == (MapViewAPI.routes.count - 1) ? true : false, uniqueString: route.polyline.title ?? "n/a"))
                 }
             }
             ///if the route is tapped

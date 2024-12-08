@@ -38,15 +38,12 @@ struct MapInteractionsView: View {
     ///bounded property stores the location object of the next step.
     @Binding var nextStepLocation: CLLocation?
     ///bounded property stores an array of tuples with a list of instructions and its distances by each step.
-    @Binding var stepInstructions: [(String, Double)]
+    @Binding var stepInstructions: [(String, String)]
     @Binding var ETA: String
     @Binding var isRouteSelectTapped: Bool
     @Binding var tappedAnnotation: MKAnnotation?
     @State private var height = 200.0
- //   var timer: Timer.TimerPublisher
 
-//    var redRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 1, green: 0.4, blue: 0.0), Color(red: 1, green: 0.0, blue: 0.00)]), center: .center, startRadius: 1, endRadius: 50)
-//    var blueRadialGradient = RadialGradient(gradient: Gradient(colors: [Color(red: 0.095, green: 0.716, blue: 0.941), Color(red: 0.092, green: 0.43, blue: 0.89)]), center: .center, startRadius: 1, endRadius: 50)
     var body: some View {
         ///enclose the map interaction views in a vstack and move them to the bottom of the screen.
         VStack(spacing: 0) {

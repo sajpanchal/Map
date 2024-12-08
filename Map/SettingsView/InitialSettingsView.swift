@@ -482,6 +482,8 @@ struct InitialSettingsView: View {
         settings.autoEngineType = engineType.rawValue
         ///set the distance unit  in string format
         settings.distanceUnit = distanceUnit.rawValue
+        ///set the initial distance unit for the MapView API.
+        MapViewAPI.distanceUnit = distanceUnit
         ///set the fuel unit in string format
         settings.fuelVolumeUnit = fuelUnit.rawValue
         ///set the efficiency unit  in string format

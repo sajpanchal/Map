@@ -15,7 +15,7 @@ struct DirectionsView: View {
     @Binding var showDirectionsList: Bool
     @State private var expandedDirectionsViewHeight: CGFloat = 0
     @Binding var nextInstruction: String
-    @Binding var stepInstructions: [(String, Double)]
+    @Binding var stepInstructions: [(String, String)]
     ///locationDataManager is an instance of a class that has a delegate of LocationManager and its methods.
     @StateObject var locationDataManager: LocationDataManager
     var body: some View {

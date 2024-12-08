@@ -381,6 +381,8 @@ struct SettingsView: View {
             settings.first?.fuelEfficiencyUnit =  efficiencyUnits[efficiencyUnitIndex]
             ///store the distance unit from  enum's string value
             settings.first?.distanceUnit = distanceUnit.rawValue
+            ///set the distance unit for MapView API.
+            MapViewAPI.distanceUnit = distanceUnit
             ///store the fuel unit from  enum's string value
             settings.first?.fuelVolumeUnit = fuelUnit.rawValue
             ///store the engine type from  enum's string value

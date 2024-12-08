@@ -30,7 +30,7 @@ struct NavigationRoutesListView: View {
     ///bounded property stores the location object of the next step.
     @Binding var nextStepLocation: CLLocation?
     ///bounded property stores an array of tuples with a list of instructions and its distances by each step.
-    @Binding var stepInstructions: [(String, Double)]
+    @Binding var stepInstructions: [(String, String)]
 
     var body: some View {
         ForEach(routeData.reversed(), id: \.id) { route in

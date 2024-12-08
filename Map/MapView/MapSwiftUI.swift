@@ -10,6 +10,7 @@ import MapKit
 
 ///this view will observe the LocationDataManager and updates the MapViewController if data in Location Manager changes.
 struct Map: View {
+    @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
     ////environment variable to get the color mode of the phone
     @Environment(\.colorScheme) var bgMode: ColorScheme
     ///this will make our MapView update if any @published value in location manager changes.
@@ -44,7 +45,7 @@ struct Map: View {
     ///flag to show/hide the directions list view.
     @State private var showDirectionsList = false
     ///binding this variable of array type to ExpendedDirectionsView.
-    @State private var stepInstructions: [(String, Double)] = []
+    @State private var stepInstructions: [(String, String)] = []
     ///binding thi variable that diplays the arrival time to the destination.
     @State private var ETA: String = ""
     ///flag used to show/hide greetings view.
@@ -120,6 +121,13 @@ struct Map: View {
                         MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeTravelTime: $routeTravelTime, routeData: $routeData, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions, ETA: $ETA, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnoation)
                     }
             }
+                .onAppear {
+                    if let thisSettings = settings.first {
+                        if let thisDistanceUnit = DistanceUnit(rawValue: thisSettings.getDistanceUnit) {
+                            MapViewAPI.distanceUnit = thisDistanceUnit
+                        }
+                    }
+                }
 }
     ///custom function takes the DragGesture value. custom function we calculate the distance of the drag from 2D cooridinates of starting and ennding points. then we check if the distance is more than 10. if so, we undo the user-location re-center button tap.
     func dragGestureAction(value: DragGesture.Value) {
