@@ -80,6 +80,7 @@ struct MapView: UIViewRepresentable {
         var tapGestureRecognizer = UITapGestureRecognizer()
         ///flag that will determine whether mapview was tapped or not
         var isOverlayTapped = false
+        
         init(_ parent: MapView) {
             ///setting a parent property as parent on initialization
             self.parent = parent
@@ -89,7 +90,7 @@ struct MapView: UIViewRepresentable {
             ///set the delegate of the gesture recognizer as the coordinator object itself.
             self.tapGestureRecognizer.delegate = self
         }
-    
+        
         @objc func handleTapGesture() {
             ///get the given route title on tap of mapview that route
             guard let overlay = MapViewAPI.getTappedOvarlay(in: self.mapView, by: tapGestureRecognizer)
@@ -196,9 +197,9 @@ struct MapView: UIViewRepresentable {
                 parent.isRouteSelectTapped = false
                 ///idle in navigation mode.
                 case .idleInNavigation:
+                    parent.animated = false
                     parent.mapViewStatus = .inNavigationNotCentered
                 ///set the animated flag to false so when user centers to current location it won't animate the re-centering of mapcamera operation to avoid consuming time.
-                    parent.animated = false
                     break
                 ///center to user location mode
                 case.centerToUserLocation:
@@ -356,15 +357,16 @@ struct MapView: UIViewRepresentable {
             break
             ///idle in navigation mode.
             case .idleInNavigation:
+            if self.mapViewStatus == .inNavigationNotCentered {
                 DispatchQueue.main.async {
                     self.animated = false
                 }
+            }
                 break
             ///center to user location mode
             case.centerToUserLocation:
                  ///if the status is not updated
-                if self.mapViewStatus != .centeredToUserLocation {
-                  //  print("centered")
+            if self.mapViewStatus != .centeredToUserLocation {                
                     DispatchQueue.main.async {
                         ///zoom the map to user location
                         uiView.animatedZoom(zoomRegion: MKCoordinateRegion(center: uiView.userLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000), duration: TimeInterval(0.1))
@@ -380,6 +382,7 @@ struct MapView: UIViewRepresentable {
                     ///instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
                     ///pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
                     MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: heading, animated: animated)
+                    
                 }
               fallthrough
             

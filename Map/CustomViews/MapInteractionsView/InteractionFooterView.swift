@@ -44,7 +44,7 @@ struct InteractionFooterView: View {
     var body: some View {
         VStack {
             ///if map is navigating
-            if mapViewStatus == .navigating {
+            if mapViewStatus == .navigating || mapViewStatus == .inNavigationNotCentered {
                 ///show the expand symbol on top of the footer view.
                 ExpandViewSymbol()
                     .gesture(

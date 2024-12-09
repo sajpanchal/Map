@@ -72,7 +72,7 @@ struct Map: View {
                     ///disable the mapview when track location button is tapped but tracking is not on yet.
                             .disabled(isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction))
                     ///gesture is a view modifier that can call various intefaces such as DragGesture() to detect the user touch-drag gesture on a given view. each inteface as certain actions to perform. such as onChanged() or onEnded(). Here, drag gesture has onChanged() action that has an associated value holding various data such as location cooridates of starting and ending of touch-drag. we are passing a custom function as a name to onChanged() it will be executed on every change in drag action data. in this
-                        .gesture(DragGesture().onChanged(dragGestureAction))
+                            .simultaneousGesture(DragGesture().onChanged(dragGestureAction).onEnded(dragGestureAction))
                     }
                     .opacity(isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction) ? 0.3 : 1.0)
                     if !isMapInNavigationMode(for: mapViewStatus).0 || isMapViewWaiting(to: .navigate, for: mapViewStatus, in: mapViewAction) {
@@ -145,6 +145,7 @@ struct Map: View {
                 mapViewStatus = .inNavigationNotCentered
                 ///make map to perform idleInNavigation action.
                 mapViewAction = .idleInNavigation
+               
             }
             ///if map is showing directions and if map is not centered.
             else if mapViewStatus == .showingDirections || mapViewStatus == .showingDirectionsNotCentered {

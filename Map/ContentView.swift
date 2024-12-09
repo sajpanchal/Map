@@ -39,6 +39,7 @@ struct ContentView: View {
                     .tabItem {
                         Label("Summary", systemImage: "steeringwheel")
                     }
+                
                     .toolbar(localSearch.status != .localSearchCancelled ? .hidden : .visible, for: .tabBar)
                 
                 SettingsView(locationDataManager: locationDataManager)
@@ -47,6 +48,7 @@ struct ContentView: View {
                     }
                     .toolbar(localSearch.status != .localSearchCancelled ? .hidden : .visible, for: .tabBar)
             }
+           
         }
     }
 }

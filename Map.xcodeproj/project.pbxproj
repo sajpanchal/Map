@@ -247,6 +247,21 @@
 			path = CustomViews;
 			sourceTree = "<group>";
 		};
+		72426BE82D06018B002E49E1 /* DataModel */ = {
+			isa = PBXGroup;
+			children = (
+				722695322C41849E007B200B /* Settings+CoreDataClass.swift */,
+				722695332C41849E007B200B /* Settings+CoreDataProperties.swift */,
+				722695342C41849E007B200B /* AutoFuelling+CoreDataClass.swift */,
+				722695352C41849E007B200B /* AutoFuelling+CoreDataProperties.swift */,
+				722695362C41849E007B200B /* Vehicle+CoreDataClass.swift */,
+				722695372C41849E007B200B /* Vehicle+CoreDataProperties.swift */,
+				722695382C41849E007B200B /* AutoService+CoreDataClass.swift */,
+				722695392C41849E007B200B /* AutoService+CoreDataProperties.swift */,
+			);
+			path = DataModel;
+			sourceTree = "<group>";
+		};
 		725181C72C19F1FC00757DD7 /* DirectionsView */ = {
 			isa = PBXGroup;
 			children = (
@@ -271,14 +286,7 @@
 		726754162A7C004000CE6F46 = {
 			isa = PBXGroup;
 			children = (
-				722695322C41849E007B200B /* Settings+CoreDataClass.swift */,
-				722695332C41849E007B200B /* Settings+CoreDataProperties.swift */,
-				722695342C41849E007B200B /* AutoFuelling+CoreDataClass.swift */,
-				722695352C41849E007B200B /* AutoFuelling+CoreDataProperties.swift */,
-				722695362C41849E007B200B /* Vehicle+CoreDataClass.swift */,
-				722695372C41849E007B200B /* Vehicle+CoreDataProperties.swift */,
-				722695382C41849E007B200B /* AutoService+CoreDataClass.swift */,
-				722695392C41849E007B200B /* AutoService+CoreDataProperties.swift */,
+				72426BE82D06018B002E49E1 /* DataModel */,
 				726754212A7C004000CE6F46 /* Map */,
 				726754322A7C004300CE6F46 /* MapTests */,
 				7267543C2A7C004300CE6F46 /* MapUITests */,
