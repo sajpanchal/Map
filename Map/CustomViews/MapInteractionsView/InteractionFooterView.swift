@@ -196,6 +196,7 @@ struct InteractionFooterView: View {
             routeDistance = ""
             ///keep the destination selected pinned to map.
             localSearch.status = .locationUnselected
+            localSearch.results.removeAll()
             ///remove all the instructions from the array that shows them in a listview.
             stepInstructions.removeAll()
             ///clear the instruction text

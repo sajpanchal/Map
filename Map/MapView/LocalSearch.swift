@@ -18,7 +18,7 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
      var suggestedLocations: [MKAnnotation]?
     ///flag to be set when search request is made and is still under process.
    // @Published var isSearchInProgress = false
-    @Published var status: LocalSearchStatus = .localSearchCancelled
+     @Published var status: LocalSearchStatus = .localSearchCancelled
     ///an instance of MKLocalSearch to generate a search request.
     let request = MKLocalSearch.Request()
     
@@ -42,11 +42,13 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
         request.region = inRegion
         ///set the query fragment for search completer so it can generate the completed search results.
         locationSearchCompleter.queryFragment = searchableText
+        print("query: ", locationSearchCompleter.queryFragment)
         status = .localSearchInProgress
        
         }
     ///when search completer updates the array of completed search for a given searched text this method will be called.
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        print("completer method()")
         if searchableText.isEmpty {
             results.removeAll()
         }
