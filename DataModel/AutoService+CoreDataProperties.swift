@@ -30,7 +30,17 @@ extension AutoService {
     public var getTimeStamp: String {
         timeStamp?.formatted(date: .long, time: .complete) ?? Date().formatted(date: .long, time: .complete)
     }
-
+    public var getShortDateString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+       return formatter.string(from: date ?? Date())
+    }
+    public var getShortDate: Date {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM yyyy"
+        let str = formatter.string(from: date ?? Date())
+        return formatter.date(from: str) ?? Date()
+    }
 }
 
 extension AutoService : Identifiable {

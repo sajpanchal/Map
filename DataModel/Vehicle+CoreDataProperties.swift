@@ -87,7 +87,7 @@ extension Vehicle {
         fuelEfficiency * 0.6214
     }
     
-    public var getBatteryCapacity: Double{
+    public var getBatteryCapacity: Double {
         batteryCapacity == 0.0 ? 40.0 : batteryCapacity
     }
     
@@ -104,7 +104,24 @@ extension Vehicle {
             $0.date! > $1.date!
         }
     }
-    
+    public var getFuellingDates: Set<Date> {
+        let set = fuellings as? Set<AutoFuelling> ?? []
+        var setDates: Set<Date> = []
+        for i in set {
+            setDates.insert(i.getShortDate)
+        }
+        
+        return setDates
+    }
+    public var getServiceDates: Set<Date> {
+        let set = services as? Set<AutoService> ?? []
+        var setDates: Set<Date> = []
+        for i in set {
+            setDates.insert(i.getShortDate)
+        }
+        
+        return setDates
+    }
     public var getServiceCost: Double {
         var cost = 0.0
         let set = services as? Set<AutoService>
