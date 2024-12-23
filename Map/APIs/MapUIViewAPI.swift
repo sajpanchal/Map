@@ -42,12 +42,16 @@ class MapViewAPI {
     static var isRoutesrequestProcessed: Bool = false
     ///array to store the rendered route polyline points at a given step.
     static var polylinePoints: [PolylinePoint] = []
-    static var comment = ""
     ///flag to determine if the rerouting was already performed.
     static var reRouted = false
     ///static variable to store the distance unit.
     static var distanceUnit: DistanceUnit = .km
-    
+    ///static variable to show whether user prefers to avoid highways or not
+    static var avoidHighways: Bool = false
+    ///static variable to show whether user prefers to avoid tolls or not
+    static var avoidTolls: Bool = false
+    ///static variable to show whether request failed to show any routes.
+    static var noRoutesFound: Bool = false
     ///this method will accept the mapView, userLocation class instances. here mapView struct instance as inout parameter. inout parameter allows us to make func parameter mutable i.e. we can change the value of the parameter in a function directly and changes will be reflected outside the function after execution.
     static func setRegionIn(mapView: MKMapView, centeredAt userLocation: MKUserLocation, parent: inout MapView) {
         ///when this function will be called for the very first time, the region property of our mapView struct will be nil.
@@ -130,6 +134,7 @@ class MapViewAPI {
         if !uiView.overlays.isEmpty {
             return
         }
+        
         ///initially set the flag to false before requesting the directions
         isRoutesrequestProcessed = false
         ///create an instance of MKDirections request to request the directions.
@@ -138,12 +143,21 @@ class MapViewAPI {
         guard let destination = destination else {
         return
         }
+        print("GetDirections()")
+        print("avoid tolls: \(avoidTolls)")
+        print("avoid highways: \(avoidHighways)")
+        print("-----------------------")
         ///set the source point of request as a placemark of user location
         request.source = MKMapItem(placemark: MKPlacemark(coordinate: source))
         ///set the destination of the request as a placemark of searched location
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
         ///set the request for alternate routes between 2 places to true to get more than one routes.
         request.requestsAlternateRoutes = true
+        ///set the highway preference for the direction request based on the user's preference.
+        request.highwayPreference = avoidHighways ? .avoid : .any
+        ///set the toll preference for the direction request based on the user's preference.
+        request.tollPreference = avoidTolls ? .avoid : .any
+        print("request toll:\(request.tollPreference.rawValue)")
         ///set the transport type as automobile as default.
         request.transportType = .automobile
         ///create a directions object from our request now.
@@ -157,9 +171,19 @@ class MapViewAPI {
             ///remove all overalys from mapview.
              uiView.removeOverlays(uiView.overlays)
             ///sort the routes recieved from the response with longer travel time first.
-            let sortedRoutes = response.routes.sorted(by: {
+            var sortedRoutes = response.routes.sorted(by: {
                 $0.expectedTravelTime > $1.expectedTravelTime
             })
+            ///if avoiding tolls
+            if avoidTolls {
+                ///remove all routes that have tolls.
+                sortedRoutes.removeAll(where: {$0.hasTolls})
+            }
+            ///if avoiding highways
+            if avoidHighways {
+                ///remove all routes that have highways.
+                sortedRoutes.removeAll(where: {$0.hasHighways})
+            }
             ///set the routes property of MapViewAPI with sorted routes
             routes = sortedRoutes
             ///create a variable to store the array size.
@@ -179,9 +203,14 @@ class MapViewAPI {
                 ///add the polyline received from the route as an overlay to be displayed in mapview.
                uiView.addOverlay(polyline)
             }
-            uiView.setVisibleMapRect(uiView.overlays.first!.boundingMapRect, edgePadding: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5), animated: true)
-        ///set the flag at the end of the request executions
-          isRoutesrequestProcessed = true
+            if let thisOverlay = uiView.overlays.first {
+                uiView.setVisibleMapRect(thisOverlay.boundingMapRect, edgePadding: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5), animated: true)
+                ///set the flag at the end of the request executions
+                  isRoutesrequestProcessed = true
+                print("Direction request complete")
+            }
+            
+       
         })
     }
     
@@ -242,6 +271,25 @@ class MapViewAPI {
       
         ///if there is any route available then get the first one otherwise exit the fuction.
         guard let route = getSelectedRoute(for: mapView) else {
+            if !noRoutesFound {
+                parent.instruction = "Re-calculating the route..."
+                return
+            }
+            if avoidHighways {
+                parent.instruction = "No routes available! Seems like you are already on highway or there are only highway available and you have preferences to avoid them! Try changing your preferences."
+              
+            }
+            if avoidTolls {
+                parent.instruction = "No routes available! Seems like you are already on toll route or there are only toll routes available and you have preferences to avoid them! Try changing your preferences."
+            }
+            else if avoidTolls && avoidHighways {
+                parent.instruction = "No routes available! Seems like you are already on highway or toll route ,or there are only toll routes available and you have preferences to avoid them! Try changing your preferences."
+            }
+            else {
+                parent.instruction = "No routes available! Please search again!"
+            }
+            print("no routes selected!")
+           
             return
         }
         ///if stepinstructions array is empty
@@ -392,7 +440,7 @@ class MapViewAPI {
         /// if user is out of route or thoroughfare
         if isUserOutofRoute {
             ///set the instruction set to be displayed with a warning text.
-            parent.instruction = "Re-calculating the route..."
+            parent.instruction = noRoutesFound ? "No routes available! Please change your route preferences if you want more options." : "Re-calculating the route..."
             ///make throroughfare nil
             parent.locationDataManager.throughfare = nil
             ///method to perform re-routing to the current destination.
@@ -495,6 +543,7 @@ extension MapViewAPI {
         isUserOutofRoute = false
         nextInstructionIndex = 0
         polylinePoints.removeAll()
+        noRoutesFound = false
        
     }
     
@@ -772,7 +821,11 @@ extension MapViewAPI {
         ///set the destination of the request as a placemark of searched location
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
         ///set the request for alternate routes between 2 places to true to get more than one routes.
-        request.requestsAlternateRoutes = false
+        request.requestsAlternateRoutes = true
+        ///set the highway preference of the direction request based on user preferences
+        request.highwayPreference = avoidHighways ? .avoid : .any
+        ///set the toll preference of the direction request based on user preferences
+        request.tollPreference = avoidTolls ? .avoid : .any
         ///set the transport type as automobile as default.
         request.transportType = .automobile
         ///create a directions object from our request now.
@@ -781,20 +834,31 @@ extension MapViewAPI {
         parent.stepInstructions.removeAll()
         ///async function to calculate the routes from information provided by request object of directions object.
         Task {
+            print("inside the task")
             ///calculate the route for a given directions object and check if there is a response
             guard let response = try? await directions.calculate() else {
+                print("unable to calculate directions.")
                 return
             }
+            print("response is available")
             ///if response is there check if there is atleast one route available in the response object.
-            guard let route = response.routes.first else {
-                return
-            }
+            let thisroutes = response.routes.filter({avoidTolls ? !$0.hasTolls : ($0.transportType == .automobile)})
             ///remove all previously fetched routes from the routes array
             routes.removeAll()
+            if thisroutes.isEmpty {
+                print("thisroutes is empty.")
+                noRoutesFound = true
+                return
+            }
             ///add the latest route to the first index of an array.
-            routes.append(route)
+            for route in thisroutes {
+                routes.append(route)
+            }
+           
             ///iterate through the sorted routes.
-            if let route = self.routes.first {
+            if let route = self.routes.first(where: {avoidHighways ? !$0.hasHighways: ($0.transportType == .automobile)}) {
+                print("re-routed route has tolls? \(route.hasTolls)")
+                print("re-routed route has highways? \(route.hasHighways)")
                 ///get the polyline object from current route
                 let polyline = route.polyline
                 let title = polyline.title
@@ -810,7 +874,13 @@ extension MapViewAPI {
                     uiView.addOverlay(polyline)
                 }
             }
+            else {
+                print("routes array is empty")
+                noRoutesFound = true
+                return
+            }
         }
+        
         reRouted = true
     }
 
@@ -964,24 +1034,24 @@ extension MapViewAPI {
                 }
                 ///remove all points from polylinePoints array where distance from userPoint is within rangePreset.
                 polylinePoints.removeAll(where: {$0.point.distance(to: userPoint) <= rangePreset})
-                comment = "Step #\(currentStep) | pts fetched | \(polylinePoints.count)"
+                //comment = "Step #\(currentStep) | pts fetched | \(polylinePoints.count)"
             }
             ///if array is not empty
             else {
                 ///if the point in polyline points is within a range of userLocation
                 if let index = polylinePoints.firstIndex(where: {$0.point.distance(to: userPoint) <= rangePreset}) {
-                    comment = "Step #\(currentStep) | found pt | \(polylinePoints.count)"
+                    //comment = "Step #\(currentStep) | found pt | \(polylinePoints.count)"
                     ///if point is not yet entered by the user and it is within a range
                     if polylinePoints[index].point.distance(to: userPoint) <= exitPreset && !polylinePoints[index].isPointEntered {
                         ///mark that point as entered
                         polylinePoints[index].isPointEntered = true
-                        comment = "Step #\(currentStep) | entered pt | \(polylinePoints.count)"
+                      // comment = "Step #\(currentStep) | entered pt | \(polylinePoints.count)"
                     }
                     ///if the point was already maked as entered and is now out or exit range
                     if polylinePoints[index].point.distance(to: userPoint) >= exitPreset && polylinePoints[index].isPointEntered {
                         ///mark it as exited.
                         polylinePoints[index].isPointExited = true
-                        comment = "Step #\(currentStep) | exited pt | \(polylinePoints.count)"
+                        //comment = "Step #\(currentStep) | exited pt | \(polylinePoints.count)"
                     }
                 }
                 ///else if point is outside the range of the userLocation.
@@ -1000,7 +1070,7 @@ extension MapViewAPI {
                             ///check if the diffrence is above preset and is positive, then re-route
                             if currentDist - prevDist >= Int(changeInDistancePreset)  {
                                 ///
-                                comment = "re-route"
+                               // comment = "re-route"
                                 ///clear instructions
                                 parent.instruction = "Re-calculating the route..."
                                 ///remove all points
@@ -1015,7 +1085,7 @@ extension MapViewAPI {
                                
                                 return
                             }
-                            comment = "Step #\(currentStep) | dist = \(currentDist - prevDist)) | \(polylinePoints.count)"
+                         //   comment = "Step #\(currentStep) | dist = \(currentDist - prevDist)) | \(polylinePoints.count)"
                             ///if the absolute difference between current and previous distance is more than preset
                             if abs(currentDist - prevDist) >= Int(changeInDistancePreset) {
                                 ///transfer the current distance to prev distance

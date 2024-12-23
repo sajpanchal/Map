@@ -66,7 +66,6 @@ struct Map: View {
                         MapView(mapViewAction: $mapViewAction, mapError: $mapError, mapViewStatus: $mapViewStatus,  instruction: $instruction, nextInstruction: $nextInstruction, localSearch: localSearch, locationDataManager: locationDataManager, nextStepLocation: $nextStepLocation, nextStepDistance: $nextStepDistance, routeTravelTime: $routeTravelTime, routeData: $routeData,  routeDistance: $routeDistance, remainingDistance: $remainingDistance, destination: $destination, stepInstructions: $stepInstructions, ETA: $ETA, showGreetings: $showGreetings, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnoation, timeInterval: $timeInterval)
                             .onReceive(timer, perform: { time in
                                 timeInterval.toggle()
-                                print("time")
                                 
                             })
                     ///disable the mapview when track location button is tapped but tracking is not on yet.
@@ -126,6 +125,11 @@ struct Map: View {
                         if let thisDistanceUnit = DistanceUnit(rawValue: thisSettings.getDistanceUnit) {
                             MapViewAPI.distanceUnit = thisDistanceUnit
                         }
+                        MapViewAPI.avoidHighways = thisSettings.avoidHighways
+                        MapViewAPI.avoidTolls = thisSettings.avoidTolls
+                        print("OnAppear()")
+                        print("avoid tolls: \( MapViewAPI.avoidTolls)")
+                        print("avoid highways: \( MapViewAPI.avoidHighways)")
                     }
                 }
 }

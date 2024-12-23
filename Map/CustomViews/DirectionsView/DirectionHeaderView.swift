@@ -48,7 +48,7 @@ struct DirectionHeaderView: View {
                             .foregroundStyle(.gray)
                     }
                     ///show the distance from next step
-                    if !instruction.contains("Re-calculating the route...") {
+                    if !instruction.contains("Re-calculating the route...") && !instruction.contains("No routes available"){
                         Text("\(nextStepDistance)")
                             .padding(.bottom, 5)
                             .font(.title2)
@@ -313,19 +313,22 @@ struct DirectionHeaderView: View {
             return
         }
         ///start voice navigation with the utterance.
-      
-            if directionSign == "arcade.stick" {
-                startVoiceNavigation(with: "In \(utteranceDistance), \(instruction), will arrive.")
-            }
-            else if directionSign == "arcade.stick.and.arrow.right"  {
-                startVoiceNavigation(with: "In \(utteranceDistance), \(instruction), will be on your right.")
-            }
-            else if directionSign == "arcade.stick.and.arrow.left" {
-                startVoiceNavigation(with: "In \(utteranceDistance), \(instruction), will be on your left.")
-            }
-            else {
-                startVoiceNavigation(with: "In \(utteranceDistance), \(instruction)")
-            }
+        if directionSign == "arcade.stick" {
+            startVoiceNavigation(with: "In \(utteranceDistance), \(instruction), will arrive.")
+        }
+        else if directionSign == "arcade.stick.and.arrow.right"  {
+            startVoiceNavigation(with: "In \(utteranceDistance), \(instruction), will be on your right.")
+        }
+        else if directionSign == "arcade.stick.and.arrow.left" {
+            startVoiceNavigation(with: "In \(utteranceDistance), \(instruction), will be on your left.")
+        }
+        else if directionSign == "exclamationmark.triangle" {
+            startVoiceNavigation(with: "\(instruction)")
+        }
+        else {
+            startVoiceNavigation(with: "In \(utteranceDistance), \(instruction)")
+        }
+          
         
     }
     func alertUserWithVoiceNavigation() {

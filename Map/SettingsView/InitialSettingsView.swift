@@ -56,7 +56,10 @@ struct InitialSettingsView: View {
     @State private var textVehicleMake = ""
     ///state variable stores vehicle model in string format
     @State private var textVehicleModel = ""
-    
+    ///state variable to decide whether to avoid highways or not
+    @State private var avoidHighways = false
+    ///state variable to decide whether to avoid tolls or not
+    @State private var avoidTolls = false
     var body: some View {
         NavigationStack {
             ///initial settings form view
@@ -173,6 +176,13 @@ struct InitialSettingsView: View {
                         }
                         .pickerStyle(.segmented)
                     }
+                }
+                ///section for navigation preferences
+                Section(header: Text("Navigation Preferences").fontWeight(.bold)) {
+                    ///toggle switch to avoid tolls
+                    Toggle("Avoid Tolls", isOn: $avoidTolls)
+                    ///toggle switch to avoid highways
+                    Toggle("Avoid Highways", isOn: $avoidHighways)
                 }
                 ///picker for vehicle distance unit selection
                 Section(header: Text("Distance Unit")) {
@@ -476,6 +486,10 @@ struct InitialSettingsView: View {
     func saveSettings(for vehicle: Vehicle) {
         ///create a settings object from viewcontext's settings entity
         let settings = Settings(context: viewContext)
+        ///update the preferences for highways
+        settings.avoidHighways = avoidHighways
+        ///update the preferences for tolls
+        settings.avoidTolls = avoidTolls
         ///assign a current vehicle that is active
         settings.vehicle = vehicle
         ///set the engine type in string format

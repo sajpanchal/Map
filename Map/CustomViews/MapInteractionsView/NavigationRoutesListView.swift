@@ -39,26 +39,48 @@ struct NavigationRoutesListView: View {
                 Spacer()
                 ///enclose the Text and HStack in VStack
                 VStack {
-                    ///show the travel time at the top
-                    Text(route.travelTime)
-                        .fontWeight(.bold)
-                        .font(Font.system(size: 25))
-                        .foregroundStyle(Color(AppColors.invertGreen.rawValue))
-                    ///show the distane and title at the bottom enclosed in HStack
                     HStack {
+                        ///show the travel time at the top
+                        Text(route.travelTime)
+                            .fontWeight(.bold)
+                            .font(Font.system(size: 20))
+                            .foregroundStyle(Color(AppColors.invertGreen.rawValue))
+                            .padding(.trailing, 10)
                         Text(route.distance)
                             .fontWeight(.bold)
-                            .font(Font.system(size: 16))
+                            .font(Font.system(size: 20))
                             .foregroundStyle(Color(AppColors.invertRed.rawValue))
-                        Text("  via")
-                            .fontWeight(.regular)
+                    }
+                    .padding(.bottom, 2)
+                    ///show the distane and title at the bottom enclosed in HStack
+                    HStack {
+                        Image(systemName: "signpost.right.fill")
+                            .fontWeight(.bold)
                             .font(Font.system(size: 16))
                             .foregroundStyle(Color(AppColors.invertSky.rawValue))
                         Text(route.title)
-                            .fontWeight(.bold)
+                            .fontWeight(.regular)
                             .font(Font.system(size: 16))
                             .foregroundStyle(Color(AppColors.invertSky.rawValue))
                     }
+                    .padding(.bottom, 2)
+                        if route.hasTolls {
+                            HStack {
+                                Image(systemName: "dollarsign.square.fill")
+                                    .fontWeight(.bold)
+                                    .font(Font.system(size: 16))
+                                    .foregroundStyle(Color(AppColors.invertPink.rawValue))
+                                Text("Tolls")
+                                    .fontWeight(.regular)
+                                    .font(Font.system(size: 16))
+                                    .foregroundStyle(Color(AppColors.invertPink.rawValue))
+                            }
+                           
+                        }
+                    
+                   
+                   
+                   
                 }
                 Spacer()
                 ///if the route is tapped show the button at the right space in the HStack
@@ -99,6 +121,7 @@ struct NavigationRoutesListView: View {
                
               
             }
+            .padding(.vertical, 10)
             .background(bgMode == .dark ? Color(uiColor: .darkGray) : Color(uiColor: .systemGray5))
             .overlay(Divider().background(bgMode == .dark ? Color(.lightGray) : Color(.gray)), alignment: .bottom)
             .cornerRadius(10)

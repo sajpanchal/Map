@@ -2,7 +2,7 @@
 //  Settings+CoreDataProperties.swift
 //  Map
 //
-//  Created by saj panchal on 2024-07-12.
+//  Created by saj panchal on 2024-12-21.
 //
 //
 
@@ -20,8 +20,9 @@ extension Settings {
     @NSManaged public var distanceUnit: String?
     @NSManaged public var fuelEfficiencyUnit: String?
     @NSManaged public var fuelVolumeUnit: String?
+    @NSManaged public var avoidHighways: Bool
+    @NSManaged public var avoidTolls: Bool
     @NSManaged public var vehicle: Vehicle?
-    
     public var getAutoEngineType: String {
         autoEngineType ?? "n/a"
     }
@@ -43,7 +44,6 @@ extension Settings {
             fatalError(error.localizedDescription)
         }
     }
-
 }
 
 extension Settings : Identifiable {

@@ -16,8 +16,6 @@
 		7222C22A2C1C9D040029E26F /* AddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7222C2292C1C9D040029E26F /* AddressView.swift */; };
 		7223439C2A8FD61F00DC7120 /* MapViewButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7223439B2A8FD61E00DC7120 /* MapViewButton.swift */; };
 		7223439E2A8FD6ED00DC7120 /* MapProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7223439D2A8FD6ED00DC7120 /* MapProgressView.swift */; };
-		7226953A2C41849E007B200B /* Settings+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722695322C41849E007B200B /* Settings+CoreDataClass.swift */; };
-		7226953B2C41849E007B200B /* Settings+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722695332C41849E007B200B /* Settings+CoreDataProperties.swift */; };
 		7226953C2C41849E007B200B /* AutoFuelling+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722695342C41849E007B200B /* AutoFuelling+CoreDataClass.swift */; };
 		7226953D2C41849E007B200B /* AutoFuelling+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722695352C41849E007B200B /* AutoFuelling+CoreDataProperties.swift */; };
 		7226953E2C41849E007B200B /* Vehicle+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722695362C41849E007B200B /* Vehicle+CoreDataClass.swift */; };
@@ -51,6 +49,8 @@
 		727F5E092B34C7C8000ECCB7 /* AddressResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727F5E082B34C7C8000ECCB7 /* AddressResult.swift */; };
 		728181FD2C52A6F400D8F3AA /* VehicleListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728181FC2C52A6F400D8F3AA /* VehicleListItem.swift */; };
 		728237572C14AA7900F91AD8 /* NavigationRoutesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728237562C14AA7900F91AD8 /* NavigationRoutesListView.swift */; };
+		728665BC2D172BFA00BF25B1 /* Settings+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728665BA2D172BFA00BF25B1 /* Settings+CoreDataClass.swift */; };
+		728665BD2D172BFA00BF25B1 /* Settings+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728665BB2D172BFA00BF25B1 /* Settings+CoreDataProperties.swift */; };
 		7286A1472C24804700333A4F /* NewEntryStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7286A1462C24804700333A4F /* NewEntryStackView.swift */; };
 		7286A1492C24813400333A4F /* FuelHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7286A1482C24813400333A4F /* FuelHistoryView.swift */; };
 		7286A14B2C24948100333A4F /* ServiceHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7286A14A2C24948100333A4F /* ServiceHistoryView.swift */; };
@@ -105,8 +105,6 @@
 		7222C2292C1C9D040029E26F /* AddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressView.swift; sourceTree = "<group>"; };
 		7223439B2A8FD61E00DC7120 /* MapViewButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewButton.swift; sourceTree = "<group>"; };
 		7223439D2A8FD6ED00DC7120 /* MapProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapProgressView.swift; sourceTree = "<group>"; };
-		722695322C41849E007B200B /* Settings+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings+CoreDataClass.swift"; sourceTree = "<group>"; };
-		722695332C41849E007B200B /* Settings+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		722695342C41849E007B200B /* AutoFuelling+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoFuelling+CoreDataClass.swift"; sourceTree = "<group>"; };
 		722695352C41849E007B200B /* AutoFuelling+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoFuelling+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		722695362C41849E007B200B /* Vehicle+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Vehicle+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -143,6 +141,8 @@
 		727F5E082B34C7C8000ECCB7 /* AddressResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressResult.swift; sourceTree = "<group>"; };
 		728181FC2C52A6F400D8F3AA /* VehicleListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleListItem.swift; sourceTree = "<group>"; };
 		728237562C14AA7900F91AD8 /* NavigationRoutesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRoutesListView.swift; sourceTree = "<group>"; };
+		728665BA2D172BFA00BF25B1 /* Settings+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings+CoreDataClass.swift"; sourceTree = "<group>"; };
+		728665BB2D172BFA00BF25B1 /* Settings+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Settings+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		7286A1462C24804700333A4F /* NewEntryStackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewEntryStackView.swift; sourceTree = "<group>"; };
 		7286A1482C24813400333A4F /* FuelHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuelHistoryView.swift; sourceTree = "<group>"; };
 		7286A14A2C24948100333A4F /* ServiceHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceHistoryView.swift; sourceTree = "<group>"; };
@@ -250,8 +250,8 @@
 		72426BE82D06018B002E49E1 /* DataModel */ = {
 			isa = PBXGroup;
 			children = (
-				722695322C41849E007B200B /* Settings+CoreDataClass.swift */,
-				722695332C41849E007B200B /* Settings+CoreDataProperties.swift */,
+				728665BA2D172BFA00BF25B1 /* Settings+CoreDataClass.swift */,
+				728665BB2D172BFA00BF25B1 /* Settings+CoreDataProperties.swift */,
 				722695342C41849E007B200B /* AutoFuelling+CoreDataClass.swift */,
 				722695352C41849E007B200B /* AutoFuelling+CoreDataProperties.swift */,
 				722695362C41849E007B200B /* Vehicle+CoreDataClass.swift */,
@@ -578,6 +578,8 @@
 				725110722C25CCA900822837 /* DashGridItemView.swift in Sources */,
 				72BF3DCB2C5152BB005395B4 /* FormButton.swift in Sources */,
 				72B4D2E92C3D8B2800B9F2AD /* AppDataModel.xcdatamodeld in Sources */,
+				728665BC2D172BFA00BF25B1 /* Settings+CoreDataClass.swift in Sources */,
+				728665BD2D172BFA00BF25B1 /* Settings+CoreDataProperties.swift in Sources */,
 				72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */,
 				72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */,
 				72928F9D2C481763007ED736 /* UpdateVehicleView.swift in Sources */,
@@ -587,8 +589,6 @@
 				72B4D2EB2C3D8CE700B9F2AD /* CoreDataStack.swift in Sources */,
 				727996332C1F3EDE00F323B4 /* SettingsView.swift in Sources */,
 				72EDE41B2B26408A00578B8A /* ExpandedDirectionsView.swift in Sources */,
-				7226953A2C41849E007B200B /* Settings+CoreDataClass.swift in Sources */,
-				7226953B2C41849E007B200B /* Settings+CoreDataProperties.swift in Sources */,
 				7226953C2C41849E007B200B /* AutoFuelling+CoreDataClass.swift in Sources */,
 				7226953D2C41849E007B200B /* AutoFuelling+CoreDataProperties.swift in Sources */,
 				7226953E2C41849E007B200B /* Vehicle+CoreDataClass.swift in Sources */,

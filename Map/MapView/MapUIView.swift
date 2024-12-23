@@ -274,7 +274,7 @@ struct MapView: UIViewRepresentable {
                                 mins = mins.truncatingRemainder(dividingBy: 60)
                                 ETA = String(format:"%.0f", hr) + " hr" + " " + String(format:"%.0f", mins) + " mins"
                         }
-                        parent.routeData.append(RouteData(id: UUID(),travelTime: ETA, distance: distanceString, title: route.name , tapped: MapViewAPI.routes.firstIndex(of: route) == (MapViewAPI.routes.count - 1) ? true : false, uniqueString: route.polyline.title ?? "n/a"))
+                        parent.routeData.append(RouteData(id: UUID(),travelTime: ETA, distance: distanceString, title: route.name , tapped: MapViewAPI.routes.firstIndex(of: route) == (MapViewAPI.routes.count - 1) ? true : false, uniqueString: route.polyline.title ?? "n/a", hasTolls: route.hasTolls))
                     }
                 }
                 if parent.isRouteSelectTapped {
@@ -311,12 +311,10 @@ struct MapView: UIViewRepresentable {
         switch mapViewAction {
             ///map in idle mode.
             case .idle:
-          //  print(self.mapViewStatus)
-            
+            self.routeData.removeAll()
                 ///if status is not updated
             if self.mapViewStatus != .idle && self.mapViewStatus != .notCentered {
                     DispatchQueue.main.async {
-                   //     print("reset")
                         ///reset the location tracking
                         if self.localSearch.status != .localSearchCancelled {
                             MapViewAPI.resetLocationTracking(of: uiView, parent: &context.coordinator.parent)
@@ -440,8 +438,18 @@ struct MapView: UIViewRepresentable {
                 if routeData.isEmpty && MapViewAPI.isRoutesrequestProcessed  {
                 ///iterate through the routes
                 for route in MapViewAPI.routes {
+                    var ETA = ""
+                    if route.expectedTravelTime < 3600 {
+                        ETA =  String(format:"%.0f",(route.expectedTravelTime/60)) + " mins"
+                    }
+                    else {
+                            var mins = (route.expectedTravelTime)/60.0
+                            let hr = (mins/60)
+                            mins = mins.truncatingRemainder(dividingBy: 60)
+                            ETA = String(format:"%.0f", hr) + " hr" + " " + String(format:"%.0f", mins) + " mins"
+                    }
                     ///extract the route travel time, distance, name and a uniue string from routes and append it to routeData along with unique id and tapped flag set/reset.
-                    routeData.append(RouteData(id: UUID(),travelTime: String(format:"%.0f",(route.expectedTravelTime/60)) + " mins", distance: MapViewAPI.distanceUnit == .miles ? MapViewAPI.convertToMiles(from: route.distance) : String(format:"%.1f",Double(route.distance/1000.0)) + " km", title: route.name, tapped: MapViewAPI.routes.firstIndex(of: route) == (MapViewAPI.routes.count - 1) ? true : false, uniqueString: route.polyline.title ?? "n/a"))
+                    routeData.append(RouteData(id: UUID(),travelTime: ETA, distance: MapViewAPI.distanceUnit == .miles ? MapViewAPI.convertToMiles(from: route.distance) : String(format:"%.1f",Double(route.distance/1000.0)) + " km", title: route.name, tapped: MapViewAPI.routes.firstIndex(of: route) == (MapViewAPI.routes.count - 1) ? true : false, uniqueString: route.polyline.title ?? "n/a", hasTolls: route.hasTolls))
                 }
             }
             ///if the route is tapped
@@ -482,7 +490,11 @@ extension MapView {
             break
         case .localSearchCancelled:
             DispatchQueue.main.async {
+                self.localSearch.suggestedLocations = nil
                 self.tappedAnnotation = nil
+                self.mapViewAction = .idle
+                self.mapViewStatus = .notCentered
+                self.routeData.removeAll()
                ///remove the annotations
                uiView.removeAnnotations(uiView.annotations)
                ///remove the overlays
@@ -533,10 +545,7 @@ extension MapView {
             }
             else {
                 for searchedLocation in locations {
-               
-                        MapViewAPI.annotateLocations(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
-                    
-                    
+                    MapViewAPI.annotateLocations(in: uiView, at: searchedLocation.coordinate, for: searchedLocation)
                 }
             }
             if !uiView.overlays.isEmpty {

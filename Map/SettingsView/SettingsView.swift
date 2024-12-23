@@ -36,6 +36,10 @@ struct SettingsView: View {
     @State private var showAddVehicleForm = false
     ///flag to show the auto garage view.
     @State private var showGarage = false
+    ///flag to show if preference is set to avoid highways
+    @State private var avoidHighways = false
+    ///flag to show if preference is set to avoid tolls
+    @State private var avoidTolls = false
     ///array of colors
     var colors = [AppColors.invertPink.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue]
     var body: some View {
@@ -103,6 +107,13 @@ struct SettingsView: View {
                         }
                     }
                     .pickerStyle(.inline)
+                ///section for navigation preferences
+                Section(header: Text("Navigation Preferences").fontWeight(.bold)) {
+                    ///toggle switch to avoid tolls
+                    Toggle("Avoid Tolls", isOn: $avoidTolls)
+                    ///toggle switch to avoid highways
+                    Toggle("Avoid Highways", isOn: $avoidHighways)
+                }
                 ///picker for selecting distnace unit
                 Section(header: Text("Distance Unit").fontWeight(.bold)) {
                     Picker("Select Unit", selection: $distanceUnit) {
@@ -370,6 +381,12 @@ struct SettingsView: View {
             fuelUnit = FuelUnit(rawValue: thisSetting.getFuelVolumeUnit) ?? .Litre
             ///get the enum value of the engine type of the corresponding engine type saved in the settings and assign it to the state variable
             engineType = EngineType(rawValue: thisSetting.getAutoEngineType) ?? .Gas
+            avoidHighways = thisSetting.avoidHighways
+            avoidTolls = thisSetting.avoidTolls
+            print("LoadSettings()")
+            print("avoid tolls: \(avoidTolls)")
+            print("avoid highways: \(avoidHighways)")
+            print("-----------------------")
         }
     }
     
@@ -377,6 +394,10 @@ struct SettingsView: View {
     func saveSettings() {
         ///if the first element of the settings entity is not nil
         if settings.first != nil {
+            ///update the settings for avoid highway preference
+            settings.first?.avoidHighways = avoidHighways
+            ///update the settings for avoid toll preference
+            settings.first?.avoidTolls = avoidTolls
             ///store the efficiency unit from the array
             settings.first?.fuelEfficiencyUnit =  efficiencyUnits[efficiencyUnitIndex]
             ///store the distance unit from  enum's string value
@@ -391,6 +412,10 @@ struct SettingsView: View {
             settings.first?.vehicle = vehicle
             ///save the records to the entity to the viewcontext parent store.
             Settings.saveContext(viewContext: viewContext)
+            print("SaveSettings()")
+            print("avoid tolls: \(settings.first?.avoidTolls)")
+            print("avoid highways: \( settings.first?.avoidHighways)")
+            print("-----------------------")
         }
     }
     

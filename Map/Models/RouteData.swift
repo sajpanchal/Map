@@ -14,4 +14,5 @@ struct RouteData: Identifiable, Equatable {
     var title: String = ""
     var tapped: Bool = false
     var uniqueString : String = ""
+    var hasTolls: Bool = false
 }

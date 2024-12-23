@@ -79,7 +79,7 @@ func getDirectionSign(for step: String) -> String? {
         return "arcade.stick.and.arrow.left"
     }
     ///if there is no match then return nil
-    else if instruction.contains("re-calculating the route..."){
+    else if instruction.contains("re-calculating the route...") || instruction.contains("no routes available"){
         return "exclamationmark.triangle"
     }
     else {
@@ -133,9 +133,9 @@ func isMapViewWaiting(to action: MapViewAction, for status: MapViewStatus, in ac
         ///check if the status is not yet inNavigationNotCentered when actual action is idleInNavigation
         return (status != .inNavigationNotCentered && actualAction == .idleInNavigation)
         ///checking for show directions action
-    case .showDirections:
+    case .showDirections:      
         ///check if the status is not yet showingDirections when actual action is showDirections
-        return (status != .showingDirections && actualAction == .showDirections)
+        return (actualAction == .showDirections && !MapViewAPI.isRoutesrequestProcessed)
         ///checking for idleInShowDirections action
     case .idleInshowDirections:
         ///check if the status is not yet showingDirectionsNotCentered when actual action is idleInshowDirections
