@@ -58,6 +58,7 @@
 		72928F9B2C481548007ED736 /* GarageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72928F9A2C481548007ED736 /* GarageView.swift */; };
 		72928F9D2C481763007ED736 /* UpdateVehicleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72928F9C2C481763007ED736 /* UpdateVehicleView.swift */; };
 		7295B88C2CE3AFCE00E9959A /* SpeechViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7295B88B2CE3AFCE00E9959A /* SpeechViewModel.swift */; };
+		729892EE2D1A651C0061CA96 /* AlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729892ED2D1A651C0061CA96 /* AlertView.swift */; };
 		72A6D14F2BD01B8000A33A0A /* PolylinePoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */; };
 		72A8BC242C29C3F600E0D7B2 /* AutoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A8BC232C29C3F600E0D7B2 /* AutoService.swift */; };
 		72A8BC262C29C7EB00E0D7B2 /* ServiceEntryForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */; };
@@ -150,6 +151,7 @@
 		72928F9A2C481548007ED736 /* GarageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarageView.swift; sourceTree = "<group>"; };
 		72928F9C2C481763007ED736 /* UpdateVehicleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateVehicleView.swift; sourceTree = "<group>"; };
 		7295B88B2CE3AFCE00E9959A /* SpeechViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechViewModel.swift; sourceTree = "<group>"; };
+		729892ED2D1A651C0061CA96 /* AlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertView.swift; sourceTree = "<group>"; };
 		72A6D14E2BD01B8000A33A0A /* PolylinePoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolylinePoint.swift; sourceTree = "<group>"; };
 		72A8BC232C29C3F600E0D7B2 /* AutoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoService.swift; sourceTree = "<group>"; };
 		72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceEntryForm.swift; sourceTree = "<group>"; };
@@ -235,14 +237,7 @@
 				7222C2262C1C98740029E26F /* MapInteractionsView */,
 				725181C82C19F23A00757DD7 /* Buttons */,
 				725181C72C19F1FC00757DD7 /* DirectionsView */,
-				7223439D2A8FD6ED00DC7120 /* MapProgressView.swift */,
-				72EDE4152B26334E00578B8A /* ExpandViewSymbol.swift */,
-				728A7CA52B90F282003AA218 /* GreetingsView.swift */,
-				72BF3DCC2C5153A9005395B4 /* AddCarImage.swift */,
-				72BF3DCE2C5157CD005395B4 /* CustomListView.swift */,
-				728181FC2C52A6F400D8F3AA /* VehicleListItem.swift */,
-				7274A4E42C8B559B00C929CC /* NetworkAlertView.swift */,
-				7274A4E62C8B566F00C929CC /* SearchProgressView.swift */,
+				729892EA2D1A64E70061CA96 /* Misc */,
 			);
 			path = CustomViews;
 			sourceTree = "<group>";
@@ -383,6 +378,22 @@
 				72928F9C2C481763007ED736 /* UpdateVehicleView.swift */,
 			);
 			path = SettingsView;
+			sourceTree = "<group>";
+		};
+		729892EA2D1A64E70061CA96 /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				7223439D2A8FD6ED00DC7120 /* MapProgressView.swift */,
+				72EDE4152B26334E00578B8A /* ExpandViewSymbol.swift */,
+				728A7CA52B90F282003AA218 /* GreetingsView.swift */,
+				72BF3DCC2C5153A9005395B4 /* AddCarImage.swift */,
+				72BF3DCE2C5157CD005395B4 /* CustomListView.swift */,
+				728181FC2C52A6F400D8F3AA /* VehicleListItem.swift */,
+				7274A4E42C8B559B00C929CC /* NetworkAlertView.swift */,
+				7274A4E62C8B566F00C929CC /* SearchProgressView.swift */,
+				729892ED2D1A651C0061CA96 /* AlertView.swift */,
+			);
+			path = Misc;
 			sourceTree = "<group>";
 		};
 		72C5E9A32B36072600B8C0E4 /* APIs */ = {
@@ -593,6 +604,7 @@
 				7226953D2C41849E007B200B /* AutoFuelling+CoreDataProperties.swift in Sources */,
 				7226953E2C41849E007B200B /* Vehicle+CoreDataClass.swift in Sources */,
 				7226953F2C41849E007B200B /* Vehicle+CoreDataProperties.swift in Sources */,
+				729892EE2D1A651C0061CA96 /* AlertView.swift in Sources */,
 				722695402C41849E007B200B /* AutoService+CoreDataClass.swift in Sources */,
 				722695412C41849E007B200B /* AutoService+CoreDataProperties.swift in Sources */,
 				72A8BC242C29C3F600E0D7B2 /* AutoService.swift in Sources */,
@@ -776,7 +788,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.25;
+				MARKETING_VERSION = 1.3.26;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MyMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -814,7 +826,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.25;
+				MARKETING_VERSION = 1.3.26;
 				PRODUCT_BUNDLE_IDENTIFIER = com.SajPanchal.MyMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

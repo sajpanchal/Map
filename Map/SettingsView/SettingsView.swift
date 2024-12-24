@@ -40,288 +40,304 @@ struct SettingsView: View {
     @State private var avoidHighways = false
     ///flag to show if preference is set to avoid tolls
     @State private var avoidTolls = false
+    @State private var showAlert = false
     ///array of colors
     var colors = [AppColors.invertPink.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue]
     var body: some View {
-    
-        NavigationStack {
-            Form {
-                ///button to access the garage screen
-                VStack {
-                    Button(action: {
-                        showGarage = true
-                    }, label: {
-                        FormButton(imageName:  "door.garage.double.bay.closed", text: "My Garage", color: Color(AppColors.red.rawValue))
-                        })
-                    .background(Color(AppColors.invertRed.rawValue))
-                    .tint(Color(AppColors.invertRed.rawValue))
-                    .buttonStyle(BorderlessButtonStyle())
-                    .cornerRadius(100)
-                    ///if the button is tapped the flag will be set and it will show the content which is garageview.
-                    .sheet(isPresented: $showGarage,  content: {
-                        GarageView(locationDataManager: locationDataManager, showGarage: $showGarage)
-                    })
-                }
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-               
-                    ///picker for vehicles.
-                    Picker(selection: $vehicle) {
-                        ///iist of vehciles
-                        List {
-                            ///iterate through the all vehicles uniquely identified by this ID.
-                            ForEach(vehicles, id: \.uniqueID) { thisVehicle in
-                                VStack {
-                                    Text(thisVehicle.getVehicleText + " " + "(" + thisVehicle.getFuelEngine + " Engine)").tag(thisVehicle)
+       
+            
+            NavigationStack {
+                ZStack {
+                    VStack {
+                        Form {
+                            ///button to access the garage screen
+                            VStack {
+                                Button(action: {
+                                    showGarage = true
+                                }, label: {
+                                    FormButton(imageName:  "door.garage.double.bay.closed", text: "My Garage", color: Color(AppColors.red.rawValue))
+                                    })
+                                .background(Color(AppColors.invertRed.rawValue))
+                                .tint(Color(AppColors.invertRed.rawValue))
+                                .buttonStyle(BorderlessButtonStyle())
+                                .cornerRadius(100)
+                                ///if the button is tapped the flag will be set and it will show the content which is garageview.
+                                .sheet(isPresented: $showGarage,  content: {
+                                    GarageView(locationDataManager: locationDataManager, showGarage: $showGarage)
+                                })
+                            }
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
+                           
+                                ///picker for vehicles.
+                                Picker(selection: $vehicle) {
+                                    ///iist of vehciles
+                                    List {
+                                        ///iterate through the all vehicles uniquely identified by this ID.
+                                        ForEach(vehicles, id: \.uniqueID) { thisVehicle in
+                                            VStack {
+                                                Text(thisVehicle.getVehicleText + " " + "(" + thisVehicle.getFuelEngine + " Engine)").tag(thisVehicle)
+                                                    .fontWeight(.bold)
+                                                    .font(Font.system(size: 18))
+                                                    .foregroundStyle(Color(colors[vehicles.firstIndex(where: {$0 == thisVehicle}) ?? 0]))
+                                                Text(thisVehicle.getYear).tag(thisVehicle)
+                                                    .fontWeight(.semibold)
+                                                    .font(Font.system(size: 14))
+                                                    .foregroundStyle(Color.gray)
+                                            }
+                                            ///assign a unique tag to this view for a given vehicle so it can be identified on tap.
+                                            .tag(thisVehicle)
+                                        }
+                                    }
+                                }
+                                ///creater the label of the picker with a pre-defined text
+                                label: {
+                                    Text("Vehicle Selection")
                                         .fontWeight(.bold)
-                                        .font(Font.system(size: 18))
-                                        .foregroundStyle(Color(colors[vehicles.firstIndex(where: {$0 == thisVehicle}) ?? 0]))
-                                    Text(thisVehicle.getYear).tag(thisVehicle)
-                                        .fontWeight(.semibold)
-                                        .font(Font.system(size: 14))
-                                        .foregroundStyle(Color.gray)
                                 }
-                                ///assign a unique tag to this view for a given vehicle so it can be identified on tap.
-                                .tag(thisVehicle)
-                            }
-                        }
-                    }
-                    ///creater the label of the picker with a pre-defined text
-                    label: {
-                        Text("Vehicle Selection")
-                            .fontWeight(.bold)
-                    }
-                ///on change of the vehicle selection change the fuel type value
-                    .onChange(of: vehicle.id) {
-                        engineType = EngineType(rawValue: vehicle.fuelEngine ?? "Gas") ?? .Gas
-                        fuelMode = (engineType == .EV) ? .EV : .Gas
-                        ///on change of vehicle, if given vehicle is EV type
-                        if engineType == .EV {
-                            ///set fuel unit to percent
-                            fuelUnit = .Percent
-                        }
-                        ///if vehicle is gas engine type
-                        else {
-                            ///set fuel unit to litre
-                            fuelUnit = .Litre
-                        }
-                    }
-                    .pickerStyle(.inline)
-                ///section for navigation preferences
-                Section(header: Text("Navigation Preferences").fontWeight(.bold)) {
-                    ///toggle switch to avoid tolls
-                    Toggle("Avoid Tolls", isOn: $avoidTolls)
-                    ///toggle switch to avoid highways
-                    Toggle("Avoid Highways", isOn: $avoidHighways)
-                }
-                ///picker for selecting distnace unit
-                Section(header: Text("Distance Unit").fontWeight(.bold)) {
-                    Picker("Select Unit", selection: $distanceUnit) {
-                        ForEach(DistanceUnit.allCases) { thisDistanceUnit in
-                            Text(thisDistanceUnit.rawValue.capitalized)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                }
-                ///if fuel engine is hybrid type
-                if engineType == .Hybrid {
-                    ///show picker to select engine mode
-                    Section(header: Text("Engine Type").fontWeight(.bold)) {
-                        Picker("Select Type", selection: $fuelMode) {
-                            ForEach(FuelMode.allCases) { thisFuelType in
-                                Text(thisFuelType.rawValue.capitalized)
-                            }
-                        }
-                        ///on change of fuel mode
-                        .onChange(of: fuelMode) {
-                            ///if fuel mode is set to EV
-                            if fuelMode == .EV {
-                                ///set fuel unit to percent
-                                fuelUnit = .Percent
-                            }
-                            ///else if fuel mode is set to gas
-                            else {
-                                ///set fuel unit to litre
-                                fuelUnit = .Litre
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                    }
-                }
-                ///if vehciles record is not empty
-                if !vehicles.isEmpty {
-                    ///if the vehicle type is gas or hybrid
-                    if fuelMode == .Gas {
-                        ///picker for fuel unit selection
-                        Section(header: Text("Fuel Volume Unit").fontWeight(.bold)) {
-                            Picker("Select Unit", selection: $fuelUnit) {
-                                ForEach(FuelUnit.allCases) { thisVolumeUnit in
-                                    ///if fuel unit is not percent
-                                    if thisVolumeUnit != .Percent {
-                                        Text(thisVolumeUnit.rawValue.capitalized)
+                            ///on change of the vehicle selection change the fuel type value
+                                .onChange(of: vehicle.id) {
+                                    engineType = EngineType(rawValue: vehicle.fuelEngine ?? "Gas") ?? .Gas
+                                    fuelMode = (engineType == .EV) ? .EV : .Gas
+                                    ///on change of vehicle, if given vehicle is EV type
+                                    if engineType == .EV {
+                                        ///set fuel unit to percent
+                                        fuelUnit = .Percent
+                                    }
+                                    ///if vehicle is gas engine type
+                                    else {
+                                        ///set fuel unit to litre
+                                        fuelUnit = .Litre
                                     }
                                 }
+                                .pickerStyle(.inline)
+                            ///section for navigation preferences
+                            Section(header: Text("Navigation Preferences").fontWeight(.bold)) {
+                                ///toggle switch to avoid tolls
+                                Toggle("Avoid Tolls", isOn: $avoidTolls)
+                                ///toggle switch to avoid highways
+                                Toggle("Avoid Highways", isOn: $avoidHighways)
                             }
-                            .pickerStyle(.segmented)
-                        }
-                        ///picker for fuel efficiency unit selection
-                        Section(header: Text("Fuel Efficiency Unit").fontWeight(.bold)) {
-                            ///if fuel unit is selected to litre
-                            if fuelUnit == .Litre {
-                                ///if the distance unit is selected to km
-                                if distanceUnit == .km {
-                                    ///show picker with options having an efficiency combination of  km and litre
-                                    Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                        ForEach(efficiencyUnits.indices, id: \.self) { index in
-                                            if index < 2 {
-                                                Text(efficiencyUnits[index])
-                                            }
-                                        }
-                                    }
-                                    ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
-                                    .onAppear(perform: {
-                                        efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 0 : 1
-                                    })
-                                    .pickerStyle(.segmented)
-                                }
-                                ///if the distance unit is in miltes
-                                else {
-                                    Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                        ForEach(efficiencyUnits.indices, id: \.self) { index in
-                                            if index > 1 && index < 4 {
-                                                Text(efficiencyUnits[index])
-                                            }
-                                        }
-                                    }
-                                    ///on appear of this picker set the efficiency unit index to 2 if previous index is multiple of 2 or 3.
-                                    .onAppear(perform: {
-                                        efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 2 : 3
-                                    })
-                                    .pickerStyle(.segmented)
-                                }
-                            }
-                            ///if fuel unit is selected to gallon
-                            else if fuelUnit == .Gallon {
-                                ///if the distance unit is selected to km
-                                if distanceUnit == .km {
-                                    Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                        ForEach(efficiencyUnits.indices, id: \.self) { index in
-                                            if index > 3 && index < 6 {
-                                                Text(efficiencyUnits[index])
-                                            }
-                                        }
-                                    }
-                                    ///on appear of this picker set the efficiency unit index to 2 if previous index is multiple of 4 or 5.
-                                    .onAppear(perform: {
-                                        efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 4 : 5
-                                    })
-                                    .pickerStyle(.segmented)
-                                }
-                                ///if the distance unit is selected to miles
-                                else {
-                                    Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                        ForEach(efficiencyUnits.indices, id: \.self) {index in
-                                            if index > 5 && index < 8 {
-                                                Text(efficiencyUnits[index])
-                                            }
-                                        }
-                                    }
-                                    ///on appear of this picker set the efficiency unit index to 2 if previous index is multiple of 6 or 7.
-                                    .onAppear(perform: {
-                                        efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 6 : 7
-                                    })
-                                    .pickerStyle(.segmented)
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        ///picker for fuel unit selection
-                        Section(header: Text("Fuel Volume Unit").fontWeight(.bold)) {
-                            Picker("Select Unit", selection: $fuelUnit) {
-                                ForEach(FuelUnit.allCases) { thisVolumeUnit in
-                                    ///if the fuel unit is percent
-                                    if thisVolumeUnit == .Percent {
-                                        Text(thisVolumeUnit.rawValue.capitalized)
+                            ///picker for selecting distnace unit
+                            Section(header: Text("Distance Unit").fontWeight(.bold)) {
+                                Picker("Select Unit", selection: $distanceUnit) {
+                                    ForEach(DistanceUnit.allCases) { thisDistanceUnit in
+                                        Text(thisDistanceUnit.rawValue.capitalized)
                                     }
                                 }
-                            }
-                            .pickerStyle(.segmented)
-                        }
-                        ///section to select the fuel efficiency unit.
-                        Section(header: Text("Fuel Efficiency Unit").fontWeight(.bold)) {
-                            ///if the distance unit is in km.
-                            if distanceUnit == .km {
-                                ///show units for km
-                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                    ForEach(efficiencyUnits.indices, id: \.self) { index in
-                                        if index == 8 {
-                                            Text(efficiencyUnits[index])
-                                        }
-                                    }
-                                }
-                                ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
-                                .onAppear(perform: {
-                                    efficiencyUnitIndex = 8
-                                })
                                 .pickerStyle(.segmented)
                             }
-                            ///if the distance unit is in miles
-                            else {
-                                ///show units for miles
-                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                    ForEach(efficiencyUnits.indices, id: \.self) {index in
-                                        if index == 9 {
-                                            Text(efficiencyUnits[index])
+                            ///if fuel engine is hybrid type
+                            if engineType == .Hybrid {
+                                ///show picker to select engine mode
+                                Section(header: Text("Engine Type").fontWeight(.bold)) {
+                                    Picker("Select Type", selection: $fuelMode) {
+                                        ForEach(FuelMode.allCases) { thisFuelType in
+                                            Text(thisFuelType.rawValue.capitalized)
+                                        }
+                                    }
+                                    ///on change of fuel mode
+                                    .onChange(of: fuelMode) {
+                                        ///if fuel mode is set to EV
+                                        if fuelMode == .EV {
+                                            ///set fuel unit to percent
+                                            fuelUnit = .Percent
+                                        }
+                                        ///else if fuel mode is set to gas
+                                        else {
+                                            ///set fuel unit to litre
+                                            fuelUnit = .Litre
+                                        }
+                                    }
+                                    .pickerStyle(.segmented)
+                                }
+                            }
+                            ///if vehciles record is not empty
+                            if !vehicles.isEmpty {
+                                ///if the vehicle type is gas or hybrid
+                                if fuelMode == .Gas {
+                                    ///picker for fuel unit selection
+                                    Section(header: Text("Fuel Volume Unit").fontWeight(.bold)) {
+                                        Picker("Select Unit", selection: $fuelUnit) {
+                                            ForEach(FuelUnit.allCases) { thisVolumeUnit in
+                                                ///if fuel unit is not percent
+                                                if thisVolumeUnit != .Percent {
+                                                    Text(thisVolumeUnit.rawValue.capitalized)
+                                                }
+                                            }
+                                        }
+                                        .pickerStyle(.segmented)
+                                    }
+                                    ///picker for fuel efficiency unit selection
+                                    Section(header: Text("Fuel Efficiency Unit").fontWeight(.bold)) {
+                                        ///if fuel unit is selected to litre
+                                        if fuelUnit == .Litre {
+                                            ///if the distance unit is selected to km
+                                            if distanceUnit == .km {
+                                                ///show picker with options having an efficiency combination of  km and litre
+                                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                                    ForEach(efficiencyUnits.indices, id: \.self) { index in
+                                                        if index < 2 {
+                                                            Text(efficiencyUnits[index])
+                                                        }
+                                                    }
+                                                }
+                                                ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                                .onAppear(perform: {
+                                                    efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 0 : 1
+                                                })
+                                                .pickerStyle(.segmented)
+                                            }
+                                            ///if the distance unit is in miltes
+                                            else {
+                                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                                    ForEach(efficiencyUnits.indices, id: \.self) { index in
+                                                        if index > 1 && index < 4 {
+                                                            Text(efficiencyUnits[index])
+                                                        }
+                                                    }
+                                                }
+                                                ///on appear of this picker set the efficiency unit index to 2 if previous index is multiple of 2 or 3.
+                                                .onAppear(perform: {
+                                                    efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 2 : 3
+                                                })
+                                                .pickerStyle(.segmented)
+                                            }
+                                        }
+                                        ///if fuel unit is selected to gallon
+                                        else if fuelUnit == .Gallon {
+                                            ///if the distance unit is selected to km
+                                            if distanceUnit == .km {
+                                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                                    ForEach(efficiencyUnits.indices, id: \.self) { index in
+                                                        if index > 3 && index < 6 {
+                                                            Text(efficiencyUnits[index])
+                                                        }
+                                                    }
+                                                }
+                                                ///on appear of this picker set the efficiency unit index to 2 if previous index is multiple of 4 or 5.
+                                                .onAppear(perform: {
+                                                    efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 4 : 5
+                                                })
+                                                .pickerStyle(.segmented)
+                                            }
+                                            ///if the distance unit is selected to miles
+                                            else {
+                                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                                    ForEach(efficiencyUnits.indices, id: \.self) {index in
+                                                        if index > 5 && index < 8 {
+                                                            Text(efficiencyUnits[index])
+                                                        }
+                                                    }
+                                                }
+                                                ///on appear of this picker set the efficiency unit index to 2 if previous index is multiple of 6 or 7.
+                                                .onAppear(perform: {
+                                                    efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 6 : 7
+                                                })
+                                                .pickerStyle(.segmented)
+                                            }
                                         }
                                     }
                                 }
-                                ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
-                                .onAppear(perform: {
-                                    efficiencyUnitIndex = 9
-                                })
-                                .pickerStyle(.segmented)
-                        }
+                                else {
+                                    ///picker for fuel unit selection
+                                    Section(header: Text("Fuel Volume Unit").fontWeight(.bold)) {
+                                        Picker("Select Unit", selection: $fuelUnit) {
+                                            ForEach(FuelUnit.allCases) { thisVolumeUnit in
+                                                ///if the fuel unit is percent
+                                                if thisVolumeUnit == .Percent {
+                                                    Text(thisVolumeUnit.rawValue.capitalized)
+                                                }
+                                            }
+                                        }
+                                        .pickerStyle(.segmented)
+                                    }
+                                    ///section to select the fuel efficiency unit.
+                                    Section(header: Text("Fuel Efficiency Unit").fontWeight(.bold)) {
+                                        ///if the distance unit is in km.
+                                        if distanceUnit == .km {
+                                            ///show units for km
+                                            Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                                ForEach(efficiencyUnits.indices, id: \.self) { index in
+                                                    if index == 8 {
+                                                        Text(efficiencyUnits[index])
+                                                    }
+                                                }
+                                            }
+                                            ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                            .onAppear(perform: {
+                                                efficiencyUnitIndex = 8
+                                            })
+                                            .pickerStyle(.segmented)
+                                        }
+                                        ///if the distance unit is in miles
+                                        else {
+                                            ///show units for miles
+                                            Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                                ForEach(efficiencyUnits.indices, id: \.self) {index in
+                                                    if index == 9 {
+                                                        Text(efficiencyUnits[index])
+                                                    }
+                                                }
+                                            }
+                                            ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                            .onAppear(perform: {
+                                                efficiencyUnitIndex = 9
+                                            })
+                                            .pickerStyle(.segmented)
+                                    }
+                                    }
+                                }
+                            }
+                            ///vstack enclosing the form submit button
+                            VStack {
+                                Button {
+                                   
+                                    ///on tap update the active vehicle
+                                    updateActiveVehicle()
+                                    ///on tap save settings
+                                    saveSettings()
+                                } label: {
+                                    FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.blueColor.rawValue))
+                                }
+                                .background(Color(AppColors.invertBlueColor.rawValue))
+                                .buttonStyle(BorderlessButtonStyle())
+                                .cornerRadius(100)
+                            }
+                            ///remove the list row color of the form
+                            .listRowBackground(Color.clear)
+                            ///apply the insets up to the edge of the screen.
+                            .listRowInsets(EdgeInsets())
                         }
                     }
+                    if showAlert {
+                        AlertView(image: "checkmark.icloud", headline: "settings saved!", bgcolor: Color(AppColors.invertBlueColor.rawValue), showAlert: $showAlert)
+                    }
                 }
-                ///vstack enclosing the form submit button
-                VStack {
+              
+                  
+                
+             
+                ///apply the tint color the the view.
+                .tint(Color(AppColors.invertBlueColor.rawValue))
+                .navigationTitle("Settings")
+                ///create a form toolbar to be appear on top right corner and add a button to it.
+                .toolbar {
                     Button {
-                        ///on tap update the active vehicle
-                        updateActiveVehicle()
-                        ///on tap save settings
-                        saveSettings()
-                    } label: {
-                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.blueColor.rawValue))
+                        showAddVehicleForm.toggle()
                     }
-                    .background(Color(AppColors.invertBlueColor.rawValue))
-                    .buttonStyle(BorderlessButtonStyle())
-                    .cornerRadius(100)
+                    label: {
+                     AddCarImage()
+                    }
+                    ///on tap of the button, flag will be true and content (AddVehicleForm) will appear.
+                    .sheet(isPresented: $showAddVehicleForm, content: {
+                        AddVehicleForm(vehicle: $vehicle, showAddVehicleForm: $showAddVehicleForm, locationDataManager: locationDataManager)
+                    })
+                    .padding(.top, 10)
                 }
-                ///remove the list row color of the form
-                .listRowBackground(Color.clear)
-                ///apply the insets up to the edge of the screen.
-                .listRowInsets(EdgeInsets())
             }
-            ///apply the tint color the the view.
-            .tint(Color(AppColors.invertBlueColor.rawValue))
-            .navigationTitle("Settings")
-            ///create a form toolbar to be appear on top right corner and add a button to it.
-            .toolbar {
-                Button {
-                    showAddVehicleForm.toggle()
-                }
-                label: {
-                 AddCarImage()
-                }
-                ///on tap of the button, flag will be true and content (AddVehicleForm) will appear.
-                .sheet(isPresented: $showAddVehicleForm, content: {
-                    AddVehicleForm(vehicle: $vehicle, showAddVehicleForm: $showAddVehicleForm, locationDataManager: locationDataManager)
-                })
-                .padding(.top, 10)
-            }
-        }
+        
+      
         ///on appear get the active vehicle and load the latest settings.
         .onAppear{
             getActiveVehicle()
@@ -412,6 +428,9 @@ struct SettingsView: View {
             settings.first?.vehicle = vehicle
             ///save the records to the entity to the viewcontext parent store.
             Settings.saveContext(viewContext: viewContext)
+            withAnimation(.easeIn(duration: 0.5)) {
+                showAlert = true
+            }
             print("SaveSettings()")
             print("avoid tolls: \(settings.first?.avoidTolls)")
             print("avoid highways: \( settings.first?.avoidHighways)")

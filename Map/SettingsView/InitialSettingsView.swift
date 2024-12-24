@@ -60,363 +60,373 @@ struct InitialSettingsView: View {
     @State private var avoidHighways = false
     ///state variable to decide whether to avoid tolls or not
     @State private var avoidTolls = false
+    @State private var showAlert = false
     var body: some View {
         NavigationStack {
-            ///initial settings form view
-            Form {
-                ///picker for vehicle type selection.
-                Section("Vehicle Type") {
-                    Picker("Select Type", selection: $vehicleType) {
-                        ForEach(VehicleTypes.allCases) { thisVehicleType in
-                            Text(thisVehicleType.rawValue)
-                        }
-                    }
-                }
-                ///textfield to enter vehicle make
-                Section("Vehicle Make") {
-                    TextField("Enter/Select your vehicle make", text: $textVehicleMake)
-                }
-                ///picker for vehicle make selection.
-                Section("") {
-                    HStack {
-                        Picker("Select Make", selection: $alphabet) {
-                            ForEach(Alphbets.allCases) { thisAlphabet in
-                                Text(thisAlphabet.rawValue)
-                            }
-                        }
-                        ///on change of alphabet
-                        .onChange(of:$alphabet.id) {
-                            ///continue if for the given alphabet's first vehicle make is not nil
-                            guard let thisVehicleMake = alphabet.makes.first else {
-                                return
-                            }
-                            ///set the first make of the alphabet on selection
-                            vehicleMake = thisVehicleMake
-                            
-                            ///continue if for the given vehicle make's first vehicle model is not nil
-                            guard let thisVehicleModel = thisVehicleMake.models.first else {
-                                return
-                            }
-                            ///set the first model of the vehicle make on selection
-                            model = thisVehicleModel
-                            ///update the textfield of vehicle make with the formated text.
-                            textVehicleMake = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
-                           
-                        }
-                        .pickerStyle(.wheel)
-                        ///picke for vehicle make selection
-                        Picker("", selection:$vehicleMake) {
-                            ForEach(alphabet.makes) { make in
-                                Text(make.rawValue)
-                            }
-                        }
-                        ///on change of vehicle make ID
-                        .onChange(of: $vehicleMake.id) {
-                            ///update the vehicle make text with formated vehicle make string
-                            textVehicleMake = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
-                            ///check if the first model of vehicle make is available
-                            guard let thisVehicleModel = vehicleMake.models.first else {
-                                return
-                            }
-                            ///store the formated model text to textfield
-                            textVehicleModel = thisVehicleModel.rawValue.replacingOccurrences(of: "_", with: " ")
-                        }
-                        .pickerStyle(.wheel)
-                    }
-                }
-                ///textfeid to store desired or selected vehicle model.
-                Section("Vehicle Model") {
-                    TextField("Enter/Select your vehicle model", text: $textVehicleModel)
-                }
-                ///picker for vehicle model selection
-                Section("") {
-                    Picker("Select Model", selection: $model) {
-                        ForEach(vehicleMake.models, id: \.id) { thisModel in
-                            Text(thisModel.rawValue.replacingOccurrences(of: "_", with: " "))
-                        }
-                    }
-                    ///on change of vehicle model ID.
-                    .onChange(of: model.id) {
-                        ///update the textfield with given model formated text.
-                        textVehicleModel = model.rawValue.replacingOccurrences(of: "_", with: " ")
-                    }
-                    .pickerStyle(.wheel)
-                }
-                ///picke for vehicle manufacturing year.
-                Section("Manufacuring Year") {
-                    Picker("Select Year", selection: $year) {
-                        ForEach(yearRange.reversed(), id: \.self) { i in
-                            Text(String(i))
-                        }
-                    }
-                    .pickerStyle(.wheel)
-                }
-                ///picker for vehicle fuel engine type
-                Section("Fuel Engine Type") {
-                    Picker("Select Type", selection:$engineType) {
-                        ForEach(EngineType.allCases) { thisFuelType in
-                            Text(thisFuelType.rawValue)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                }
-                if engineType != .Gas {
-                    Section(header: Text("EV Battery Capacity in KWh").fontWeight(.bold)) {
-                        TextField("Enter battery capacity in kwh", value: $batteryCapacity, format: .number)
-                            .keyboardType(.decimalPad)
-                    }
-                }
-                if engineType == .Hybrid {
-                    ///picker for vehicle fuel engine type
-                    Section("Fuel Mode") {
-                        Picker("Select Mode", selection:$fuelMode) {
-                            ForEach(FuelMode.allCases) { thisFuelMode in
-                                Text(thisFuelMode.rawValue)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                    }
-                }
-                ///section for navigation preferences
-                Section(header: Text("Navigation Preferences").fontWeight(.bold)) {
-                    ///toggle switch to avoid tolls
-                    Toggle("Avoid Tolls", isOn: $avoidTolls)
-                    ///toggle switch to avoid highways
-                    Toggle("Avoid Highways", isOn: $avoidHighways)
-                }
-                ///picker for vehicle distance unit selection
-                Section(header: Text("Distance Unit")) {
-                    Picker("Select Unit", selection: $distanceUnit) {
-                        ForEach(DistanceUnit.allCases) { thisDistanceUnit in
-                            Text(thisDistanceUnit.rawValue.capitalized)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                }
-
-                    if distanceUnit == .km {
-                        ///textfield to enter/update vehicle odometer readings
-                        Section("Vehicle Odometer (in Km)") {
-                            TextField("Enter the odometer readings", value: $odometer, format: .number)
-                            ///on change of odometer
-                                .onChange(of: odometer) {
-                                    ///convert the odometer in km to miles
-                                    let odometerDouble = Double(odometer)
-                                    odometerMiles = Int(odometerDouble * 0.6214)
-                                }
-                                .keyboardType(.numberPad)
-                        }
-                        ///textfield to enter/update vehicle trip odometer readings
-                        Section("Vehicle Trip (in Km)") {
-                            TextField("Enter the Trip readings", value: $trip, format: .number)
-                            ///on change of trip
-                                .onChange(of: trip) {
-                                    ///convert the trip in km to miles
-                                    let tripDouble = Double(trip)
-                                    tripMiles = tripDouble * 0.6214
-                                }
-                                .keyboardType(.decimalPad)
-                        }
-                        if engineType == .Hybrid {
-                            ///textfield to enter/update vehicle trip odometer readings
-                            Section("Vehicle Trip for EV mode (in Km)") {
-                                TextField("Enter the Trip readings", value: $tripHybridEV, format: .number)
-                                ///on change of trip
-                                    .onChange(of: tripHybridEV) {
-                                        ///convert the trip in km to miles
-                                        let tripDouble = Double(tripHybridEV)
-                                        tripHybridEVMiles = tripDouble * 0.6214
-                                    }
-                                    .keyboardType(.decimalPad)
-                            }
-                        }
-                    }
-                    else {
-                        ///textfield to enter/update vehicle odometer readings
-                        Section("Vehicle Odometer (in Miles)") {
-                            TextField("Enter the odometer readings", value: $odometerMiles, format: .number)
-                            ///on change of odometerMiles
-                                .onChange(of: odometerMiles) {
-                                    ///convert the odometer in miles to km.
-                                    let odometerMilesDouble = Double(odometerMiles)
-                                    odometer = Int(odometerMilesDouble / 0.6214)
-                                }
-                                .keyboardType(.numberPad)
-                        }
-                        ///textfield to enter/update vehicle trip odometer readings
-                        Section("Vehicle Trip (in Miles)") {
-                            TextField("Enter the Trip readings", value: $tripMiles, format: .number)
-                            ///on change of tripMiles
-                                .onChange(of: tripMiles) {
-                                    ///convert the trip in miles to km.
-                                    let tripMilesDouble = Double(tripMiles)
-                                    trip = tripMilesDouble / 0.6214
-                                }
-                                .keyboardType(.decimalPad)
-                        }
-                        if engineType == .Hybrid {
-                            ///textfield to enter/update vehicle trip odometer readings
-                            Section("Vehicle Trip for EV mode (in Miles)") {
-                                TextField("Enter the Trip readings", value: $tripHybridEVMiles, format: .number)
-                                ///on change of tripMiles
-                                    .onChange(of: tripHybridEVMiles) {
-                                        ///convert the trip in miles to km.
-                                        let tripMilesDouble = Double(tripHybridEVMiles)
-                                        tripHybridEV = tripMilesDouble / 0.6214
-                                    }
-                                    .keyboardType(.decimalPad)
-                            }
-                        }
-                    }
-                ///if engine type of the vehicle is gas type
-                if fuelMode == .Gas {
-                    ///picker for fuel volume unit selection
-                    Section(header: Text("Fuel Volume Unit")) {
-                        Picker("Select Unit", selection: $fuelUnit) {
-                            ForEach(FuelUnit.allCases) { thisFuelMode in
-                                if thisFuelMode != .Percent {
-                                    Text(thisFuelMode.rawValue.capitalized)
-                                }
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                    }
-                }
-                ///if fuel mode is EV
-                else {
-                    ///picker for fuel volume unit selection
-                    Section(header: Text("Fuel Volume Unit")) {
-                        Picker("Select Unit", selection: $fuelUnit) {
-                            ForEach(FuelUnit.allCases) { thisFuelMode in
-                                if thisFuelMode == .Percent {
-                                    Text(thisFuelMode.rawValue.capitalized)
-                                }
-                             
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                    }
-                }
-                ///if engine type of the vehicle is gas or hybrid.
-                if fuelMode == .Gas {
-                    ///picker for efficiency unit selection
-                    Section(header: Text("Fuel Efficiency Unit")) {
-                        ///check if the fuel unit is set to liter
-                        if fuelUnit == .Litre {
-                            ///if the distance unit is set to km.
-                            if distanceUnit == .km {
-                                ///picker to select fuel efficiency unit
-                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                    ForEach(efficiencyUnits.indices, id: \.self) { index in
-                                        ///if fuel index is 0 or 1.
-                                        if index < 2 {
-                                            Text(efficiencyUnits[index])
-                                        }
-                                    }
-                                }
-                                .pickerStyle(.segmented)
-                            }
-                            ///if distance unit is in miles
-                            else {
-                                ///picker to select fuel efficiency unit
-                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                    ForEach(efficiencyUnits.indices, id: \.self) { index in
-                                        ///if fuel index is 2 or 3.
-                                        if index > 1 && index < 4 {
-                                            Text(efficiencyUnits[index])
-                                        }
-                                    }
-                                }
-                                .pickerStyle(.segmented)
-                            }
-                        }
-                        ///if fuel unit is in gallons
-                        else if fuelUnit == .Gallon {
-                            ///if distance unit is in km
-                            if distanceUnit == .km {
-                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                    ForEach(efficiencyUnits.indices, id: \.self) { index in
-                                        ///if fuel index is 4 or 5.
-                                        if index > 3 && index < 6 {
-                                            Text(efficiencyUnits[index])
-                                        }
-                                    }
-                                }
-                                .pickerStyle(.segmented)
-                            }
-                            ///if distance unit is in miles
-                            else {
-                                Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                    ForEach(efficiencyUnits.indices, id: \.self) { index in
-                                        ///if fuel index is 6 or 7.
-                                        if index > 5 && index < 8 {
-                                            Text(efficiencyUnits[index])
-                                        }
-                                    }
-                                }
-                                .pickerStyle(.segmented)
-                            }
-                        }
-                    }
-                }
-                ///if the engine type of the vehicle is electric
-                else {
-                    ///picke for selecting fuel efficiency
-                    Section(header: Text("Fuel Efficiency Unit")) {
-                        ///if the distance unit is in km.
-                        if distanceUnit == .km {
-                            Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                ForEach(efficiencyUnits.indices, id: \.self) { index in
-                                    ///if the efficiency unit index is at 8
-                                    if index == 8 {
-                                        Text(efficiencyUnits[index])
-                                    }
-                                }
-                            }
-                            ///on appear of the picker set the index to 8 for picker item to be selected predefined.
-                            .onAppear(perform: {
-                                efficiencyUnitIndex = 8
-                            })
-                            .pickerStyle(.segmented)
-                        }
-                        ///if the distance unit is in miles.
-                        else {
-                            Picker("Select Unit", selection: $efficiencyUnitIndex) {
-                                ForEach(efficiencyUnits.indices, id: \.self) { index in
-                                    ///if the efficiency unit index is at 9
-                                    if index == 9 {
-                                        Text(efficiencyUnits[index])
-                                    }
-                                }
-                            }
-                            ///on appear of the picker set the index to 9 for picker item to be selected predefined.
-                            .onAppear(perform: {
-                                efficiencyUnitIndex = 9
-                            })
-                            .pickerStyle(.segmented)
-                        }
-                    }
-                }
-                ///vstack enclosing the form submit button view.
+            ZStack {
                 VStack {
-                    Button {
-                        ///on tap of the button, instantiate a vehicle entity object from the managed view context
-                    let vehicle = Vehicle(context: viewContext)
-                        ///add a new vehicle for this vehicle object created.
-                    addVehicle(for: vehicle)
-                        ///save the settings for this vehicle object created.
-                    saveSettings(for: vehicle)
-                    } label: {
-                        ///button view ui.
-                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.pink.rawValue))
+                    ///initial settings form view
+                    Form {
+                        ///picker for vehicle type selection.
+                        Section("Vehicle Type") {
+                            Picker("Select Type", selection: $vehicleType) {
+                                ForEach(VehicleTypes.allCases) { thisVehicleType in
+                                    Text(thisVehicleType.rawValue)
+                                }
+                            }
+                        }
+                        ///textfield to enter vehicle make
+                        Section("Vehicle Make") {
+                            TextField("Enter/Select your vehicle make", text: $textVehicleMake)
+                        }
+                        ///picker for vehicle make selection.
+                        Section("") {
+                            HStack {
+                                Picker("Select Make", selection: $alphabet) {
+                                    ForEach(Alphbets.allCases) { thisAlphabet in
+                                        Text(thisAlphabet.rawValue)
+                                    }
+                                }
+                                ///on change of alphabet
+                                .onChange(of:$alphabet.id) {
+                                    ///continue if for the given alphabet's first vehicle make is not nil
+                                    guard let thisVehicleMake = alphabet.makes.first else {
+                                        return
+                                    }
+                                    ///set the first make of the alphabet on selection
+                                    vehicleMake = thisVehicleMake
+                                    
+                                    ///continue if for the given vehicle make's first vehicle model is not nil
+                                    guard let thisVehicleModel = thisVehicleMake.models.first else {
+                                        return
+                                    }
+                                    ///set the first model of the vehicle make on selection
+                                    model = thisVehicleModel
+                                    ///update the textfield of vehicle make with the formated text.
+                                    textVehicleMake = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
+                                   
+                                }
+                                .pickerStyle(.wheel)
+                                ///picke for vehicle make selection
+                                Picker("", selection:$vehicleMake) {
+                                    ForEach(alphabet.makes) { make in
+                                        Text(make.rawValue)
+                                    }
+                                }
+                                ///on change of vehicle make ID
+                                .onChange(of: $vehicleMake.id) {
+                                    ///update the vehicle make text with formated vehicle make string
+                                    textVehicleMake = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
+                                    ///check if the first model of vehicle make is available
+                                    guard let thisVehicleModel = vehicleMake.models.first else {
+                                        return
+                                    }
+                                    ///store the formated model text to textfield
+                                    textVehicleModel = thisVehicleModel.rawValue.replacingOccurrences(of: "_", with: " ")
+                                }
+                                .pickerStyle(.wheel)
+                            }
+                        }
+                        ///textfeid to store desired or selected vehicle model.
+                        Section("Vehicle Model") {
+                            TextField("Enter/Select your vehicle model", text: $textVehicleModel)
+                        }
+                        ///picker for vehicle model selection
+                        Section("") {
+                            Picker("Select Model", selection: $model) {
+                                ForEach(vehicleMake.models, id: \.id) { thisModel in
+                                    Text(thisModel.rawValue.replacingOccurrences(of: "_", with: " "))
+                                }
+                            }
+                            ///on change of vehicle model ID.
+                            .onChange(of: model.id) {
+                                ///update the textfield with given model formated text.
+                                textVehicleModel = model.rawValue.replacingOccurrences(of: "_", with: " ")
+                            }
+                            .pickerStyle(.wheel)
+                        }
+                        ///picke for vehicle manufacturing year.
+                        Section("Manufacuring Year") {
+                            Picker("Select Year", selection: $year) {
+                                ForEach(yearRange.reversed(), id: \.self) { i in
+                                    Text(String(i))
+                                }
+                            }
+                            .pickerStyle(.wheel)
+                        }
+                        ///picker for vehicle fuel engine type
+                        Section("Fuel Engine Type") {
+                            Picker("Select Type", selection:$engineType) {
+                                ForEach(EngineType.allCases) { thisFuelType in
+                                    Text(thisFuelType.rawValue)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                        }
+                        if engineType != .Gas {
+                            Section(header: Text("EV Battery Capacity in KWh").fontWeight(.bold)) {
+                                TextField("Enter battery capacity in kwh", value: $batteryCapacity, format: .number)
+                                    .keyboardType(.decimalPad)
+                            }
+                        }
+                        if engineType == .Hybrid {
+                            ///picker for vehicle fuel engine type
+                            Section("Fuel Mode") {
+                                Picker("Select Mode", selection:$fuelMode) {
+                                    ForEach(FuelMode.allCases) { thisFuelMode in
+                                        Text(thisFuelMode.rawValue)
+                                    }
+                                }
+                                .pickerStyle(.segmented)
+                            }
+                        }
+                        ///section for navigation preferences
+                        Section(header: Text("Navigation Preferences").fontWeight(.bold)) {
+                            ///toggle switch to avoid tolls
+                            Toggle("Avoid Tolls", isOn: $avoidTolls)
+                            ///toggle switch to avoid highways
+                            Toggle("Avoid Highways", isOn: $avoidHighways)
+                        }
+                        ///picker for vehicle distance unit selection
+                        Section(header: Text("Distance Unit")) {
+                            Picker("Select Unit", selection: $distanceUnit) {
+                                ForEach(DistanceUnit.allCases) { thisDistanceUnit in
+                                    Text(thisDistanceUnit.rawValue.capitalized)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                        }
+
+                            if distanceUnit == .km {
+                                ///textfield to enter/update vehicle odometer readings
+                                Section("Vehicle Odometer (in Km)") {
+                                    TextField("Enter the odometer readings", value: $odometer, format: .number)
+                                    ///on change of odometer
+                                        .onChange(of: odometer) {
+                                            ///convert the odometer in km to miles
+                                            let odometerDouble = Double(odometer)
+                                            odometerMiles = Int(odometerDouble * 0.6214)
+                                        }
+                                        .keyboardType(.numberPad)
+                                }
+                                ///textfield to enter/update vehicle trip odometer readings
+                                Section("Vehicle Trip (in Km)") {
+                                    TextField("Enter the Trip readings", value: $trip, format: .number)
+                                    ///on change of trip
+                                        .onChange(of: trip) {
+                                            ///convert the trip in km to miles
+                                            let tripDouble = Double(trip)
+                                            tripMiles = tripDouble * 0.6214
+                                        }
+                                        .keyboardType(.decimalPad)
+                                }
+                                if engineType == .Hybrid {
+                                    ///textfield to enter/update vehicle trip odometer readings
+                                    Section("Vehicle Trip for EV mode (in Km)") {
+                                        TextField("Enter the Trip readings", value: $tripHybridEV, format: .number)
+                                        ///on change of trip
+                                            .onChange(of: tripHybridEV) {
+                                                ///convert the trip in km to miles
+                                                let tripDouble = Double(tripHybridEV)
+                                                tripHybridEVMiles = tripDouble * 0.6214
+                                            }
+                                            .keyboardType(.decimalPad)
+                                    }
+                                }
+                            }
+                            else {
+                                ///textfield to enter/update vehicle odometer readings
+                                Section("Vehicle Odometer (in Miles)") {
+                                    TextField("Enter the odometer readings", value: $odometerMiles, format: .number)
+                                    ///on change of odometerMiles
+                                        .onChange(of: odometerMiles) {
+                                            ///convert the odometer in miles to km.
+                                            let odometerMilesDouble = Double(odometerMiles)
+                                            odometer = Int(odometerMilesDouble / 0.6214)
+                                        }
+                                        .keyboardType(.numberPad)
+                                }
+                                ///textfield to enter/update vehicle trip odometer readings
+                                Section("Vehicle Trip (in Miles)") {
+                                    TextField("Enter the Trip readings", value: $tripMiles, format: .number)
+                                    ///on change of tripMiles
+                                        .onChange(of: tripMiles) {
+                                            ///convert the trip in miles to km.
+                                            let tripMilesDouble = Double(tripMiles)
+                                            trip = tripMilesDouble / 0.6214
+                                        }
+                                        .keyboardType(.decimalPad)
+                                }
+                                if engineType == .Hybrid {
+                                    ///textfield to enter/update vehicle trip odometer readings
+                                    Section("Vehicle Trip for EV mode (in Miles)") {
+                                        TextField("Enter the Trip readings", value: $tripHybridEVMiles, format: .number)
+                                        ///on change of tripMiles
+                                            .onChange(of: tripHybridEVMiles) {
+                                                ///convert the trip in miles to km.
+                                                let tripMilesDouble = Double(tripHybridEVMiles)
+                                                tripHybridEV = tripMilesDouble / 0.6214
+                                            }
+                                            .keyboardType(.decimalPad)
+                                    }
+                                }
+                            }
+                        ///if engine type of the vehicle is gas type
+                        if fuelMode == .Gas {
+                            ///picker for fuel volume unit selection
+                            Section(header: Text("Fuel Volume Unit")) {
+                                Picker("Select Unit", selection: $fuelUnit) {
+                                    ForEach(FuelUnit.allCases) { thisFuelMode in
+                                        if thisFuelMode != .Percent {
+                                            Text(thisFuelMode.rawValue.capitalized)
+                                        }
+                                    }
+                                }
+                                .pickerStyle(.segmented)
+                            }
+                        }
+                        ///if fuel mode is EV
+                        else {
+                            ///picker for fuel volume unit selection
+                            Section(header: Text("Fuel Volume Unit")) {
+                                Picker("Select Unit", selection: $fuelUnit) {
+                                    ForEach(FuelUnit.allCases) { thisFuelMode in
+                                        if thisFuelMode == .Percent {
+                                            Text(thisFuelMode.rawValue.capitalized)
+                                        }
+                                     
+                                    }
+                                }
+                                .pickerStyle(.segmented)
+                            }
+                        }
+                        ///if engine type of the vehicle is gas or hybrid.
+                        if fuelMode == .Gas {
+                            ///picker for efficiency unit selection
+                            Section(header: Text("Fuel Efficiency Unit")) {
+                                ///check if the fuel unit is set to liter
+                                if fuelUnit == .Litre {
+                                    ///if the distance unit is set to km.
+                                    if distanceUnit == .km {
+                                        ///picker to select fuel efficiency unit
+                                        Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                            ForEach(efficiencyUnits.indices, id: \.self) { index in
+                                                ///if fuel index is 0 or 1.
+                                                if index < 2 {
+                                                    Text(efficiencyUnits[index])
+                                                }
+                                            }
+                                        }
+                                        .pickerStyle(.segmented)
+                                    }
+                                    ///if distance unit is in miles
+                                    else {
+                                        ///picker to select fuel efficiency unit
+                                        Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                            ForEach(efficiencyUnits.indices, id: \.self) { index in
+                                                ///if fuel index is 2 or 3.
+                                                if index > 1 && index < 4 {
+                                                    Text(efficiencyUnits[index])
+                                                }
+                                            }
+                                        }
+                                        .pickerStyle(.segmented)
+                                    }
+                                }
+                                ///if fuel unit is in gallons
+                                else if fuelUnit == .Gallon {
+                                    ///if distance unit is in km
+                                    if distanceUnit == .km {
+                                        Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                            ForEach(efficiencyUnits.indices, id: \.self) { index in
+                                                ///if fuel index is 4 or 5.
+                                                if index > 3 && index < 6 {
+                                                    Text(efficiencyUnits[index])
+                                                }
+                                            }
+                                        }
+                                        .pickerStyle(.segmented)
+                                    }
+                                    ///if distance unit is in miles
+                                    else {
+                                        Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                            ForEach(efficiencyUnits.indices, id: \.self) { index in
+                                                ///if fuel index is 6 or 7.
+                                                if index > 5 && index < 8 {
+                                                    Text(efficiencyUnits[index])
+                                                }
+                                            }
+                                        }
+                                        .pickerStyle(.segmented)
+                                    }
+                                }
+                            }
+                        }
+                        ///if the engine type of the vehicle is electric
+                        else {
+                            ///picke for selecting fuel efficiency
+                            Section(header: Text("Fuel Efficiency Unit")) {
+                                ///if the distance unit is in km.
+                                if distanceUnit == .km {
+                                    Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                        ForEach(efficiencyUnits.indices, id: \.self) { index in
+                                            ///if the efficiency unit index is at 8
+                                            if index == 8 {
+                                                Text(efficiencyUnits[index])
+                                            }
+                                        }
+                                    }
+                                    ///on appear of the picker set the index to 8 for picker item to be selected predefined.
+                                    .onAppear(perform: {
+                                        efficiencyUnitIndex = 8
+                                    })
+                                    .pickerStyle(.segmented)
+                                }
+                                ///if the distance unit is in miles.
+                                else {
+                                    Picker("Select Unit", selection: $efficiencyUnitIndex) {
+                                        ForEach(efficiencyUnits.indices, id: \.self) { index in
+                                            ///if the efficiency unit index is at 9
+                                            if index == 9 {
+                                                Text(efficiencyUnits[index])
+                                            }
+                                        }
+                                    }
+                                    ///on appear of the picker set the index to 9 for picker item to be selected predefined.
+                                    .onAppear(perform: {
+                                        efficiencyUnitIndex = 9
+                                    })
+                                    .pickerStyle(.segmented)
+                                }
+                            }
+                        }
+                        ///vstack enclosing the form submit button view.
+                        VStack {
+                            Button {
+                                ///on tap of the button, instantiate a vehicle entity object from the managed view context
+                            let vehicle = Vehicle(context: viewContext)
+                                ///add a new vehicle for this vehicle object created.
+                            addVehicle(for: vehicle)
+                                ///save the settings for this vehicle object created.
+                            saveSettings(for: vehicle)
+                            } label: {
+                                ///button view ui.
+                                FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.pink.rawValue))
+                            }
+                            .background(Color(AppColors.invertPink.rawValue))
+                            .buttonStyle(BorderlessButtonStyle())
+                            .cornerRadius(100)
+                        }
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets())
                     }
-                    .background(Color(AppColors.invertPink.rawValue))
-                    .buttonStyle(BorderlessButtonStyle())
-                    .cornerRadius(100)
                 }
-                .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets())
+                if showAlert {
+                    AlertView(image: "checkmark.icloud", headline: "Settings Saved!", bgcolor: Color(AppColors.invertBlueColor.rawValue), showAlert: $showAlert)
+                }
             }
+          
+           
             .onAppear {
                 ///update textfield with the initial vehicle make
                 textVehicleMake = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
@@ -504,6 +514,9 @@ struct InitialSettingsView: View {
         settings.fuelEfficiencyUnit = efficiencyUnits[efficiencyUnitIndex]
         ///save the managed view context to the core data store with new changes.
         Settings.saveContext(viewContext: viewContext)
+        withAnimation(.easeIn(duration: 0.5)) {
+            showAlert = true
+        }
     }
 }
 

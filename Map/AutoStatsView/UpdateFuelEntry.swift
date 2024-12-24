@@ -21,177 +21,189 @@ struct UpdateFuelEntry: View {
     @State private var isTapped = false
     @State private var tripKm = 0.0
     @State private var tripMiles = 0.0
+    @State private var showAlert = false
     @Binding var showFuelHistoryView: Bool
     var fuelEntry: AutoFuelling
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section(header:Text("Fuel Station").fontWeight(.bold)) {
-                    TextField("Enter Location", text:$location)
-                        .onTapGesture {
-                            isTapped = false
-                        }
-                    if location.isEmpty && isTapped {
-                        Text("location field can not be empty!")
-                            .font(.caption2)
-                            .foregroundStyle(.red)
-                    }
-                    else if Double(location) != nil && isTapped {
-                        Text("Please enter the valid text entry!")
-                            .font(.caption2)
-                            .foregroundStyle(.red)
-                    }
-                }
-                
-                Section(header:Text("EV Battery charge in \(settings.first!.getFuelVolumeUnit)").fontWeight(.bold)) {
-                    if settings.first!.getFuelVolumeUnit != "%" {
-                        TextField("Enter Amount", value: $amount, format: .number)
-                            .keyboardType(.decimalPad)
-                            .onTapGesture {
-                                isTapped = false
-                            }
-                        if amount == 0.0 && isTapped {
-                            Text("This field can not be empty!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                        else if amount < 0 && isTapped {
-                            Text("Please enter the valid text entry!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                    }
-                    else {
-                        ///fill volume in % of charge before start
-                        TextField("Enter % before charge", value: $percentBeforeCharge, format: .number)
-                            .keyboardType(.numberPad)
-                        ///on tap of the textfield
-                            .onTapGesture {
-                                isTapped = false
-                            }
-                        ///if value is not number type and textfield is not active.
-                        if (percentBeforeCharge >= 100 || percentBeforeCharge < 0) && isTapped {
-                            Text("Please enter the valid percentage value between 0-99%")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                        ///fill volume in % of charge after finish
-                        TextField("Enter % after charge", value: $percentAfterCharge, format: .number)
-                            .keyboardType(.numberPad)
-                            .onTapGesture {
-                                isTapped = false
-                            }
-                        ///if the variable is not set and textfield is not active.
-                        if percentAfterCharge == 0 && isTapped {
-                            Text("This field can not be empty!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                        ///if charging before is greater than charging after.
-                        else if percentBeforeCharge >= percentAfterCharge {
-                            Text("charging percent before charging can't be more than or equal to after charging percent!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                        ///if value is not number type and textfield is not active.
-                        else if (percentAfterCharge > 100 || percentAfterCharge <= 0) && isTapped {
-                            Text("Please enter the valid percentage value between 1-100%.")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                    }
-                    
-                }
-                Section(header:Text("Fuel Cost").fontWeight(.bold)) {
-                    TextField("Enter Cost", value: $cost, format: .number)
-                        .keyboardType(.decimalPad)
-                        .onTapGesture {
-                            isTapped = false
-                        }
-                    if cost == 0.0 && isTapped {
-                        Text("This field can not be empty!")
-                            .font(.caption2)
-                            .foregroundStyle(.red)
-                    }
-                    else if cost < 0 && isTapped {
-                        Text("Please enter the valid text entry!")
-                            .font(.caption2)
-                            .foregroundStyle(.red)
-                    }
-                }
-                ///textfield to update the trip distance
-                Section(header:Text("Trip Distance in \(settings.first!.getDistanceUnit)").fontWeight(.bold)) {
-                    ///if the distance unit is in km
-                    if settings.first!.distanceUnit == "km" {
-                        ///show the textfield to enter trip in km
-                        TextField("Enter Distance", value: $tripKm, format: .number)
-                            .onChange(of: tripKm) {
-                                ///on change of tripkm variable, update fuel entry lasttrip in km
-                                fuelEntry.lasttrip = tripKm
-                                ///on change of tripkm variable, update fuel entry lasttrip in miles
-                                fuelEntry.lastTripMiles = fuelEntry.lasttrip * 0.6214
-                            }
-                            .keyboardType(.decimalPad)
-                            .onTapGesture {
-                                ///on tap of the textfield clear the isTapped flag detecting the submit button tap.
-                                isTapped = false
-                            }
-                       if tripKm <= 0 && isTapped {
-                            Text("Please enter the valid text entry!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                    }
-                    else {
-                        TextField("Enter Distance", value: $tripMiles, format: .number)
-                            .keyboardType(.decimalPad)
-                            .onTapGesture {
-                                isTapped = false
-                            }
-                       if tripMiles <= 0.0 && isTapped {
-                            Text("Please enter the valid text entry!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                    }
-                   
-                }
-                Section(header: Text("Date:").font(Font.system(size: 15))) {
-                    DatePicker("Fuelling Day", selection: $date, displayedComponents:[.date])
-                    if date > Date() {
-                        Text("Future date is not acceptable!")
-                            .font(.caption2)
-                            .foregroundStyle(.red)
-                    }
-                }
-                if let activeVehicle = vehicles.first(where: {$0.isActive}) {
-                    VStack {
-                        Button {
-                            if isTextFieldEntryValid() {
-                                let index = vehicles.firstIndex(where: {$0.uniqueID == activeVehicle.uniqueID})
-                                
-                                addFuellingEntry(for: activeVehicle, at: index)
-                                                               
-                                if  let i = index {
-                                    calculateFuelCost(for: activeVehicle, at: i)
-                                    calculateFuelEfficiency(for: activeVehicle, at: i)
+            ZStack {
+                VStack {
+                    Form {
+                        Section(header:Text("Fuel Station").fontWeight(.bold)) {
+                            TextField("Enter Location", text:$location)
+                                .onTapGesture {
+                                    isTapped = false
                                 }
-                                showFuelHistoryView = false
+                            if location.isEmpty && isTapped {
+                                Text("location field can not be empty!")
+                                    .font(.caption2)
+                                    .foregroundStyle(.red)
                             }
-                            isTapped = true
-                         
-                        } label: {
-                            FormButton(imageName: "plus.square.fill", text: "Update Entry", color: Color(AppColors.yellow.rawValue))
+                            else if Double(location) != nil && isTapped {
+                                Text("Please enter the valid text entry!")
+                                    .font(.caption2)
+                                    .foregroundStyle(.red)
+                            }
                         }
-                        .background(Color(AppColors.invertYellow.rawValue))
-                        .buttonStyle(BorderlessButtonStyle())
-                        .cornerRadius(100)
+                        
+                        Section(header:Text("EV Battery charge in \(settings.first!.getFuelVolumeUnit)").fontWeight(.bold)) {
+                            if settings.first!.getFuelVolumeUnit != "%" {
+                                TextField("Enter Amount", value: $amount, format: .number)
+                                    .keyboardType(.decimalPad)
+                                    .onTapGesture {
+                                        isTapped = false
+                                    }
+                                if amount == 0.0 && isTapped {
+                                    Text("This field can not be empty!")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+                                else if amount < 0 && isTapped {
+                                    Text("Please enter the valid text entry!")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+                            }
+                            else {
+                                ///fill volume in % of charge before start
+                                TextField("Enter % before charge", value: $percentBeforeCharge, format: .number)
+                                    .keyboardType(.numberPad)
+                                ///on tap of the textfield
+                                    .onTapGesture {
+                                        isTapped = false
+                                    }
+                                ///if value is not number type and textfield is not active.
+                                if (percentBeforeCharge >= 100 || percentBeforeCharge < 0) && isTapped {
+                                    Text("Please enter the valid percentage value between 0-99%")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+                                ///fill volume in % of charge after finish
+                                TextField("Enter % after charge", value: $percentAfterCharge, format: .number)
+                                    .keyboardType(.numberPad)
+                                    .onTapGesture {
+                                        isTapped = false
+                                    }
+                                ///if the variable is not set and textfield is not active.
+                                if percentAfterCharge == 0 && isTapped {
+                                    Text("This field can not be empty!")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+                                ///if charging before is greater than charging after.
+                                else if percentBeforeCharge >= percentAfterCharge {
+                                    Text("charging percent before charging can't be more than or equal to after charging percent!")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+                                ///if value is not number type and textfield is not active.
+                                else if (percentAfterCharge > 100 || percentAfterCharge <= 0) && isTapped {
+                                    Text("Please enter the valid percentage value between 1-100%.")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+                            }
+                            
+                        }
+                        Section(header:Text("Fuel Cost").fontWeight(.bold)) {
+                            TextField("Enter Cost", value: $cost, format: .number)
+                                .keyboardType(.decimalPad)
+                                .onTapGesture {
+                                    isTapped = false
+                                }
+                            if cost == 0.0 && isTapped {
+                                Text("This field can not be empty!")
+                                    .font(.caption2)
+                                    .foregroundStyle(.red)
+                            }
+                            else if cost < 0 && isTapped {
+                                Text("Please enter the valid text entry!")
+                                    .font(.caption2)
+                                    .foregroundStyle(.red)
+                            }
+                        }
+                        ///textfield to update the trip distance
+                        Section(header:Text("Trip Distance in \(settings.first!.getDistanceUnit)").fontWeight(.bold)) {
+                            ///if the distance unit is in km
+                            if settings.first!.distanceUnit == "km" {
+                                ///show the textfield to enter trip in km
+                                TextField("Enter Distance", value: $tripKm, format: .number)
+                                    .onChange(of: tripKm) {
+                                        ///on change of tripkm variable, update fuel entry lasttrip in km
+                                        fuelEntry.lasttrip = tripKm
+                                        ///on change of tripkm variable, update fuel entry lasttrip in miles
+                                        fuelEntry.lastTripMiles = fuelEntry.lasttrip * 0.6214
+                                    }
+                                    .keyboardType(.decimalPad)
+                                    .onTapGesture {
+                                        ///on tap of the textfield clear the isTapped flag detecting the submit button tap.
+                                        isTapped = false
+                                    }
+                               if tripKm <= 0 && isTapped {
+                                    Text("Please enter the valid text entry!")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+                            }
+                            else {
+                                TextField("Enter Distance", value: $tripMiles, format: .number)
+                                    .keyboardType(.decimalPad)
+                                    .onTapGesture {
+                                        isTapped = false
+                                    }
+                               if tripMiles <= 0.0 && isTapped {
+                                    Text("Please enter the valid text entry!")
+                                        .font(.caption2)
+                                        .foregroundStyle(.red)
+                                }
+                            }
+                           
+                        }
+                        Section(header: Text("Date:").font(Font.system(size: 15))) {
+                            DatePicker("Fuelling Day", selection: $date, displayedComponents:[.date])
+                            if date > Date() {
+                                Text("Future date is not acceptable!")
+                                    .font(.caption2)
+                                    .foregroundStyle(.red)
+                            }
+                        }
+                        if let activeVehicle = vehicles.first(where: {$0.isActive}) {
+                            VStack {
+                                Button {
+                                    if isTextFieldEntryValid() {
+                                        let index = vehicles.firstIndex(where: {$0.uniqueID == activeVehicle.uniqueID})
+                                        
+                                        addFuellingEntry(for: activeVehicle, at: index)
+                                                                       
+                                        if  let i = index {
+                                            calculateFuelCost(for: activeVehicle, at: i)
+                                            calculateFuelEfficiency(for: activeVehicle, at: i)
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                            showFuelHistoryView = false
+                                        }
+                                      
+                                    }
+                                    isTapped = true
+                                 
+                                } label: {
+                                    FormButton(imageName: "plus.square.fill", text: "Update Entry", color: Color(AppColors.yellow.rawValue))
+                                }
+                                .background(Color(AppColors.invertYellow.rawValue))
+                                .buttonStyle(BorderlessButtonStyle())
+                                .cornerRadius(100)
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets())
+                        }
                     }
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets())
+                }
+                if showAlert {
+                    AlertView(image: "fuelpump.circle.fill", headline: "Fuel Entry Updated!", bgcolor: Color(AppColors.invertYellow.rawValue), showAlert: $showAlert)
                 }
             }
+          
             .navigationTitle("Update Fuelling Entry")
         }
         .onAppear(perform: {
@@ -276,6 +288,9 @@ struct UpdateFuelEntry: View {
             }
         }
         Vehicle.saveContext(viewContext: viewContext)
+        withAnimation(.easeIn(duration: 0.5)) {
+            showAlert = true
+        }
     }
     
     func resetTripData(at index: Int) {
