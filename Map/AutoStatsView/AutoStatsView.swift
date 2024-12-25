@@ -61,6 +61,7 @@ struct AutoStatsView: View {
                         Section {
                             LazyHGrid(rows: rows) {
                                 DashGridItemView(title: "ODOMETER", foreGroundColor: Color(AppColors.invertPurple.rawValue), backGroundColor: Color(AppColors.purple.rawValue), numericText: settings.first!.getDistanceUnit == "km" ? numberFormatter.string(for: vehicle.odometer) ?? "--" : numberFormatter.string(for: vehicle.odometerMiles) ?? "--", unitText: settings.first?.getDistanceUnit ?? "", geometricSize: geo.size)
+                                  
                                 ///get the first fuelling entry from fuellings array of this vehicle filtered by the current fuel mode.
                                 if let fuellingEntry = vehicle.getFuellings.filter({$0.fuelType == vehicle.fuelMode}).first {
                                     ///if fuel unit is in litre show value in litre
@@ -163,6 +164,7 @@ struct AutoStatsView: View {
                                     .background(Color(AppColors.invertYellow.rawValue))
                                     .buttonStyle(BorderlessButtonStyle())
                                     .cornerRadius(10)
+                                    .shadow(color: bgMode == .dark ? Color(UIColor.darkGray) : .black, radius: 1, x: 1, y: 1)
                                     .sheet(isPresented: $showFuelHistoryView, content: {
                                         FuelHistoryView(showFuelHistoryView: $showFuelHistoryView, vehicle: vehicle)
                                     })
@@ -204,6 +206,7 @@ struct AutoStatsView: View {
                                     .background(Color(AppColors.invertRed.rawValue))
                                     .buttonStyle(BorderlessButtonStyle())
                                     .cornerRadius(10)
+                                    .shadow(color: bgMode == .dark ? Color(UIColor.darkGray)  : .black, radius: 1, x: 1, y: 1)
                                     .sheet(isPresented: $showServiceHistoryView, content: {
                                         ServiceHistoryView(showServiceHistoryView: $showServiceHistoryView, vehicle: vehicle)
                                     })
@@ -214,7 +217,9 @@ struct AutoStatsView: View {
                 }
                 
                 .frame(width: geo.size.width, height: geo.size.height - 40)
+              
                 .navigationTitle("Auto Summary")
+            
             }
         }
     }

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct FuellingEntryForm: View {
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: Settings.entity(), sortDescriptors: []) var settings: FetchedResults<Settings>
@@ -147,28 +148,34 @@ struct FuellingEntryForm: View {
                         }
                         if let vehicle = vehicles.first(where: {$0.isActive}) {
                             VStack {
-                                Button {
-                                    if isTextFieldEntryValid() {
-                                        let index = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID})
-                                        
-                                        addFuellingEntry(for: vehicle, at: index)
-                                                                       
-                                        if  let i = index {
-                                            resetTripData(at: i)
-                                            calculateFuelCost(for: vehicle, at: i)
-                                            calculateFuelEfficiency(for: vehicle, at: i)
+                                HStack {
+                                    Spacer()
+                                    Button {
+                                        if isTextFieldEntryValid() {
+                                            let index = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID})
+                                            
+                                            addFuellingEntry(for: vehicle, at: index)
+                                                                           
+                                            if  let i = index {
+                                                resetTripData(at: i)
+                                                calculateFuelCost(for: vehicle, at: i)
+                                                calculateFuelEfficiency(for: vehicle, at: i)
+                                            }
                                         }
+                                        isTapped = true
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                            showFuellingEntryform = !isTextFieldEntryValid()
+                                        }
+                                    } label: {
+                                        FormButton(imageName: "plus.square.fill", text: "Add Entry", color: Color(AppColors.yellow.rawValue))
                                     }
-                                    isTapped = true
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                        showFuellingEntryform = !isTextFieldEntryValid()
-                                    }
-                                } label: {
-                                    FormButton(imageName: "plus.square.fill", text: "Add Entry", color: Color(AppColors.yellow.rawValue))
+                                    .background(Color(AppColors.invertYellow.rawValue))
+                                    .buttonStyle(BorderlessButtonStyle())
+                                    .cornerRadius(100)
+                                    .shadow(color: bgMode == .dark ? .gray : .black, radius: 1, x: 1, y: 1)
+                                    Spacer()
                                 }
-                                .background(Color(AppColors.invertYellow.rawValue))
-                                .buttonStyle(BorderlessButtonStyle())
-                                .cornerRadius(100)
+                                
                             }
                             .listRowBackground(Color.clear)
                             .listRowInsets(EdgeInsets())
@@ -181,6 +188,7 @@ struct FuellingEntryForm: View {
             }
            
             .navigationTitle("Add Fuelling Entry")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
     func isTextFieldEntryValid() -> Bool {

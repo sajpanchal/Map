@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct InitialSettingsView: View {
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     ///viewContext is the environment object of managed view context of core data stack.
     @Environment(\.managedObjectContext) private var viewContext
     ///state object that handles tasks of the location manger
@@ -402,20 +403,26 @@ struct InitialSettingsView: View {
                         }
                         ///vstack enclosing the form submit button view.
                         VStack {
-                            Button {
-                                ///on tap of the button, instantiate a vehicle entity object from the managed view context
-                            let vehicle = Vehicle(context: viewContext)
-                                ///add a new vehicle for this vehicle object created.
-                            addVehicle(for: vehicle)
-                                ///save the settings for this vehicle object created.
-                            saveSettings(for: vehicle)
-                            } label: {
-                                ///button view ui.
-                                FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.pink.rawValue))
+                            HStack {
+                                Spacer()
+                                Button {
+                                    ///on tap of the button, instantiate a vehicle entity object from the managed view context
+                                let vehicle = Vehicle(context: viewContext)
+                                    ///add a new vehicle for this vehicle object created.
+                                addVehicle(for: vehicle)
+                                    ///save the settings for this vehicle object created.
+                                saveSettings(for: vehicle)
+                                } label: {
+                                    ///button view ui.
+                                    FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.pink.rawValue))
+                                }
+                                .background(Color(AppColors.invertPink.rawValue))
+                                .buttonStyle(BorderlessButtonStyle())
+                                .cornerRadius(100)
+                                .shadow(color: bgMode == .dark ? .gray : .black, radius: 1, x: 1, y: 1)
+                                Spacer()
                             }
-                            .background(Color(AppColors.invertPink.rawValue))
-                            .buttonStyle(BorderlessButtonStyle())
-                            .cornerRadius(100)
+                     
                         }
                         .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets())

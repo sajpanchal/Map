@@ -23,7 +23,7 @@ struct NewEntryStackView: View {
                             .font(.system(size: 40))
                           
                     }
-                    
+                    .shadow(color: bgMode == .dark ? Color(UIColor.darkGray) : .black, radius: 1, x: 1, y: 1)
                     Spacer()
                     Text("New Entry")
                         .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))

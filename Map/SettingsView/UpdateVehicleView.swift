@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct UpdateVehicleView: View {
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     ///environment object that represents core data store's managed object context which tracks the changes made in entities.
     @Environment(\.managedObjectContext) private var viewContext
     ///state variable that stores vehicle type in enum format
@@ -382,18 +383,23 @@ struct UpdateVehicleView: View {
                         }
                                      
                         VStack {
-                            Button {
-                                addVehicle(for: vehicle)
-                                saveSettings(for: vehicle)
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                    showGarage = false
+                            HStack {
+                                Spacer()
+                                Button {
+                                    addVehicle(for: vehicle)
+                                    saveSettings(for: vehicle)
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                        showGarage = false
+                                    }
+                                } label: {
+                                    FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.blueColor.rawValue))
                                 }
-                            } label: {
-                                FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.blueColor.rawValue))
+                                .background(Color(AppColors.invertBlueColor.rawValue))
+                                .buttonStyle(BorderlessButtonStyle())
+                                .cornerRadius(100)
+                                .shadow(color: bgMode == .dark ? .gray : .black, radius: 1, x: 1, y: 1)
+                                Spacer()
                             }
-                            .background(Color(AppColors.invertBlueColor.rawValue))
-                            .buttonStyle(BorderlessButtonStyle())
-                            .cornerRadius(100)
                         }
                         .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets())
@@ -408,6 +414,7 @@ struct UpdateVehicleView: View {
            
             
             .navigationTitle("Update Settings")
+            .navigationBarTitleDisplayMode(.inline)
          
         }
         .onAppear {           

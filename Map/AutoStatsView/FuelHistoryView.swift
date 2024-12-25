@@ -168,6 +168,7 @@ struct FuelHistoryView: View {
                 }
             }
             .navigationTitle("Fuelling History")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
     func getString(from : Date) -> String {

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ServiceEntryForm: View {
- 
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @State private var location: String = ""
@@ -82,23 +82,29 @@ struct ServiceEntryForm: View {
                         }
                         if let vehicle = vehicles.first(where: {$0.isActive}) {
                             VStack {
-                                Button {
-                                    if isTextFieldEntryValid() {
-                                        let service = AutoService(context: viewContext)
-                                        addServiceEntry(service: service)
-                                        vehicle.addToServices(service)
-                                        aggregateServiceCost(for: vehicle)
+                                HStack {
+                                    Spacer()
+                                    Button {
+                                        if isTextFieldEntryValid() {
+                                            let service = AutoService(context: viewContext)
+                                            addServiceEntry(service: service)
+                                            vehicle.addToServices(service)
+                                            aggregateServiceCost(for: vehicle)
+                                        }
+                                    isButtonTapped = true
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                            showServiceEntryForm = !isTextFieldEntryValid()
+                                        }
+                                    } label: {
+                                        FormButton(imageName: "plus.square.fill", text: "Add Entry", color: Color(AppColors.red.rawValue))
                                     }
-                                isButtonTapped = true
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                        showServiceEntryForm = !isTextFieldEntryValid()
-                                    }
-                                } label: {
-                                    FormButton(imageName: "plus.square.fill", text: "Add Entry", color: Color(AppColors.red.rawValue))
+                                    .background(Color(AppColors.invertRed.rawValue))
+                                    .buttonStyle(BorderlessButtonStyle())
+                                    .cornerRadius(100)
+                                    .shadow(color: bgMode == .dark ? .gray : .black, radius: 1, x: 1, y: 1)
+                                    Spacer()
                                 }
-                                .background(Color(AppColors.invertRed.rawValue))
-                                .buttonStyle(BorderlessButtonStyle())
-                                .cornerRadius(100)
+                              
                             }
                             .listRowBackground(Color.clear)
                             .listRowInsets(EdgeInsets())
@@ -111,6 +117,7 @@ struct ServiceEntryForm: View {
             }
           
             .navigationTitle("Add Auto Service")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
     

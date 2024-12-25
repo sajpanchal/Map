@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct AddVehicleForm: View {
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     ///view context is the object of core data persistance container that tracks changes made to core data model data.
     @Environment(\.managedObjectContext) private var viewContext
     ///fetchrequest will request the records of vehicle entity and stores it in array form as a result. Here, it has the sort descriptors  with one element that asks to sort an array with vehicles active comes last in order.
@@ -250,16 +251,22 @@ struct AddVehicleForm: View {
                         }
                         ///form submit button
                         VStack {
-                            Button {
-                                ///on tap of the button call function to add a new vehicle.
-                               addVehicle()
-                            } label: {
-                                ///appearnce of the button
-                                FormButton(imageName: "car.fill", text: "Add Vehicle", color: Color(AppColors.green.rawValue))
+                            HStack {
+                                Spacer()
+                                Button {
+                                    ///on tap of the button call function to add a new vehicle.
+                                   addVehicle()
+                                } label: {
+                                    ///appearnce of the button
+                                    FormButton(imageName: "car.fill", text: "Add Vehicle", color: Color(AppColors.green.rawValue))
+                                }
+                                .background(Color(AppColors.invertGreen.rawValue))
+                                .buttonStyle(BorderlessButtonStyle())
+                                .cornerRadius(100)
+                                .shadow(color: bgMode == .dark ? .gray : .black, radius: 1, x: 1, y: 1)
+                                Spacer()
                             }
-                            .background(Color(AppColors.invertGreen.rawValue))
-                            .buttonStyle(BorderlessButtonStyle())
-                            .cornerRadius(100)
+                           
                         }
                         .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets())
@@ -279,6 +286,7 @@ struct AddVehicleForm: View {
                 textVehicleModel = model.rawValue.replacingOccurrences(of: "_", with: " ")
             }
             .navigationTitle("Add New Vehicle")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
     func addVehicle() {

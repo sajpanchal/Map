@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
     ///Fetch request to get the records from the Settings entity.
     @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
@@ -52,19 +52,28 @@ struct SettingsView: View {
                         Form {
                             ///button to access the garage screen
                             VStack {
-                                Button(action: {
-                                    showGarage = true
-                                }, label: {
-                                    FormButton(imageName:  "door.garage.double.bay.closed", text: "My Garage", color: Color(AppColors.red.rawValue))
+                                HStack {
+                                    Spacer()
+                                    Button(action: {
+                                        showGarage = true
+                                    }, label: {
+                                        
+                                        FormButton(imageName:  "door.garage.double.bay.closed", text: "My Garage", color: Color(AppColors.red.rawValue))
+                                          
+                                        })
+                                   
+                                    .background(Color(AppColors.invertRed.rawValue))
+                                    .tint(Color(AppColors.invertRed.rawValue))
+                                    .buttonStyle(BorderlessButtonStyle())
+                                    .cornerRadius(100)
+                                    .shadow(color: bgMode == .dark ? .gray : .black, radius: 1, x: 1, y: 1)
+                                    ///if the button is tapped the flag will be set and it will show the content which is garageview.
+                                    .sheet(isPresented: $showGarage,  content: {
+                                        GarageView(locationDataManager: locationDataManager, showGarage: $showGarage)
                                     })
-                                .background(Color(AppColors.invertRed.rawValue))
-                                .tint(Color(AppColors.invertRed.rawValue))
-                                .buttonStyle(BorderlessButtonStyle())
-                                .cornerRadius(100)
-                                ///if the button is tapped the flag will be set and it will show the content which is garageview.
-                                .sheet(isPresented: $showGarage,  content: {
-                                    GarageView(locationDataManager: locationDataManager, showGarage: $showGarage)
-                                })
+                                    Spacer()
+                                }
+                              
                             }
                             .listRowInsets(EdgeInsets())
                             .listRowBackground(Color.clear)
@@ -291,18 +300,24 @@ struct SettingsView: View {
                             }
                             ///vstack enclosing the form submit button
                             VStack {
-                                Button {
-                                   
-                                    ///on tap update the active vehicle
-                                    updateActiveVehicle()
-                                    ///on tap save settings
-                                    saveSettings()
-                                } label: {
-                                    FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.blueColor.rawValue))
+                                HStack {
+                                    Spacer()
+                                    Button {
+                                       
+                                        ///on tap update the active vehicle
+                                        updateActiveVehicle()
+                                        ///on tap save settings
+                                        saveSettings()
+                                    } label: {
+                                        FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.blueColor.rawValue))
+                                    }
+                                    .background(Color(AppColors.invertBlueColor.rawValue))
+                                    .buttonStyle(BorderlessButtonStyle())
+                                    .cornerRadius(100)
+                                    .shadow(color: bgMode == .dark ? .gray : .black, radius: 1, x: 1, y: 1)
+                                    Spacer()
                                 }
-                                .background(Color(AppColors.invertBlueColor.rawValue))
-                                .buttonStyle(BorderlessButtonStyle())
-                                .cornerRadius(100)
+                               
                             }
                             ///remove the list row color of the form
                             .listRowBackground(Color.clear)
@@ -329,6 +344,7 @@ struct SettingsView: View {
                     label: {
                      AddCarImage()
                     }
+                  
                     ///on tap of the button, flag will be true and content (AddVehicleForm) will appear.
                     .sheet(isPresented: $showAddVehicleForm, content: {
                         AddVehicleForm(vehicle: $vehicle, showAddVehicleForm: $showAddVehicleForm, locationDataManager: locationDataManager)

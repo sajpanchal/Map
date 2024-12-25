@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct UpdateFuelEntry: View {
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: AutoFuelling.entity(), sortDescriptors: []) var fuelEntries: FetchedResults<AutoFuelling>
@@ -170,29 +171,35 @@ struct UpdateFuelEntry: View {
                         }
                         if let activeVehicle = vehicles.first(where: {$0.isActive}) {
                             VStack {
-                                Button {
-                                    if isTextFieldEntryValid() {
-                                        let index = vehicles.firstIndex(where: {$0.uniqueID == activeVehicle.uniqueID})
-                                        
-                                        addFuellingEntry(for: activeVehicle, at: index)
-                                                                       
-                                        if  let i = index {
-                                            calculateFuelCost(for: activeVehicle, at: i)
-                                            calculateFuelEfficiency(for: activeVehicle, at: i)
+                                HStack {
+                                    Spacer()
+                                    Button {
+                                        if isTextFieldEntryValid() {
+                                            let index = vehicles.firstIndex(where: {$0.uniqueID == activeVehicle.uniqueID})
+                                            
+                                            addFuellingEntry(for: activeVehicle, at: index)
+                                                                           
+                                            if  let i = index {
+                                                calculateFuelCost(for: activeVehicle, at: i)
+                                                calculateFuelEfficiency(for: activeVehicle, at: i)
+                                            }
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                                showFuelHistoryView = false
+                                            }
+                                          
                                         }
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                            showFuelHistoryView = false
-                                        }
-                                      
+                                        isTapped = true
+                                     
+                                    } label: {
+                                        FormButton(imageName: "plus.square.fill", text: "Update Entry", color: Color(AppColors.yellow.rawValue))
                                     }
-                                    isTapped = true
-                                 
-                                } label: {
-                                    FormButton(imageName: "plus.square.fill", text: "Update Entry", color: Color(AppColors.yellow.rawValue))
+                                    .background(Color(AppColors.invertYellow.rawValue))
+                                    .buttonStyle(BorderlessButtonStyle())
+                                    .cornerRadius(100)
+                                    .shadow(color: bgMode == .dark ? .gray : .black, radius: 1, x: 1, y: 1)
+                                    Spacer()
                                 }
-                                .background(Color(AppColors.invertYellow.rawValue))
-                                .buttonStyle(BorderlessButtonStyle())
-                                .cornerRadius(100)
+                          
                             }
                             .listRowBackground(Color.clear)
                             .listRowInsets(EdgeInsets())
@@ -205,6 +212,7 @@ struct UpdateFuelEntry: View {
             }
           
             .navigationTitle("Update Fuelling Entry")
+            .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear(perform: {
             ///location of the fuel entry

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct FormButton: View {
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     var imageName: String
     var text: String
     var color: Color
@@ -24,6 +25,7 @@ struct FormButton: View {
             Spacer()
         }
         .frame(height: 40, alignment: .center)
+      
     }
 }
 

@@ -10,6 +10,7 @@ import SwiftUI
 ///custom buttons to be used  for MapView
 struct MapViewButton: View {
     ///systemname of the image to be displayed on the button
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     var imageName: String = ""
     
     var body: some View {
@@ -26,6 +27,7 @@ struct MapViewButton: View {
                         .frame(width: 50, height: 50)
                         .foregroundStyle(Color(UIColor.systemGray3))
                         .cornerRadius(10)
+                        .shadow(color: .black, radius: 1, x: 1, y: 1)
                     ///if the image name is circle or circle with fill
                     if imageName == "circle" || imageName == "circle.fill" {
                         ///add a circle with gray gradiant on top of a rectangle.

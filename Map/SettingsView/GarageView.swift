@@ -68,6 +68,7 @@ struct GarageView: View {
                 }
                 .padding(.top,20)
                 .navigationTitle("Your Auto Garage")
+                .navigationBarTitleDisplayMode(.inline)
             }
             ///if settings object is found nil
             else {

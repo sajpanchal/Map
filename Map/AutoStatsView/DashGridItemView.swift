@@ -37,6 +37,7 @@ struct DashGridItemView: View {
                 //.background(backGroundColor.gradient)
                 .background(bgMode == .dark ? Color(UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1.0)) : Color(UIColor(red: 0.96, green: 0.96, blue: 0.96, alpha: 1.0)))
                 .cornerRadius(10)
+                .shadow(color: bgMode == .dark ? Color(UIColor.darkGray) : .black, radius: 1, x: 1, y: 1)
             }
         }
     }

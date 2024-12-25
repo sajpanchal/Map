@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct UpdateServiceEntry: View {
+    @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: AutoService.entity(), sortDescriptors: []) var serviceEntries: FetchedResults<AutoService>
@@ -90,25 +91,30 @@ struct UpdateServiceEntry: View {
                         }
                         if let vehicle = vehicles.first(where: {$0.isActive}) {
                             VStack {
-                                Button {
-                                    if isTextFieldEntryValid() {
-                                        if let index = serviceEntries.firstIndex(where: {$0.vehicle == vehicle && $0.uniqueID == serviceEntry.uniqueID}) {
-                                            editServiceCost(at: index)
+                                HStack {
+                                    Spacer()
+                                    Button {
+                                        if isTextFieldEntryValid() {
+                                            if let index = serviceEntries.firstIndex(where: {$0.vehicle == vehicle && $0.uniqueID == serviceEntry.uniqueID}) {
+                                                editServiceCost(at: index)
+                                            }
+                                            aggregateServiceCost(for: vehicle)
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                                showServiceHistoryView = false
+                                            }
+                                           
                                         }
-                                        aggregateServiceCost(for: vehicle)
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                            showServiceHistoryView = false
-                                        }
-                                       
+                                        isButtonTapped = true
+                                   
+                                    } label: {
+                                        FormButton(imageName: "plus.square.fill", text: "Add Entry", color: Color(AppColors.red.rawValue))
                                     }
-                                    isButtonTapped = true
-                               
-                                } label: {
-                                    FormButton(imageName: "plus.square.fill", text: "Add Entry", color: Color(AppColors.red.rawValue))
+                                    .background(Color(AppColors.invertRed.rawValue))
+                                    .buttonStyle(BorderlessButtonStyle())
+                                    .cornerRadius(100)
+                                    .shadow(color: bgMode == .dark ? .gray : .black, radius: 1, x: 1, y: 1)
+                                    Spacer()
                                 }
-                                .background(Color(AppColors.invertRed.rawValue))
-                                .buttonStyle(BorderlessButtonStyle())
-                                .cornerRadius(100)
                             }
                             .listRowBackground(Color.clear)
                             .listRowInsets(EdgeInsets())
@@ -120,7 +126,8 @@ struct UpdateServiceEntry: View {
                 }
             }
           
-            .navigationTitle("Add Auto Service")
+            .navigationTitle("Update Auto Service")
+            .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear(perform: {
             location = serviceEntry.location ?? ""

@@ -73,6 +73,7 @@ struct ServiceHistoryView: View {
                 }
             }
             .navigationTitle("Service History")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
     func getString(from : Date) -> String {
