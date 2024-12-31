@@ -112,6 +112,16 @@ struct AutoStatsView: View {
                             .onChange(of: showFuelHistoryView) {
                                 efficiency = getFuelEfficiency()
                             }
+                            NavigationLink {
+                                AutoSummaryList()
+                            } label : {
+                                Text("Show Past Summary")
+                            }
+                            NavigationLink {
+                                ChartView()
+                            } label : {
+                                Text("Show Graphs")
+                            }
                         }
                         header: {
                             Text("Dashboard")
@@ -120,6 +130,49 @@ struct AutoStatsView: View {
                                 .padding(.top, 15)
                         }
                         .padding(10)
+                        .onAppear {
+                            for vehicle in vehicles {
+                                print(vehicle.getVehicleText)
+                                print("is Active:\(vehicle.isActive)")
+                            }
+                          
+                            print("on appear of auto stats")
+                            if vehicle.getReports.isEmpty {
+                                print("reports are nil")
+                               for year in vehicle.getYearsOfVehicleRun {
+                                   let autoSummary = AutoSummary(context: viewContext)
+                                   autoSummary.calenderYear = Int16(year)
+                                   resetSummaryFields(in: autoSummary)
+                                   calculateFuellingSummary(forYear: year, in: autoSummary, for: vehicle)
+                                   calculateServiceCostSummary(forYear: year, in: autoSummary, for: vehicle)
+                                   vehicle.addToReports(autoSummary)
+                                   AutoSummary.saveContext(viewContext: viewContext)
+                                }
+                            }
+                            else {
+                                print("vehicleID:\(vehicle.objectID)")
+                                print("vehicleName:\(vehicle.getVehicleText)")
+                                print("reports are not nil")
+                                for autoSummary in vehicle.getReports {
+                                
+                                    print(autoSummary.annualTrip)
+                                    print(autoSummary.annualTripMiles)
+                                    print(autoSummary.litreConsumed)
+                                    print(autoSummary.gallonsConsumed)
+                                    print(autoSummary.annualMileage)
+                                    print(autoSummary.annualFuelCost)
+                                    print(autoSummary.annualTripEV)
+                                    print(autoSummary.annualTripEVMiles)
+                                    print(autoSummary.kwhConsumed)
+                                    print(autoSummary.annualMileageEV)
+                                    print(autoSummary.annualfuelCostEV)
+                                    print(autoSummary.annualServiceCost)
+                                    print(autoSummary.annualServiceCostEV)
+                                }
+                            }
+                            
+                        }
+                        
                     }
                     if let vehicle = vehicles.first(where:{$0.isActive}) {
                         Section {
@@ -219,6 +272,7 @@ struct AutoStatsView: View {
                 .frame(width: geo.size.width, height: geo.size.height - 40)
               
                 .navigationTitle("Auto Summary")
+                
             
             }
         }
@@ -276,6 +330,50 @@ struct AutoStatsView: View {
       ///return the value.
         return vehicle.fuelEfficiency
 
+    }
+    func resetSummaryFields(in autoSummary: AutoSummary) {
+        autoSummary.annualTrip = 0
+        autoSummary.annualTripMiles = 0
+        autoSummary.litreConsumed = 0
+        autoSummary.gallonsConsumed = 0
+        autoSummary.annualMileage = 0
+        autoSummary.annualFuelCost = 0
+        autoSummary.annualTripEV  = 0
+        autoSummary.annualTripEVMiles  = 0
+        autoSummary.kwhConsumed = 0
+        autoSummary.annualMileageEV = 0
+        autoSummary.annualfuelCostEV = 0
+        autoSummary.annualServiceCost = 0
+        autoSummary.annualServiceCostEV = 0
+    }
+    func calculateFuellingSummary(forYear year: Int, in autoSummary: AutoSummary, for vehicle: Vehicle) {
+       
+        for fuel in vehicle.getFuellings.filter({Calendar.current.component(.year, from: $0.date!) == year && $0.fuelType == FuelMode.Gas.rawValue}) {
+            autoSummary.annualTrip += fuel.lasttrip
+            autoSummary.annualTripMiles += fuel.lastTripMiles
+                                
+            autoSummary.litreConsumed += fuel.litre
+            autoSummary.gallonsConsumed += fuel.gallon
+            
+            autoSummary.annualMileage = autoSummary.annualTrip/autoSummary.litreConsumed
+            autoSummary.annualFuelCost += fuel.cost
+        }
+        for fuel in vehicle.getFuellings.filter({Calendar.current.component(.year, from: $0.date!) == year && $0.fuelType == FuelMode.EV.rawValue}) {
+            autoSummary.annualTripEV += fuel.lasttrip
+            autoSummary.annualTripEVMiles += fuel.lastTripMiles
+                                
+            autoSummary.kwhConsumed += (vehicle.getBatteryCapacity * (fuel.percent/100))
+                     
+            autoSummary.annualMileageEV = autoSummary.annualTripEV/autoSummary.kwhConsumed
+            autoSummary.annualfuelCostEV += fuel.cost
+        }
+    }
+    
+    func calculateServiceCostSummary(forYear year: Int, in autoSummary: AutoSummary, for vehicle: Vehicle) {
+        for service in vehicle.getServices.filter({Calendar.current.component(.year, from: $0.date!) == year}) {
+            autoSummary.annualServiceCost += service.cost
+            autoSummary.annualServiceCostEV += service.cost
+        }
     }
 }
 

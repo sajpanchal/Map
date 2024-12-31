@@ -18,13 +18,15 @@
 		7223439E2A8FD6ED00DC7120 /* MapProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7223439D2A8FD6ED00DC7120 /* MapProgressView.swift */; };
 		7226953C2C41849E007B200B /* AutoFuelling+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722695342C41849E007B200B /* AutoFuelling+CoreDataClass.swift */; };
 		7226953D2C41849E007B200B /* AutoFuelling+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722695352C41849E007B200B /* AutoFuelling+CoreDataProperties.swift */; };
-		7226953E2C41849E007B200B /* Vehicle+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722695362C41849E007B200B /* Vehicle+CoreDataClass.swift */; };
-		7226953F2C41849E007B200B /* Vehicle+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722695372C41849E007B200B /* Vehicle+CoreDataProperties.swift */; };
 		722695402C41849E007B200B /* AutoService+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722695382C41849E007B200B /* AutoService+CoreDataClass.swift */; };
 		722695412C41849E007B200B /* AutoService+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722695392C41849E007B200B /* AutoService+CoreDataProperties.swift */; };
+		7228CAFF2D1F603B00D4FED5 /* AutoSummary+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7228CAFD2D1F603B00D4FED5 /* AutoSummary+CoreDataClass.swift */; };
+		7228CB002D1F603B00D4FED5 /* AutoSummary+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7228CAFE2D1F603B00D4FED5 /* AutoSummary+CoreDataProperties.swift */; };
 		722DABAE2BADF267004447FE /* RouteData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 722DABAD2BADF267004447FE /* RouteData.swift */; };
 		7246B2132C27284A00086BFB /* FuellingEntryForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7246B2122C27284A00086BFB /* FuellingEntryForm.swift */; };
 		7246B2152C272E1B00086BFB /* FuelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7246B2142C272E1B00086BFB /* FuelData.swift */; };
+		724D99782D21A8C20052B242 /* AutoSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724D99772D21A8C20052B242 /* AutoSummaryView.swift */; };
+		724D997A2D21A95E0052B242 /* OdometerForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724D99792D21A95E0052B242 /* OdometerForm.swift */; };
 		725110722C25CCA900822837 /* DashGridItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725110712C25CCA900822837 /* DashGridItemView.swift */; };
 		725181CA2C19F32E00757DD7 /* DirectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725181C92C19F32E00757DD7 /* DirectionsView.swift */; };
 		725BEFC92C152D0E00EA3C37 /* NearbyLocationsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725BEFC82C152D0E00EA3C37 /* NearbyLocationsListView.swift */; };
@@ -45,6 +47,8 @@
 		7274A4E72C8B566F00C929CC /* SearchProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7274A4E62C8B566F00C929CC /* SearchProgressView.swift */; };
 		727996302C1F3E4D00F323B4 /* AutoStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7279962F2C1F3E4D00F323B4 /* AutoStatsView.swift */; };
 		727996332C1F3EDE00F323B4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727996322C1F3EDE00F323B4 /* SettingsView.swift */; };
+		727B04142D1F03B700E876F5 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727B04132D1F03B700E876F5 /* ChartView.swift */; };
+		727B04162D1F03D700E876F5 /* AutoSummaryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727B04152D1F03D700E876F5 /* AutoSummaryList.swift */; };
 		727F5E072B34C748000ECCB7 /* LocalSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727F5E062B34C748000ECCB7 /* LocalSearch.swift */; };
 		727F5E092B34C7C8000ECCB7 /* AddressResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727F5E082B34C7C8000ECCB7 /* AddressResult.swift */; };
 		728181FD2C52A6F400D8F3AA /* VehicleListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728181FC2C52A6F400D8F3AA /* VehicleListItem.swift */; };
@@ -55,6 +59,8 @@
 		7286A1492C24813400333A4F /* FuelHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7286A1482C24813400333A4F /* FuelHistoryView.swift */; };
 		7286A14B2C24948100333A4F /* ServiceHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7286A14A2C24948100333A4F /* ServiceHistoryView.swift */; };
 		728A7CA62B90F282003AA218 /* GreetingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728A7CA52B90F282003AA218 /* GreetingsView.swift */; };
+		728F359E2D1DB31B008B9FC9 /* Vehicle+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728F359D2D1DB31B008B9FC9 /* Vehicle+CoreDataProperties.swift */; };
+		728F359F2D1DB31B008B9FC9 /* Vehicle+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728F359C2D1DB31B008B9FC9 /* Vehicle+CoreDataClass.swift */; };
 		72928F9B2C481548007ED736 /* GarageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72928F9A2C481548007ED736 /* GarageView.swift */; };
 		72928F9D2C481763007ED736 /* UpdateVehicleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72928F9C2C481763007ED736 /* UpdateVehicleView.swift */; };
 		7295B88C2CE3AFCE00E9959A /* SpeechViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7295B88B2CE3AFCE00E9959A /* SpeechViewModel.swift */; };
@@ -108,13 +114,15 @@
 		7223439D2A8FD6ED00DC7120 /* MapProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapProgressView.swift; sourceTree = "<group>"; };
 		722695342C41849E007B200B /* AutoFuelling+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoFuelling+CoreDataClass.swift"; sourceTree = "<group>"; };
 		722695352C41849E007B200B /* AutoFuelling+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoFuelling+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		722695362C41849E007B200B /* Vehicle+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Vehicle+CoreDataClass.swift"; sourceTree = "<group>"; };
-		722695372C41849E007B200B /* Vehicle+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Vehicle+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		722695382C41849E007B200B /* AutoService+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoService+CoreDataClass.swift"; sourceTree = "<group>"; };
 		722695392C41849E007B200B /* AutoService+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoService+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		7228CAFD2D1F603B00D4FED5 /* AutoSummary+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoSummary+CoreDataClass.swift"; sourceTree = "<group>"; };
+		7228CAFE2D1F603B00D4FED5 /* AutoSummary+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AutoSummary+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		722DABAD2BADF267004447FE /* RouteData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteData.swift; sourceTree = "<group>"; };
 		7246B2122C27284A00086BFB /* FuellingEntryForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuellingEntryForm.swift; sourceTree = "<group>"; };
 		7246B2142C272E1B00086BFB /* FuelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuelData.swift; sourceTree = "<group>"; };
+		724D99772D21A8C20052B242 /* AutoSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoSummaryView.swift; sourceTree = "<group>"; };
+		724D99792D21A95E0052B242 /* OdometerForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OdometerForm.swift; sourceTree = "<group>"; };
 		725110712C25CCA900822837 /* DashGridItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashGridItemView.swift; sourceTree = "<group>"; };
 		725181C92C19F32E00757DD7 /* DirectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionsView.swift; sourceTree = "<group>"; };
 		725BEFC82C152D0E00EA3C37 /* NearbyLocationsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyLocationsListView.swift; sourceTree = "<group>"; };
@@ -138,6 +146,8 @@
 		7274A4E62C8B566F00C929CC /* SearchProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchProgressView.swift; sourceTree = "<group>"; };
 		7279962F2C1F3E4D00F323B4 /* AutoStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoStatsView.swift; sourceTree = "<group>"; };
 		727996322C1F3EDE00F323B4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		727B04132D1F03B700E876F5 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		727B04152D1F03D700E876F5 /* AutoSummaryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoSummaryList.swift; sourceTree = "<group>"; };
 		727F5E062B34C748000ECCB7 /* LocalSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LocalSearch.swift; path = ../MapView/LocalSearch.swift; sourceTree = "<group>"; };
 		727F5E082B34C7C8000ECCB7 /* AddressResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressResult.swift; sourceTree = "<group>"; };
 		728181FC2C52A6F400D8F3AA /* VehicleListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleListItem.swift; sourceTree = "<group>"; };
@@ -148,6 +158,8 @@
 		7286A1482C24813400333A4F /* FuelHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuelHistoryView.swift; sourceTree = "<group>"; };
 		7286A14A2C24948100333A4F /* ServiceHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceHistoryView.swift; sourceTree = "<group>"; };
 		728A7CA52B90F282003AA218 /* GreetingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreetingsView.swift; sourceTree = "<group>"; };
+		728F359C2D1DB31B008B9FC9 /* Vehicle+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Vehicle+CoreDataClass.swift"; sourceTree = "<group>"; };
+		728F359D2D1DB31B008B9FC9 /* Vehicle+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Vehicle+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		72928F9A2C481548007ED736 /* GarageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarageView.swift; sourceTree = "<group>"; };
 		72928F9C2C481763007ED736 /* UpdateVehicleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateVehicleView.swift; sourceTree = "<group>"; };
 		7295B88B2CE3AFCE00E9959A /* SpeechViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechViewModel.swift; sourceTree = "<group>"; };
@@ -245,12 +257,14 @@
 		72426BE82D06018B002E49E1 /* DataModel */ = {
 			isa = PBXGroup;
 			children = (
+				728F359C2D1DB31B008B9FC9 /* Vehicle+CoreDataClass.swift */,
+				728F359D2D1DB31B008B9FC9 /* Vehicle+CoreDataProperties.swift */,
 				728665BA2D172BFA00BF25B1 /* Settings+CoreDataClass.swift */,
 				728665BB2D172BFA00BF25B1 /* Settings+CoreDataProperties.swift */,
+				7228CAFD2D1F603B00D4FED5 /* AutoSummary+CoreDataClass.swift */,
+				7228CAFE2D1F603B00D4FED5 /* AutoSummary+CoreDataProperties.swift */,
 				722695342C41849E007B200B /* AutoFuelling+CoreDataClass.swift */,
 				722695352C41849E007B200B /* AutoFuelling+CoreDataProperties.swift */,
-				722695362C41849E007B200B /* Vehicle+CoreDataClass.swift */,
-				722695372C41849E007B200B /* Vehicle+CoreDataProperties.swift */,
 				722695382C41849E007B200B /* AutoService+CoreDataClass.swift */,
 				722695392C41849E007B200B /* AutoService+CoreDataProperties.swift */,
 			);
@@ -364,6 +378,10 @@
 				72A8BC252C29C7EB00E0D7B2 /* ServiceEntryForm.swift */,
 				721E4BA22C569E9200C3C769 /* UpdateServiceEntry.swift */,
 				721E4BA42C569EED00C3C769 /* UpdateFuelEntry.swift */,
+				727B04132D1F03B700E876F5 /* ChartView.swift */,
+				727B04152D1F03D700E876F5 /* AutoSummaryList.swift */,
+				724D99772D21A8C20052B242 /* AutoSummaryView.swift */,
+				724D99792D21A95E0052B242 /* OdometerForm.swift */,
 			);
 			path = AutoStatsView;
 			sourceTree = "<group>";
@@ -569,12 +587,18 @@
 				725BEFC92C152D0E00EA3C37 /* NearbyLocationsListView.swift in Sources */,
 				728237572C14AA7900F91AD8 /* NavigationRoutesListView.swift in Sources */,
 				7222C22A2C1C9D040029E26F /* AddressView.swift in Sources */,
+				727B04142D1F03B700E876F5 /* ChartView.swift in Sources */,
 				72C226272C2C6D8600E51D9E /* Settings.swift in Sources */,
 				7286A14B2C24948100333A4F /* ServiceHistoryView.swift in Sources */,
 				72EDE4192B26372D00578B8A /* MapInteractionsView.swift in Sources */,
+				728F359E2D1DB31B008B9FC9 /* Vehicle+CoreDataProperties.swift in Sources */,
+				728F359F2D1DB31B008B9FC9 /* Vehicle+CoreDataClass.swift in Sources */,
 				721E4BA32C569E9200C3C769 /* UpdateServiceEntry.swift in Sources */,
 				7223439C2A8FD61F00DC7120 /* MapViewButton.swift in Sources */,
 				725EF4E02A91089B000FB0E1 /* MapUIViewAPI.swift in Sources */,
+				724D99782D21A8C20052B242 /* AutoSummaryView.swift in Sources */,
+				7228CAFF2D1F603B00D4FED5 /* AutoSummary+CoreDataClass.swift in Sources */,
+				7228CB002D1F603B00D4FED5 /* AutoSummary+CoreDataProperties.swift in Sources */,
 				72928F9B2C481548007ED736 /* GarageView.swift in Sources */,
 				726A77DA2B486ABE0095B047 /* NavigationButton.swift in Sources */,
 				72BF3DCD2C5153A9005395B4 /* AddCarImage.swift in Sources */,
@@ -594,6 +618,7 @@
 				72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */,
 				72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */,
 				72928F9D2C481763007ED736 /* UpdateVehicleView.swift in Sources */,
+				727B04162D1F03D700E876F5 /* AutoSummaryList.swift in Sources */,
 				727996302C1F3E4D00F323B4 /* AutoStatsView.swift in Sources */,
 				728A7CA62B90F282003AA218 /* GreetingsView.swift in Sources */,
 				72EDE41D2B26457A00578B8A /* MapSwiftUIAPI.swift in Sources */,
@@ -602,12 +627,11 @@
 				72EDE41B2B26408A00578B8A /* ExpandedDirectionsView.swift in Sources */,
 				7226953C2C41849E007B200B /* AutoFuelling+CoreDataClass.swift in Sources */,
 				7226953D2C41849E007B200B /* AutoFuelling+CoreDataProperties.swift in Sources */,
-				7226953E2C41849E007B200B /* Vehicle+CoreDataClass.swift in Sources */,
-				7226953F2C41849E007B200B /* Vehicle+CoreDataProperties.swift in Sources */,
 				729892EE2D1A651C0061CA96 /* AlertView.swift in Sources */,
 				722695402C41849E007B200B /* AutoService+CoreDataClass.swift in Sources */,
 				722695412C41849E007B200B /* AutoService+CoreDataProperties.swift in Sources */,
 				72A8BC242C29C3F600E0D7B2 /* AutoService.swift in Sources */,
+				724D997A2D21A95E0052B242 /* OdometerForm.swift in Sources */,
 				7286A1472C24804700333A4F /* NewEntryStackView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

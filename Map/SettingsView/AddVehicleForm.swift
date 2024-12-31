@@ -291,6 +291,9 @@ struct AddVehicleForm: View {
     }
     func addVehicle() {
         ///create an instance of Vehicle entity
+        let autoSummary = AutoSummary(context: viewContext)
+        let year = Calendar.current.component(.year, from: Date())
+        autoSummary.calenderYear = Int16(year)
         let newVehicle = Vehicle(context: viewContext)
         ///set new UUID
         newVehicle.uniqueID = UUID()
@@ -312,28 +315,38 @@ struct AddVehicleForm: View {
         newVehicle.year = Int16(year)
         ///set vehicle odometer
         newVehicle.odometer = Double(odometer)
+        autoSummary.odometerStart = Double(odometer)
         ///set vehicle odometer
         newVehicle.odometerMiles = Double(odometerMiles)
+        autoSummary.odometerStartMiles = Double(odometerMiles)
         ///set vehicle trip odometer
         if settings.first!.distanceUnit == "km" {
             newVehicle.trip = trip
+            autoSummary.annualTrip = trip
             newVehicle.tripMiles = newVehicle.trip * 0.6214
+            autoSummary.annualTripMiles = newVehicle.trip * 0.6214
         }
         else {
             newVehicle.tripMiles = tripMiles
+            autoSummary.annualTripMiles = tripMiles
             newVehicle.trip = newVehicle.tripMiles / 0.6214
+            autoSummary.annualTrip = newVehicle.tripMiles / 0.6214
         }
       
         if engineType == .Hybrid {
             if settings.first!.distanceUnit == "km" {
                 ///set vehicle trip odometer
                 newVehicle.tripHybridEV = tripHybridEV
+                autoSummary.annualTripEV = tripHybridEV
                 newVehicle.tripHybridEVMiles = newVehicle.tripHybridEV * 0.6214
+                autoSummary.annualTripEVMiles =  newVehicle.tripHybridEV * 0.6214
             }
             else {
                 ///set vehicle trip odometer
                 newVehicle.tripHybridEVMiles = tripHybridEVMiles
+                autoSummary.annualTripEVMiles =  newVehicle.tripHybridEVMiles
                 newVehicle.tripHybridEV = newVehicle.tripHybridEVMiles / 0.6214
+                autoSummary.annualTripEV = newVehicle.tripHybridEVMiles / 0.6214
             }
            
         }
@@ -349,6 +362,7 @@ struct AddVehicleForm: View {
         withAnimation(.easeIn(duration: 0.5)) {
             showAlert = true
         }
+        vehicle.addToReports(autoSummary)
         ///save the context after new vehicle is set.
         Vehicle.saveContext(viewContext: viewContext)
         ///hide the vehicle form

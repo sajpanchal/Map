@@ -11,6 +11,7 @@ struct UpdateVehicleView: View {
     @Environment(\.colorScheme) var bgMode: ColorScheme
     ///environment object that represents core data store's managed object context which tracks the changes made in entities.
     @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(entity: AutoSummary.entity(), sortDescriptors: []) var reports: FetchedResults<AutoSummary>
     ///state variable that stores vehicle type in enum format
     @State private var vehicleType: VehicleTypes = .Car
     ///state variable that stores vehicle make in enum format
@@ -423,24 +424,34 @@ struct UpdateVehicleView: View {
         }
     }
     func addVehicle(for vehicle: Vehicle) {
-        
+        let year = Calendar.current.component(.year, from: Date())
+        guard let index = reports.firstIndex(where: {$0.vehicle == vehicle && $0.calenderYear == Int16(year)}) else {
+            return
+        }
+       
         vehicle.uniqueID = UUID()
         vehicle.model = vehicleModel.rawValue
         vehicle.make = vehicleMake.rawValue
         vehicle.year = Int16(manufacturingYear)
         vehicle.odometer = Double(odometer)
+        reports[index].odometerEnd = Double(odometer)
         vehicle.odometerMiles = Double(odometerMiles)
+        reports[index].odometerEndMiles = Double(odometerMiles)
        ///if the engine type is hybrid
         if engineType == .Hybrid {
             ///update the hybrid EV trip (in km)
             vehicle.tripHybridEV = tripHybridEV
+            reports[index].annualTripEV = tripHybridEV
             vehicle.tripHybridEVMiles = tripHybridEVMiles
+            reports[index].annualTripEVMiles = tripHybridEVMiles
             
         }
         ///update vehicle trip (in miles) with new values
         vehicle.tripMiles = tripMiles
+        reports[index].annualTripMiles = tripMiles
         ///update vehicle trip (in km) with new values
         vehicle.trip = trip
+        reports[index].annualTrip = trip
         ///save the engine type in vehicle object. (Gas, EV, Hybrid)
         vehicle.fuelEngine = engineType.rawValue
         ///if engine type is not gas set the battery capacity of the EV engine
@@ -449,7 +460,8 @@ struct UpdateVehicleView: View {
         }
         ///save the vehicle type (Car, Truck, SUV)
         vehicle.type = vehicleType.rawValue
-        vehicle.isActive = true
+        //vehicle.isActive = true
+      
         Vehicle.saveContext(viewContext: viewContext)
     }
     func saveSettings(for vehicle: Vehicle) {

@@ -609,3 +609,16 @@ enum EfficiencyModesG2: String, CaseIterable, Identifiable  {
         self
     }
 }
+
+enum EfficiencyCharts: String, CaseIterable, Identifiable {
+    case travel, fuel, mileage
+    var id: Self {
+        self
+    }
+}
+enum CostCharts: String, CaseIterable, Identifiable {
+    case fuel_Cost, service_Cost
+    var id: Self {
+        self
+    }
+}

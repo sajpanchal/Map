@@ -2,7 +2,7 @@
 //  Vehicle+CoreDataProperties.swift
 //  Map
 //
-//  Created by saj panchal on 2024-10-06.
+//  Created by saj panchal on 2024-12-26.
 //
 //
 
@@ -25,17 +25,18 @@ extension Vehicle {
     @NSManaged public var make: String?
     @NSManaged public var model: String?
     @NSManaged public var odometer: Double
+    @NSManaged public var odometerMiles: Double
     @NSManaged public var serviceCost: Double
     @NSManaged public var trip: Double
     @NSManaged public var tripHybridEV: Double
+    @NSManaged public var tripHybridEVMiles: Double
     @NSManaged public var tripMiles: Double
     @NSManaged public var type: String?
     @NSManaged public var uniqueID: UUID?
     @NSManaged public var year: Int16
-    @NSManaged public var tripHybridEVMiles: Double
-    @NSManaged public var odometerMiles: Double
     @NSManaged public var fuellings: NSSet?
     @NSManaged public var services: NSSet?
+    @NSManaged public var reports: NSSet?
     public var getFuelEngine: String {
         fuelEngine ?? "N/A"
     }
@@ -104,6 +105,12 @@ extension Vehicle {
             $0.date! > $1.date!
         }
     }
+    public var getReports: [AutoSummary] {
+        let set = reports as? Set<AutoSummary> ?? []
+        return set.sorted {
+            $0.calenderYear > $1.calenderYear
+        }
+    }
     public var getFuellingDates: Set<Date> {
         let set = fuellings as? Set<AutoFuelling> ?? []
         var setDates: Set<Date> = []
@@ -121,6 +128,23 @@ extension Vehicle {
         }
         
         return setDates
+    }
+    public var getYearsOfVehicleRun: [Int] {
+        let serviceDates = getServiceDates
+        let fuellingDates = getFuellingDates
+        var combineDates: Set<Int> = []
+        var years: [Int] = []
+        for sd in serviceDates {
+            combineDates.insert(Calendar.current.component(.year, from: sd))
+        }
+        for fd in fuellingDates {
+            combineDates.insert(Calendar.current.component(.year, from: fd))
+        }
+        for cd in combineDates {
+            years.append(cd)
+        }
+        return years
+        
     }
     public var getServiceCost: Double {
         var cost = 0.0
@@ -196,6 +220,23 @@ extension Vehicle {
 
     @objc(removeServices:)
     @NSManaged public func removeFromServices(_ values: NSSet)
+
+}
+
+// MARK: Generated accessors for reports
+extension Vehicle {
+
+    @objc(addReportsObject:)
+    @NSManaged public func addToReports(_ value: AutoSummary)
+
+    @objc(removeReportsObject:)
+    @NSManaged public func removeFromReports(_ value: AutoSummary)
+
+    @objc(addReports:)
+    @NSManaged public func addToReports(_ values: NSSet)
+
+    @objc(removeReports:)
+    @NSManaged public func removeFromReports(_ values: NSSet)
 
 }
 

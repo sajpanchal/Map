@@ -2,14 +2,14 @@
 //  Vehicle+CoreDataClass.swift
 //  Map
 //
-//  Created by saj panchal on 2024-07-12.
+//  Created by saj panchal on 2024-12-26.
 //
 //
 
 import Foundation
 import CoreData
 
-@objc(Vehicle)
+
 public class Vehicle: NSManagedObject {
 
 }

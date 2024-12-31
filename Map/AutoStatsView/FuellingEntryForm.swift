@@ -11,6 +11,7 @@ struct FuellingEntryForm: View {
     @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
+    @FetchRequest(entity: AutoSummary.entity(), sortDescriptors: []) var reports: FetchedResults<AutoSummary>
     @FetchRequest(entity: Settings.entity(), sortDescriptors: []) var settings: FetchedResults<Settings>
     @StateObject var locationDatamanager: LocationDataManager
     @State private var location = ""
@@ -160,6 +161,7 @@ struct FuellingEntryForm: View {
                                                 resetTripData(at: i)
                                                 calculateFuelCost(for: vehicle, at: i)
                                                 calculateFuelEfficiency(for: vehicle, at: i)
+                                                updateAutoSummary(for: vehicle, at: i)
                                             }
                                         }
                                         isTapped = true
@@ -365,6 +367,82 @@ struct FuellingEntryForm: View {
           
             Vehicle.saveContext(viewContext: viewContext)
         }
+    }
+    
+    func updateAutoSummary(for vehicle: Vehicle, at index: Int) {
+      
+        let year = Calendar.current.component(.year, from: date)
+        if let i = reports.firstIndex(where: {$0.vehicle == vehicle && $0.calenderYear == year}) {
+            print("index found for \(vehicle.getVehicleText) for year \(year)")
+            reports[i].annualTrip = 0
+            reports[i].annualTripMiles = 0
+            reports[i].annualTripEV = 0
+            reports[i].annualTripEVMiles = 0
+            reports[i].litreConsumed = 0
+            reports[i].gallonsConsumed = 0
+            reports[i].kwhConsumed = 0
+            reports[i].annualFuelCost = 0
+            reports[i].annualfuelCostEV = 0
+            
+            for fuelling in vehicle.getFuellings.filter({Calendar.current.component(.year, from: $0.date!) == year}) {
+                if fuelling.fuelType == FuelMode.Gas.rawValue {
+                 
+                    reports[i].annualTrip += fuelling.lasttrip
+                    reports[i].annualTripMiles += fuelling.lastTripMiles
+                    reports[i].annualFuelCost += fuelling.cost
+                }
+                else {
+                    reports[i].annualTripEV += fuelling.lasttrip
+                    reports[i].annualTripEVMiles += fuelling.lastTripMiles
+                    reports[i].annualfuelCostEV += fuelling.cost
+                }
+                    reports[i].litreConsumed += fuelling.litre
+                    reports[i].gallonsConsumed += fuelling.gallon
+                    reports[i].kwhConsumed += (vehicle.batteryCapacity * fuelling.percent)/100
+            }
+            reports[i].odometerEnd = vehicle.odometer
+            reports[i].odometerEndMiles = vehicle.odometerMiles
+            Vehicle.saveContext(viewContext: viewContext)
+        }
+        else {
+            print("Record not found for year \(year)")
+            let autoSummary = AutoSummary(context: viewContext)
+            autoSummary.calenderYear = Int16(year)
+            if  vehicle.getFuelMode == "Gas"  {
+                autoSummary.annualTrip = vehicles[index].trip
+                autoSummary.annualTripMiles = vehicles[index].tripMiles
+                autoSummary.annualFuelCost = cost
+            }
+            else {
+                autoSummary.annualTripEV = vehicles[index].tripHybridEV
+                autoSummary.annualTripEVMiles = vehicles[index].tripHybridEVMiles
+                autoSummary.annualfuelCostEV = cost
+            }
+            if settings.first?.getFuelVolumeUnit == "Litre" {
+                autoSummary.litreConsumed = litre
+                autoSummary.gallonsConsumed = litre/3.785
+                print("auto litre:\(autoSummary.litreConsumed)")
+                print("auto gallon: \(autoSummary.gallonsConsumed)")
+            }
+            else if settings.first?.getFuelVolumeUnit == "Gallon" {
+                autoSummary.gallonsConsumed = gallon
+                autoSummary.litreConsumed = gallon * 3.785
+                print("auto litre:\(autoSummary.litreConsumed)")
+                print("auto gallon: \(autoSummary.gallonsConsumed)")
+            }
+            else {
+                autoSummary.kwhConsumed = (vehicle.batteryCapacity * Double((percentAfterCharge - percentBeforeCharge)))/100
+            }
+           // autoSummary.kwhConsumed = (vehicle.batteryCapacity * (percentAfterCharge - percentBeforeCharge))/100
+            autoSummary.odometerEnd = vehicle.odometer
+            autoSummary.odometerEndMiles = vehicle.odometerMiles
+            vehicles[index].addToReports(autoSummary)
+            Vehicle.saveContext(viewContext: viewContext)
+            print("new fuel entry saved")
+        }
+       
+            
+        
     }
 }
 

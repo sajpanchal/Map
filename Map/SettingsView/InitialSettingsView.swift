@@ -445,6 +445,9 @@ struct InitialSettingsView: View {
     }
     
     func addVehicle(for vehicle: Vehicle) {
+        let year =  Calendar.current.component(.year, from: Date())
+        let autoSummary = AutoSummary(context: viewContext)
+        autoSummary.calenderYear = Int16(year)
         ///set unique id.
         vehicle.uniqueID = UUID()
         ///set model name string
@@ -455,32 +458,42 @@ struct InitialSettingsView: View {
         vehicle.year = Int16(year)
         ///set vehicle odometer in decimal format
         vehicle.odometer = Double(odometer)
+        autoSummary.odometerStart = Double(odometer)
         ///set vehicle odometer in decimal format
         vehicle.odometerMiles = Double(odometerMiles)
+        autoSummary.odometerStartMiles = Double(odometerMiles)
         if distanceUnit == .km {
             ///set vehicle trip odometer in decimal format
             vehicle.trip = trip
+            autoSummary.annualTrip = trip
             ///set vehicle trip odometer in decimal format
             vehicle.tripMiles =  vehicle.trip * 0.6214
+            autoSummary.annualTripMiles =  vehicle.trip * 0.6214
         }
         else {
             ///set vehicle trip odometer in decimal format
             vehicle.tripMiles = tripMiles
+            autoSummary.annualTripMiles = tripMiles
             ///set vehicle trip odometer in decimal format
             vehicle.trip = vehicle.tripMiles / 0.6214
+            autoSummary.annualTrip =  vehicle.tripMiles / 0.6214
         }
         if engineType == .Hybrid {
             if distanceUnit == .km {
                 ///set vehicle trip odometer in decimal format
                 vehicle.tripHybridEV = tripHybridEV
+                autoSummary.annualTripEV = tripHybridEV
                 ///set vehicle trip odometer in decimal format
                 vehicle.tripHybridEVMiles =  vehicle.tripHybridEV * 0.6214
+                autoSummary.annualTripEVMiles = vehicle.tripHybridEV * 0.6214
             }
             else {
                 ///set vehicle trip odometer in decimal format
                 vehicle.tripHybridEVMiles = tripHybridEVMiles
+                autoSummary.annualTripEVMiles = tripHybridEVMiles
                 ///set vehicle trip odometer in decimal format
                 vehicle.tripHybridEV = vehicle.tripHybridEVMiles / 0.6214
+                autoSummary.annualTripEV = vehicle.tripHybridEVMiles / 0.6214
             }
         }
 
@@ -496,6 +509,7 @@ struct InitialSettingsView: View {
         ///set vehicle as active vehicle as it is the only vehicle available initially.
         vehicle.isActive = true
         vehicle.fuelMode = fuelMode.rawValue
+        vehicle.addToReports(autoSummary)
         ///save the managed view context to the core data store with new changes.
         Vehicle.saveContext(viewContext: viewContext)
     }

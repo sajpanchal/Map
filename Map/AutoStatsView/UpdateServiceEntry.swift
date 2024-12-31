@@ -12,6 +12,7 @@ struct UpdateServiceEntry: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: AutoService.entity(), sortDescriptors: []) var serviceEntries: FetchedResults<AutoService>
+    @FetchRequest(entity: AutoSummary.entity(), sortDescriptors: []) var reports: FetchedResults<AutoSummary>
     @State private var location: String = ""
     @State private var type: ServiceTypes = .service
     @State private var description: String = ""
@@ -99,6 +100,7 @@ struct UpdateServiceEntry: View {
                                                 editServiceCost(at: index)
                                             }
                                             aggregateServiceCost(for: vehicle)
+                                            updateAutoSummary(for: vehicle)
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                                 showServiceHistoryView = false
                                             }
@@ -160,6 +162,35 @@ struct UpdateServiceEntry: View {
                 vehicles[i].serviceCost += service.cost
         }
             Vehicle.saveContext(viewContext: viewContext)
+        }
+    }
+    
+    func updateAutoSummary(for vehicle: Vehicle) {
+        let year = Calendar.current.component(.year, from: date)
+        if let i = reports.firstIndex(where: {$0.vehicle == vehicle && $0.calenderYear == year}) {
+            reports[i].annualServiceCost = 0
+            reports[i].annualServiceCostEV = 0
+            for service in vehicle.getServices.filter({Calendar.current.component(.year, from: $0.date!) == year}) {
+                reports[i].annualServiceCost += service.cost
+                reports[i].annualServiceCostEV += service.cost
+            }
+            reports[i].odometerEnd = vehicle.odometer
+            reports[i].odometerEndMiles = vehicle.odometerMiles
+            Vehicle.saveContext(viewContext: viewContext)
+        }
+        else {
+            print("Record not found for year \(year)")
+            if let i = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
+                let autoSummary = AutoSummary(context: viewContext)
+                autoSummary.calenderYear = Int16(year)
+                autoSummary.annualServiceCost = cost
+                autoSummary.annualServiceCostEV = cost
+                autoSummary.odometerEnd = vehicles[i].odometer
+                autoSummary.odometerEndMiles = vehicles[i].odometerMiles
+                vehicles[i].addToReports(autoSummary)
+                AutoSummary.saveContext(viewContext: viewContext)
+                print("new service entry saved")
+            }
         }
     }
     

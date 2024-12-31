@@ -24,6 +24,27 @@
         <attribute name="uniqueID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <relationship name="vehicle" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vehicle" inverseName="services" inverseEntity="Vehicle"/>
     </entity>
+    <entity name="AutoSummary" representedClassName=".AutoSummary" syncable="YES">
+        <attribute name="annualFuelCost" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="annualfuelCostEV" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="annualMileage" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="annualMileageEV" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="annualServiceCost" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="annualServiceCostEV" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="annualTrip" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="annualTripEV" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="annualTripEVMiles" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="annualTripMiles" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="calenderYear" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="gallonsConsumed" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="kwhConsumed" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="litreConsumed" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="odometerEnd" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="odometerEndMiles" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="odometerStart" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="odometerStartMiles" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="vehicle" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Vehicle" inverseName="reports" inverseEntity="Vehicle"/>
+    </entity>
     <entity name="Settings" representedClassName=".Settings" syncable="YES">
         <attribute name="autoEngineType" optional="YES" attributeType="String"/>
         <attribute name="avoidHighways" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
@@ -53,6 +74,7 @@
         <attribute name="uniqueID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="year" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="fuellings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AutoFuelling" inverseName="vehicle" inverseEntity="AutoFuelling"/>
+        <relationship name="reports" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AutoSummary" inverseName="vehicle" inverseEntity="AutoSummary"/>
         <relationship name="services" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AutoService" inverseName="vehicle" inverseEntity="AutoService"/>
     </entity>
 </model>
