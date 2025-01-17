@@ -30,6 +30,7 @@ enum AppColors: String {
     case darkBlue = "darkBlueColor"
     case blueColor = "bluColor"
     case invertBlueColor = "invertBluColor"
+    case invertGryColor = "invertGryColor"
 }
 
 //enum type to be used to track the status of MapView

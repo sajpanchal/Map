@@ -167,31 +167,8 @@ struct UpdateServiceEntry: View {
     
     func updateAutoSummary(for vehicle: Vehicle) {
         let year = Calendar.current.component(.year, from: date)
-        if let i = reports.firstIndex(where: {$0.vehicle == vehicle && $0.calenderYear == year}) {
-            reports[i].annualServiceCost = 0
-            reports[i].annualServiceCostEV = 0
-            for service in vehicle.getServices.filter({Calendar.current.component(.year, from: $0.date!) == year}) {
-                reports[i].annualServiceCost += service.cost
-                reports[i].annualServiceCostEV += service.cost
-            }
-            reports[i].odometerEnd = vehicle.odometer
-            reports[i].odometerEndMiles = vehicle.odometerMiles
-            Vehicle.saveContext(viewContext: viewContext)
-        }
-        else {
-            print("Record not found for year \(year)")
-            if let i = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) {
-                let autoSummary = AutoSummary(context: viewContext)
-                autoSummary.calenderYear = Int16(year)
-                autoSummary.annualServiceCost = cost
-                autoSummary.annualServiceCostEV = cost
-                autoSummary.odometerEnd = vehicles[i].odometer
-                autoSummary.odometerEndMiles = vehicles[i].odometerMiles
-                vehicles[i].addToReports(autoSummary)
-                AutoSummary.saveContext(viewContext: viewContext)
-                print("new service entry saved")
-            }
-        }
+        ///call method to accumulate the service costs for all service records corresponding to a given vehicle in a given year.
+        AutoSummary.accumulateServiceCostSummary(viewContext: viewContext, for: vehicle, year: year, cost: cost)
     }
     
     func isTextFieldEntryValid() -> Bool {

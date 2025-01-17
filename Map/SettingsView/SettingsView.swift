@@ -13,7 +13,7 @@ struct SettingsView: View {
     ///Fetch request to get the records from the Settings entity.
     @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
     ///Fetch request to get the records from the vehicles entity in descending order which is currently active.
-    @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[NSSortDescriptor(keyPath: \Vehicle.isActive, ascending: false)]) var vehicles: FetchedResults<Vehicle>
+    @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[]) var vehicles: FetchedResults<Vehicle>
     ///Location Data manager object.
     @StateObject var locationDataManager: LocationDataManager
     ///Index of the vehicle objects array
@@ -40,12 +40,18 @@ struct SettingsView: View {
     @State private var avoidHighways = false
     ///flag to show if preference is set to avoid tolls
     @State private var avoidTolls = false
+    ///flag to show/hide alert view.
     @State private var showAlert = false
+    ///index of the vehicles list.
+    @State private var vehiclesListIndex: Int = 0
+    ///create an array of vehicleData to be displayed in the picker view from vehicles.
+    var vehiclesList: [VehicleData] {
+        return vehicles.map({VehicleData(uniqueID: $0.uniqueID, text: $0.getVehicleText, engineType: $0.getFuelEngine)})
+    }
     ///array of colors
-    var colors = [AppColors.invertPink.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue]
+    var colors = [AppColors.invertPink.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue, AppColors.invertGryColor.rawValue]
+   
     var body: some View {
-       
-            
             NavigationStack {
                 ZStack {
                     VStack {
@@ -57,11 +63,8 @@ struct SettingsView: View {
                                     Button(action: {
                                         showGarage = true
                                     }, label: {
-                                        
                                         FormButton(imageName:  "door.garage.double.bay.closed", text: "My Garage", color: Color(AppColors.red.rawValue))
-                                          
                                         })
-                                   
                                     .background(Color(AppColors.invertRed.rawValue))
                                     .tint(Color(AppColors.invertRed.rawValue))
                                     .buttonStyle(BorderlessButtonStyle())
@@ -73,53 +76,46 @@ struct SettingsView: View {
                                     })
                                     Spacer()
                                 }
-                              
                             }
                             .listRowInsets(EdgeInsets())
                             .listRowBackground(Color.clear)
-                           
+                            
+                            Section(header: Text("Current Vehicle Selection").fontWeight(.bold)) {
                                 ///picker for vehicles.
-                                Picker(selection: $vehicle) {
-                                    ///iist of vehciles
-                                    List {
-                                        ///iterate through the all vehicles uniquely identified by this ID.
-                                        ForEach(vehicles, id: \.uniqueID) { thisVehicle in
-                                            VStack {
-                                                Text(thisVehicle.getVehicleText + " " + "(" + thisVehicle.getFuelEngine + " Engine)").tag(thisVehicle)
-                                                    .fontWeight(.bold)
-                                                    .font(Font.system(size: 18))
-                                                    .foregroundStyle(Color(colors[vehicles.firstIndex(where: {$0 == thisVehicle}) ?? 0]))
-                                                Text(thisVehicle.getYear).tag(thisVehicle)
-                                                    .fontWeight(.semibold)
-                                                    .font(Font.system(size: 14))
-                                                    .foregroundStyle(Color.gray)
-                                            }
-                                            ///assign a unique tag to this view for a given vehicle so it can be identified on tap.
-                                            .tag(thisVehicle)
+                                Picker(selection: $vehiclesListIndex) {
+                                        ///iterate through the all vehicles uniquely identified by itself
+                                    ForEach(0..<vehiclesList.count, id: \.self) { index in
+                                        Text(vehiclesList[index].text + " " + (vehiclesList[index].engineType != "Gas" ? vehiclesList[index].engineType : ""))
+                                                        .multilineTextAlignment(.leading)
+                                                        .fontWeight(.bold)
+                                                        .font(Font.system(size: 18))
+                                                        .foregroundStyle(Color(colors[getColorIndex(for:index)]))
+                                                        .padding(10)
+                                                        .tag(vehiclesList[index].uniqueID)
                                         }
-                                    }
                                 }
                                 ///creater the label of the picker with a pre-defined text
                                 label: {
-                                    Text("Vehicle Selection")
-                                        .fontWeight(.bold)
+                                    Text("Vehicle")
+                                        .font(Font.system(size: 18))
                                 }
-                            ///on change of the vehicle selection change the fuel type value
-                                .onChange(of: vehicle.id) {
+                            ///on change of the vehicle selection update the settings
+                                .onChange(of: vehiclesListIndex) {
+                                    ///get the vehicle from vehicles entity where uniqueID matches with the selected vehicle from picker view.
+                                    guard let selectedVehicle = vehicles.first(where: {$0.uniqueID == vehiclesList[vehiclesListIndex].uniqueID}) else {
+                                       return
+                                    }
+                                    ///set the vehicle prop as selected vehicle.
+                                    vehicle = selectedVehicle
+                                    ///call load settings method.
+                                    loadSettings()
+                                    ///set the engine type prop to whatever selected vehicle is set.
                                     engineType = EngineType(rawValue: vehicle.fuelEngine ?? "Gas") ?? .Gas
-                                    fuelMode = (engineType == .EV) ? .EV : .Gas
-                                    ///on change of vehicle, if given vehicle is EV type
-                                    if engineType == .EV {
-                                        ///set fuel unit to percent
-                                        fuelUnit = .Percent
-                                    }
-                                    ///if vehicle is gas engine type
-                                    else {
-                                        ///set fuel unit to litre
-                                        fuelUnit = .Litre
-                                    }
+                                    ///set the engine type prop to whatever selected vehicle is set.
+                                    fuelMode = FuelMode(rawValue: vehicle.fuelMode ?? "Gas") ?? .Gas
                                 }
-                                .pickerStyle(.inline)
+                                .pickerStyle(.navigationLink)
+                            }
                             ///section for navigation preferences
                             Section(header: Text("Navigation Preferences").fontWeight(.bold)) {
                                 ///toggle switch to avoid tolls
@@ -152,9 +148,7 @@ struct SettingsView: View {
                                             ///set fuel unit to percent
                                             fuelUnit = .Percent
                                         }
-                                        ///else if fuel mode is set to gas
                                         else {
-                                            ///set fuel unit to litre
                                             fuelUnit = .Litre
                                         }
                                     }
@@ -308,6 +302,8 @@ struct SettingsView: View {
                                         updateActiveVehicle()
                                         ///on tap save settings
                                         saveSettings()
+                                        ///set the vehicleListIndex the index of the selected vehicle from an array of list.
+                                        vehiclesListIndex = vehiclesList.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) ?? 0
                                     } label: {
                                         FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.blueColor.rawValue))
                                     }
@@ -329,10 +325,6 @@ struct SettingsView: View {
                         AlertView(image: "checkmark.icloud", headline: "settings saved!", bgcolor: Color(AppColors.invertBlueColor.rawValue), showAlert: $showAlert)
                     }
                 }
-              
-                  
-                
-             
                 ///apply the tint color the the view.
                 .tint(Color(AppColors.invertBlueColor.rawValue))
                 .navigationTitle("Settings")
@@ -344,20 +336,19 @@ struct SettingsView: View {
                     label: {
                      AddCarImage()
                     }
-                  
                     ///on tap of the button, flag will be true and content (AddVehicleForm) will appear.
                     .sheet(isPresented: $showAddVehicleForm, content: {
                         AddVehicleForm(vehicle: $vehicle, showAddVehicleForm: $showAddVehicleForm, locationDataManager: locationDataManager)
                     })
                     .padding(.top, 10)
                 }
-            }
-        
-      
+        }
         ///on appear get the active vehicle and load the latest settings.
-        .onAppear{
+        .onAppear {
+            ///call a method to get the active vehicle
             getActiveVehicle()
-            loadSettings()
+            ///call a method to load settings.
+            loadSettings()            
         }
     }
     
@@ -371,6 +362,8 @@ struct SettingsView: View {
                 vehicleIndex = activeVehicleIndex
                 ///assign the active vehicle to state variable
                 vehicle = activeVehicle
+                ///set the vehicleListIndex the index of the selected vehicle from an array of list.
+                vehiclesListIndex = vehiclesList.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) ?? 0
             }
         }
         ///if no active vehicle found
@@ -409,16 +402,27 @@ struct SettingsView: View {
             efficiencyUnitIndex = efficiencyUnits.firstIndex(of: thisSetting.getFuelEfficiencyUnit) ?? 0
             ///get the enum value of the corresponding distance unit saved in the settings and assign it to the state variable
             distanceUnit = DistanceUnit(rawValue: thisSetting.getDistanceUnit) ?? .km
-            ///get the enum value of the fuel volume unit of the corresponding fuel unit saved in the settings and assign it to the state variable
-            fuelUnit = FuelUnit(rawValue: thisSetting.getFuelVolumeUnit) ?? .Litre
+            
+            ///if vehicle fuel mode is set to EV
+            if vehicle.getFuelMode == "EV" {
+                ///update the fuelUnit prop to percent
+                fuelUnit = .Percent
+                ///update the fuelMode prop to EV
+                fuelMode = .EV
+            }
+            ///if vehicle fuel mode is set to Gas
+            else {
+                ///if the settings have fuel volume set to % change it to Litre otherwise get the unit set from the settings object.
+                fuelUnit = thisSetting.getFuelVolumeUnit != "%" ? FuelUnit(rawValue: thisSetting.getFuelVolumeUnit) ?? .Litre : .Litre
+                ///update the fuelMode prop to Gas
+                fuelMode = .Gas
+            }
             ///get the enum value of the engine type of the corresponding engine type saved in the settings and assign it to the state variable
-            engineType = EngineType(rawValue: thisSetting.getAutoEngineType) ?? .Gas
+            engineType = EngineType(rawValue: vehicle.getFuelEngine) ?? .Gas
+            ///update the avoidHighways preferences to whatever is in the settings object
             avoidHighways = thisSetting.avoidHighways
+            ///update the avoidTolls preferences to whatever is in the settings object
             avoidTolls = thisSetting.avoidTolls
-            print("LoadSettings()")
-            print("avoid tolls: \(avoidTolls)")
-            print("avoid highways: \(avoidHighways)")
-            print("-----------------------")
         }
     }
     
@@ -442,18 +446,52 @@ struct SettingsView: View {
             settings.first?.autoEngineType = engineType.rawValue
             ///store the currently active vehicle object from state varaible
             settings.first?.vehicle = vehicle
+            ///if the vehicle is hybrid type
+            if vehicle.fuelEngine == "Hybrid" {
+                ///update the vehicle fule mode to whatever is there in the fuelMode props
+                vehicle.fuelMode = fuelMode.rawValue
+            }
+            ///if the vehicle is EV type
+            else if vehicle.fuelEngine == "EV" {
+                ///update the vehicle fule mode to EV
+                vehicle.fuelMode = "EV"
+            }
+            ///if the vehicle is Gas type
+            else {
+                ///update the vehicle fule mode to Gas
+                vehicle.fuelMode = "Gas"
+            }
             ///save the records to the entity to the viewcontext parent store.
             Settings.saveContext(viewContext: viewContext)
+            ///withAnimation method will change state variable with animation for a given time duration
             withAnimation(.easeIn(duration: 0.5)) {
                 showAlert = true
             }
-            print("SaveSettings()")
-            print("avoid tolls: \(settings.first?.avoidTolls)")
-            print("avoid highways: \( settings.first?.avoidHighways)")
-            print("-----------------------")
         }
     }
     
+    ///method to get the index of the colors array
+    func getColorIndex(for index: Int) -> Int {
+        ///set the updated Index value with the index value received from function call or recursive call.
+        var updatedIndex = index
+       ///if the index is within the array bounds
+        if index < colors.count {
+            ///return the index value and exit function.
+            return index
+        }
+        ///if the difference between the index number and array size is out of array bounds
+        else if index - colors.count >= colors.count {
+            ///call the function again and get the updated index from the diffrerence
+            updatedIndex = getColorIndex(for: index - colors.count)
+        }
+        ///if the difference is within the array bounds
+        else {
+            ///return the difference as the index number
+            return  index - colors.count
+        }
+        return updatedIndex
+        
+    }
     ///method the update the active vehicle and save changes.
     func updateActiveVehicle() {
         ///return the function call if vehicles entity is empty

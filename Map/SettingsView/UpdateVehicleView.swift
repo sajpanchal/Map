@@ -11,6 +11,8 @@ struct UpdateVehicleView: View {
     @Environment(\.colorScheme) var bgMode: ColorScheme
     ///environment object that represents core data store's managed object context which tracks the changes made in entities.
     @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
+    @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var settingsEntity: FetchedResults<Settings>
     @FetchRequest(entity: AutoSummary.entity(), sortDescriptors: []) var reports: FetchedResults<AutoSummary>
     ///state variable that stores vehicle type in enum format
     @State private var vehicleType: VehicleTypes = .Car
@@ -270,7 +272,17 @@ struct UpdateVehicleView: View {
                                 }
                                 ///on appear update the fuel unit which is already saved in settings
                                 .onAppear(perform: {
-                                    fuelUnit =  FuelUnit(rawValue: settings.getFuelVolumeUnit) ?? .Litre
+                                    ///if settings have fuel unit set to %
+                                    if settings.getFuelVolumeUnit == "%" {
+                                        ///update the fuel unit to litre
+                                        fuelUnit = .Litre
+                                    }
+                                    ///if fuel unit is up to date in the settings
+                                    else {
+                                        ///get the settings fuel unit
+                                        fuelUnit =  FuelUnit(rawValue: settings.getFuelVolumeUnit) ?? .Litre
+                                    }
+                                  
                                 })
                                 
                                 .pickerStyle(.segmented)
@@ -317,6 +329,10 @@ struct UpdateVehicleView: View {
                                                 }
                                             }
                                         }
+                                        ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                        .onAppear(perform: {
+                                            efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 0 : 1
+                                        })
                                         .pickerStyle(.segmented)
                                     }
                                     else {
@@ -327,6 +343,10 @@ struct UpdateVehicleView: View {
                                                 }
                                             }
                                         }
+                                        ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                        .onAppear(perform: {
+                                            efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 2 : 3
+                                        })
                                         .pickerStyle(.segmented)
                                     }
                                 }
@@ -339,6 +359,10 @@ struct UpdateVehicleView: View {
                                                 }
                                             }
                                         }
+                                        ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                        .onAppear(perform: {
+                                            efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 4 : 5
+                                        })
                                         .pickerStyle(.segmented)
                                     }
                                     else {
@@ -349,6 +373,10 @@ struct UpdateVehicleView: View {
                                                 }
                                             }
                                         }
+                                        ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                        .onAppear(perform: {
+                                            efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 6 : 7
+                                        })
                                         .pickerStyle(.segmented)
                                     }
                                 }
@@ -363,6 +391,7 @@ struct UpdateVehicleView: View {
                                         }
                                     }
                                 }
+                                ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
                                 .onAppear {
                                     efficiencyUnitIndex = 8
                                 }
@@ -376,6 +405,7 @@ struct UpdateVehicleView: View {
                                         }
                                     }
                                 }
+                                ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
                                 .onAppear {
                                     efficiencyUnitIndex = 9
                                 }
@@ -387,7 +417,7 @@ struct UpdateVehicleView: View {
                             HStack {
                                 Spacer()
                                 Button {
-                                    addVehicle(for: vehicle)
+                                    updateVehicle(with: vehicle)
                                     saveSettings(for: vehicle)
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                         showGarage = false
@@ -418,60 +448,65 @@ struct UpdateVehicleView: View {
             .navigationBarTitleDisplayMode(.inline)
          
         }
-        .onAppear {           
-           
+        .onAppear {
             fillForm()
         }
     }
-    func addVehicle(for vehicle: Vehicle) {
-        let year = Calendar.current.component(.year, from: Date())
-        guard let index = reports.firstIndex(where: {$0.vehicle == vehicle && $0.calenderYear == Int16(year)}) else {
+    
+    ///method to update vehicle in the core data stack
+    func updateVehicle(with vehicle: Vehicle) {
+        ///get the calendar year for the reports
+        let calendarYear = Calendar.current.component(.year, from: Date())
+        ///get the index of the current vehicle in vehicles entity
+        guard let vIndex = vehicles.firstIndex(of: vehicle) else {
+            print("vehicle index not found")
             return
         }
+        ///set the vehicle model to new model input
+        vehicles[vIndex].model = vehicleModel.rawValue
+        ///set the vehicle make to new make input
+        vehicles[vIndex].make = vehicleMake.rawValue
+        ///set the vehicle year to new year input
+        vehicles[vIndex].year = Int16(manufacturingYear)
+        ///set the vehicle odometer to new odometer input
+        vehicles[vIndex].odometer = Double(odometer)
+        ///set the vehicle odometer to new odometer input in miles
+        vehicles[vIndex].odometerMiles = Double(odometerMiles)
        
-        vehicle.uniqueID = UUID()
-        vehicle.model = vehicleModel.rawValue
-        vehicle.make = vehicleMake.rawValue
-        vehicle.year = Int16(manufacturingYear)
-        vehicle.odometer = Double(odometer)
-        reports[index].odometerEnd = Double(odometer)
-        vehicle.odometerMiles = Double(odometerMiles)
-        reports[index].odometerEndMiles = Double(odometerMiles)
+        ///get the report corresponding to a given vehicle and having a current calendar year
+        if let index = reports.firstIndex(where: {$0.vehicle == vehicle && $0.calenderYear == Int16(calendarYear)}) {
+            reports[index].odometerEnd = Double(odometer)
+            reports[index].odometerEndMiles = Double(odometerMiles)
+        }
+        ///if no reports were found
+        else {
+            ///create a new report for a given vehicle and calendar year.
+            AutoSummary.createNewReport(viewContext: viewContext, in: settings, for: vehicle, year: calendarYear)
+        }
        ///if the engine type is hybrid
         if engineType == .Hybrid {
             ///update the hybrid EV trip (in km)
-            vehicle.tripHybridEV = tripHybridEV
-            reports[index].annualTripEV = tripHybridEV
-            vehicle.tripHybridEVMiles = tripHybridEVMiles
-            reports[index].annualTripEVMiles = tripHybridEVMiles
-            
+            vehicles[vIndex].tripHybridEV = tripHybridEV
+            vehicles[vIndex].tripHybridEVMiles = tripHybridEVMiles
         }
         ///update vehicle trip (in miles) with new values
-        vehicle.tripMiles = tripMiles
-        reports[index].annualTripMiles = tripMiles
+        vehicles[vIndex].tripMiles = tripMiles
         ///update vehicle trip (in km) with new values
-        vehicle.trip = trip
-        reports[index].annualTrip = trip
+        vehicles[vIndex].trip = trip
         ///save the engine type in vehicle object. (Gas, EV, Hybrid)
-        vehicle.fuelEngine = engineType.rawValue
+        vehicles[vIndex].fuelEngine = engineType.rawValue
         ///if engine type is not gas set the battery capacity of the EV engine
         if engineType != .Gas {
-            vehicle.batteryCapacity = batteryCapacity
+            vehicles[vIndex].batteryCapacity = batteryCapacity
         }
         ///save the vehicle type (Car, Truck, SUV)
-        vehicle.type = vehicleType.rawValue
-        //vehicle.isActive = true
+        vehicles[vIndex].type = vehicleType.rawValue
       
         Vehicle.saveContext(viewContext: viewContext)
     }
+    
+    ///method to save vehicle settings
     func saveSettings(for vehicle: Vehicle) {
-        let settings = Settings(context: viewContext)
-        settings.vehicle = vehicle
-        settings.autoEngineType = engineType.rawValue
-        settings.distanceUnit = distanceUnit.rawValue
-        settings.fuelVolumeUnit = fuelUnit.rawValue
-        settings.fuelEfficiencyUnit = efficiencyUnits[efficiencyUnitIndex]
-        Settings.saveContext(viewContext: viewContext)
         withAnimation(.easeIn(duration: 0.5)) {
             showAlert = true
         }

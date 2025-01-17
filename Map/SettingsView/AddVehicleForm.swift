@@ -292,8 +292,11 @@ struct AddVehicleForm: View {
     func addVehicle() {
         ///create an instance of Vehicle entity
         let autoSummary = AutoSummary(context: viewContext)
-        let year = Calendar.current.component(.year, from: Date())
-        autoSummary.calenderYear = Int16(year)
+        ///get the current calendarYear from the Calendar object and set its value.
+        let calendarYear = Calendar.current.component(.year, from: Date())
+        ///set the calendar year of the autoSummary object.
+        autoSummary.calenderYear = Int16(calendarYear)
+        ///create a new vehicle from coredata context
         let newVehicle = Vehicle(context: viewContext)
         ///set new UUID
         newVehicle.uniqueID = UUID()
@@ -305,37 +308,49 @@ struct AddVehicleForm: View {
         newVehicle.model = textVehicleModel
         ///set vehicle type
         newVehicle.type = vehicleType.rawValue
+        ///if vehicle engine is other than Gas type
         if engineType != .Gas {
+            ///set the batteryCapacity prop of the vehicle object.
             newVehicle.batteryCapacity = batteryCapacity
         }
-      
         ///set vehicle as not active
         newVehicle.isActive = false
         ///set vehicle year
         newVehicle.year = Int16(year)
         ///set vehicle odometer
         newVehicle.odometer = Double(odometer)
+        ///set vehicle odometer as odometer start of autoSummary
         autoSummary.odometerStart = Double(odometer)
         ///set vehicle odometer
         newVehicle.odometerMiles = Double(odometerMiles)
+        ///set vehicle odometer as odometer start of autoSummary in miles
         autoSummary.odometerStartMiles = Double(odometerMiles)
-        ///set vehicle trip odometer
+        ///set vehicle trip odometer in km mode
         if settings.first!.distanceUnit == "km" {
+            ///set new vehicle's trip odometer as trip inputed
             newVehicle.trip = trip
+            ///set autoSummary annualtrip as trip inputted
             autoSummary.annualTrip = trip
+            ///set new vehicle's trip odometer converted in miles
             newVehicle.tripMiles = newVehicle.trip * 0.6214
+            ///set autoSummary annualtrip converted in miles
             autoSummary.annualTripMiles = newVehicle.trip * 0.6214
         }
+        ///set vehicle trip odometer in mi mode
         else {
+            ///set new vehicle's trip odometer as trip inputed
             newVehicle.tripMiles = tripMiles
+            ///set autoSummary annualtrip as trip inputted
             autoSummary.annualTripMiles = tripMiles
+            ///set new vehicle's trip odometer converted in km
             newVehicle.trip = newVehicle.tripMiles / 0.6214
+            ///set autoSummary annualtrip converted in km
             autoSummary.annualTrip = newVehicle.tripMiles / 0.6214
         }
-      
+        ///if engine type is hybrid set EV props
         if engineType == .Hybrid {
             if settings.first!.distanceUnit == "km" {
-                ///set vehicle trip odometer
+                //set vehicle trip odometer
                 newVehicle.tripHybridEV = tripHybridEV
                 autoSummary.annualTripEV = tripHybridEV
                 newVehicle.tripHybridEVMiles = newVehicle.tripHybridEV * 0.6214
@@ -350,7 +365,8 @@ struct AddVehicleForm: View {
             }
            
         }
-        
+        ///add new report to the newVehicle.
+        newVehicle.addToReports(autoSummary)
         ///continue if any active vehicle is found
         guard let activeVehicle = vehicles.first(where: {$0.isActive}) else {
             return
@@ -362,7 +378,7 @@ struct AddVehicleForm: View {
         withAnimation(.easeIn(duration: 0.5)) {
             showAlert = true
         }
-        vehicle.addToReports(autoSummary)
+      
         ///save the context after new vehicle is set.
         Vehicle.saveContext(viewContext: viewContext)
         ///hide the vehicle form

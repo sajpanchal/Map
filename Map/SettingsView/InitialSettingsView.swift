@@ -318,6 +318,10 @@ struct InitialSettingsView: View {
                                                 }
                                             }
                                         }
+                                        ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                        .onAppear(perform: {
+                                            efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 0 : 1
+                                        })
                                         .pickerStyle(.segmented)
                                     }
                                     ///if distance unit is in miles
@@ -331,6 +335,10 @@ struct InitialSettingsView: View {
                                                 }
                                             }
                                         }
+                                        ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                        .onAppear(perform: {
+                                            efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 2 : 3
+                                        })
                                         .pickerStyle(.segmented)
                                     }
                                 }
@@ -346,6 +354,10 @@ struct InitialSettingsView: View {
                                                 }
                                             }
                                         }
+                                        ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                        .onAppear(perform: {
+                                            efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 4 : 5
+                                        })
                                         .pickerStyle(.segmented)
                                     }
                                     ///if distance unit is in miles
@@ -358,6 +370,10 @@ struct InitialSettingsView: View {
                                                 }
                                             }
                                         }
+                                        ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
+                                        .onAppear(perform: {
+                                            efficiencyUnitIndex = efficiencyUnitIndex.isMultiple(of: 2) ? 6 : 7
+                                        })
                                         .pickerStyle(.segmented)
                                     }
                                 }
@@ -445,15 +461,18 @@ struct InitialSettingsView: View {
     }
     
     func addVehicle(for vehicle: Vehicle) {
-        let year =  Calendar.current.component(.year, from: Date())
+        ///get the current year from calender.
+        let calendaryear =  Calendar.current.component(.year, from: Date())
+        ///instantiate autosummary object
         let autoSummary = AutoSummary(context: viewContext)
-        autoSummary.calenderYear = Int16(year)
+        ///save the calender year in autosummary
+        autoSummary.calenderYear = Int16(calendaryear)
         ///set unique id.
         vehicle.uniqueID = UUID()
         ///set model name string
-        vehicle.model = model.rawValue
+        vehicle.model = textVehicleModel
         ///set vehicle make string
-        vehicle.make = vehicleMake.rawValue
+        vehicle.make = textVehicleMake
         ///set vehicle manufacturing year.
         vehicle.year = Int16(year)
         ///set vehicle odometer in decimal format

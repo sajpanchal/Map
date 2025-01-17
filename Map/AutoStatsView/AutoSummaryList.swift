@@ -8,45 +8,54 @@
 import SwiftUI
 
 struct AutoSummaryList: View {
+    ///environment variable dismiss is used to dismiss this view on execution.
+    @Environment(\.dismiss) var dismiss
+    ///environment variable managedObjectContext is used to track changes in the instances of core data entities.
+    @Environment(\.managedObjectContext) private var viewContext
+    ///state object locationdatamanager
+    @StateObject var locationDataManager: LocationDataManager
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: AutoSummary.entity(), sortDescriptors: []) var reports: FetchedResults<AutoSummary>
+    @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
+    
     var body: some View {
         NavigationStack {
+            ///get the first vehicle instance from vehicles entity which is active
             if let vehicle = vehicles.first(where: {$0.isActive}) {
-              
+                ///enclose the navigation links in a list view.
                 List {
+                    ///iterate through each reports for a given vehicle.
                     ForEach(vehicle.getReports) { entry in
+                        ///with desination as AutoSummaryView and label as text view.
                         NavigationLink {
+                            ///on tap of the label in a given list item in a list the corresponding autosummary view for that item will appear.
                             AutoSummaryView(autoSummary: entry, reportIndex: reports.firstIndex(of: entry))
                         }
+                        ///label is the view to be displayed for a given navigation link.
                         label: {
-                            Text(entry.getCalenderYear + " Auto Summary")
+                            ///here it is a text view that shows autosummary of given Calendar year.
+                            Text(entry.getCalenderYear)
                         }                       
                     }
                 }
+                ////on appear of this swiftui view this modifier will be executed once.
                 .onAppear {
-                    if vehicle.getReports.isEmpty {
-                        print("empty")
-                       
-                        print("vehicleID:\(vehicle.objectID)")
-                        print("vehicleName:\(vehicle.getVehicleText)")
+                    ///get the first settings instance if available
+                    guard let thisSettings = settings.first else {
+                        return
                     }
-                    else {
-                        for i in vehicle.getReports {
-                            print(i.calenderYear)
-                            print(i.annualTrip)
-                            
-                        }
-                    }
-                }
+                    ///call set fuel efficiency method of autosummary to calculate the fuel efficiency for each year for a given vehicle in a set units.
+                    AutoSummary.setFuelEfficiency(viewContext: viewContext, vehicle: vehicle, settings: thisSettings)
+                }              
                 .navigationTitle("Auto Summary History")
+                .navigationBarTitleDisplayMode(.inline)
             }
-            
         }
-        
     }
+    
+  
 }
 
 #Preview {
-    AutoSummaryList()
+    AutoSummaryList(locationDataManager: LocationDataManager())
 }

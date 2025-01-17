@@ -22,7 +22,7 @@ struct GarageView: View {
     @Binding var showGarage: Bool
     ///state variable to show or hide alert on deletion of any active vehicle
     @State private var showAlert = false
-    var colors = [AppColors.invertRed.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue]
+    var colors = [AppColors.invertRed.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue, AppColors.invertGryColor.rawValue]
 
     var body: some View {
         NavigationStack {
@@ -35,7 +35,7 @@ struct GarageView: View {
                                 Text(thisVehicle.getVehicleText + " " + thisVehicle.getFuelEngine)
                                     .fontWeight(.bold)
                                     .font(Font.system(size: 18))
-                                    .foregroundStyle(Color(colors[vehicles.firstIndex(where: {$0 == thisVehicle}) ?? 0]))
+                                    .foregroundStyle(Color(colors[getColorIndex(for: vehicles.firstIndex(where: {$0 == thisVehicle}) ?? 0)]))
                                 Text(thisVehicle.getYear)
                                     .fontWeight(.semibold)
                                     .font(Font.system(size: 14))
@@ -83,6 +83,20 @@ struct GarageView: View {
                 .padding(40)
             }
         }
+    }
+    func getColorIndex(for index: Int) -> Int {
+        var updatedIndex = index
+        if index < colors.count {
+            return index
+        }
+        else if index - colors.count >= colors.count {
+            updatedIndex = getColorIndex(for: index - colors.count)
+        }
+        else {
+            return  index - colors.count
+        }
+        return updatedIndex
+        
     }
 }
 

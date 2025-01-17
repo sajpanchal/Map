@@ -154,14 +154,15 @@ struct FuellingEntryForm: View {
                                     Button {
                                         if isTextFieldEntryValid() {
                                             let index = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID})
-                                            
+                                            print("Vehicle index: \(index) for vehicle \n \(vehicles[index!].getVehicleText)")
                                             addFuellingEntry(for: vehicle, at: index)
                                                                            
                                             if  let i = index {
-                                                resetTripData(at: i)
+                                              
                                                 calculateFuelCost(for: vehicle, at: i)
                                                 calculateFuelEfficiency(for: vehicle, at: i)
                                                 updateAutoSummary(for: vehicle, at: i)
+                                                resetTripData(at: i)
                                             }
                                         }
                                         isTapped = true
@@ -282,11 +283,7 @@ struct FuellingEntryForm: View {
     
     ///reset the trip data at a given index of the vehicle
     func resetTripData(at index: Int) {
-        ///reset the fuel cost
-        vehicles[index].fuelCost = 0
-        ///reset the trip in location manager.
-        locationDatamanager.trip = 0.00
-        ///if the fuel engine is hybrid
+       
         if vehicles[index].fuelEngine == "Hybrid" {
             ///if the fuel mode is gas
             if vehicles[index].getFuelMode == "Gas" {
@@ -314,6 +311,11 @@ struct FuellingEntryForm: View {
     
     ///function to calculate fuel cost in total
     func calculateFuelCost(for vehicle: Vehicle, at index: Int) {
+        ///reset the fuel cost
+        vehicles[index].fuelCost = 0
+        ///reset the trip in location manager.
+        locationDatamanager.trip = 0.00
+        ///if the fuel engine is hybrid
         ///get a list of fuelling records of a given vehicle filtred by its fuel mode (gas or ev)
         let fuellings = vehicle.getFuellings.filter({$0.fuelType == vehicle.fuelMode})
         ///iterate through the fuelling records
@@ -368,81 +370,30 @@ struct FuellingEntryForm: View {
             Vehicle.saveContext(viewContext: viewContext)
         }
     }
-    
+    ///method to update autoSummary for a given vehicle at a given index of reports array.
     func updateAutoSummary(for vehicle: Vehicle, at index: Int) {
-      
+        ///get the year componet from the fuelling date.
         let year = Calendar.current.component(.year, from: date)
-        if let i = reports.firstIndex(where: {$0.vehicle == vehicle && $0.calenderYear == year}) {
-            print("index found for \(vehicle.getVehicleText) for year \(year)")
-            reports[i].annualTrip = 0
-            reports[i].annualTripMiles = 0
-            reports[i].annualTripEV = 0
-            reports[i].annualTripEVMiles = 0
-            reports[i].litreConsumed = 0
-            reports[i].gallonsConsumed = 0
-            reports[i].kwhConsumed = 0
-            reports[i].annualFuelCost = 0
-            reports[i].annualfuelCostEV = 0
-            
-            for fuelling in vehicle.getFuellings.filter({Calendar.current.component(.year, from: $0.date!) == year}) {
-                if fuelling.fuelType == FuelMode.Gas.rawValue {
-                 
-                    reports[i].annualTrip += fuelling.lasttrip
-                    reports[i].annualTripMiles += fuelling.lastTripMiles
-                    reports[i].annualFuelCost += fuelling.cost
-                }
-                else {
-                    reports[i].annualTripEV += fuelling.lasttrip
-                    reports[i].annualTripEVMiles += fuelling.lastTripMiles
-                    reports[i].annualfuelCostEV += fuelling.cost
-                }
-                    reports[i].litreConsumed += fuelling.litre
-                    reports[i].gallonsConsumed += fuelling.gallon
-                    reports[i].kwhConsumed += (vehicle.batteryCapacity * fuelling.percent)/100
-            }
-            reports[i].odometerEnd = vehicle.odometer
-            reports[i].odometerEndMiles = vehicle.odometerMiles
-            Vehicle.saveContext(viewContext: viewContext)
+        ///get the first settings object from settings entity
+        guard let thisSettings = settings.first else {
+            return
         }
+        ///create and  the fuel amount to 0.
+        var fuelAmount = 0.0
+        ///if fuel unit is set to litre in the settings
+        if thisSettings.getFuelVolumeUnit == "Litre" {
+            fuelAmount = litre
+        }
+        ///if fuel unit is set to gallon in the settings
+        else if thisSettings.getFuelVolumeUnit == "Gallon" {
+            fuelAmount = gallon
+        }
+        ///if fuel unit is set to % in the settings
         else {
-            print("Record not found for year \(year)")
-            let autoSummary = AutoSummary(context: viewContext)
-            autoSummary.calenderYear = Int16(year)
-            if  vehicle.getFuelMode == "Gas"  {
-                autoSummary.annualTrip = vehicles[index].trip
-                autoSummary.annualTripMiles = vehicles[index].tripMiles
-                autoSummary.annualFuelCost = cost
-            }
-            else {
-                autoSummary.annualTripEV = vehicles[index].tripHybridEV
-                autoSummary.annualTripEVMiles = vehicles[index].tripHybridEVMiles
-                autoSummary.annualfuelCostEV = cost
-            }
-            if settings.first?.getFuelVolumeUnit == "Litre" {
-                autoSummary.litreConsumed = litre
-                autoSummary.gallonsConsumed = litre/3.785
-                print("auto litre:\(autoSummary.litreConsumed)")
-                print("auto gallon: \(autoSummary.gallonsConsumed)")
-            }
-            else if settings.first?.getFuelVolumeUnit == "Gallon" {
-                autoSummary.gallonsConsumed = gallon
-                autoSummary.litreConsumed = gallon * 3.785
-                print("auto litre:\(autoSummary.litreConsumed)")
-                print("auto gallon: \(autoSummary.gallonsConsumed)")
-            }
-            else {
-                autoSummary.kwhConsumed = (vehicle.batteryCapacity * Double((percentAfterCharge - percentBeforeCharge)))/100
-            }
-           // autoSummary.kwhConsumed = (vehicle.batteryCapacity * (percentAfterCharge - percentBeforeCharge))/100
-            autoSummary.odometerEnd = vehicle.odometer
-            autoSummary.odometerEndMiles = vehicle.odometerMiles
-            vehicles[index].addToReports(autoSummary)
-            Vehicle.saveContext(viewContext: viewContext)
-            print("new fuel entry saved")
+            fuelAmount = Double(percentAfterCharge - percentBeforeCharge)
         }
-       
-            
-        
+        ///call the method in AutoSummary to accumulate the fuelling data and travel data for a given year and save it.
+        AutoSummary.accumulateFuellingsAndTravelSummary(viewContext: viewContext, in: thisSettings, for: vehicle, year: year, cost: cost, amount: fuelAmount)
     }
 }
 

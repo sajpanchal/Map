@@ -19,7 +19,8 @@ struct AutoStatsView: View {
     @State private var showFuellingEntryform = false
     @State private var showServiceEntryForm = false
     @State private var efficiency: Double = 0
-  
+    @State private var showAutoSummary = false
+    @State private var showChartView = false
     let currentYear: String = {
         let components = DateComponents()
         if let year = Calendar.current.dateComponents([.year], from: Date()).year {
@@ -112,16 +113,40 @@ struct AutoStatsView: View {
                             .onChange(of: showFuelHistoryView) {
                                 efficiency = getFuelEfficiency()
                             }
-                            NavigationLink {
-                                AutoSummaryList()
-                            } label : {
+                            ///tappable HStack to show the autoSummaryList view
+                            HStack {
                                 Text("Show Past Summary")
+                                Spacer()
+                                Image(systemName:"chevron.up")
+                                    .font(Font.system(size: 14))
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.gray)
                             }
-                            NavigationLink {
-                                ChartView()
-                            } label : {
-                                Text("Show Graphs")
+                            ///on tap toggle the showAutoSummary flag
+                            .onTapGesture {
+                                showAutoSummary.toggle()
                             }
+                            ///this modifier will be called whenever showAutoSummary flag changes and if it is true it will present the swiftuiView on top of the current view.
+                            .sheet(isPresented: $showAutoSummary, content: {
+                                AutoSummaryList(locationDataManager: locationDataManager)
+                            })
+                            ///tappable HStack to show the chartview view
+                            HStack {
+                                Text("Show Graphical Stats")
+                                Spacer()
+                                Image(systemName:"chevron.up")
+                                    .font(Font.system(size: 14))
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.gray)
+                            }
+                            ///on tap toggle the showChartView flag
+                            .onTapGesture {
+                                showChartView.toggle()
+                            }
+                            ///this modifier will be called whenever showAutoSummary flag changes and if it is true it will present the swiftuiView on top of the current view.
+                            .sheet(isPresented: $showChartView, content: {
+                                ChartView(showChartView: $showChartView)
+                            })
                         }
                         header: {
                             Text("Dashboard")
@@ -131,49 +156,9 @@ struct AutoStatsView: View {
                         }
                         .padding(10)
                         .onAppear {
-                            for vehicle in vehicles {
-                                print(vehicle.getVehicleText)
-                                print("is Active:\(vehicle.isActive)")
-                            }
-                          
-                            print("on appear of auto stats")
-                            if vehicle.getReports.isEmpty {
-                                print("reports are nil")
-                               for year in vehicle.getYearsOfVehicleRun {
-                                   let autoSummary = AutoSummary(context: viewContext)
-                                   autoSummary.calenderYear = Int16(year)
-                                   resetSummaryFields(in: autoSummary)
-                                   calculateFuellingSummary(forYear: year, in: autoSummary, for: vehicle)
-                                   calculateServiceCostSummary(forYear: year, in: autoSummary, for: vehicle)
-                                   vehicle.addToReports(autoSummary)
-                                   AutoSummary.saveContext(viewContext: viewContext)
-                                }
-                            }
-                            else {
-                                print("vehicleID:\(vehicle.objectID)")
-                                print("vehicleName:\(vehicle.getVehicleText)")
-                                print("reports are not nil")
-                                for autoSummary in vehicle.getReports {
-                                
-                                    print(autoSummary.annualTrip)
-                                    print(autoSummary.annualTripMiles)
-                                    print(autoSummary.litreConsumed)
-                                    print(autoSummary.gallonsConsumed)
-                                    print(autoSummary.annualMileage)
-                                    print(autoSummary.annualFuelCost)
-                                    print(autoSummary.annualTripEV)
-                                    print(autoSummary.annualTripEVMiles)
-                                    print(autoSummary.kwhConsumed)
-                                    print(autoSummary.annualMileageEV)
-                                    print(autoSummary.annualfuelCostEV)
-                                    print(autoSummary.annualServiceCost)
-                                    print(autoSummary.annualServiceCostEV)
-                                }
-                            }
-                            
                         }
-                        
                     }
+                    
                     if let vehicle = vehicles.first(where:{$0.isActive}) {
                         Section {
                             ScrollView {
@@ -345,35 +330,6 @@ struct AutoStatsView: View {
         autoSummary.annualfuelCostEV = 0
         autoSummary.annualServiceCost = 0
         autoSummary.annualServiceCostEV = 0
-    }
-    func calculateFuellingSummary(forYear year: Int, in autoSummary: AutoSummary, for vehicle: Vehicle) {
-       
-        for fuel in vehicle.getFuellings.filter({Calendar.current.component(.year, from: $0.date!) == year && $0.fuelType == FuelMode.Gas.rawValue}) {
-            autoSummary.annualTrip += fuel.lasttrip
-            autoSummary.annualTripMiles += fuel.lastTripMiles
-                                
-            autoSummary.litreConsumed += fuel.litre
-            autoSummary.gallonsConsumed += fuel.gallon
-            
-            autoSummary.annualMileage = autoSummary.annualTrip/autoSummary.litreConsumed
-            autoSummary.annualFuelCost += fuel.cost
-        }
-        for fuel in vehicle.getFuellings.filter({Calendar.current.component(.year, from: $0.date!) == year && $0.fuelType == FuelMode.EV.rawValue}) {
-            autoSummary.annualTripEV += fuel.lasttrip
-            autoSummary.annualTripEVMiles += fuel.lastTripMiles
-                                
-            autoSummary.kwhConsumed += (vehicle.getBatteryCapacity * (fuel.percent/100))
-                     
-            autoSummary.annualMileageEV = autoSummary.annualTripEV/autoSummary.kwhConsumed
-            autoSummary.annualfuelCostEV += fuel.cost
-        }
-    }
-    
-    func calculateServiceCostSummary(forYear year: Int, in autoSummary: AutoSummary, for vehicle: Vehicle) {
-        for service in vehicle.getServices.filter({Calendar.current.component(.year, from: $0.date!) == year}) {
-            autoSummary.annualServiceCost += service.cost
-            autoSummary.annualServiceCostEV += service.cost
-        }
     }
 }
 

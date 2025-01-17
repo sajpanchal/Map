@@ -45,6 +45,9 @@ struct ContentView: View {
                 SettingsView(locationDataManager: locationDataManager)
                     .tabItem {
                         Label("Settings", systemImage: "gearshape.fill")
+                            .onTapGesture {
+                                
+                            }
                     }
                     .toolbar(localSearch.status != .localSearchCancelled ? .hidden : .visible, for: .tabBar)
             }

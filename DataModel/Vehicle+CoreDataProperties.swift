@@ -72,7 +72,7 @@ extension Vehicle {
         make ?? "N/A"
     }
     public var getVehicleText: String {
-        "\(make ?? "") \(model?.replacingOccurrences(of: "_", with: " ") ?? "")"
+        "\(make ?? "") \(model?.replacingOccurrences(of: "_", with: " ") ?? "") \(year)"
     }
     public var getModel: String {
         model ?? "N/A"
