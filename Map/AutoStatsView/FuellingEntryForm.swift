@@ -154,7 +154,7 @@ struct FuellingEntryForm: View {
                                     Button {
                                         if isTextFieldEntryValid() {
                                             let index = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID})
-                                            print("Vehicle index: \(index) for vehicle \n \(vehicles[index!].getVehicleText)")
+                                         
                                             addFuellingEntry(for: vehicle, at: index)
                                                                            
                                             if  let i = index {

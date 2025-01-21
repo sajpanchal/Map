@@ -9,10 +9,12 @@ import SwiftUI
 
 ///custom buttons to be used  for MapView
 struct MapViewButton: View {
+    @FetchRequest(entity: Settings.entity(), sortDescriptors: []) var settings: FetchedResults<Settings>
     ///systemname of the image to be displayed on the button
     @Environment(\.colorScheme) var bgMode: ColorScheme
     var imageName: String = ""
-    
+    var speed: Int = 0
+  //  @ObservedObject var locationDataManager: LocationDataManager
     var body: some View {
         ///enclose the hstack in vstack with a spacer above so the button view will stay at the bottom of the screen.
         VStack {
@@ -35,14 +37,35 @@ struct MapViewButton: View {
                             .frame(width: 30, height: 30)
                             .foregroundStyle(Color.white)
                     }
-                    ///add an image to be displayed
-                    
-                    Image(systemName: imageName == "circle" || imageName == "circle.fill" ? "circle.fill" : imageName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                    ///set its color to blue gradient if image is having a circle filled otherwise set the gray geadient.
-                        .foregroundStyle(imageName == "circle" || imageName == "location" ? Color.blue : Color.white)
+                    ///if no image name is received
+                    if imageName == "" {
+                        ///get the first instance of settings.
+                        if let thisSettings = settings.first {
+                            ///vertical stack.
+                            VStack {
+                                ///if the distance unit is in km show speed in km/h otherwise show it in mi/h.
+                                Text(thisSettings.getDistanceUnit == "km" ? String(speed) : String(Int(Double(speed)/1.609)))
+                                    .multilineTextAlignment(.center)
+                                    .fontWeight(.semibold)
+                                    .font(.system(size: 25))
+                                    .foregroundStyle(bgMode == .dark ? .white : .black)
+                                ///if the distance unit is in km show display unit km/h otherwise mi/h.
+                                Text(thisSettings.getDistanceUnit == "km" ? "km/h" : "mi/h")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(bgMode == .dark ? .white : .black)
+                            }
+                        }
+                    }
+                    else {
+                        ///add an image to be displayed
+                        Image(systemName: imageName == "circle" || imageName == "circle.fill" ? "circle.fill" : imageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                        ///set its color to blue gradient if image is having a circle filled otherwise set the gray geadient.
+                            .foregroundStyle(imageName == "circle" || imageName == "location" ? Color.blue : Color.white)
+                    }
+                  
                 }
             }
             .padding(10)

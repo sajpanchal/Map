@@ -69,21 +69,50 @@ class MapViewAPI {
     }
     
     ///this method is used for instantiating map camera and configuring the same
-    static func setCameraRegion(of mapView: MKMapView, centeredAt userLocation: MKUserLocation, userHeading: CLHeading?, animated: Bool) {
+    static func setCameraRegion(of mapView: MKMapView, centeredAt userLocation: MKUserLocation, userHeading: CLHeading?, animated: Bool, distance: CLLocationDistance) {
         guard let heading = userHeading else {
             ///instantiate the MKMapCamera object with center as user location, distance (camera zooming to center), pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
             return
         }
         ///instantiate the camera with center to user location and following its heading directions.
-        let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: 600, pitch: 40, heading: heading.magneticHeading)
-        
+        let camera = MKMapCamera(lookingAtCenter: userLocation.coordinate, fromDistance: distance, pitch: 40, heading: heading.magneticHeading)
+        print(camera.centerCoordinateDistance)
+      
         DispatchQueue.main.async {
             ///set the mapview camera to our defined object.
             mapView.setCamera(camera, animated: animated)
             mapView.showsScale = true
         }
     }
-    
+    ///method to get the mapView camera distance from mapview based on device speed
+    static func getCameraDistanceFromMapView(atSpeed speed: Int) -> CLLocationDistance {
+        ///create a core location distance (in meters) variable with 600 meter set as inital value
+        var distance: CLLocationDistance = 600
+        ///switch case statement
+        switch speed {
+            /// if speed is between 0-50
+        case 0...50:
+            ///set the distance to 600
+            distance = 600
+            /// if speed is between 41-60
+        case 51...60:
+            ///set the distance to 800
+            distance = 800
+            /// if speed is between 61-80
+        case 61...80:
+            ///set the distance to 1000
+            distance = 1000
+            /// if speed is between 81-120
+        case 81...120:
+            ///set the distance to 2000
+            distance = 2000
+            /// if speed is above 120
+        default:
+            ///set the distance to 2000
+            distance = 2000
+        }
+        return distance
+    }
     ///function to untrack user location
     static func resetLocationTracking(of mapView: MKMapView, parent: inout MapView) {
         ///clear the instruction field that displays next step instruction on the DirectionsView.
@@ -203,6 +232,7 @@ class MapViewAPI {
                 ///add the polyline received from the route as an overlay to be displayed in mapview.
                uiView.addOverlay(polyline)
             }
+            
             if let thisOverlay = uiView.overlays.first {
                 uiView.setVisibleMapRect(thisOverlay.boundingMapRect, edgePadding: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5), animated: true)
                 ///set the flag at the end of the request executions

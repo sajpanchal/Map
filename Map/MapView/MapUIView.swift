@@ -210,8 +210,10 @@ struct MapView: UIViewRepresentable {
                     fallthrough
                 ///navigation mode.
                 case .navigate:
+                ///get cam distance to be set based on the current speed.
+                let camDistance = MapViewAPI.getCameraDistanceFromMapView(atSpeed: self.parent.locationDataManager.speed)
                 ///set the camera region centered at user location and follow it with megnatic heading
-                    MapViewAPI.setCameraRegion(of: mapView, centeredAt: userLocation, userHeading: parent.locationDataManager.userHeading, animated: parent.animated)
+                MapViewAPI.setCameraRegion(of: mapView, centeredAt: userLocation, userHeading: parent.locationDataManager.userHeading, animated: parent.animated, distance: camDistance)
                 ///start navigate the user to destination
             
                     MapViewAPI.startNavigation(in: mapView, parent: &parent)
@@ -307,7 +309,6 @@ struct MapView: UIViewRepresentable {
     
     ///this method will be executed whenever our UIViewController is going to be updated.UIViewController will be updated when our swiftui view MapView will be updated. Mapview will be updated when our @observedObject / @StateObject is updated.
      func updateUIView(_ uiView: MKMapView, context: Context) {
-        
         switch mapViewAction {
             ///map in idle mode.
             case .idle:
@@ -376,10 +377,12 @@ struct MapView: UIViewRepresentable {
                 break
             ///in navigation mode center map to userlocation
             case .inNavigationCenterToUserLocation:
-                if let heading = locationDataManager.userHeading {                   
+                if let heading = locationDataManager.userHeading {
+                    ///get cam distance to be set based on the current speed.
+                    let camDistance = MapViewAPI.getCameraDistanceFromMapView(atSpeed: self.locationDataManager.speed)
                     ///instantiate the MKMapCamera object with center as user location, distance (camera zooming to center),
                     ///pitch(camera angle) and camera heading set to user heading relative to  true north of camera.
-                    MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: heading, animated: animated)
+                    MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: heading, animated: animated, distance: camDistance)
                     
                 }
               fallthrough
@@ -388,16 +391,35 @@ struct MapView: UIViewRepresentable {
             case .navigate:
                 ///if navigation is not updated.
                 if mapViewStatus != .navigating {
+                    ///get cam distance to be set based on the current speed.
+                    let camDistance = MapViewAPI.getCameraDistanceFromMapView(atSpeed: self.locationDataManager.speed)
                      ///set the camera region centered to user location and follow it using heading updated.
-                    MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: self.locationDataManager.userHeading, animated: animated)
+                    MapViewAPI.setCameraRegion(of: uiView, centeredAt: uiView.userLocation, userHeading: self.locationDataManager.userHeading, animated: animated, distance: camDistance)
                     DispatchQueue.main.async {
                         self.timeInterval = true
                         ///navigate to the destination.
                         MapViewAPI.startNavigation(in: uiView, parent: &context.coordinator.parent)
                     }
                 }
+            ///get the last user location if available
+            if let thisUserLocation = locationDataManager.lastUserlocation {
+                ///if the speed is above 0 in m/s.
+                if thisUserLocation.speed > 0 {
+                    ///convert it to km/h
+                    locationDataManager.speed = Int(thisUserLocation.speed * 3.6)
+                }
+                ///if the speed is 0 in m/s.
+                else {
+                    ///set it to 0.
+                    locationDataManager.speed = 0
+                }
+            }
+            ///get the last user location if not available
+            else {
+                ///set it to 0.
+                locationDataManager.speed = 0
+            }
                 break
-            
             ///show directions mode
             case .showDirections:
                 ///show the directions for a given destination by drawing overlays.
@@ -489,6 +511,9 @@ extension MapView {
             
             break
         case .localSearchCancelled:
+            guard uiView.annotations.count > 1 else {
+                return
+            }
             DispatchQueue.main.async {
                 self.localSearch.suggestedLocations = nil
                 self.tappedAnnotation = nil

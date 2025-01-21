@@ -48,8 +48,15 @@ struct MapInteractionsView: View {
         ///enclose the map interaction views in a vstack and move them to the bottom of the screen.
         VStack(spacing: 0) {
            Spacer()
+            if isMapInNavigationMode().0 && isMapInNavigationMode().1 != .inNavigationNotCentered {
+                MapViewButton(speed: locationDataManager.speed)
+                MapViewButton(imageName: "location.fill")
+                    .gesture(TapGesture().onEnded(centerMapToUserLocation))
+                    .hidden()
+            }
             ///custom buttons that is floating on our  if map is navigating but it is not centered to user location show the location button to center it on tap.
             if isMapInNavigationMode().0 && isMapInNavigationMode().1 == .inNavigationNotCentered {
+                MapViewButton(speed: locationDataManager.speed)
                 MapViewButton(imageName: "location.fill")
                     .gesture(TapGesture().onEnded(centerMapToUserLocation))
             }

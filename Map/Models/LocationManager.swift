@@ -17,6 +17,8 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
     ///this is a object property that will reflect the user location authorization status. it is set as a type-alieas @published. which makes updates to swiftui if this object is used in that swiftui view.
     ///property storing userlocation
     var userlocation: CLLocation?
+    ///latest user location from locations array of core location
+    var lastUserlocation: CLLocation?
     ///property storing user heading relative to magnetic north.
     var userHeading: CLHeading?
     ///region instance for setting up the visible region in the map with centered location and zoom level configured based on needs.
@@ -110,13 +112,14 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
         guard let thisUserLocation = userlocation else {
             return
         }
+        ///get the last location from locations array.
+        lastUserlocation = locations.last
         ///if locations array is not nil and has the first location of the user, get the last user location, also check if the remainingDistance is not nil
-        if let lastUserLocation = locations.last {
+        if let lastLocation = lastUserlocation {
          ///check if the distance updated is greater than 0.01 meters and make sure distance is greater than 0.
-           
-            if thisUserLocation.distance(from: lastUserLocation)/1000 >= 0.01 {
+            if thisUserLocation.distance(from: lastLocation)/1000 >= 0.01 {
                 ///update the lastLocation variable with the latest user location recevied by location manager.
-                self.distance = thisUserLocation.distance(from: lastUserLocation)/1000
+                self.distance = thisUserLocation.distance(from: lastLocation)/1000
                 self.distanceText = String(format: "%.1f",self.distance)
                 ///if the vehicle is not nil
                 if let activeVehicle = vehicle {
@@ -138,11 +141,11 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                     ///if the index of the active vehicle is found
                     if let i = results.firstIndex(of: activeVehicle) {
                         ///start updating the odometer of the active vehicle in km.
-                        self.results[i].odometer += thisUserLocation.distance(from: lastUserLocation)/1000
+                        self.results[i].odometer += thisUserLocation.distance(from: lastLocation)/1000
                         ///start updating the odometer of the active vehicle in miles.
                         self.results[i].odometerMiles =  self.results[i].odometer * 0.6214
                         ///start updating the trip odometer of the active vehicle in km.
-                        self.results[i].trip += thisUserLocation.distance(from: lastUserLocation)/1000
+                        self.results[i].trip += thisUserLocation.distance(from: lastLocation)/1000
                         ///start updating the trip odometer of the active vehicle in miles.
                         self.results[i].tripMiles = self.results[i].trip * 0.6214
                         ///save view context
@@ -166,20 +169,20 @@ class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject
                         }
                     }
                 }
-                userlocation = lastUserLocation
+                userlocation = lastLocation
             }
             else {
                 self.distance = 0.0
             }
             ///calculate the speed of the user
-            if thisUserLocation.speed >= 0 {
-                self.speed = Int(thisUserLocation.speed * 3.6)
+            if lastLocation.speed >= 0 {
+                self.speed = Int(lastLocation.speed * 3.6)
             }
             else {
                 self.speed = 0
             }         
             ///set the region of the map with a center at last user coordinates and zoomed to 1000 meters.
-            region = MKCoordinateRegion(center: lastUserLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
+            region = MKCoordinateRegion(center: lastLocation.coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
         }
     }
     

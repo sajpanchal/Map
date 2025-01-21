@@ -32,6 +32,7 @@ struct DirectionHeaderView: View {
     @State private var isStepExited = false
     ///range is a variable to store the step range for entry or exit.
     @State private var range = 20.0
+    @State var maxDistance = "0.0"
     
     var body: some View {
         VStack {
@@ -82,6 +83,7 @@ struct DirectionHeaderView: View {
         ///if instruction is empty return the function call
         if instruction.isEmpty || utterance.isEmpty || instruction.contains("Starting at") {
             print("instruction empty")
+            speechVm.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
             return
         }
         ///if instruction says re-calculating the route stop synthesizer to speak immidiately.
@@ -121,119 +123,146 @@ struct DirectionHeaderView: View {
         if thisStepDistance != 0 {
             if let sign = directionSign {
                 if sign.contains("arcade.stick") {
-                    return 30
+                   // return 30
                 }
             }
-           
             ///switch case statements
             switch thisStepDistance {
-                ///if distance is between 200-300
+                ///if distance is between 0-79
             case 0...79:
-                ///if speed of travel is more than 90 km/h
-                if locationDataManager.speed >= 90 {
-                    ///return 120 m range
-                    return 30
-                }
-                ///if speed of travel is between 60-90 km/h
-                else if locationDataManager.speed < 90 && locationDataManager.speed >= 60 {
-                    ///return 110 m range
-                    return 30
-                }
-                ///if speed of travel is less than 60 km/h
-                else {
-                    ///return 90 m range
-                    return 30
-                }
-                ///if distance is between 200-300
-            case 79...99:
-                ///if speed of travel is more than 90 km/h
-                if locationDataManager.speed >= 90 {
-                    ///return 120 m range
+                ///if speed of travel is more than 80 km/h
+                if locationDataManager.speed >= 80 {
+                    ///return 50 m range
                     return 50
                 }
-                ///if speed of travel is between 60-90 km/h
-                else if locationDataManager.speed < 90 && locationDataManager.speed >= 60 {
-                    ///return 110 m range
-                    return 50
-                }
-                ///if speed of travel is less than 60 km/h
-                else {
-                    ///return 90 m range
+                ///if speed of travel is between 40-80 km/h
+                else if locationDataManager.speed < 80 && locationDataManager.speed >= 40 {
+                    ///return 40 m range
                     return 40
                 }
-                ///if distance is between 200-300
-            case 100...199:
-                ///if speed of travel is more than 90 km/h
-                if locationDataManager.speed >= 90 {
-                    ///return 120 m range
-                    return 60
-                }
-                ///if speed of travel is between 60-90 km/h
-                else if locationDataManager.speed < 90 && locationDataManager.speed >= 60 {
-                    ///return 110 m range
-                    return 60
-                }
                 ///if speed of travel is less than 60 km/h
                 else {
-                    ///return 90 m range
+                    ///return 30 m range
+                    return 30
+                }
+                ///if distance is between 79-99
+            case 79...99:
+                ///if speed of travel is more than 80 km/h
+                if locationDataManager.speed >= 80 {
+                    ///return 60 m range
+                    return 60
+                }
+                ///if speed of travel is between 40-80 km/h
+                else if locationDataManager.speed < 80 && locationDataManager.speed >= 40 {
+                    ///return 50 m range
+                    return 50
+                }
+                ///if speed of travel is less than 40 km/h
+                else {
+                    ///return 40 m range
+                    return 40
+                }
+                ///if distance is between 100-199
+            case 100...199:
+                ///if speed of travel is more than 80 km/h
+                if locationDataManager.speed >= 80 {
+                    ///return 80 m range
+                    return 80
+                }
+                ///if speed of travel is between 50-80 km/h
+                else if locationDataManager.speed < 80 && locationDataManager.speed >= 50 {
+                    ///return 40 m range
+                    return 60
+                }
+                ///if speed of travel is less than 50 km/h
+                else {
+                    ///return 50 m range
                     return 50
                 }
                 ///if distance is between 200-300
             case 200...300:
-                ///if speed of travel is more than 90 km/h
-                if locationDataManager.speed >= 90 {
+                ///if speed of travel is more than 80 km/h
+                if locationDataManager.speed >= 80 {
+                    ///return 160 m range
+                    return 160
+                }
+                ///if speed of travel is between 40-80 km/h
+                else if locationDataManager.speed < 80 && locationDataManager.speed >= 50 {
                     ///return 120 m range
                     return 120
                 }
-                ///if speed of travel is between 60-90 km/h
-                else if locationDataManager.speed < 90 && locationDataManager.speed >= 60 {
-                    ///return 110 m range
-                    return 110
-                }
-                ///if speed of travel is less than 60 km/h
+                ///if speed of travel is less than 50 km/h
                 else {
-                    ///return 90 m range
+                    ///return 80 m range
                     return 80
                 }
+                ///if distance is between 301-500
             case 301...500:
-                if locationDataManager.speed >= 90 {
-                    return 150
+                ///if speed of travel is more than 80 km/h
+                if locationDataManager.speed >= 80 {
+                    ///return 260 m range
+                    return 260
                 }
-                else if locationDataManager.speed < 90 && locationDataManager.speed >= 60 {
-                    return 110
-                }
-                else {
-                    return 90
-                }
-            case 501...1000:
-                if locationDataManager.speed >= 90 {
-                    return 250
-                }
-                else if locationDataManager.speed < 90 && locationDataManager.speed >= 60 {
-                    return 180
-                }
-                else {
-                    return 90
-                }
-            case 1001...10000:
-                if locationDataManager.speed >= 90 {
-                    return 250
-                }
-                else if locationDataManager.speed < 90 && locationDataManager.speed >= 60 {
-                    return 180
-                }
-                else {
+                ///if speed of travel is between 40-80 km/h
+                else if locationDataManager.speed < 80 && locationDataManager.speed >= 40 {
+                    ///return 120 m range
                     return 120
                 }
-            default:
-                if locationDataManager.speed >= 90 {
-                    return 250
-                }
-                else if locationDataManager.speed < 90 && locationDataManager.speed >= 60 {
-                    return 180
-                }
+                ///if speed of travel is less than 40 km/h
                 else {
-                    return  90
+                    ///return 80 m range
+                    return 80
+                }
+                ///if distance is between 501-1000
+            case 501...1000:
+                ///if speed of travel is more than 80 km/h
+                if locationDataManager.speed >= 80 {
+                    ///return 400 m range
+                    return 400
+                }
+                ///if speed of travel is between 40-80 km/h
+                else if locationDataManager.speed < 80 && locationDataManager.speed >= 40 {
+                    ///return 120 m range
+                    return 120
+                }
+                ///if speed of travel is less than 40 km/h
+                else {
+                    ///return 80 m range
+                    return 80
+                }
+                ///if distance is between 1001-10000
+            case 1001...10000:
+                ///if speed of travel is more than 80 km/h
+                if locationDataManager.speed >= 80 {
+                    ///return 400 m range
+                    return 400
+                }
+                ///if speed of travel is between 40-80 km/h
+                else if locationDataManager.speed < 80 && locationDataManager.speed >= 40 {
+                    ///return 120 m range
+                    return 120
+                }
+                ///if speed of travel is less than 40 km/h
+                else {
+                    ///return 80 m range
+                    return 80
+                }
+                ///if distance is above 10000
+            default:
+                ///if speed of travel is more than 80 km/h
+                if locationDataManager.speed >= 80 {
+                    ///return 400 m range
+                    return 400
+                }
+                ///if speed of travel is between 40-80 km/h
+                else if locationDataManager.speed < 80 && locationDataManager.speed >= 40 {
+                    ///return 120 m range
+                    return 120
+                }
+                ///if speed of travel is less than 40 km/h
+                else {
+                    ///return 80 m range
+                    return  80
                 }
             }
         }
@@ -308,7 +337,7 @@ struct DirectionHeaderView: View {
         ///set the utteranceDistance by the updated next step distance on appear of instruction text
         utteranceDistance = getUtteranceDistance()
         ///get the range preset from the utteranceDistance received on first appearance of the instruction.
-        range = nextStepRange(distance: nextStepDistance)
+        maxDistance = nextStepDistance
         if getDistanceInNumber(distance: nextStepDistance) < 80 && locationDataManager.speed > 36 {
             return
         }
@@ -325,13 +354,24 @@ struct DirectionHeaderView: View {
         else if directionSign == "exclamationmark.triangle" {
             startVoiceNavigation(with: "\(instruction)")
         }
+       ///if direction sign is other then mentioned above.
         else {
-            startVoiceNavigation(with: "In \(utteranceDistance), \(instruction)")
+            ///if utterance distance is less than or equal to 50
+            if getDistanceInNumber(distance: utteranceDistance) <= 50 {
+                ///start voice navigation with no inital text instruction
+                startVoiceNavigation(with: "\(instruction)")
+            }
+            ///else if distance is above 50.
+            else {
+                ///start voice navigation with inital text instruction
+                startVoiceNavigation(with: "In \(utteranceDistance), \(instruction)")
+            }
         }
-          
-        
     }
+    
     func alertUserWithVoiceNavigation() {
+        ///get the range for starting voice instruction from max step distance received.
+        range = nextStepRange(distance: maxDistance)
         ///get the current distance from user to the next step in number format
         let distance = getDistanceInNumber(distance: nextStepDistance)
         ///if the distance is less than or equal to the range and step is not exited yet, prepare for the voice navigation
