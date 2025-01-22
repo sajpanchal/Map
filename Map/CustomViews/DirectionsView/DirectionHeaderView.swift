@@ -81,7 +81,7 @@ struct DirectionHeaderView: View {
     }
     func startVoiceNavigation(with utterance: String) {
         ///if instruction is empty return the function call
-        if instruction.isEmpty || utterance.isEmpty || instruction.contains("Starting at") {
+        if instruction.isEmpty || utterance.isEmpty {
             print("instruction empty")
             speechVm.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
             return
@@ -270,8 +270,7 @@ struct DirectionHeaderView: View {
     }
     
     ///function to get distance from the next step in numbers
-    func getDistanceInNumber(distance: String) -> Double {
-        print("Distance String:", distance)
+    func getDistanceInNumber(distance: String) -> Double {      
         ///create a local step distance variable
         var thisStepDistance = 0.0
         ///if distance unit is set to miles.
@@ -417,15 +416,15 @@ struct DirectionHeaderView: View {
                     ///convert whole double to integer
                     if abs(roundedDistance - Double(Int(roundedDistance))) != 0.5 {
                         let wholeDistance = Int(roundedDistance)
-                        return String(wholeDistance) + "mi"
+                        return String(wholeDistance) + " mi"
                     }
                     else {
                         let wholeDistance = roundedDistance
-                        return String(wholeDistance) + "mi"
+                        return String(wholeDistance) + " mi"
                     }
                 }
                 else {
-                    return String(format: "%.1f", distanceNumbers) + "mi"
+                    return String(format: "%.1f", distanceNumbers) + " mi"
                 }
             }
             ///if step instruction distance is not containing km sign.
@@ -433,7 +432,7 @@ struct DirectionHeaderView: View {
                 distanceNumbers = distanceNumbers * 3.281
                 let roundedDistance = round(distanceNumbers/50) * 50.0
                 let wholeDistance = Int(roundedDistance)
-                return String(wholeDistance) + "ft"
+                return String(wholeDistance) + " ft"
             }
         }
         else {
@@ -446,18 +445,18 @@ struct DirectionHeaderView: View {
                 ///convert whole double to integer
                 if abs(roundedDistance - Double(Int(roundedDistance))) != 0.5 {
                     let wholeDistance = Int(roundedDistance)
-                    return String(wholeDistance) + "km"
+                    return String(wholeDistance) + " km"
                 }
                 else {
                     let wholeDistance = roundedDistance
-                    return String(wholeDistance) + "km"
+                    return String(wholeDistance) + " km"
                 }
             }
             ///if step instruction distance is not containing km sign.
             else {
                 let roundedDistance = round(distanceNumbers/50) * 50.0
                 let wholeDistance = Int(roundedDistance)
-                return String(wholeDistance) + "m"
+                return String(wholeDistance) + " m"
             }
         }
     }
