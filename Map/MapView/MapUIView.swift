@@ -312,7 +312,9 @@ struct MapView: UIViewRepresentable {
         switch mapViewAction {
             ///map in idle mode.
             case .idle:
-            self.routeData.removeAll()
+            DispatchQueue.main.async {
+                self.routeData.removeAll()
+            }
                 ///if status is not updated
             if self.mapViewStatus != .idle && self.mapViewStatus != .notCentered {
                     DispatchQueue.main.async {

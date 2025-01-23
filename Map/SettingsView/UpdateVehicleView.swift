@@ -56,6 +56,10 @@ struct UpdateVehicleView: View {
     @State private var efficiencyUnitIndex = 0
     ///flag to show/hide add vehicle form
     @State private var showAddVehicleForm = false
+    ///state variable stores vehicle make in string format
+    @State private var textVehicleMake = ""
+    ///state variable stores vehicle model in string format
+    @State private var textVehicleModel = ""
     ///flag to show/hide garage view
     @Binding var showGarage: Bool
     ///variable that stores settings object of core data
@@ -77,8 +81,17 @@ struct UpdateVehicleView: View {
                                 }
                             }
                         }
+                        ///textfield to enter vehicle make
+                        Section("Vehicle Make") {
+                            TextField("Enter/Select your vehicle make", text: $textVehicleMake)
+                        }
+                        if textVehicleMake.isEmpty {
+                            Text("vehicle make can not be empty!")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                        }
                         ///picker to select vehicle make alphabetically
-                        Section(header: Text("Vehicle Make").fontWeight(.bold)) {
+                        Section("") {
                             HStack {
                                 Picker("Select Make", selection: $alphabet) {
                                     ForEach(Alphbets.allCases) { alpha in
@@ -99,6 +112,9 @@ struct UpdateVehicleView: View {
                                     }
                                     ///set the selected make as initial vehicle model
                                     vehicleModel = thisModel
+                                    ///update the textfield with the selected vehicle make from the picker in string format.
+                                    textVehicleMake = thisMake.rawValue.replacingOccurrences(of: "_", with: " ")
+                                    
                                 }
                                 .pickerStyle(.wheel)
                                 ///picker for vehicle make
@@ -109,17 +125,37 @@ struct UpdateVehicleView: View {
                                 }
                                 ///on change of vehicle make
                                 .onChange(of: vehicleMake) {
+                                    print("on change of make")
                                     vehicleModel = vehicleMake.models.first ?? .Other
+                                    ///update the vehicle make text with formated vehicle make string
+                                    textVehicleMake = vehicleMake.rawValue.replacingOccurrences(of: "_", with: " ")
+                                    ///update the vehicle model text with formated vehicle model string
+                                    textVehicleModel = vehicleModel.rawValue.replacingOccurrences(of: "_", with: " ")
                                 }
                                 .pickerStyle(.wheel)
                             }
                         }
+                        ///textfeid to store desired or selected vehicle model.
+                        Section("Vehicle Model") {
+                            TextField("Enter/Select your vehicle model", text: $textVehicleModel)
+                        }
+                        if textVehicleModel.isEmpty {
+                            Text("vehicle model can not be empty!")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                        }
                         ///picker to select vehicle model
-                        Section(header: Text("Vehicle model").fontWeight(.bold)) {
+                        Section("") {
                             Picker("Select model", selection: $vehicleModel) {
                                 ForEach(vehicleMake.models, id: \.id) { vehicleModel in
                                     Text(vehicleModel.rawValue.replacingOccurrences(of: "_", with: " "))
                                 }
+                            }
+                            ///on change of vehicle model ID.
+                            .onChange(of: vehicleModel.id) {
+                                print("on change of model")
+                                ///update the textfield with given model formated text.
+                                textVehicleModel = vehicleModel.rawValue.replacingOccurrences(of: "_", with: " ")
                             }
                             .pickerStyle(.wheel)
                         }
@@ -417,11 +453,14 @@ struct UpdateVehicleView: View {
                             HStack {
                                 Spacer()
                                 Button {
-                                    updateVehicle(with: vehicle)
-                                    saveSettings(for: vehicle)
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                        showGarage = false
+                                    if !textVehicleMake.isEmpty && !textVehicleModel.isEmpty {
+                                        updateVehicle(with: vehicle)
+                                        saveSettings(for: vehicle)
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                            showGarage = false
+                                        }
                                     }
+                                   
                                 } label: {
                                     FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.blueColor.rawValue))
                                 }
@@ -455,6 +494,7 @@ struct UpdateVehicleView: View {
     
     ///method to update vehicle in the core data stack
     func updateVehicle(with vehicle: Vehicle) {
+        
         ///get the calendar year for the reports
         let calendarYear = Calendar.current.component(.year, from: Date())
         ///get the index of the current vehicle in vehicles entity
@@ -463,9 +503,9 @@ struct UpdateVehicleView: View {
             return
         }
         ///set the vehicle model to new model input
-        vehicles[vIndex].model = vehicleModel.rawValue
+        vehicles[vIndex].model = textVehicleModel
         ///set the vehicle make to new make input
-        vehicles[vIndex].make = vehicleMake.rawValue
+        vehicles[vIndex].make = textVehicleMake
         ///set the vehicle year to new year input
         vehicles[vIndex].year = Int16(manufacturingYear)
         ///set the vehicle odometer to new odometer input
@@ -517,8 +557,20 @@ struct UpdateVehicleView: View {
         vehicleType = VehicleTypes(rawValue: vehicle.getType) ?? .Car
         ///set the vehicle make fetched from the selected vehicle
         vehicleMake = VehicleMake(rawValue: vehicle.getMake) ?? .AC
-        ///set the vehicle model fetched from the selected vehicle
-        vehicleModel = Model(rawValue: vehicle.getModel) ?? .ATS
+        ///fill the vehicle make text field with a selected vehicle make
+        textVehicleMake = vehicle.getMake
+       ///if vehicle model is found in model enum
+        if let model = Model(rawValue: vehicle.getModel) {
+            ///set the vehicle model fetched from the selected vehicle
+            vehicleModel = model
+            ///set the vehicle model text with the selected vehicle model
+            textVehicleModel = vehicle.getModel
+        }
+        ///if vehicle model is other than in a list of enum values.
+        else {
+            ///set the vehicle model text with the selected vehicle model
+            textVehicleModel = vehicle.getModel
+        }
         ///set the vehicle manufacturing year fetched from the selected vehicle
         manufacturingYear = Int(vehicle.year)
         ///set the alphbet to sort vehicle makes fetched from the selected vehicle

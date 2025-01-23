@@ -71,6 +71,11 @@ struct AddVehicleForm: View {
                         Section("Vehicle Make") {
                             TextField("Enter/Select your vehicle make", text: $textVehicleMake)
                         }
+                        if textVehicleMake.isEmpty {
+                            Text("vehicle make can not be empty!")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                        }
                         ///picker to select vehicle make from the list.
                         Section("") {
                             HStack {
@@ -121,6 +126,11 @@ struct AddVehicleForm: View {
                         ///textfeid to store desired or selected vehicle model.
                         Section("Vehicle Model") {
                             TextField("Enter/Select your vehicle model", text: $textVehicleModel)
+                        }
+                        if textVehicleModel.isEmpty {
+                            Text("vehicle model can not be empty!")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
                         }
                         ///picler for vehicle model selection
                         Section("") {
@@ -254,8 +264,11 @@ struct AddVehicleForm: View {
                             HStack {
                                 Spacer()
                                 Button {
-                                    ///on tap of the button call function to add a new vehicle.
-                                   addVehicle()
+                                    if !textVehicleMake.isEmpty && !textVehicleModel.isEmpty {
+                                        ///on tap of the button call function to add a new vehicle.
+                                       addVehicle()
+                                    }
+                                   
                                 } label: {
                                     ///appearnce of the button
                                     FormButton(imageName: "car.fill", text: "Add Vehicle", color: Color(AppColors.green.rawValue))

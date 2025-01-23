@@ -80,6 +80,11 @@ struct InitialSettingsView: View {
                         Section("Vehicle Make") {
                             TextField("Enter/Select your vehicle make", text: $textVehicleMake)
                         }
+                        if textVehicleMake.isEmpty {
+                            Text("vehicle make can not be empty!")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
+                        }
                         ///picker for vehicle make selection.
                         Section("") {
                             HStack {
@@ -131,6 +136,11 @@ struct InitialSettingsView: View {
                         ///textfeid to store desired or selected vehicle model.
                         Section("Vehicle Model") {
                             TextField("Enter/Select your vehicle model", text: $textVehicleModel)
+                        }
+                        if textVehicleModel.isEmpty {
+                            Text("vehicle model can not be empty!")
+                                .font(.caption2)
+                                .foregroundStyle(.red)
                         }
                         ///picker for vehicle model selection
                         Section("") {
@@ -422,12 +432,14 @@ struct InitialSettingsView: View {
                             HStack {
                                 Spacer()
                                 Button {
-                                    ///on tap of the button, instantiate a vehicle entity object from the managed view context
-                                let vehicle = Vehicle(context: viewContext)
-                                    ///add a new vehicle for this vehicle object created.
-                                addVehicle(for: vehicle)
-                                    ///save the settings for this vehicle object created.
-                                saveSettings(for: vehicle)
+                                    if !textVehicleMake.isEmpty && !textVehicleModel.isEmpty {
+                                        ///on tap of the button, instantiate a vehicle entity object from the managed view context
+                                        let vehicle = Vehicle(context: viewContext)
+                                        ///add a new vehicle for this vehicle object created.
+                                        addVehicle(for: vehicle)
+                                        ///save the settings for this vehicle object created.
+                                        saveSettings(for: vehicle)
+                                    }
                                 } label: {
                                     ///button view ui.
                                     FormButton(imageName: "gearshape.fill", text: "Save Settings", color: Color(AppColors.pink.rawValue))
