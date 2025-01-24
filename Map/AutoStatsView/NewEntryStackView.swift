@@ -11,6 +11,7 @@ struct NewEntryStackView: View {
     @Environment(\.colorScheme) var bgMode: ColorScheme
     var foregroundColor: Color
     var width: CGFloat
+    var title: String
     var body: some View {
         Group {
             VStack {
@@ -25,7 +26,7 @@ struct NewEntryStackView: View {
                     }
                     .shadow(color: bgMode == .dark ? Color(UIColor.darkGray) : .black, radius: 1, x: 1, y: 1)
                     Spacer()
-                    Text("New Entry")
+                    Text(title)
                         .foregroundStyle(bgMode == .dark ? Color(UIColor.systemGray2) : Color(UIColor.darkGray))
                         .font(.system(size: 18, weight: .bold))
                     Spacer()
@@ -42,5 +43,5 @@ struct NewEntryStackView: View {
 }
 
 #Preview {
-    NewEntryStackView(foregroundColor: .clear, width: 0.0)
+    NewEntryStackView(foregroundColor: .clear, width: 0.0, title: "New Entry")
 }

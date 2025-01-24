@@ -32,14 +32,10 @@ struct GarageView: View {
                     ForEach(vehicles, id: \.uniqueID) { thisVehicle in
                         NavigationLink(destination: UpdateVehicleView(locationDataManager: locationDataManager, showGarage: $showGarage, settings: thisSettings, vehicle: thisVehicle), label: {
                             VStack {
-                                Text(thisVehicle.getVehicleText + " " + thisVehicle.getFuelEngine)
+                                Text(thisVehicle.getVehicleText + " " + (thisVehicle.getFuelEngine != "Gas" ? thisVehicle.getFuelEngine : ""))
                                     .fontWeight(.bold)
                                     .font(Font.system(size: 18))
                                     .foregroundStyle(Color(colors[getColorIndex(for: vehicles.firstIndex(where: {$0 == thisVehicle}) ?? 0)]))
-                                Text(thisVehicle.getYear)
-                                    .fontWeight(.semibold)
-                                    .font(Font.system(size: 14))
-                                    .foregroundStyle(Color.gray)
                             }
                      })
                     }

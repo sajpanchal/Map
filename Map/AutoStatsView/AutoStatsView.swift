@@ -113,15 +113,8 @@ struct AutoStatsView: View {
                             .onChange(of: showFuelHistoryView) {
                                 efficiency = getFuelEfficiency()
                             }
-                            ///tappable HStack to show the autoSummaryList view
-                            HStack {
-                                Text("Show Past Summary")
-                                Spacer()
-                                Image(systemName:"chevron.up")
-                                    .font(Font.system(size: 14))
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.gray)
-                            }
+                            ///tappable headerview to show the autoSummaryList view
+                            CustomHeaderView(signImage: "steeringwheel", title: "Summary Archives")
                             ///on tap toggle the showAutoSummary flag
                             .onTapGesture {
                                 showAutoSummary.toggle()
@@ -130,15 +123,8 @@ struct AutoStatsView: View {
                             .sheet(isPresented: $showAutoSummary, content: {
                                 AutoSummaryList(locationDataManager: locationDataManager)
                             })
-                            ///tappable HStack to show the chartview view
-                            HStack {
-                                Text("Show Graphical Stats")
-                                Spacer()
-                                Image(systemName:"chevron.up")
-                                    .font(Font.system(size: 14))
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.gray)
-                            }
+                            ///tappable headerview to show the Chart  view
+                            CustomHeaderView(signImage: "chart.bar.xaxis.ascending", title: "Summary Charts")
                             ///on tap toggle the showChartView flag
                             .onTapGesture {
                                 showChartView.toggle()
@@ -162,7 +148,7 @@ struct AutoStatsView: View {
                     if let vehicle = vehicles.first(where:{$0.isActive}) {
                         Section {
                             ScrollView {
-                                NewEntryStackView(foregroundColor: Color(AppColors.yellow.rawValue), width: geo.size.width)
+                                NewEntryStackView(foregroundColor: Color(AppColors.yellow.rawValue), width: geo.size.width, title: "New Fuel Entry")
                                     .foregroundStyle(Color(AppColors.invertYellow.rawValue))
                                 .onTapGesture {
                                     showFuellingEntryform.toggle()
@@ -212,7 +198,7 @@ struct AutoStatsView: View {
         
                         Section {
                             ScrollView {
-                                NewEntryStackView(foregroundColor: Color(AppColors.red.rawValue), width: geo.size.width)
+                                NewEntryStackView(foregroundColor: Color(AppColors.red.rawValue), width: geo.size.width, title: "New Service Entry")
                                     .foregroundStyle(Color(AppColors.invertRed.rawValue))
                                 .onTapGesture {
                                     showServiceEntryForm.toggle()

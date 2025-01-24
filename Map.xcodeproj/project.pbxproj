@@ -82,6 +82,7 @@
 		72C226272C2C6D8600E51D9E /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C226262C2C6D8600E51D9E /* Settings.swift */; };
 		72C3D8A52A990C1D0073CCC5 /* SearchFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */; };
 		72C3D8A72A9911FC0073CCC5 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C3D8A62A9911FC0073CCC5 /* Enums.swift */; };
+		72D075C02D43F8CF00422E98 /* CustomHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D075BF2D43F8CF00422E98 /* CustomHeaderView.swift */; };
 		72D189C72C45805900AAC514 /* InitialSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D189C62C45805900AAC514 /* InitialSettingsView.swift */; };
 		72EDE4142B2631D800578B8A /* DirectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EDE4132B2631D800578B8A /* DirectionHeaderView.swift */; };
 		72EDE4162B26334E00578B8A /* ExpandViewSymbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EDE4152B26334E00578B8A /* ExpandViewSymbol.swift */; };
@@ -186,6 +187,7 @@
 		72C226262C2C6D8600E51D9E /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		72C3D8A42A990C1D0073CCC5 /* SearchFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFieldView.swift; sourceTree = "<group>"; };
 		72C3D8A62A9911FC0073CCC5 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		72D075BF2D43F8CF00422E98 /* CustomHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomHeaderView.swift; sourceTree = "<group>"; };
 		72D189C62C45805900AAC514 /* InitialSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialSettingsView.swift; sourceTree = "<group>"; };
 		72D68E2E2B1199DF00756253 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		72EDE4132B2631D800578B8A /* DirectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionHeaderView.swift; sourceTree = "<group>"; };
@@ -425,6 +427,7 @@
 				72233ADF2D38215000C7A5E4 /* AnnualMileageSection.swift */,
 				72233AE12D38239D00C7A5E4 /* AnnualCostsSection.swift */,
 				72233AE32D3824DB00C7A5E4 /* AnnualCostsSectionHybrid.swift */,
+				72D075BF2D43F8CF00422E98 /* CustomHeaderView.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -585,6 +588,7 @@
 				72EDE4142B2631D800578B8A /* DirectionHeaderView.swift in Sources */,
 				72A8BC262C29C7EB00E0D7B2 /* ServiceEntryForm.swift in Sources */,
 				72A6D14F2BD01B8000A33A0A /* PolylinePoint.swift in Sources */,
+				72D075C02D43F8CF00422E98 /* CustomHeaderView.swift in Sources */,
 				7286A1492C24813400333A4F /* FuelHistoryView.swift in Sources */,
 				728181FD2C52A6F400D8F3AA /* VehicleListItem.swift in Sources */,
 				72053A872A951D5000B1D3FC /* AddressListView.swift in Sources */,
