@@ -65,14 +65,20 @@ struct ChartView: View {
                                     BarMark(x: .value("Year", $0.getCalenderYear),  y: .value("Volume (kwh)", $0.kwhConsumed))
                                 }
                             }
+                           
                             .frame(height: 400)
                             .padding(.trailing,5)
                             .foregroundStyle(Color.yellow)
+                            .chartScrollableAxes(.horizontal)
+                            .chartXVisibleDomain(length: vehicle.getReports.count < 5 ? vehicle.getReports.count : 5)
                             ///footer text
                             Text("Fuel consumption in " + (thisSettings.getFuelVolumeUnit == "%" ? "kwh" : thisSettings.getFuelVolumeUnit))
-                                .fontWeight(.bold)
-                                .foregroundStyle(Color.blue)
-                                .padding(.bottom, 30)
+                                .fontWeight(.semibold)
+                                .font(.caption)
+                                .foregroundStyle(Color.gray)
+                                .padding(.bottom, 20)
+                                .padding(.top, 5)          
+                         
                         ///if picker is set to show mileage chart
                         case .mileage:
                             ///create a chart from all the reports belongs to the given vehicle
@@ -83,11 +89,16 @@ struct ChartView: View {
                             .padding(.trailing,5)
                             .frame(height: 400)
                             .foregroundStyle(Color.green)
+                            .chartScrollableAxes(.horizontal)
+                            .chartXVisibleDomain(length: vehicle.getReports.count < 5 ? vehicle.getReports.count : 5)
                             ///footer text view.
                             Text("Mileage in " + thisSettings.getFuelEfficiencyUnit)
-                                .fontWeight(.bold)
-                                .foregroundStyle(Color.blue)
-                                .padding(.bottom, 30)
+                                .fontWeight(.semibold)
+                                .font(.caption)
+                                .foregroundStyle(Color.gray)
+                                .padding(.bottom, 20)
+                                .padding(.top, 5)
+                            
                         ///if picker is set to show travel chart
                         case .travel:
                             ///create a chart from all the reports belongs to the given vehicle
@@ -107,15 +118,19 @@ struct ChartView: View {
                                     ///show bar chart with x axis showing calendar years and y axis showing travel distance in km or miles for default engine mode.
                                     BarMark(x: .value("Year", $0.getCalenderYear),  y: .value("Travel in " + thisSettings.getDistanceUnit, (thisSettings.getDistanceUnit == "km" ? $0.annualTrip : $0.annualTripMiles)))
                                 }
-                            }
+                            }                    
                             .padding(.trailing,5)
                             .frame(height: 400)
                             .foregroundStyle(Color.purple)
+                            .chartScrollableAxes(.horizontal)
+                            .chartXVisibleDomain(length: vehicle.getReports.count < 5 ? vehicle.getReports.count : 5)
                             ///footer text view.
                             Text("Travel in "  + thisSettings.getDistanceUnit)
-                                .fontWeight(.bold)
-                                .foregroundStyle(Color.blue)
-                                .padding(.bottom, 30)
+                                .fontWeight(.semibold)
+                                .font(.caption)
+                                .foregroundStyle(Color.gray)
+                                .padding(.bottom, 20)
+                                .padding(.top, 5)
                         }
                         ///picker with selection as binding value of the selection.
                         Picker("Show Chart For", selection: $costChart) {
@@ -152,11 +167,15 @@ struct ChartView: View {
                             .frame(height: 400)
                             .padding(.trailing,5)
                             .foregroundStyle(Color.orange)
+                            .chartScrollableAxes(.horizontal)
+                            .chartXVisibleDomain(length: vehicle.getReports.count < 5 ? vehicle.getReports.count : 5)
                             ///footer text view.
                             Text("Fuel Cost in " + (Locale.current.currency?.identifier ?? "$CAD"))
-                                .fontWeight(.bold)
-                                .foregroundStyle(Color.blue)
-                                .padding(.bottom, 30)
+                                .fontWeight(.semibold)
+                                .font(.caption)
+                                .foregroundStyle(Color.gray)
+                                .padding(.bottom, 20)
+                                .padding(.top, 5)
                             
                         case .service_Cost:
                             ///create a chart from all the reports belongs to the given vehicle
@@ -180,14 +199,16 @@ struct ChartView: View {
                             .frame(height: 400)
                             .padding(.trailing,5)
                             .foregroundStyle(Color.red)
+                            .chartScrollableAxes(.horizontal)
+                            .chartXVisibleDomain(length: vehicle.getReports.count < 5 ? vehicle.getReports.count : 5)
                             ///footer text view.
                             Text("Service Cost in " + (Locale.current.currency?.identifier ?? "$CAD"))
-                                .fontWeight(.bold)
-                                .foregroundStyle(Color.blue)
-                                .padding(.bottom, 30)
+                                .fontWeight(.semibold)
+                                .font(.caption)
+                                .foregroundStyle(Color.gray)
+                                .padding(.bottom, 20)
+                                .padding(.top, 5)
                         }
-                        
-                        
                     }
                     ///on appear of this swiftui view, this modifier will be called.
                     .onAppear {
