@@ -13,6 +13,7 @@ struct AutoStatsView: View {
     @StateObject var locationDataManager: LocationDataManager
     @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
+    @FetchRequest(entity: AutoSummary.entity(), sortDescriptors:[]) var reports: FetchedResults<AutoSummary>
     let rows = [GridItem(spacing: 10, alignment: .topLeading), GridItem(spacing: 10, alignment: .topLeading), GridItem(spacing: 10, alignment: .topLeading)]
     @State private var showFuelHistoryView = false
     @State private var showServiceHistoryView = false
@@ -21,6 +22,9 @@ struct AutoStatsView: View {
     @State private var efficiency: Double = 0
     @State private var showAutoSummary = false
     @State private var showChartView = false
+    @State private var showOdometerAlert = false
+    @State private var odometerStart = 0.0
+    @State private var odometerEnd = 0.0
     let currentYear: String = {
         let components = DateComponents()
         if let year = Calendar.current.dateComponents([.year], from: Date()).year {
@@ -240,14 +244,78 @@ struct AutoStatsView: View {
                     }
                 }
                 
+                
                 .frame(width: geo.size.width, height: geo.size.height - 40)
               
                 .navigationTitle("Auto Summary")
                 
             
             }
+            .onAppear {
+                print("on Appear")
+                guard let thisVehicle = vehicles.first(where: {$0.isActive}) else {
+                    return
+                }
+                
+                print("vehicle: ", thisVehicle.getVehicleText)
+                guard let thisAutoSummary = reports.first(where: {$0.vehicle == thisVehicle && $0.getCalenderYear == currentYear}) else {
+                    return
+                }
+                
+                print("Summary year: ", thisAutoSummary.calenderYear)
+                print("Summary Odometer: ", thisAutoSummary.odometerStart)
+                if thisAutoSummary.odometerStart == 0.0 {
+                    showOdometerAlert = true
+                }
+                else {
+                    showOdometerAlert = false
+                }
+                
+            }
+            .alert("Set Vehicle Odometer", isPresented: $showOdometerAlert) {
+                TextField("Odometer Start Readings", value: $odometerStart, format: .number)
+                
+                Button("OK", action: setOdometer)
+                Button("Cancel", role: .cancel) {}
+               
+            } message: {
+                HStack {
+                    Text("What was it On Jan 01, " + currentYear + "?")
+                    Text("in " + settings.first!.getDistanceUnit)
+                }
+            }
         }
     }
+    
+    func setOdometer() {
+        guard let thisSettings = settings.first else {
+            return
+        }
+        guard let thisVehicle = vehicles.first(where: {$0.isActive}) else {
+            return
+        }
+        guard let index = reports.firstIndex(where: {$0.vehicle == thisVehicle && $0.getCalenderYear == currentYear}) else {
+            return
+        }
+        
+        if odometerStart == 0.0 {
+            odometerStart = 0.1
+        }
+                    
+        if thisSettings.getDistanceUnit == "km" {
+            reports[index].odometerStart = odometerStart
+            reports[index].odometerStartMiles = odometerStart / 1.609
+            print("in km: ", reports[index].odometerStart)
+        }
+        else {
+            reports[index].odometerStartMiles = odometerStart
+            reports[index].odometerStart = odometerStart * 1.609
+            print("in mi: ", reports[index].odometerStartMiles)
+        }
+        AutoSummary.saveContext(viewContext: viewContext)
+      
+    }
+    
     ///function to get the vehicle fuel efficiency
     func getFuelEfficiency() -> Double {
         ///get the first vehicle from entity of vehicles which is currently active.
@@ -302,6 +370,21 @@ struct AutoStatsView: View {
         return vehicle.fuelEfficiency
 
     }
+    
+    func isFuellingDataEmpty() -> Bool {
+        guard let thisVehicle = vehicles.first(where: {$0.isActive}) else {
+            return false
+        }
+         let fuellings = thisVehicle.getFuellings.filter({Calendar.current.component(.year, from: $0.getShortDate) == Int(currentYear)})
+        
+        if fuellings.isEmpty {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    
     func resetSummaryFields(in autoSummary: AutoSummary) {
         autoSummary.annualTrip = 0
         autoSummary.annualTripMiles = 0
