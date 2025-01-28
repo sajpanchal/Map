@@ -23,8 +23,8 @@ struct AutoStatsView: View {
     @State private var showAutoSummary = false
     @State private var showChartView = false
     @State private var showOdometerAlert = false
-    @State private var odometerStart = 0.0
-    @State private var odometerEnd = 0.0
+    @State private var odometerTextfield = 0.0
+   
     let currentYear: String = {
         let components = DateComponents()
         if let year = Calendar.current.dateComponents([.year], from: Date()).year {
@@ -251,67 +251,81 @@ struct AutoStatsView: View {
                 
             
             }
+            ///on appear of this swiftui view
             .onAppear {
                 print("on Appear")
+                ///get the active vehicle from the vehicles entity list
                 guard let thisVehicle = vehicles.first(where: {$0.isActive}) else {
                     return
                 }
-                
                 print("vehicle: ", thisVehicle.getVehicleText)
-                guard let thisAutoSummary = reports.first(where: {$0.vehicle == thisVehicle && $0.getCalenderYear == currentYear}) else {
-                    return
-                }
-                
-                print("Summary year: ", thisAutoSummary.calenderYear)
-                print("Summary Odometer: ", thisAutoSummary.odometerStart)
-                if thisAutoSummary.odometerStart == 0.0 {
+                ///if vehicle odometer is set to 0.
+                if thisVehicle.odometer < 1 || thisVehicle.odometerMiles < 1 {
+                    ///set this flag to show the alert view
                     showOdometerAlert = true
                 }
+                ///if vehicle odometer is greater than 0.
                 else {
+                    ///don't show the alert view.
                     showOdometerAlert = false
                 }
-                
             }
+            ///modifier to show the alert with a headline and boolean variable to show/hide alert.
             .alert("Set Vehicle Odometer", isPresented: $showOdometerAlert) {
-                TextField("Odometer Start Readings", value: $odometerStart, format: .number)
-                
+                ///body of the alert modifier to set its appearance
+                ///show the text field to enter the odometer value to set it for a given vehicle
+                TextField("Odometer Readings", value: $odometerTextfield, format: .number)
+                ///Ok button. On tap of it, execute setOdometer function
                 Button("OK", action: setOdometer)
+                ///Cancel button. On tap of it, do nothing
                 Button("Cancel", role: .cancel) {}
                
-            } message: {
-                HStack {
-                    Text("What was it On Jan 01, " + currentYear + "?")
-                    Text("in " + settings.first!.getDistanceUnit)
-                }
+            }
+            ///message parameter of the alert will show the subheadline.
+            message: {
+                ///show the textfield with message.
+                Text("Please set your odometer to the latest from vehicle dashboard.")
             }
         }
     }
     
+    ///function to set odometer
     func setOdometer() {
+        ///get the first element from the settings.
         guard let thisSettings = settings.first else {
             return
         }
-        guard let thisVehicle = vehicles.first(where: {$0.isActive}) else {
+        ///get the vehicle index from the vehicles entity list which is currently active.
+        guard let index = vehicles.firstIndex(where: {$0.isActive}) else {
             return
         }
-        guard let index = reports.firstIndex(where: {$0.vehicle == thisVehicle && $0.getCalenderYear == currentYear}) else {
+        ///get the report index from the reports where report belongs to the given vehicle and a current year.
+        guard let reportIndex = reports.firstIndex(where: {$0.vehicle == vehicles[index] && $0.getCalenderYear == currentYear }) else {
             return
         }
-        
-        if odometerStart == 0.0 {
-            odometerStart = 0.1
-        }
-                    
+        ///if the distance unit is set to km in settings tab
         if thisSettings.getDistanceUnit == "km" {
-            reports[index].odometerStart = odometerStart
-            reports[index].odometerStartMiles = odometerStart / 1.609
-            print("in km: ", reports[index].odometerStart)
+            ///set the vehicle odometer in km.
+            vehicles[index].odometer = odometerTextfield
+            ///convert from km to miles and set the vehicle odometer.
+            vehicles[index].odometerMiles = odometerTextfield / 1.609
+            ///set the odometer end in km in report's current year of a current vehicle
+            reports[reportIndex].odometerEnd = odometerTextfield
+            ///convert from km to miles and set the odometer end in km in report's current year of a current vehicle
+            reports[reportIndex].odometerEndMiles = odometerTextfield / 1.609
         }
+        ///if the distance unit is set to miles in settings tab
         else {
-            reports[index].odometerStartMiles = odometerStart
-            reports[index].odometerStart = odometerStart * 1.609
-            print("in mi: ", reports[index].odometerStartMiles)
+            ///set the vehicle odometer in miles.
+            vehicles[index].odometerMiles = odometerTextfield
+            ///convert from miles to km and set the vehicle odometer.
+            vehicles[index].odometer = odometerTextfield * 1.609
+            ///set the odometer end in km  in report's current year of a current vehicle
+            reports[reportIndex].odometerEndMiles = odometerTextfield
+            ///convert from miles to km and set the odometer end in km in report's current year of a current vehicle
+            reports[reportIndex].odometerEnd = odometerTextfield * 1.609
         }
+        ///save the changes in core data viewcontext.
         AutoSummary.saveContext(viewContext: viewContext)
       
     }
@@ -369,20 +383,6 @@ struct AutoStatsView: View {
       ///return the value.
         return vehicle.fuelEfficiency
 
-    }
-    
-    func isFuellingDataEmpty() -> Bool {
-        guard let thisVehicle = vehicles.first(where: {$0.isActive}) else {
-            return false
-        }
-         let fuellings = thisVehicle.getFuellings.filter({Calendar.current.component(.year, from: $0.getShortDate) == Int(currentYear)})
-        
-        if fuellings.isEmpty {
-            return true
-        }
-        else {
-            return false
-        }
     }
     
     func resetSummaryFields(in autoSummary: AutoSummary) {

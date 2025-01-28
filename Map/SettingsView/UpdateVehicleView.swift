@@ -84,12 +84,13 @@ struct UpdateVehicleView: View {
                         ///textfield to enter vehicle make
                         Section("Vehicle Make") {
                             TextField("Enter/Select your vehicle make", text: $textVehicleMake)
+                            if textVehicleMake.isEmpty {
+                                Text("vehicle make can not be empty!")
+                                    .font(.caption2)
+                                    .foregroundStyle(.red)
+                            }
                         }
-                        if textVehicleMake.isEmpty {
-                            Text("vehicle make can not be empty!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
+                        
                         ///picker to select vehicle make alphabetically
                         Section("") {
                             HStack {
@@ -138,12 +139,13 @@ struct UpdateVehicleView: View {
                         ///textfeid to store desired or selected vehicle model.
                         Section("Vehicle Model") {
                             TextField("Enter/Select your vehicle model", text: $textVehicleModel)
+                            if textVehicleModel.isEmpty {
+                                Text("vehicle model can not be empty!")
+                                    .font(.caption2)
+                                    .foregroundStyle(.red)
+                            }
                         }
-                        if textVehicleModel.isEmpty {
-                            Text("vehicle model can not be empty!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
+                       
                         ///picker to select vehicle model
                         Section("") {
                             Picker("Select model", selection: $vehicleModel) {
@@ -517,6 +519,16 @@ struct UpdateVehicleView: View {
         if let index = reports.firstIndex(where: {$0.vehicle == vehicle && $0.calenderYear == Int16(calendarYear)}) {
             reports[index].odometerEnd = Double(odometer)
             reports[index].odometerEndMiles = Double(odometerMiles)
+            ///if the odometer start is greater than odometer end after the change in odometer of a given vehicle
+            if reports[index].odometerStart > reports[index].odometerEnd {
+                ///set the odometer start value to same as odometer end.
+                reports[index].odometerStart = Double(odometer)
+            }
+            ///if the odometer start is greater than odometer end after the change in odometer of a given vehicle
+            if reports[index].odometerStartMiles > reports[index].odometerEndMiles {
+                ///set the odometer start value to same as odometer end.
+                reports[index].odometerStartMiles = Double(odometerMiles)
+            }
         }
         ///if no reports were found
         else {

@@ -70,12 +70,13 @@ struct AddVehicleForm: View {
                         ///textfield to enter vehicle make
                         Section("Vehicle Make") {
                             TextField("Enter/Select your vehicle make", text: $textVehicleMake)
+                            if textVehicleMake.isEmpty {
+                                Text("vehicle make can not be empty!")
+                                    .font(.caption2)
+                                    .foregroundStyle(.red)
+                            }
                         }
-                        if textVehicleMake.isEmpty {
-                            Text("vehicle make can not be empty!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
+                       
                         ///picker to select vehicle make from the list.
                         Section("") {
                             HStack {
@@ -126,12 +127,13 @@ struct AddVehicleForm: View {
                         ///textfeid to store desired or selected vehicle model.
                         Section("Vehicle Model") {
                             TextField("Enter/Select your vehicle model", text: $textVehicleModel)
+                            if textVehicleModel.isEmpty {
+                                Text("vehicle model can not be empty!")
+                                    .font(.caption2)
+                                    .foregroundStyle(.red)
+                            }
                         }
-                        if textVehicleModel.isEmpty {
-                            Text("vehicle model can not be empty!")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
+                        
                         ///picler for vehicle model selection
                         Section("") {
                             Picker("Select Model", selection: $model) {
@@ -334,10 +336,14 @@ struct AddVehicleForm: View {
         newVehicle.odometer = Double(odometer)
         ///set vehicle odometer as odometer start of autoSummary
         autoSummary.odometerStart = Double(odometer)
+        ///set vehicle odometer as odometer end of autoSummary
+        autoSummary.odometerEnd = Double(odometer)
         ///set vehicle odometer
         newVehicle.odometerMiles = Double(odometerMiles)
         ///set vehicle odometer as odometer start of autoSummary in miles
         autoSummary.odometerStartMiles = Double(odometerMiles)
+        ///set vehicle odometer as odometer end of autoSummary in miles
+        autoSummary.odometerEndMiles = Double(odometerMiles)
         ///set vehicle trip odometer in km mode
         if settings.first!.distanceUnit == "km" {
             ///set new vehicle's trip odometer as trip inputed

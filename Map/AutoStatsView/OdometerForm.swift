@@ -24,6 +24,18 @@ struct OdometerForm: View {
     @Binding var odometerEnd: Double
     ///binding variable for reports array index.
     @Binding var reportIndex: Int?
+    var todaysDate: String {
+        let date = Date()
+        let year = Calendar.current.component(.year, from: date)
+        if year <= calenderYear {
+            let today = date.formatted(date: .abbreviated, time: .omitted)
+            return today
+        }
+        else {
+            return "Dec 31, " + String(calenderYear)
+        }
+    }
+    
     var body: some View {
         ///form to edit odometer settings.
         Form {
@@ -31,10 +43,20 @@ struct OdometerForm: View {
             Section("Odometer readings on Jan 01, "+(String(calenderYear))) {
                 ///textfield with odometer start binding variable as value and format set as a number
                 TextField("Enter", value: $odometerStart, format: .number)
+                if !isEntryValid() {
+                    Text("Odometer start can't be greater than Odometer end!")
+                        .font(.caption2)
+                        .foregroundStyle(.red)
+                }
             }
             ///textfield with odometer stop binding variable as value and format set as,a number
-            Section("Odometer readings on Dec 31, "+(String(calenderYear))) {
+            Section("Odometer readings on " + todaysDate) {
                 TextField("Enter", value: $odometerEnd, format: .number)
+                if !isEntryValid() {
+                    Text("Odometer end can't be less than Odometer start!")
+                        .font(.caption2)
+                        .foregroundStyle(.red)
+                }
             }
             ///form submit button
             Button {
@@ -42,6 +64,9 @@ struct OdometerForm: View {
                 guard let index = reportIndex else {
                     dismiss()
                     print("no index found")
+                    return
+                }
+                if !isEntryValid() {
                     return
                 }
                 ///if distance unit in settings is set to km
@@ -67,6 +92,14 @@ struct OdometerForm: View {
             label: {
                 Text("Save")
             }
+        }
+    }
+    func isEntryValid() -> Bool {
+        if odometerStart > odometerEnd {
+            return false
+        }
+        else {
+            return true
         }
     }
 }

@@ -489,10 +489,16 @@ struct InitialSettingsView: View {
         vehicle.year = Int16(year)
         ///set vehicle odometer in decimal format
         vehicle.odometer = Double(odometer)
+        ///set autosummary odometer start to set odometer
         autoSummary.odometerStart = Double(odometer)
+        ///set autosummary odometer end to set odometer
+        autoSummary.odometerEnd = Double(odometer)
         ///set vehicle odometer in decimal format
         vehicle.odometerMiles = Double(odometerMiles)
+        ///set autosummary odometer end to set odometer in miles.
         autoSummary.odometerStartMiles = Double(odometerMiles)
+        ///set autosummary odometer end to set odometer in miles.
+        autoSummary.odometerEndMiles = Double(odometerMiles)
         if distanceUnit == .km {
             ///set vehicle trip odometer in decimal format
             vehicle.trip = trip
