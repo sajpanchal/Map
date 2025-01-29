@@ -25,6 +25,7 @@ enum AppColors: String {
     case lightSky = "lightSkyColor"
     case darkSky = "darkSkyColor"
     case pink = "pnkColor"
+    case darkPink = "darkPnk"
     case invertPink = "invertPnkColor"
     case lightBlue = "lightBluColor"
     case darkBlue = "darkBlueColor"

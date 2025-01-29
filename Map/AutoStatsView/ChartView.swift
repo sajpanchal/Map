@@ -68,7 +68,7 @@ struct ChartView: View {
                            
                             .frame(height: 400)
                             .padding(.trailing,5)
-                            .foregroundStyle(Color.yellow)
+                            .foregroundStyle(Color(AppColors.invertYellow.rawValue))
                             .chartScrollableAxes(.horizontal)
                             .chartXVisibleDomain(length: vehicle.getReports.count < 5 ? vehicle.getReports.count : 5)
                             ///footer text
@@ -88,7 +88,7 @@ struct ChartView: View {
                             }
                             .padding(.trailing,5)
                             .frame(height: 400)
-                            .foregroundStyle(Color.green)
+                            .foregroundStyle(Color(AppColors.invertGreen.rawValue))
                             .chartScrollableAxes(.horizontal)
                             .chartXVisibleDomain(length: vehicle.getReports.count < 5 ? vehicle.getReports.count : 5)
                             ///footer text view.
@@ -121,7 +121,7 @@ struct ChartView: View {
                             }                    
                             .padding(.trailing,5)
                             .frame(height: 400)
-                            .foregroundStyle(Color.purple)
+                            .foregroundStyle(Color(AppColors.invertSky.rawValue))
                             .chartScrollableAxes(.horizontal)
                             .chartXVisibleDomain(length: vehicle.getReports.count < 5 ? vehicle.getReports.count : 5)
                             ///footer text view.
@@ -166,7 +166,7 @@ struct ChartView: View {
                             }
                             .frame(height: 400)
                             .padding(.trailing,5)
-                            .foregroundStyle(Color.orange)
+                            .foregroundStyle(Color(AppColors.invertOrange.rawValue))
                             .chartScrollableAxes(.horizontal)
                             .chartXVisibleDomain(length: vehicle.getReports.count < 5 ? vehicle.getReports.count : 5)
                             ///footer text view.
@@ -198,7 +198,7 @@ struct ChartView: View {
                             }
                             .frame(height: 400)
                             .padding(.trailing,5)
-                            .foregroundStyle(Color.red)
+                            .foregroundStyle(Color(AppColors.invertRed.rawValue))
                             .chartScrollableAxes(.horizontal)
                             .chartXVisibleDomain(length: vehicle.getReports.count < 5 ? vehicle.getReports.count : 5)
                             ///footer text view.
