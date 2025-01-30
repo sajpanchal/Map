@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		720483072D4A8F2F009C9F65 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720483062D4A8F2F009C9F65 /* SignInView.swift */; };
 		72053A872A951D5000B1D3FC /* AddressListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72053A862A951D5000B1D3FC /* AddressListView.swift */; };
 		7218C7852C04D95A00986B0B /* ExpandDirectionsViewSymbol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7218C7842C04D95A00986B0B /* ExpandDirectionsViewSymbol.swift */; };
 		721C11822C3495DB00272F31 /* AddVehicleForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721C11812C3495DB00272F31 /* AddVehicleForm.swift */; };
@@ -109,6 +110,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		720483052D4A8DBC009C9F65 /* Map.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Map.entitlements; sourceTree = "<group>"; };
+		720483062D4A8F2F009C9F65 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		72053A862A951D5000B1D3FC /* AddressListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressListView.swift; sourceTree = "<group>"; };
 		7218C7842C04D95A00986B0B /* ExpandDirectionsViewSymbol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandDirectionsViewSymbol.swift; sourceTree = "<group>"; };
 		721C11812C3495DB00272F31 /* AddVehicleForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddVehicleForm.swift; sourceTree = "<group>"; };
@@ -329,6 +332,7 @@
 		726754212A7C004000CE6F46 /* Map */ = {
 			isa = PBXGroup;
 			children = (
+				720483052D4A8DBC009C9F65 /* Map.entitlements */,
 				727996312C1F3EC100F323B4 /* SettingsView */,
 				7279962E2C1F3E2400F323B4 /* AutoStatsView */,
 				72C5E9A32B36072600B8C0E4 /* APIs */,
@@ -341,6 +345,7 @@
 				72D68E2E2B1199DF00756253 /* Info.plist */,
 				726754282A7C004200CE6F46 /* Preview Content */,
 				72B4D2E72C3D8B2800B9F2AD /* AppDataModel.xcdatamodeld */,
+				720483062D4A8F2F009C9F65 /* SignInView.swift */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -592,6 +597,7 @@
 				7286A1492C24813400333A4F /* FuelHistoryView.swift in Sources */,
 				728181FD2C52A6F400D8F3AA /* VehicleListItem.swift in Sources */,
 				72053A872A951D5000B1D3FC /* AddressListView.swift in Sources */,
+				720483072D4A8F2F009C9F65 /* SignInView.swift in Sources */,
 				726754502A7C077500CE6F46 /* MapSwiftUI.swift in Sources */,
 				72233AE22D38239D00C7A5E4 /* AnnualCostsSection.swift in Sources */,
 				72C226252C2C6C4700E51D9E /* Vehicle.swift in Sources */,
@@ -816,6 +822,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Map/Map.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Map/Preview Content\"";
@@ -854,6 +861,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Map/Map.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Map/Preview Content\"";
