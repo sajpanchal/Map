@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import CloudKit
 @main
 struct MapApp: App {
     @StateObject private var coreDataStack = CoreDataStack.shared

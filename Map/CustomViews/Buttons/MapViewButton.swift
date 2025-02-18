@@ -9,7 +9,7 @@ import SwiftUI
 
 ///custom buttons to be used  for MapView
 struct MapViewButton: View {
-    @FetchRequest(entity: Settings.entity(), sortDescriptors: []) var settings: FetchedResults<Settings>
+    @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
     ///systemname of the image to be displayed on the button
     @Environment(\.colorScheme) var bgMode: ColorScheme
     var imageName: String = ""
@@ -40,21 +40,24 @@ struct MapViewButton: View {
                     ///if no image name is received
                     if imageName == "" {
                         ///get the first instance of settings.
-                        if let thisSettings = settings.first {
-                            ///vertical stack.
-                            VStack {
-                                ///if the distance unit is in km show speed in km/h otherwise show it in mi/h.
-                                Text(thisSettings.getDistanceUnit == "km" ? String(speed) : String(Int(Double(speed)/1.609)))
-                                    .multilineTextAlignment(.center)
-                                    .fontWeight(.semibold)
-                                    .font(.system(size: 25))
-                                    .foregroundStyle(bgMode == .dark ? .white : .black)
-                                ///if the distance unit is in km show display unit km/h otherwise mi/h.
-                                Text(thisSettings.getDistanceUnit == "km" ? "km/h" : "mi/h")
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(bgMode == .dark ? .white : .black)
+                        if let activeVehicle = vehicles.first(where: {$0.isActive}) {
+                            if let thisSettings = activeVehicle.settings {
+                                ///vertical stack.
+                                VStack {
+                                    ///if the distance unit is in km show speed in km/h otherwise show it in mi/h.
+                                    Text(thisSettings.getDistanceUnit == "km" ? String(speed) : String(Int(Double(speed)/1.609)))
+                                        .multilineTextAlignment(.center)
+                                        .fontWeight(.semibold)
+                                        .font(.system(size: 25))
+                                        .foregroundStyle(bgMode == .dark ? .white : .black)
+                                    ///if the distance unit is in km show display unit km/h otherwise mi/h.
+                                    Text(thisSettings.getDistanceUnit == "km" ? "km/h" : "mi/h")
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(bgMode == .dark ? .white : .black)
+                                }
                             }
                         }
+                       
                     }
                     else {
                         ///add an image to be displayed

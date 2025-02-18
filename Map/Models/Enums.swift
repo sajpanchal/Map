@@ -195,7 +195,7 @@ enum Model: String, CaseIterable, Identifiable {
     case GT6, Spitfire, Stag, TR
     case Tuscan
     case VF_8
-   // case _411, Arteon, Atlas, Atlas_Cross_Sport, Beetle, Cabrio, Cabriolet, CC, Corrado, E_Golf, Eos, Eurovan, GLI, Golf, Golf_Alltrack, Golf_GTI, Golf_R, Golf_SportWagen, Golf_Wagon, GTI, ID_4, Jetta, Jet
+   // case _411, Arteon, Atlas, Atlas_Cross_Sport, Beetle, Cabrio, Cabriolet, CC, Corrado, E_Golf, Eos, Eurovan, GLI, Golf, Golf_Alltrack, Golf_GTI, Golf_R, Golf_SportWagen, Golf_Wagon, GTI,ID_Buzz, ID_4, Jetta, Jetta_GLI, Jetta_SportWagen, Jetta_Wegon, Karmann_Ghia, Kombi, Passat, Passat_CC, Passat_Wagon, Paheton, 
     
     var id: Self {
         self
@@ -225,7 +225,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     case Ram, Rambler, Renault, Rivian, Rolls_Royce, Rover
     case Saab, Saturn, Scion, Seat, Shelby, Smart, Spyker, Standard, Sterling, Studebaker, Subaru, Sunbeam, Suzuki
     case Tesla, Toyota, Triumph, TVR
-    case VinFast, Volkswagen
+    case VinFast, Volga, Volkswagen, Volvo, VPG
  
     
     var models: [Model] {
@@ -481,7 +481,13 @@ enum VehicleMake: String, CaseIterable, Identifiable {
             return [.Tuscan, .Other]
         case .VinFast:
             return [.VF_8, .Other]
+        case .Volga:
+            return [.Other]
         case .Volkswagen:
+            return []
+        case .Volvo:
+            return []
+        case .VPG:
             return []
         }
 
@@ -493,7 +499,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     }
 }
 enum Alphbets: String, CaseIterable, Identifiable {
-    case A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,R,S,T,U//,V,W,X,Y,Z
+    case A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,R,S,T,U,V//,W,X,Y,Z
  
     var makes: [VehicleMake] {
         switch self {
@@ -537,6 +543,8 @@ enum Alphbets: String, CaseIterable, Identifiable {
             return[.Tesla, .Toyota, .Triumph, .TVR]
         case .U:
             return[]
+        case .V:
+            return[.VinFast, .Volga, .Volkswagen, .Volvo, .VPG]
         }
     }
     var id: Self {

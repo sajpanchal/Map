@@ -27,9 +27,9 @@ struct ChartView: View {
        
         NavigationStack {
             ///if settings has first instance
-            if let thisSettings = settings.first {
+            if let vehicle = vehicles.first(where: {$0.isActive})  {
                 ///get the vehicle from vehicles entity which is active.
-                if let vehicle = vehicles.first(where: {$0.isActive}) {
+                if let thisSettings = vehicle.settings {
                     ///enclose the chart and its picker in a scrollview.
                     ScrollView {
                         ///picker with selection as binding value of the selection.
@@ -212,12 +212,15 @@ struct ChartView: View {
                     }
                     ///on appear of this swiftui view, this modifier will be called.
                     .onAppear {
+                        guard let activeVehicle = vehicles.first(where: {$0.isActive}) else {
+                            return
+                        }
                         ///get the first element of settings entity
-                        guard let thisSettings = settings.first else {
+                        guard let thisSettings = vehicle.settings else {
                             return
                         }
                         ///call set fuel efficiency method for a given vehicle with all settings in AutoSummary to calculate the fuel efficiency in a set units for each year.
-                        AutoSummary.setFuelEfficiency(viewContext: viewContext, vehicle: vehicle, settings: thisSettings)
+                        AutoSummary.setFuelEfficiency(viewContext: viewContext, vehicle: activeVehicle, settings: thisSettings)
                         
                     }
                     .navigationTitle("Charts")

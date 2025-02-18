@@ -13,7 +13,7 @@ struct SettingsView: View {
     ///Fetch request to get the records from the Settings entity.
     @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
     ///Fetch request to get the records from the vehicles entity in descending order which is currently active.
-    @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[]) var vehicles: FetchedResults<Vehicle>
+    @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[NSSortDescriptor(keyPath: \Vehicle.isActive, ascending: false)]) var vehicles: FetchedResults<Vehicle>
     ///Location Data manager object.
     @StateObject var locationDataManager: LocationDataManager
     ///Index of the vehicle objects array
@@ -49,7 +49,7 @@ struct SettingsView: View {
         return vehicles.map({VehicleData(uniqueID: $0.uniqueID, text: $0.getVehicleText, engineType: $0.getFuelEngine)})
     }
     ///array of colors
-    var colors = [AppColors.invertPink.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue, AppColors.invertGryColor.rawValue]
+    let colors = [AppColors.invertGryColor.rawValue,AppColors.invertPink.rawValue, AppColors.invertGreen.rawValue,AppColors.invertSky.rawValue,AppColors.invertYellow.rawValue, AppColors.invertPurple.rawValue, AppColors.invertOrange.rawValue]
    
     var body: some View {
             NavigationStack {
@@ -99,12 +99,16 @@ struct SettingsView: View {
                                     Text("Vehicle")
                                         .font(Font.system(size: 18))
                                 }
+                                .onAppear(perform: {
+                                    print("Picker")
+                                })
                             ///on change of the vehicle selection update the settings
                                 .onChange(of: vehiclesListIndex) {
                                     ///get the vehicle from vehicles entity where uniqueID matches with the selected vehicle from picker view.
                                     guard let selectedVehicle = vehicles.first(where: {$0.uniqueID == vehiclesList[vehiclesListIndex].uniqueID}) else {
                                        return
                                     }
+                                    print("on change of vehicle index")
                                     ///set the vehicle prop as selected vehicle.
                                     vehicle = selectedVehicle
                                     ///call load settings method.
@@ -285,6 +289,7 @@ struct SettingsView: View {
                                             }
                                             ///on appear of this picker set the efficiency unit index to 0 if previous index is multiple of 2 or 1.
                                             .onAppear(perform: {
+                                                
                                                 efficiencyUnitIndex = 9
                                             })
                                             .pickerStyle(.segmented)
@@ -343,8 +348,15 @@ struct SettingsView: View {
                     .padding(.top, 10)
                 }
         }
+            .onChange(of: showGarage) {
+                print("on change")
+                getActiveVehicle()
+                ///call a method to load settings.
+                loadSettings()
+            }
         ///on appear get the active vehicle and load the latest settings.
         .onAppear {
+            print("On appear of settings")
             ///call a method to get the active vehicle
             getActiveVehicle()
             ///call a method to load settings.
@@ -355,36 +367,28 @@ struct SettingsView: View {
     ///method to get the currently active vehicle from the core data entities.
     func getActiveVehicle() {
         ///if there is any active vehicle set in the entities
-        if let activeVehicle = vehicles.first(where: {$0.isActive}) {
-            ///get the index of the active vehicle
-            if let activeVehicleIndex = vehicles.firstIndex(where: {$0.isActive}) {
-                ///assign the index to state variable
-                vehicleIndex = activeVehicleIndex
-                ///assign the active vehicle to state variable
-                vehicle = activeVehicle
-                ///set the vehicleListIndex the index of the selected vehicle from an array of list.
-                vehiclesListIndex = vehiclesList.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) ?? 0
-            }
-        }
-        ///if no active vehicle found
-        else {
-            ///get the first settings object from entities if available
-            guard let thisSetting = settings.first else {
-                return
-            }
-            ///get the first vehicle from the settings object if available
-            guard let thisVehicle = thisSetting.vehicle else {
+        guard let activeVehicle = vehicles.first(where: {$0.isActive}) else {
             return
-            }
-            ///assign the fetched vehicle to the state varaible vehicle
-            vehicle = thisVehicle
+        }
+       
+        ///get the index of the active vehicle
+        if let activeVehicleIndex = vehicles.firstIndex(where: {$0.isActive}) {
+            ///assign the index to state variable
+            vehicleIndex = activeVehicleIndex
+            ///assign the active vehicle to state variable
+            vehicle = activeVehicle
+            ///set the vehicleListIndex the index of the selected vehicle from an array of list.
+            vehiclesListIndex = vehiclesList.firstIndex(where: {$0.uniqueID == vehicle.uniqueID}) ?? 0
         }
         ///update the odometer of the location manager with the odometer of the currently active vehicle
         locationDataManager.odometer = vehicle.odometer
         ///update the odometer of the location manager with the odometer of the currently active vehicle
         locationDataManager.odometerMiles = vehicle.odometerMiles
          ///update the trip odometer of the location manager with the trip odometer of the currently active vehicle
-        if settings.first!.distanceUnit == "km" {
+        guard let vehicleSettings = vehicle.settings else {
+            return
+        }
+        if vehicleSettings.distanceUnit == "km" {
             locationDataManager.trip = vehicle.trip
             locationDataManager.tripMiles =  locationDataManager.trip * 0.6214
         }
@@ -396,13 +400,20 @@ struct SettingsView: View {
     
     ///method to load the latest saved settings from the system
     func loadSettings() {
+        print("load settings")
+        print(vehicle.getVehicleText)
+        print(vehicle.settings)
         ///get the setting object from settings entity if available
-        if let thisSetting = settings.first {
+        guard let thisSettings = vehicle.settings  else {
+            print("no settings found")
+            return
+        }
             ///assign the efficiency unit index of a set unit from the array to state variable
-            efficiencyUnitIndex = efficiencyUnits.firstIndex(of: thisSetting.getFuelEfficiencyUnit) ?? 0
+            efficiencyUnitIndex = efficiencyUnits.firstIndex(of: thisSettings.getFuelEfficiencyUnit) ?? 0
             ///get the enum value of the corresponding distance unit saved in the settings and assign it to the state variable
-            distanceUnit = DistanceUnit(rawValue: thisSetting.getDistanceUnit) ?? .km
-            
+            distanceUnit = DistanceUnit(rawValue: thisSettings.getDistanceUnit) ?? .km
+            print("fuel mode: ", vehicle.getFuelMode)
+            print("fuel unit: ", thisSettings.getFuelVolumeUnit)
             ///if vehicle fuel mode is set to EV
             if vehicle.getFuelMode == "EV" {
                 ///update the fuelUnit prop to percent
@@ -413,39 +424,67 @@ struct SettingsView: View {
             ///if vehicle fuel mode is set to Gas
             else {
                 ///if the settings have fuel volume set to % change it to Litre otherwise get the unit set from the settings object.
-                fuelUnit = thisSetting.getFuelVolumeUnit != "%" ? FuelUnit(rawValue: thisSetting.getFuelVolumeUnit) ?? .Litre : .Litre
+                fuelUnit = thisSettings.getFuelVolumeUnit != "%" ? FuelUnit(rawValue: thisSettings.getFuelVolumeUnit) ?? .Litre : .Litre
                 ///update the fuelMode prop to Gas
                 fuelMode = .Gas
             }
             ///get the enum value of the engine type of the corresponding engine type saved in the settings and assign it to the state variable
             engineType = EngineType(rawValue: vehicle.getFuelEngine) ?? .Gas
             ///update the avoidHighways preferences to whatever is in the settings object
-            avoidHighways = thisSetting.avoidHighways
+            avoidHighways = thisSettings.avoidHighways
             ///update the avoidTolls preferences to whatever is in the settings object
-            avoidTolls = thisSetting.avoidTolls
-        }
+            avoidTolls = thisSettings.avoidTolls
+        
     }
     
     ///method to save settings
     func saveSettings() {
-        ///if the first element of the settings entity is not nil
-        if settings.first != nil {
-            ///update the settings for avoid highway preference
-            settings.first?.avoidHighways = avoidHighways
+        print(fuelUnit)
+        print(fuelMode)
+        print(efficiencyUnits)
+        if vehicle.settings == nil {
+            let settings = Settings(context: viewContext)
+            settings.avoidHighways = avoidHighways
             ///update the settings for avoid toll preference
-            settings.first?.avoidTolls = avoidTolls
+            settings.avoidTolls = avoidTolls
             ///store the efficiency unit from the array
-            settings.first?.fuelEfficiencyUnit =  efficiencyUnits[efficiencyUnitIndex]
+            settings.fuelEfficiencyUnit =  efficiencyUnits[efficiencyUnitIndex]
             ///store the distance unit from  enum's string value
-            settings.first?.distanceUnit = distanceUnit.rawValue
+            settings.distanceUnit = distanceUnit.rawValue
             ///set the distance unit for MapView API.
             MapViewAPI.distanceUnit = distanceUnit
             ///store the fuel unit from  enum's string value
-            settings.first?.fuelVolumeUnit = fuelUnit.rawValue
+            settings.fuelVolumeUnit = fuelUnit.rawValue
             ///store the engine type from  enum's string value
-            settings.first?.autoEngineType = engineType.rawValue
+            settings.autoEngineType = engineType.rawValue
             ///store the currently active vehicle object from state varaible
-            settings.first?.vehicle = vehicle
+            settings.vehicle = vehicle
+            guard let vIndex = vehicles.firstIndex(of: vehicle) else {
+                return
+               
+            }
+            vehicles[vIndex].settings = settings
+            ///save the records to the entity to the viewcontext parent store.
+            Settings.saveContext(viewContext: viewContext)
+        }
+        ///if the first element of the settings entity is not nil
+        else {
+            ///update the settings for avoid highway preference
+            vehicle.settings!.avoidHighways = avoidHighways
+            ///update the settings for avoid toll preference
+            vehicle.settings!.avoidTolls = avoidTolls
+            ///store the efficiency unit from the array
+            vehicle.settings!.fuelEfficiencyUnit =  efficiencyUnits[efficiencyUnitIndex]
+            ///store the distance unit from  enum's string value
+            vehicle.settings!.distanceUnit = distanceUnit.rawValue
+            ///set the distance unit for MapView API.
+            MapViewAPI.distanceUnit = distanceUnit
+            ///store the fuel unit from  enum's string value
+            vehicle.settings!.fuelVolumeUnit = fuelUnit.rawValue
+            ///store the engine type from  enum's string value
+            vehicle.settings!.autoEngineType = engineType.rawValue
+            ///store the currently active vehicle object from state varaible
+            vehicle.settings!.vehicle = vehicle
             ///if the vehicle is hybrid type
             if vehicle.fuelEngine == "Hybrid" {
                 ///update the vehicle fule mode to whatever is there in the fuelMode props
@@ -461,6 +500,11 @@ struct SettingsView: View {
                 ///update the vehicle fule mode to Gas
                 vehicle.fuelMode = "Gas"
             }
+            guard let vIndex = vehicles.firstIndex(of: vehicle) else {
+                return
+               
+            }
+            vehicles[vIndex].settings = vehicle.settings!
             ///save the records to the entity to the viewcontext parent store.
             Settings.saveContext(viewContext: viewContext)
             ///withAnimation method will change state variable with animation for a given time duration
@@ -513,39 +557,44 @@ struct SettingsView: View {
             }
         }
         ///get the index of the vehicle which is active
-        if let i = vehicles.firstIndex(where: {$0.isActive}) {
-            ///if fuel engine is hybrid type and fuel mode is not set the gas type
-            if vehicles[i].fuelEngine == "Hybrid" && vehicles[i].fuelMode != "Gas" {
-                ///set the hybrid EV engine trip odometers
-                ///if distance unit is km
-                if distanceUnit == .km {
-                    ///trip hybrid EV in miles
-                    vehicles[i].tripHybridEVMiles = vehicle.tripHybridEV * 0.6214
-                }
-                else {
-                    ///trip hybrid EV in km
-                    vehicles[i].tripHybridEV = vehicle.tripHybridEVMiles / 0.6214
-                }
+        guard let i = vehicles.firstIndex(where: {$0.isActive})  else {
+            return
+        }
+        ///if fuel engine is hybrid type and fuel mode is not set the gas type
+        if vehicles[i].fuelEngine == "Hybrid" && vehicles[i].fuelMode != "Gas" {
+            ///set the hybrid EV engine trip odometers
+            ///if distance unit is km
+            if distanceUnit == .km {
+                ///trip hybrid EV in miles
+                vehicles[i].tripHybridEVMiles = vehicle.tripHybridEV * 0.6214
             }
-            ///if fuel engine is not hybrid or if hybrid but gas type
             else {
-                ///if distance unit is set to km
-                if distanceUnit == .km {
-                    ///trip in miles
-                    vehicles[i].tripMiles = vehicle.trip * 0.6214
-                }
-                else {
-                    ///trip in km
-                    vehicles[i].trip = vehicle.tripMiles / 0.6214
-                }
+                ///trip hybrid EV in km
+                vehicles[i].tripHybridEV = vehicle.tripHybridEVMiles / 0.6214
             }
         }
+        ///if fuel engine is not hybrid or if hybrid but gas type
+        else {
+            ///if distance unit is set to km
+            if distanceUnit == .km {
+                ///trip in miles
+                vehicles[i].tripMiles = vehicle.trip * 0.6214
+            }
+            else {
+                ///trip in km
+                vehicles[i].trip = vehicle.tripMiles / 0.6214
+            }
+        }
+        
         ///set the active vehicle as location manager's vehicle
         locationDataManager.vehicle = vehicle
         ///set the active vehicle's odometer as location manager's odometer
         locationDataManager.odometer = vehicle.odometer
+        guard let thisSettings = vehicles[i].settings else {
+            return
+        }
         ///set the active vehicle's trip odometer as location manager's trip odometer based on set unit
-        if settings.first!.distanceUnit == "km" {
+        if thisSettings.distanceUnit == "km" {
             ///trip in km
             locationDataManager.trip = vehicle.trip
             ///trip in miles

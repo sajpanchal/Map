@@ -40,8 +40,11 @@ struct AutoSummaryList: View {
                 }
                 ////on appear of this swiftui view this modifier will be executed once.
                 .onAppear {
-                    ///get the first settings instance if available
-                    guard let thisSettings = settings.first else {
+                    guard let activeVehicle = vehicles.first(where: {$0.isActive}) else {
+                        return
+                    }
+                    
+                    guard let thisSettings = activeVehicle.settings else {
                         return
                     }
                     ///call set fuel efficiency method of autosummary to calculate the fuel efficiency for each year for a given vehicle in a set units.

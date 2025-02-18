@@ -27,45 +27,53 @@ struct GarageView: View {
     var body: some View {
         NavigationStack {
             ///show list of vehicles with its title and manufacturing year
-            if let thisSettings = settings.first {
-                List {
-                    ForEach(vehicles, id: \.uniqueID) { thisVehicle in
-                        NavigationLink(destination: UpdateVehicleView(locationDataManager: locationDataManager, showGarage: $showGarage, settings: thisSettings, vehicle: thisVehicle), label: {
-                            VStack {
-                                Text(thisVehicle.getVehicleText + " " + (thisVehicle.getFuelEngine != "Gas" ? thisVehicle.getFuelEngine : ""))
-                                    .fontWeight(.bold)
-                                    .font(Font.system(size: 18))
-                                    .foregroundStyle(Color(colors[getColorIndex(for: vehicles.firstIndex(where: {$0 == thisVehicle}) ?? 0)]))
-                            }
-                     })
-                    }
-                   
-                    ///on swipe left delete the given vehicle from the list
-                    .onDelete(perform: { indexSet in
-                        ///here indexSet is a set of indexes that to be deleted. in our case it will be only an array of one element.
-                        for i in indexSet {
-                            ///get the vehicle at a given indexset.
-                            let vehicle = vehicles[i]
-                            if vehicles.first(where: {$0.isActive}) != vehicle {
-                                ///delete the vehicle from the viewcontext.
-                                viewContext.delete(vehicle)
-                                ///save the changes made to viewcontext in the core data store.
-                                Vehicle.saveContext(viewContext: viewContext)
-                            }
-                            else {
-                                showAlert = true
-                            }
-                          
+            if let activeVehicles = vehicles.first(where: {$0.isActive}) {
+                if let thisSettings = activeVehicles.settings {
+                    List {
+                        ForEach(vehicles, id: \.uniqueID) { thisVehicle in
+                            NavigationLink(destination: UpdateVehicleView(locationDataManager: locationDataManager, showGarage: $showGarage, settings: thisSettings, vehicle: thisVehicle), label: {
+                                VStack {
+                                    Text(thisVehicle.getVehicleText + " " + (thisVehicle.getFuelEngine != "Gas" ? thisVehicle.getFuelEngine : ""))
+                                        .fontWeight(.bold)
+                                        .font(Font.system(size: 18))
+                                        .foregroundStyle(Color(colors[getColorIndex(for: vehicles.firstIndex(where: {$0 == thisVehicle}) ?? 0)]))
+                                }
+                         })
                         }
-                    })
+                       
+                        ///on swipe left delete the given vehicle from the list
+                        .onDelete(perform: { indexSet in
+                            ///here indexSet is a set of indexes that to be deleted. in our case it will be only an array of one element.
+                            for i in indexSet {
+                                ///get the vehicle at a given indexset.
+                                let vehicle = vehicles[i]
+                               
+                                if vehicles.first(where: {$0.isActive}) != vehicle {
+                                    ///delete the vehicle from the viewcontext.
+                                    viewContext.delete(vehicle)
+                                    if let settings = settings.first(where: {$0.vehicle == vehicle}) {
+                                        viewContext.delete(settings)
+                                    }
+                                  
+                                    ///save the changes made to viewcontext in the core data store.
+                                    Vehicle.saveContext(viewContext: viewContext)
+                                }
+                                else {
+                                    showAlert = true
+                                }
+                              
+                            }
+                        })
+                    }
+                    .alert(isPresented: $showAlert) {
+                        Alert(title: Text("Can't delete this Vehicle"), message: Text("Active vehicle can't be deleted! Please change the active vehicle first to delete this vehicle."), dismissButton: .default(Text("Okay")))
+                    }
+                    .padding(.top,20)
+                    .navigationTitle("Your Auto Garage")
+                    .navigationBarTitleDisplayMode(.inline)
                 }
-                .alert(isPresented: $showAlert) {
-                    Alert(title: Text("Can't delete this Vehicle"), message: Text("Active vehicle can't be deleted! Please change the active vehicle first to delete this vehicle."), dismissButton: .default(Text("Okay")))
-                }
-                .padding(.top,20)
-                .navigationTitle("Your Auto Garage")
-                .navigationBarTitleDisplayMode(.inline)
             }
+          
             ///if settings object is found nil
             else {
                 ///show error text.

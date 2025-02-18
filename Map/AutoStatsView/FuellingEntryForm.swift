@@ -31,163 +31,168 @@ struct FuellingEntryForm: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                VStack {
-                    Form {
-                        Section(header:Text("Fuel Station").fontWeight(.bold)) {
-                            TextField("Enter Location", text:$location)
-                                .onTapGesture {
-                                    isTapped = false
-                                }
-                            if location.isEmpty && isTapped {
-                                Text("location field can not be empty!")
-                                    .font(.caption2)
-                                    .foregroundStyle(.red)
-                            }
-                            else if Double(location) != nil && isTapped {
-                                Text("Please enter the valid text entry!")
-                                    .font(.caption2)
-                                    .foregroundStyle(.red)
-                            }
-                        }
-                        ///fuel volume entry field
-                        Section(header:Text("Fuel Volume in \(settings.first!.getFuelVolumeUnit)").fontWeight(.bold)) {
-                            ///if the fuel volume unit is set to litre
-                            if settings.first!.getFuelVolumeUnit == "Litre" {
-                                ///fill volume in litre
-                                TextField("Enter Fuel Volume", value: $litre, format: .number)
-                                    .keyboardType(.decimalPad)
-                                    ///on tap of the textfield
-                                    .onTapGesture {
-                                        isTapped = false
+                if let activeVehicle = vehicles.first(where: {$0.isActive}) {
+                    if let thisSettings = activeVehicle.settings {
+                        VStack {
+                            Form {
+                                Section(header:Text("Fuel Station").fontWeight(.bold)) {
+                                    TextField("Enter Location", text:$location)
+                                        .onTapGesture {
+                                            isTapped = false
+                                        }
+                                    if location.isEmpty && isTapped {
+                                        Text("location field can not be empty!")
+                                            .font(.caption2)
+                                            .foregroundStyle(.red)
                                     }
-                                ///if the variable is not set and textfield is not active.
-                                if litre == 0.0 && isTapped {
-                                    Text("fuel volume can't be 0!")
-                                        .font(.caption2)
-                                        .foregroundStyle(.red)
-                                }
-                            }
-                            ///if the fuel volume unit is set to gallon
-                            else if settings.first!.getFuelVolumeUnit == "Gallon" {
-                                ///fill volume in gallon
-                                TextField("Enter Fuel Volume", value: $gallon, format: .number)
-                                    .keyboardType(.decimalPad)
-                                ///on tap of the textfield
-                                    .onTapGesture {
-                                        isTapped = false
+                                    else if Double(location) != nil && isTapped {
+                                        Text("Please enter the valid text entry!")
+                                            .font(.caption2)
+                                            .foregroundStyle(.red)
                                     }
-                                ///if the variable is not set and textfield is not active.
-                                if gallon == 0.0 && isTapped {
-                                    Text("fuel volume can't be 0!")
-                                        .font(.caption2)
-                                        .foregroundStyle(.red)
                                 }
-                            }
-                            ///if the fuel volume unit is set to %.
-                            else {
-                                ///fill volume in % of charge before start
-                                TextField("Enter % before charge", value: $percentBeforeCharge, format: .number)
-                                    .keyboardType(.numberPad)
-                                ///on tap of the textfield
-                                    .onTapGesture {
-                                        isTapped = false
-                                    }
-                                ///if value is not number type and textfield is not active.
-                                if (percentBeforeCharge >= 100 || percentBeforeCharge < 0) && isTapped {
-                                    Text("Please enter the valid percentage value between 0-99%")
-                                        .font(.caption2)
-                                        .foregroundStyle(.red)
-                                }
-                                ///fill volume in % of charge after finish
-                                TextField("Enter % after charge", value: $percentAfterCharge, format: .number)
-                                    .keyboardType(.numberPad)
-                                    .onTapGesture {
-                                        isTapped = false
-                                    }
-                                ///if the variable is not set and textfield is not active.
-                                if percentAfterCharge == 0 && isTapped {
-                                    Text("This field can not be empty!")
-                                        .font(.caption2)
-                                        .foregroundStyle(.red)
-                                }
-                                ///if charging before is greater than charging after.
-                                else if percentBeforeCharge >= percentAfterCharge && isTapped {
-                                    Text("charging percent before charging can't be more than or equal to after charging percent!")
-                                        .font(.caption2)
-                                        .foregroundStyle(.red)
-                                }
-                                ///if value is not number type and textfield is not active.
-                                else if (percentAfterCharge > 100 || percentAfterCharge <= 0) && isTapped {
-                                    Text("Please enter the valid percentage value between 1-100%.")
-                                        .font(.caption2)
-                                        .foregroundStyle(.red)
-                                }
-                            }
-                        }
-                        ///fuel cost entry field
-                        Section(header:Text("Fuel Cost").fontWeight(.bold)) {
-                            TextField("Enter Cost", value: $cost, format: .number)
-                                .keyboardType(.decimalPad)
-                                .onTapGesture {
-                                    isTapped = false
-                                }
-                            ///if the variable is not set and textfield is not active.
-                            if cost == 0.0 && isTapped {
-                                Text("This field can not be empty!")
-                                    .font(.caption2)
-                                    .foregroundStyle(.red)
-                            }
-                        }
-                        ///
-                        Section(header: Text("Date").fontWeight(.bold)) {
-                            DatePicker("Fuelling Day", selection: $date, displayedComponents:[.date])
-                            if date > Date() {
-                                Text("Future date is not acceptable!")
-                                    .font(.caption2)
-                                    .foregroundStyle(.red)
-                            }
-                        }
-                        if let vehicle = vehicles.first(where: {$0.isActive}) {
-                            VStack {
-                                HStack {
-                                    Spacer()
-                                    Button {
-                                        if isTextFieldEntryValid() {
-                                            let index = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID})
-                                         
-                                            addFuellingEntry(for: vehicle, at: index)
-                                                                           
-                                            if  let i = index {
-                                              
-                                                calculateFuelCost(for: vehicle, at: i)
-                                                calculateFuelEfficiency(for: vehicle, at: i)
-                                                updateAutoSummary(for: vehicle, at: i)
-                                                resetTripData(at: i)
+                                ///fuel volume entry field
+                                Section(header:Text("Fuel Volume in \(thisSettings.getFuelVolumeUnit)").fontWeight(.bold)) {
+                                    ///if the fuel volume unit is set to litre
+                                    if thisSettings.getFuelVolumeUnit == "Litre" {
+                                        ///fill volume in litre
+                                        TextField("Enter Fuel Volume", value: $litre, format: .number)
+                                            .keyboardType(.decimalPad)
+                                            ///on tap of the textfield
+                                            .onTapGesture {
+                                                isTapped = false
                                             }
+                                        ///if the variable is not set and textfield is not active.
+                                        if litre == 0.0 && isTapped {
+                                            Text("fuel volume can't be 0!")
+                                                .font(.caption2)
+                                                .foregroundStyle(.red)
                                         }
-                                        isTapped = true
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                            showFuellingEntryform = !isTextFieldEntryValid()
-                                        }
-                                    } label: {
-                                        FormButton(imageName: "plus.square.fill", text: "Add Entry", color: Color(AppColors.yellow.rawValue))
                                     }
-                                    .background(Color(AppColors.invertYellow.rawValue))
-                                    .buttonStyle(BorderlessButtonStyle())
-                                    .cornerRadius(100)
-                                    .shadow(color: bgMode == .dark ? .gray : .black, radius: 1, x: 1, y: 1)
-                                    Spacer()
+                                    ///if the fuel volume unit is set to gallon
+                                    else if thisSettings.getFuelVolumeUnit == "Gallon" {
+                                        ///fill volume in gallon
+                                        TextField("Enter Fuel Volume", value: $gallon, format: .number)
+                                            .keyboardType(.decimalPad)
+                                        ///on tap of the textfield
+                                            .onTapGesture {
+                                                isTapped = false
+                                            }
+                                        ///if the variable is not set and textfield is not active.
+                                        if gallon == 0.0 && isTapped {
+                                            Text("fuel volume can't be 0!")
+                                                .font(.caption2)
+                                                .foregroundStyle(.red)
+                                        }
+                                    }
+                                    ///if the fuel volume unit is set to %.
+                                    else {
+                                        ///fill volume in % of charge before start
+                                        TextField("Enter % before charge", value: $percentBeforeCharge, format: .number)
+                                            .keyboardType(.numberPad)
+                                        ///on tap of the textfield
+                                            .onTapGesture {
+                                                isTapped = false
+                                            }
+                                        ///if value is not number type and textfield is not active.
+                                        if (percentBeforeCharge >= 100 || percentBeforeCharge < 0) && isTapped {
+                                            Text("Please enter the valid percentage value between 0-99%")
+                                                .font(.caption2)
+                                                .foregroundStyle(.red)
+                                        }
+                                        ///fill volume in % of charge after finish
+                                        TextField("Enter % after charge", value: $percentAfterCharge, format: .number)
+                                            .keyboardType(.numberPad)
+                                            .onTapGesture {
+                                                isTapped = false
+                                            }
+                                        ///if the variable is not set and textfield is not active.
+                                        if percentAfterCharge == 0 && isTapped {
+                                            Text("This field can not be empty!")
+                                                .font(.caption2)
+                                                .foregroundStyle(.red)
+                                        }
+                                        ///if charging before is greater than charging after.
+                                        else if percentBeforeCharge >= percentAfterCharge && isTapped {
+                                            Text("charging percent before charging can't be more than or equal to after charging percent!")
+                                                .font(.caption2)
+                                                .foregroundStyle(.red)
+                                        }
+                                        ///if value is not number type and textfield is not active.
+                                        else if (percentAfterCharge > 100 || percentAfterCharge <= 0) && isTapped {
+                                            Text("Please enter the valid percentage value between 1-100%.")
+                                                .font(.caption2)
+                                                .foregroundStyle(.red)
+                                        }
+                                    }
                                 }
-                                
+                                ///fuel cost entry field
+                                Section(header:Text("Fuel Cost").fontWeight(.bold)) {
+                                    TextField("Enter Cost", value: $cost, format: .number)
+                                        .keyboardType(.decimalPad)
+                                        .onTapGesture {
+                                            isTapped = false
+                                        }
+                                    ///if the variable is not set and textfield is not active.
+                                    if cost == 0.0 && isTapped {
+                                        Text("This field can not be empty!")
+                                            .font(.caption2)
+                                            .foregroundStyle(.red)
+                                    }
+                                }
+                                ///
+                                Section(header: Text("Date").fontWeight(.bold)) {
+                                    DatePicker("Fuelling Day", selection: $date, displayedComponents:[.date])
+                                    if date > Date() {
+                                        Text("Future date is not acceptable!")
+                                            .font(.caption2)
+                                            .foregroundStyle(.red)
+                                    }
+                                }
+                                if let vehicle = vehicles.first(where: {$0.isActive}) {
+                                    VStack {
+                                        HStack {
+                                            Spacer()
+                                            Button {
+                                                if isTextFieldEntryValid() {
+                                                    let index = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID})
+                                                 
+                                                    addFuellingEntry(for: vehicle, at: index)
+                                                                                   
+                                                    if  let i = index {
+                                                      
+                                                        calculateFuelCost(for: vehicle, at: i)
+                                                        calculateFuelEfficiency(for: vehicle, at: i)
+                                                        updateAutoSummary(for: vehicle, at: i)
+                                                        resetTripData(at: i)
+                                                    }
+                                                }
+                                                isTapped = true
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                                    showFuellingEntryform = !isTextFieldEntryValid()
+                                                }
+                                            } label: {
+                                                FormButton(imageName: "plus.square.fill", text: "Add Entry", color: Color(AppColors.yellow.rawValue))
+                                            }
+                                            .background(Color(AppColors.invertYellow.rawValue))
+                                            .buttonStyle(BorderlessButtonStyle())
+                                            .cornerRadius(100)
+                                            .shadow(color: bgMode == .dark ? .gray : .black, radius: 1, x: 1, y: 1)
+                                            Spacer()
+                                        }
+                                        
+                                    }
+                                    .listRowBackground(Color.clear)
+                                    .listRowInsets(EdgeInsets())
+                                }
                             }
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets())
+                        }
+                        if showAlert {
+                            AlertView(image: "fuelpump.circle.fill", headline: "Fuel Entry Added!", bgcolor: Color(AppColors.invertYellow.rawValue), showAlert: $showAlert)
                         }
                     }
                 }
-                if showAlert {
-                    AlertView(image: "fuelpump.circle.fill", headline: "Fuel Entry Added!", bgcolor: Color(AppColors.invertYellow.rawValue), showAlert: $showAlert)
-                }
+               
             }
            
             .navigationTitle("Add Fuelling Entry")
@@ -201,7 +206,13 @@ struct FuellingEntryForm: View {
         if date > Date() {
             return false
         }
-        if settings.first!.getFuelVolumeUnit == "%" && (percentAfterCharge > 100 || percentBeforeCharge >= 100 || percentAfterCharge < percentBeforeCharge || percentAfterCharge == percentBeforeCharge) {
+        guard let activeVehicle = vehicles.first(where: {$0.isActive}) else {
+            return false
+        }
+        guard let thisSettings = activeVehicle.settings else {
+            return false
+        }
+        if thisSettings.getFuelVolumeUnit == "%" && (percentAfterCharge > 100 || percentBeforeCharge >= 100 || percentAfterCharge < percentBeforeCharge || percentAfterCharge == percentBeforeCharge) {
             return false
         }
         return true
@@ -214,12 +225,16 @@ struct FuellingEntryForm: View {
         fuelling.date = date
         fuelling.timeStamp = Date()
         fuelling.location = location
+        
+        guard let thisSettings = vehicle.settings else {
+            return
+        }
         ///if the fuel engine is hybrid
         if vehicle.fuelEngine == "Hybrid" {
             ///if hyrid vehicle is currently set to gas engine mode
             if vehicle.getFuelMode == "Gas" {
                 ///if distance unit is set in km.
-                if settings.first!.distanceUnit == "Km" {
+                if thisSettings.distanceUnit == "Km" {
                     ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in km)
                     fuelling.lasttrip = index != nil ? vehicles[index!].trip : 0.0
                     ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in miles)
@@ -244,7 +259,7 @@ struct FuellingEntryForm: View {
         ///if fuel engine is not hybrid
         else {
             ///if distance unit is set in km.
-            if settings.first!.distanceUnit == "Km" {
+            if thisSettings.distanceUnit == "Km" {
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in km)
                 fuelling.lasttrip = index != nil ? vehicles[index!].trip : 0.0
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in miles)
@@ -261,7 +276,7 @@ struct FuellingEntryForm: View {
         ///set the fuel type field to the set fuel mode for that vehicle (gas or EV)
         fuelling.fuelType = vehicle.getFuelMode
         ///check fuel volume unit
-        switch settings.first!.getFuelVolumeUnit {
+        switch thisSettings.getFuelVolumeUnit {
             ///if it is in litre update the litre prop
         case "Litre":
             fuelling.litre = litre
@@ -333,27 +348,30 @@ struct FuellingEntryForm: View {
         var accumulatedFuelVolume = 0.0
         ///local variable to store the accumulated trip readings.
         var accumulatedTripReadings = 0.0
+        guard let thisSettings = vehicle.settings else {
+            return
+        }
         ///if the list of fuellings is not empty
         if !fuellings.isEmpty {
             ///iterate through the list of fuellings
             for thisFuelEntry in fuellings {
                 ///if the fuel volume unit is set to litre
-                if settings.first!.getFuelVolumeUnit == "Litre" {
+                if thisSettings.getFuelVolumeUnit == "Litre" {
                     ///accumulate the fuel volume in litre
                     accumulatedFuelVolume += thisFuelEntry.litre
                 }
                 ///if the fuel volume unit is set to gallon
-                else if settings.first!.getFuelVolumeUnit == "Gallon" {
+                else if thisSettings.getFuelVolumeUnit == "Gallon" {
                     ///accumulate the fuel volume in gallon
                     accumulatedFuelVolume += thisFuelEntry.gallon
                 }
                 ///if the fuel volume unit is set to %
-                else if settings.first?.getFuelVolumeUnit == "%" {
+                else if thisSettings.getFuelVolumeUnit == "%" {
                     ///accumulate the fuel volume in %
                     accumulatedFuelVolume += ((vehicle.batteryCapacity * thisFuelEntry.percent)/100)
                 }
                 ///if the distance unit is in km
-                if settings.first?.distanceUnit == "Km" {
+                if thisSettings.distanceUnit == "Km" {
                     ///accumulate the trip odometer in km
                     accumulatedTripReadings += thisFuelEntry.lasttrip
                 }
@@ -375,7 +393,7 @@ struct FuellingEntryForm: View {
         ///get the year componet from the fuelling date.
         let year = Calendar.current.component(.year, from: date)
         ///get the first settings object from settings entity
-        guard let thisSettings = settings.first else {
+        guard let thisSettings = vehicle.settings else {
             return
         }
         ///create and  the fuel amount to 0.

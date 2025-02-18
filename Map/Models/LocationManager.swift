@@ -9,6 +9,7 @@ import Foundation
 import CoreLocation
 import MapKit
 import SwiftUI
+import CloudKit
 ///custom Location manager class that inherits NSObject class and CLlocationManageDelegate protocol. this class also conforms to ObservableObject type-alias. it means that this instance will be obsered by swiftui view  for any changes in data associated with it. to make it possible we just have to type-alias it as @ObservedObject. we have to do it as we as interfacing between structs and classes. structs are value types and classes are reference type LocationDataManager is responsible to handle user location authorization, gather all the user location data and track user data.
 class LocationDataManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     ///locationManager object is instantiated in a class

@@ -23,6 +23,7 @@ struct InitialSettingsView: View {
     @State private var model: Model = .Ace
     ///state variable that stores vehicle manufacturing year.
     @State private var year = (Calendar.current.dateComponents([.year], from: Date())).year ?? 1900
+    @State private var calendarYear = (Calendar.current.dateComponents([.year], from: Date())).year
     ///state variable that stores the range of vehicle manufacturing year
     @State private var yearRange = 1900..<((Calendar.current.dateComponents([.year], from: Date())).year ?? 1900) + 1
     ///state variable that stores vehicle engine type enum value
@@ -62,6 +63,7 @@ struct InitialSettingsView: View {
     ///state variable to decide whether to avoid tolls or not
     @State private var avoidTolls = false
     @State private var showAlert = false
+    @Binding var isInitialized: Bool
     var body: some View {
         NavigationStack {
             ZStack {
@@ -174,6 +176,21 @@ struct InitialSettingsView: View {
                             }
                             .pickerStyle(.segmented)
                         }
+                        .onChange(of: engineType) {
+                            if engineType != .Hybrid {
+                                fuelMode = FuelMode(rawValue: engineType.rawValue) ?? .Gas
+                            }
+                                
+                            
+                        }
+                        .onChange(of: fuelMode) {
+                            if fuelMode == .EV {
+                                fuelUnit = .Percent
+                            }
+                            else {
+                                fuelUnit = .Litre
+                            }
+                        }
                         if engineType != .Gas {
                             Section(header: Text("EV Battery Capacity in KWh").fontWeight(.bold)) {
                                 TextField("Enter battery capacity in kwh", value: $batteryCapacity, format: .number)
@@ -186,6 +203,14 @@ struct InitialSettingsView: View {
                                 Picker("Select Mode", selection:$fuelMode) {
                                     ForEach(FuelMode.allCases) { thisFuelMode in
                                         Text(thisFuelMode.rawValue)
+                                    }
+                                }
+                                .onChange(of: fuelMode) {
+                                    if fuelMode == .EV {
+                                        fuelUnit = .Percent
+                                    }
+                                    else {
+                                        fuelUnit = .Litre
                                     }
                                 }
                                 .pickerStyle(.segmented)
@@ -434,11 +459,40 @@ struct InitialSettingsView: View {
                                 Button {
                                     if !textVehicleMake.isEmpty && !textVehicleModel.isEmpty {
                                         ///on tap of the button, instantiate a vehicle entity object from the managed view context
-                                        let vehicle = Vehicle(context: viewContext)
+                                        guard let vehicle = Vehicle.AddNewVehicle(viewContext: viewContext , getModel: {
+                                            VehicleModel(vehicleType: vehicleType.rawValue, vehicleMake: vehicleMake.rawValue, model: textVehicleModel, year: year, engineType: engineType.rawValue, batteryCapacity: batteryCapacity, odometer: Double(odometer), odometerMiles: Double(odometerMiles), trip: trip, tripMiles: tripMiles, tripHybridEV: tripHybridEV, tripHybridEVMiles: tripHybridEVMiles,fuelMode: fuelMode.rawValue)
+                                        }) else {
+                                            return
+                                        }
                                         ///add a new vehicle for this vehicle object created.
-                                        addVehicle(for: vehicle)
+                                        let newSettings = Settings.createNewSettings(viewContext: viewContext, for: vehicle, getModel: {
+                                            SettingsModel(autoEngineType: engineType.rawValue, distanceUnit: distanceUnit.rawValue, fuelEfficiencyUnit: efficiencyUnits[efficiencyUnitIndex], fuelVolumeUnit: fuelUnit.rawValue, avoidHighways: avoidHighways, avoidTolls: avoidTolls)
+                                        })
+                                        createSummary(in: newSettings, for: vehicle)
+                                        print("------------Vehicle Added--------------")
+                                        print("Name: ",vehicle.getVehicleText)
+                                        print("trip: ",vehicle.trip)
+                                        print("trip miles: ",vehicle.tripMiles)
+                                        print("fuel mode: ",vehicle.fuelMode)
+                                        print("trip EV: ",vehicle.tripHybridEV)
+                                        print("trip EV miles: ",vehicle.tripHybridEVMiles)
+                                        print("odometer: ",vehicle.odometer)
+                                        print("odometer Miles: ",vehicle.odometerMiles)
+                                        print("battery: ",vehicle.batteryCapacity)
+                                        print("fuel engine: ",vehicle.fuelEngine)
+                                        print("is active: ",vehicle.isActive)
+                                        print("odometer Miles: ",vehicle.year)
+                                        print("------------Vehicle Settings--------------")
+                                        print(vehicle.settings)
+                                        print("------------Vehicle Summary--------------")
+                                        print("summary count: ",vehicle.getReports.count)
+                                        print("summary count: ",vehicle.getReports.first)
+                                        withAnimation(.easeIn(duration: 0.5)) {
+                                            showAlert = true
+                                            isInitialized = true
+                                        }
                                         ///save the settings for this vehicle object created.
-                                        saveSettings(for: vehicle)
+                                       // saveSettings(for: vehicle)
                                     }
                                 } label: {
                                     ///button view ui.
@@ -471,8 +525,12 @@ struct InitialSettingsView: View {
             .navigationTitle("Settings")
         }
     }
-    
-    func addVehicle(for vehicle: Vehicle) {
+    func createSummary(in newSettings: Settings, for newVehicle: Vehicle) {
+        if let calYear = calendarYear {
+            AutoSummary.createNewReport(viewContext: viewContext, in: newSettings, for: newVehicle, year: calYear)
+        }
+    }
+   /* func addVehicle(for vehicle: Vehicle) {
         ///get the current year from calender.
         let calendaryear =  Calendar.current.component(.year, from: Date())
         ///instantiate autosummary object
@@ -548,10 +606,10 @@ struct InitialSettingsView: View {
         vehicle.fuelMode = fuelMode.rawValue
         vehicle.addToReports(autoSummary)
         ///save the managed view context to the core data store with new changes.
-        Vehicle.saveContext(viewContext: viewContext)
-    }
+       
+    }*/
     
-    func saveSettings(for vehicle: Vehicle) {
+   /* func saveSettings(for vehicle: Vehicle) {
         ///create a settings object from viewcontext's settings entity
         let settings = Settings(context: viewContext)
         ///update the preferences for highways
@@ -570,14 +628,16 @@ struct InitialSettingsView: View {
         settings.fuelVolumeUnit = fuelUnit.rawValue
         ///set the efficiency unit  in string format
         settings.fuelEfficiencyUnit = efficiencyUnits[efficiencyUnitIndex]
+        vehicle.settings = settings
         ///save the managed view context to the core data store with new changes.
         Settings.saveContext(viewContext: viewContext)
+        Vehicle.saveContext(viewContext: viewContext)
         withAnimation(.easeIn(duration: 0.5)) {
             showAlert = true
         }
-    }
+    }*/
 }
 
 #Preview {
-    InitialSettingsView(locationDataManager: LocationDataManager())
+    InitialSettingsView(locationDataManager: LocationDataManager(), isInitialized: .constant(false))
 }

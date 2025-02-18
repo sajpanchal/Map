@@ -10,6 +10,9 @@ import SwiftUI
 struct AutoSummaryView: View {
     ///environment variable dismiss is used to dismiss this SwitUIView  on execution
     @Environment(\.dismiss) var dismiss
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(entity: Vehicle.entity(), sortDescriptors: []) var vehicles: FetchedResults<Vehicle>
+    @FetchRequest(entity: AutoSummary.entity(), sortDescriptors: []) var reports: FetchedResults<AutoSummary>
     @FetchRequest(entity:Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
     @State var autoSummary: AutoSummary = AutoSummary()
     @State var odometerEnd: Double = 0.0
@@ -34,18 +37,22 @@ struct AutoSummaryView: View {
     
     var body: some View {
         ///grouping the entire view
+        VStack {
+            if let activeVehicle = vehicles.first(where: {$0.isActive}) {
+                if let thisSettings = activeVehicle.settings {
             Group {
                 ///Horizontal stack displays text view aligned to the right.
                 HStack {
                     Spacer()
                     ///text view displays current vehicle title.
                     VStack {
-                        if let thisSettings = settings.first {
-                            Text((thisSettings.vehicle?.getVehicleText ?? "N/A") + "\n" + (thisSettings.vehicle?.getFuelEngine == "Gas" ? "" : (thisSettings.vehicle?.getFuelEngine ?? "")))
-                                .fontWeight(.bold)
-                                .font(.system(size: 16))
-                                .multilineTextAlignment(.trailing)
-                        }
+                       
+                        Text((activeVehicle.getVehicleText) + "\n" + (activeVehicle.getFuelEngine == "Gas" ? "" : (activeVehicle.getFuelEngine)))
+                                    .fontWeight(.bold)
+                                    .font(.system(size: 16))
+                                    .multilineTextAlignment(.trailing)
+                         
+                        
                     }
                 }
                 .padding()
@@ -53,12 +60,12 @@ struct AutoSummaryView: View {
                 ///list view enclosing the sections.
                 List {
                     ///if the settings have the distance unit set to km
-                    if settings.first!.distanceUnit == "km" {
+                    if thisSettings.distanceUnit == "km" {
                         ///section with header for odometer readings display label and navigation link
                         Section {
                             ///navigation link to the odometerForm swiftuiview to update start and end odometer of a given year
                             NavigationLink {
-                                OdometerForm(calenderYear: calenderYear, odometerStart: $odometerStart, odometerEnd: $odometerEnd, reportIndex: $reportIndex)                                
+                                OdometerForm(calenderYear: calenderYear, odometerStart: $odometerStart, odometerEnd: $odometerEnd, reportIndex: $reportIndex)
                             }
                             ///navigation link label to display the odometer start and end readings.
                             label : {
@@ -92,14 +99,14 @@ struct AutoSummaryView: View {
                     ///if engine type is other then hybrid
                     if engineType != .Hybrid {
                         ///show annual mileage section view to show mileage data for either gas or EV engine based on the settings of the vehicle.
-                        AnnualMileageSection(annualTrip: engineType == .Gas ? annualTrip: annualTripEV, distanceUnit: settings.first!.getDistanceUnit, fuelConsumed: engineType == .Gas ? fuelConsumed: fuelConsumedEV, fuelUnit: engineType == .Gas ? settings.first!.getFuelVolumeUnit : "kwh", annualMileage: engineType == .Gas ? annualMileage: annualMileageEV, efficiencyUnit: settings.first!.getFuelEfficiencyUnit, calendarYear: autoSummary.getCalenderYear)
+                        AnnualMileageSection(annualTrip: engineType == .Gas ? annualTrip : annualTripEV, distanceUnit: thisSettings.getDistanceUnit, fuelConsumed: engineType == .Gas ? fuelConsumed: fuelConsumedEV, fuelUnit: engineType == .Gas ? thisSettings.getFuelVolumeUnit : "kwh", annualMileage: engineType == .Gas ? annualMileage : annualMileageEV, efficiencyUnit: thisSettings.getFuelEfficiencyUnit, calendarYear: autoSummary.getCalenderYear)
                     }
                     ///if engine type is hybrid
                     else {
                         ///show annual mileage section view to show mileage data for gas engine based on the settings of the vehicle.
-                        AnnualMileageSection(annualTrip: annualTrip, distanceUnit: settings.first!.getDistanceUnit, fuelConsumed: fuelConsumed, fuelUnit: settings.first!.getFuelVolumeUnit == "%" ? "L" : settings.first!.getFuelVolumeUnit, annualMileage: annualMileage, efficiencyUnit: settings.first!.getFuelVolumeUnit == "%" ? "km/L" : settings.first!.getFuelEfficiencyUnit, calendarYear: autoSummary.getCalenderYear)
+                        AnnualMileageSection(annualTrip: annualTrip, distanceUnit: thisSettings.getDistanceUnit, fuelConsumed: fuelConsumed, fuelUnit: thisSettings.getFuelVolumeUnit == "%" ? "L" : thisSettings.getFuelVolumeUnit, annualMileage: annualMileage, efficiencyUnit: thisSettings.getFuelVolumeUnit == "%" ? "km/L" : thisSettings.getFuelEfficiencyUnit, calendarYear: autoSummary.getCalenderYear)
                         ///show annual mileage section view to show mileage data for EV engine based on the settings of the vehicle.
-                        AnnualMileageSection(annualTrip: annualTripEV, distanceUnit: settings.first!.getDistanceUnit, fuelConsumed: fuelConsumedEV, fuelUnit: "kwh", annualMileage: annualMileageEV, efficiencyUnit: settings.first!.getFuelVolumeUnit != "%" ? "km/kwh" :settings.first!.getFuelEfficiencyUnit, calendarYear: autoSummary.getCalenderYear)
+                        AnnualMileageSection(annualTrip: annualTripEV, distanceUnit: thisSettings.getDistanceUnit, fuelConsumed: fuelConsumedEV, fuelUnit: "kwh", annualMileage: annualMileageEV, efficiencyUnit: thisSettings.getFuelVolumeUnit != "%" ? "km/kwh" :thisSettings.getFuelEfficiencyUnit, calendarYear: autoSummary.getCalenderYear)
                     }
                     ///if engine type is other then hybrid
                     if engineType != .Hybrid {
@@ -120,12 +127,31 @@ struct AutoSummaryView: View {
                 .navigationTitle(String(calenderYear) + " Summary")
                 .navigationBarTitleDisplayMode(.inline)
         }
+                }
+            }
+        }
+           
     }
+    func updateVehicleOdometer() {
+        guard let activeVehicle = vehicles.first(where: {$0.isActive}) else {
+            return
+        }
+        guard let summaryIndex = reports.firstIndex(where: {$0.vehicle == activeVehicle && $0.calenderYear == Int16(calenderYear)}) else {
+            return
+        }
     
+        reports[summaryIndex].odometerEnd = odometerEnd
+        reports[summaryIndex].odometerEndMiles = odometerEndMiles
+        AutoSummary.saveContext(viewContext: viewContext)
+        
+    }
     ///method to fill up the form with data gathered from autosummary of a given vehicle in a given year.
     func fillUpForm() {
+        guard let activeVehicle = vehicles.first(where: {$0.isActive}) else {
+            return
+        }
         ///get the first instance of the settings entity.
-        guard let thisSettings = settings.first else {
+        guard let thisSettings = activeVehicle.settings else {
             return
         }
         

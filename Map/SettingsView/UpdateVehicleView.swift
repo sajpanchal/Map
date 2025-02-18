@@ -349,9 +349,12 @@ struct UpdateVehicleView: View {
                             Section(header: Text("Fuel Mode").fontWeight(.bold)) {
                                 Picker("Select Type", selection: $fuelMode) {
                                     ForEach(FuelMode.allCases) { thisFuelType in
-                                        Text(thisFuelType.rawValue.capitalized)
+                                        Text(thisFuelType.rawValue)
                                     }
                                 }
+                                .onAppear(perform: {
+                                    fuelMode = FuelMode(rawValue:vehicle.getFuelMode) ?? .Gas
+                                })
                                 .pickerStyle(.segmented)
                             }
                         }
@@ -456,8 +459,60 @@ struct UpdateVehicleView: View {
                                 Spacer()
                                 Button {
                                     if !textVehicleMake.isEmpty && !textVehicleModel.isEmpty {
-                                        updateVehicle(with: vehicle)
-                                        saveSettings(for: vehicle)
+                                        guard let index = vehicles.firstIndex(of: vehicle) else {
+                                            return
+                                        }
+                                        Vehicle.updateVehicle(viewContext: viewContext, vehicleIndex: index) {
+                                            VehicleModel(vehicleType: vehicleType.rawValue, vehicleMake: vehicleMake.rawValue, model: vehicleModel.rawValue, year: manufacturingYear, engineType: engineType.rawValue, batteryCapacity: batteryCapacity, odometer: Double(odometer), odometerMiles: Double(odometerMiles), trip: trip, tripMiles: tripMiles, tripHybridEV: tripHybridEV, tripHybridEVMiles: tripHybridEVMiles, fuelMode: fuelMode.rawValue)
+                                        }
+                                        Settings.updateSettings(viewContext: viewContext, for: vehicles[index]) {
+                                            SettingsModel(autoEngineType: engineType.rawValue, distanceUnit: distanceUnit.rawValue, fuelEfficiencyUnit: efficiencyUnits[efficiencyUnitIndex], fuelVolumeUnit: fuelUnit.rawValue, avoidHighways: false , avoidTolls: false)
+                                        }
+                                        let calendarYear = Calendar.current.component(.year, from: Date())
+                                        guard let reportIndex = reports.firstIndex(where: {$0.vehicle == vehicle && $0.calenderYear == Int16(calendarYear)}) else {
+                                            return
+                                        }
+                                        print("report Index: ", reportIndex)
+                                        AutoSummary.updateReport(viewContext: viewContext, for: vehicle, year: calendarYear, odometer: odometer, odometerMiles: odometerMiles)
+//                                        updateVehicle(with: vehicle)
+//                                         print("------------Vehicle Added--------------")
+                                        print("Name: ",vehicle.getVehicleText)
+                                        print("trip: ",vehicle.trip)
+                                        print("trip miles: ",vehicle.tripMiles)
+                                        print("fuel mode: ",vehicle.fuelMode)
+                                        print("trip EV: ",vehicle.tripHybridEV)
+                                        print("trip EV miles: ",vehicle.tripHybridEVMiles)
+                                        print("odometer: ",vehicle.odometer)
+                                        print("odometer Miles: ",vehicle.odometerMiles)
+                                        print("battery: ",vehicle.batteryCapacity)
+                                        print("fuel engine: ",vehicle.fuelEngine)
+                                        print("is active: ",vehicle.isActive)
+                                        print("odometer Miles: ",vehicle.year)
+                                        print("------------Vehicle Settings--------------")
+                                        print(vehicle.settings)
+                                        print("------------Vehicle Summary--------------")
+                                        print("year: ", reports[reportIndex].calenderYear)
+                                        print("odometer Start: ", reports[reportIndex].odometerStart)
+                                        print("odometer End: ", reports[reportIndex].odometerEnd)
+                                        print("odometer Start Miles: ", reports[reportIndex].odometerStartMiles)
+                                        print("odometer End Miles: ", reports[reportIndex].odometerEndMiles)
+                                        print("Vehicle: ", reports[reportIndex].vehicle?.getVehicleText)
+                                        print("annual fuel cost: ", reports[reportIndex].annualFuelCost)
+                                        print("annual trip: ", reports[reportIndex].annualTrip)
+                                        print("annual trip EV: ", reports[reportIndex].annualTripEV)
+                                        print("annual trip EV Miles ", reports[reportIndex].annualTripEVMiles)
+                                        print("annual trip Miles ", reports[reportIndex].annualTripMiles)
+                                        print("kwh: ", reports[reportIndex].kwhConsumed)
+                                        print("Litre: ", reports[reportIndex].litreConsumed)
+                                        print("Gallons: ", reports[reportIndex].gallonsConsumed)
+                                        print("Service Cost: ", reports[reportIndex].annualServiceCost)
+                                        print("Service Cost EV: ", reports[reportIndex].annualServiceCostEV)
+                                        print("Fuel Cost: ", reports[reportIndex].annualfuelCostEV)
+                                        print("Mileage: ", reports[reportIndex].annualMileage)
+                                        print("Mileage EV: ", reports[reportIndex].annualMileageEV)
+                                        
+                                        
+//                                        saveSettings(for: vehicle)
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                             showGarage = false
                                         }
@@ -495,7 +550,7 @@ struct UpdateVehicleView: View {
     }
     
     ///method to update vehicle in the core data stack
-    func updateVehicle(with vehicle: Vehicle) {
+   /* func updateVehicle(with vehicle: Vehicle) {
         
         ///get the calendar year for the reports
         let calendarYear = Calendar.current.component(.year, from: Date())
@@ -555,14 +610,23 @@ struct UpdateVehicleView: View {
         vehicles[vIndex].type = vehicleType.rawValue
       
         Vehicle.saveContext(viewContext: viewContext)
-    }
+    }*/
     
     ///method to save vehicle settings
-    func saveSettings(for vehicle: Vehicle) {
+    /*func saveSettings(for vehicle: Vehicle) {
+        guard let index = vehicles.firstIndex(of: vehicle) else {
+            return
+        }
+        vehicles[index].settings?.distanceUnit = distanceUnit.rawValue
+        vehicles[index].settings?.autoEngineType = engineType.rawValue
+        vehicles[index].settings?.fuelVolumeUnit = fuelUnit.rawValue
+        vehicles[index].settings?.fuelEfficiencyUnit = efficiencyUnits[efficiencyUnitIndex]
+        vehicles[index].settings?.vehicle = vehicle
+        Settings.saveContext(viewContext: viewContext)
         withAnimation(.easeIn(duration: 0.5)) {
             showAlert = true
         }
-    }
+    }*/
     
     func fillForm() {
         ///set the vehicle type fetched from the selected vehicle
@@ -608,6 +672,10 @@ struct UpdateVehicleView: View {
         }
         distanceUnit = DistanceUnit(rawValue: settings.getDistanceUnit) ?? .km
         fuelUnit = FuelUnit(rawValue: settings.getFuelVolumeUnit) ?? .Litre
+//        print("Update vehicle form: \(vehicle.getFuelMode)")
+//        print(FuelMode(rawValue: vehicle.getFuelMode))
+        fuelMode = FuelMode(rawValue: vehicle.getFuelMode) ?? .Gas
+//        print(fuelMode)
         efficiencyUnitIndex = efficiencyUnits.firstIndex(where: {$0 == settings.fuelEfficiencyUnit}) ?? 0
     }
 }

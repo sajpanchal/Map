@@ -90,6 +90,7 @@
 		72EDE4192B26372D00578B8A /* MapInteractionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EDE4182B26372D00578B8A /* MapInteractionsView.swift */; };
 		72EDE41B2B26408A00578B8A /* ExpandedDirectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EDE41A2B26408A00578B8A /* ExpandedDirectionsView.swift */; };
 		72EDE41D2B26457A00578B8A /* MapSwiftUIAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EDE41C2B26457A00578B8A /* MapSwiftUIAPI.swift */; };
+		72F078182D5A5C0A00A3E44B /* CustomModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F078172D5A5C0A00A3E44B /* CustomModels.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -198,6 +199,7 @@
 		72EDE4182B26372D00578B8A /* MapInteractionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapInteractionsView.swift; sourceTree = "<group>"; };
 		72EDE41A2B26408A00578B8A /* ExpandedDirectionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandedDirectionsView.swift; sourceTree = "<group>"; };
 		72EDE41C2B26457A00578B8A /* MapSwiftUIAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSwiftUIAPI.swift; sourceTree = "<group>"; };
+		72F078172D5A5C0A00A3E44B /* CustomModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomModels.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -241,6 +243,7 @@
 				72C226242C2C6C4700E51D9E /* Vehicle.swift */,
 				72C226262C2C6D8600E51D9E /* Settings.swift */,
 				72B4D2EA2C3D8CE700B9F2AD /* CoreDataStack.swift */,
+				72F078172D5A5C0A00A3E44B /* CustomModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -652,6 +655,7 @@
 				728A7CA62B90F282003AA218 /* GreetingsView.swift in Sources */,
 				72EDE41D2B26457A00578B8A /* MapSwiftUIAPI.swift in Sources */,
 				72B4D2EB2C3D8CE700B9F2AD /* CoreDataStack.swift in Sources */,
+				72F078182D5A5C0A00A3E44B /* CustomModels.swift in Sources */,
 				727996332C1F3EDE00F323B4 /* SettingsView.swift in Sources */,
 				72EDE41B2B26408A00578B8A /* ExpandedDirectionsView.swift in Sources */,
 				7226953C2C41849E007B200B /* AutoFuelling+CoreDataClass.swift in Sources */,

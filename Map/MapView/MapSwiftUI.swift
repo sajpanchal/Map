@@ -11,6 +11,9 @@ import MapKit
 ///this view will observe the LocationDataManager and updates the MapViewController if data in Location Manager changes.
 struct Map: View {
     @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
+    @FetchRequest(entity: Vehicle.entity(), sortDescriptors:[]) var vehicles: FetchedResults<Vehicle>
+    
+    @Environment(\.managedObjectContext) private var viewContext
     ////environment variable to get the color mode of the phone
     @Environment(\.colorScheme) var bgMode: ColorScheme
     ///this will make our MapView update if any @published value in location manager changes.
@@ -121,10 +124,62 @@ struct Map: View {
                     }
             }
                 .onAppear {
-                    if let thisSettings = settings.first {
+                    print("Settings Length: ", settings.count)
+//                    if let vehicle = vehicles.first {
+//                        viewContext.delete(vehicle)
+//                        
+//                    }
+//                    if let setting = settings.first {
+//                        viewContext.delete(setting)
+//                    }
+//                    Vehicle.saveContext(viewContext: viewContext)
+//                   
+                    for setting in settings {
+                        print(setting.vehicle?.getVehicleText)
+                        print(setting.autoEngineType)
+                    }
+                    print("--------------------------")
+
+                    guard let newVehicle = vehicles.first(where: {$0.isActive}) else {
+                        print("no active vehicle")
+                        return
+                    }
+                    print("------------Vehicle Added--------------")
+                    print("Name: ",newVehicle.getVehicleText)
+                    print("trip: ",newVehicle.trip)
+                    print("trip miles: ",newVehicle.tripMiles)
+                    print("fuel mode: ",newVehicle.fuelMode)
+                    print("trip EV: ",newVehicle.tripHybridEV)
+                    print("trip EV miles: ",newVehicle.tripHybridEVMiles)
+                    print("odometer: ",newVehicle.odometer)
+                    print("odometer Miles: ",newVehicle.odometerMiles)
+                    print("battery: ",newVehicle.batteryCapacity)
+                    print("fuel engine: ",newVehicle.fuelEngine)
+                    print("is active: ",newVehicle.isActive)
+                    print("odometer Miles: ",newVehicle.year)
+                    print("------------Vehicle Settings--------------")
+                    print(newVehicle.settings)
+                    print("------------Vehicle Summary--------------")
+                    print("summary count: ",newVehicle.getReports.count)
+                    print("summary count: ",newVehicle.getReports.first?.annualTrip)
+                
+                    
+                    
+                    guard let thisSettings = newVehicle.settings  else {
+                    return
+                    }
+                    
                         if let thisDistanceUnit = DistanceUnit(rawValue: thisSettings.getDistanceUnit) {
                             MapViewAPI.distanceUnit = thisDistanceUnit
                         }
+                        print("Vehicle: \(thisSettings.vehicle)")
+                        print("Distance Unit: \(thisSettings.getDistanceUnit)")
+                        print("fuel Unit: \(thisSettings.getFuelVolumeUnit)")
+                        print("Engine type: \(thisSettings.getAutoEngineType)")
+                        print("fuel Mode: \(thisSettings.vehicle?.getFuelMode)")
+                        if let thisVehicle = vehicles.first(where: {$0.isActive}) {
+
+                        
                         MapViewAPI.avoidHighways = thisSettings.avoidHighways
                         MapViewAPI.avoidTolls = thisSettings.avoidTolls
                         print("OnAppear()")

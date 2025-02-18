@@ -307,6 +307,14 @@ extension AutoSummary {
         let autoSummary = AutoSummary(context: viewContext)
         ///set a calendar year to a year of interest.
         autoSummary.calenderYear = Int16(year)
+        autoSummary.odometerStart = vehicle.odometer
+        autoSummary.odometerEnd = vehicle.odometer
+        autoSummary.odometerStartMiles = vehicle.odometerMiles
+        autoSummary.odometerEndMiles = vehicle.odometerMiles
+        autoSummary.annualTrip = vehicle.trip
+        autoSummary.annualTripMiles = vehicle.tripMiles
+        autoSummary.annualTripEV = vehicle.tripHybridEV
+        autoSummary.annualTripEVMiles = vehicle.tripHybridEVMiles
         ///get the report index of previous year if available
         if let previousYearIndex = reports.firstIndex(where: {$0.vehicle == vehicle && $0.calenderYear == (year - 1)}) {
             ///set the previousYears odometer end as start of this year's odometer
@@ -326,6 +334,27 @@ extension AutoSummary {
         ///save the context.
         Vehicle.saveContext(viewContext: viewContext)
     }
+    
+    static func updateReport(viewContext: NSManagedObjectContext, for vehicle: Vehicle, year: Int, odometer: Int, odometerMiles: Int) {
+        let reports = getResults(viewContext: viewContext, vehicle: vehicle)
+        guard let index = reports.firstIndex(where: {$0.vehicle == vehicle && $0.calenderYear == year}) else {
+            return
+        }
+        reports[index].odometerEnd = Double(odometer)
+        reports[index].odometerEndMiles = Double(odometerMiles)
+        ///if the odometer start is greater than odometer end after the change in odometer of a given vehicle
+        if reports[index].odometerStart > reports[index].odometerEnd {
+            ///set the odometer start value to same as odometer end.
+            reports[index].odometerStart = Double(odometer)
+        }
+        ///if the odometer start is greater than odometer end after the change in odometer of a given vehicle
+        if reports[index].odometerStartMiles > reports[index].odometerEndMiles {
+            ///set the odometer start value to same as odometer end.
+            reports[index].odometerStartMiles = Double(odometerMiles)
+        }
+        AutoSummary.saveContext(viewContext: viewContext)
+    }
+    
     ///method to accumulate service cost for a given vehicle in a given year.
     static func accumulateServiceCostSummary(viewContext: NSManagedObjectContext, for vehicle: Vehicle, year: Int, cost: Double) {
         ///get autoSummary reports for a given year.

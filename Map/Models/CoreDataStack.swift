@@ -6,13 +6,21 @@
 //
 
 import Foundation
+import CloudKit
 import CoreData
-
 class CoreDataStack: ObservableObject {
     static let shared = CoreDataStack()
     
-    lazy var persistantContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "AppDataModel")
+    lazy var persistantContainer: NSPersistentCloudKitContainer = {
+        let container = NSPersistentCloudKitContainer(name: "AppDataModel")
+        container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        do {
+            try container.viewContext.setQueryGenerationFrom(.current)
+        }
+        catch {
+            print(error.localizedDescription)
+        }
         container.loadPersistentStores { _, error in
             if let error {
                 fatalError("Failed to load persistant stores: \(error.localizedDescription)")
