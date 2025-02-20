@@ -121,8 +121,10 @@ struct AutoSummaryView: View {
                 }
                 ///on appear of this swiftui view execute this modifier.
                 .onAppear {
+                    updateVehicleOdometer()
                     ///call method to fill up the form with data gathered from autosummary of a given vehicle in a given year.
                     fillUpForm()
+                    
                 }
                 .navigationTitle(String(calenderYear) + " Summary")
                 .navigationBarTitleDisplayMode(.inline)

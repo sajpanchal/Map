@@ -58,6 +58,12 @@ extension AutoFuelling {
         let str = formatter.string(from: date ?? Date())
         return formatter.date(from: str) ?? Date()
     }
+    public var getYearFromDate: Int {
+       
+        let year = Calendar.current.component(.year, from: date ?? Date())
+       
+        return year
+    }
 }
 
 extension AutoFuelling : Identifiable {

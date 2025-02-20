@@ -118,7 +118,8 @@ class LocalSearch: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
             }
             catch {
                 DispatchQueue.main.async {
-                    self.status = .localSearchFailed
+                    //status = .localSearchFailed
+                    print(error.localizedDescription)
                 }
             }
             

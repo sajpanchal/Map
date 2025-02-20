@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FuelHistoryView: View {
     @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
+    @FetchRequest(entity: AutoSummary.entity(), sortDescriptors: []) var reports: FetchedResults<AutoSummary>
     @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
     @Binding var showFuelHistoryView: Bool
@@ -115,21 +116,35 @@ struct FuelHistoryView: View {
                                 }
                                 ///on deletion
                                 .onDelete { indexSet in
+                                    print("fuel mode is: \(fuelMode)")
                                     ///iterate through the indexsets where indexset will be single item array having the index of a selected list item.
-                                    for i in indexSet {
-                                        ///get the fuelling entry at a given index.
-                                        let thisfuellingEntry = vehicle.getFuellings[i]
-                                        ///remove this entry from fuellings entity of a given vehicle
-                                        vehicle.removeFromFuellings(thisfuellingEntry)
-                                        ///subtract the fuel cost of this entry from the total fuel cost.
-                                        vehicle.fuelCost -= thisfuellingEntry.cost
-                                        ///save changes
-                                        Vehicle.saveContext(viewContext: viewContext)
-                                    }
+                                    var calendarYear: Int?
                                     ///local variable to calulate and store accumulated fuel volume
                                     var accumulatedFuelVolume = 0.0
                                     ///local variable to calulate and store accumulated trip
                                     var accumulatedTrip = 0.0
+                                    var amount = 0.0
+                                    guard let i = Array(indexSet).first else {
+                                        return
+                                    }
+                                    ///get the fuelling entry at a given index.
+                                    let thisfuellingEntry = vehicle.getFuellings.filter({$0.fuelType == fuelMode})[i]
+                                    
+                                    print("fuel type:", thisfuellingEntry.fuelType)
+                                    print(thisfuellingEntry.location)
+                                    print(thisfuellingEntry.cost)
+                                    print(thisfuellingEntry.lasttrip)
+                                    ///remove this entry from fuellings entity of a given vehicle
+                                    if thisfuellingEntry.fuelType == fuelMode {
+                                        vehicle.removeFromFuellings(thisfuellingEntry)
+                                        calendarYear = thisfuellingEntry.getYearFromDate
+                                        ///subtract the fuel cost of this entry from the total fuel cost.
+                                        vehicle.fuelCost -= thisfuellingEntry.cost
+                                        amount = thisfuellingEntry.percent
+                                      
+                                        ///save changes
+                                        Vehicle.saveContext(viewContext: viewContext)
+                                    }
                                     ///iterate through fuellings records of a vehicle entiry filtered by fuel mode (gas or ev).
                                     for fuelling in vehicle.getFuellings.filter({$0.fuelType == fuelMode}) {
                                         ///if fuel volume unit is in litre
@@ -157,6 +172,10 @@ struct FuelHistoryView: View {
                                             accumulatedTrip += fuelling.lastTripMiles != 0 ? fuelling.lastTripMiles : fuelling.getLastTripMiles
                                         }
                                     }
+                                    guard let year = calendarYear else {
+                                        return
+                                    }
+                                    AutoSummary.accumulateFuellingsAndTravelSummary(viewContext: viewContext, in: thisSettings, for: vehicle, year: year, cost: vehicle.fuelCost, amount: amount)
                                     ///calculate the fuel efficiency by dividing accumulated trip by fuel volume.
                                     vehicle.fuelEfficiency = accumulatedTrip/accumulatedFuelVolume
                                     ///save changes.

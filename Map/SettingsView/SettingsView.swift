@@ -402,7 +402,7 @@ struct SettingsView: View {
     func loadSettings() {
         print("load settings")
         print(vehicle.getVehicleText)
-        print(vehicle.settings)
+        print(vehicle.settings ?? "n/a")
         ///get the setting object from settings entity if available
         guard let thisSettings = vehicle.settings  else {
             print("no settings found")

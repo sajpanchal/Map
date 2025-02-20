@@ -135,8 +135,8 @@ struct Map: View {
 //                    Vehicle.saveContext(viewContext: viewContext)
 //                   
                     for setting in settings {
-                        print(setting.vehicle?.getVehicleText)
-                        print(setting.autoEngineType)
+                        print(setting.vehicle?.getVehicleText ?? "n/a")
+                        print(setting.autoEngineType ?? "n/a")
                     }
                     print("--------------------------")
 
@@ -148,20 +148,20 @@ struct Map: View {
                     print("Name: ",newVehicle.getVehicleText)
                     print("trip: ",newVehicle.trip)
                     print("trip miles: ",newVehicle.tripMiles)
-                    print("fuel mode: ",newVehicle.fuelMode)
+                    print("fuel mode: ",newVehicle.fuelMode ?? "n/a")
                     print("trip EV: ",newVehicle.tripHybridEV)
                     print("trip EV miles: ",newVehicle.tripHybridEVMiles)
                     print("odometer: ",newVehicle.odometer)
                     print("odometer Miles: ",newVehicle.odometerMiles)
                     print("battery: ",newVehicle.batteryCapacity)
-                    print("fuel engine: ",newVehicle.fuelEngine)
+                    print("fuel engine: ",newVehicle.fuelEngine ?? "n/a")
                     print("is active: ",newVehicle.isActive)
                     print("odometer Miles: ",newVehicle.year)
                     print("------------Vehicle Settings--------------")
-                    print(newVehicle.settings)
+                    print(newVehicle.settings ?? "n/a")
                     print("------------Vehicle Summary--------------")
                     print("summary count: ",newVehicle.getReports.count)
-                    print("summary count: ",newVehicle.getReports.first?.annualTrip)
+                    print("summary count: ",newVehicle.getReports.first?.annualTrip ?? "n/a")
                 
                     
                     
@@ -172,11 +172,11 @@ struct Map: View {
                         if let thisDistanceUnit = DistanceUnit(rawValue: thisSettings.getDistanceUnit) {
                             MapViewAPI.distanceUnit = thisDistanceUnit
                         }
-                        print("Vehicle: \(thisSettings.vehicle)")
-                        print("Distance Unit: \(thisSettings.getDistanceUnit)")
+                    print("Vehicle: ", thisSettings.vehicle ?? "n/a")
+                        print("Distance Unit: ",(thisSettings.getDistanceUnit))
                         print("fuel Unit: \(thisSettings.getFuelVolumeUnit)")
                         print("Engine type: \(thisSettings.getAutoEngineType)")
-                        print("fuel Mode: \(thisSettings.vehicle?.getFuelMode)")
+                    print("fuel Mode: ", (thisSettings.vehicle?.getFuelMode) ?? "n/a")
                         if let thisVehicle = vehicles.first(where: {$0.isActive}) {
 
                         
