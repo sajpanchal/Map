@@ -29,7 +29,7 @@ struct AutoSummaryList: View {
                         ///with desination as AutoSummaryView and label as text view.
                         NavigationLink {
                             ///on tap of the label in a given list item in a list the corresponding autosummary view for that item will appear.
-                            AutoSummaryView(autoSummary: entry, reportIndex: reports.firstIndex(of: entry))
+                            AutoSummaryView(autoSummary: entry)
                         }
                         ///label is the view to be displayed for a given navigation link.
                         label: {

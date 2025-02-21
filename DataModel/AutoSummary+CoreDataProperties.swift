@@ -50,6 +50,7 @@ extension AutoSummary {
         }
     }
     
+    
     ///get an array of AutoSummary from the viewContext
     static func getResults(viewContext: NSManagedObjectContext, vehicle: Vehicle) -> [AutoSummary] {
         ///call fetchRequest method to fetch AutoSummary records.
@@ -354,7 +355,29 @@ extension AutoSummary {
         }
         AutoSummary.saveContext(viewContext: viewContext)
     }
-    
+    static func updateReport(viewContext: NSManagedObjectContext, distanceUnit: String, year: Int, vehicleIndex: Int,  odometerStart: Int, odometerEnd: Int) {
+        let vehicles = Vehicle.getResults(viewContext: viewContext)
+        print("vIndex: \(vehicleIndex)")
+        let reports = getResults(viewContext: viewContext, vehicle: vehicles[vehicleIndex])
+        guard let index = reports.firstIndex(where: {$0.vehicle == vehicles[vehicleIndex] && $0.calenderYear == year}) else {
+            return
+        }
+        print("rIndex: \(index)")
+        if distanceUnit == "km" {
+            reports[index].odometerStart = Double(odometerStart)
+            reports[index].odometerStartMiles = Double(odometerStart) / 1.609
+            reports[index].odometerEnd = Double(odometerEnd)
+            reports[index].odometerEndMiles = Double(odometerEnd) / 1.609
+        }
+        else {
+            reports[index].odometerStartMiles = Double(odometerStart)
+            reports[index].odometerStart = Double(odometerStart) * 1.609
+            reports[index].odometerEndMiles = Double(odometerEnd)
+            reports[index].odometerEnd = Double(odometerEnd) * 1.609
+        }
+        
+        AutoSummary.saveContext(viewContext: viewContext)
+    }
     ///method to accumulate service cost for a given vehicle in a given year.
     static func accumulateServiceCostSummary(viewContext: NSManagedObjectContext, for vehicle: Vehicle, year: Int, cost: Double) {
         ///get autoSummary reports for a given year.

@@ -130,8 +130,8 @@ struct FuelHistoryView: View {
                                     ///get the fuelling entry at a given index.
                                     let thisfuellingEntry = vehicle.getFuellings.filter({$0.fuelType == fuelMode})[i]
                                     
-                                    print("fuel type:", thisfuellingEntry.fuelType)
-                                    print(thisfuellingEntry.location)
+                                    print("fuel type:", thisfuellingEntry.fuelType ?? "n/a")
+                                    print(thisfuellingEntry.location ?? "n/a")
                                     print(thisfuellingEntry.cost)
                                     print(thisfuellingEntry.lasttrip)
                                     ///remove this entry from fuellings entity of a given vehicle

@@ -11,19 +11,22 @@ struct OdometerForm: View {
     ///environment variable to dismiss this swiftui view.
     @Environment(\.dismiss) var dismiss
     ///fetch request for entity of autosummary which will store the fetchedResults of autosummary in this variable
-    @FetchRequest(entity: AutoSummary.entity(), sortDescriptors: []) var reports: FetchedResults<AutoSummary>
+   // @FetchRequest(entity: AutoSummary.entity(), sortDescriptors: []) var reports: FetchedResults<AutoSummary>
     ///fetch request for entity of settings which will store the fetchedResults of settings in this variable
-    @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[]) var vehicles: FetchedResults<Vehicle>
+  //  @FetchRequest(entity:Vehicle.entity(), sortDescriptors:[]) var vehicles: FetchedResults<Vehicle>
     ///environment variable of managedObjectContext that tracks changes to the instances of core data entities.
     @Environment(\.managedObjectContext) private var viewContext
     ///calendaryear
-    var calenderYear: Int
+    var calenderYear: Int = 0
+    var distanceUnit: String = ""
     ///binding variable for odometer Start readings
     @Binding var odometerStart: Double
     ///binding variable for odometer Stop readings
     @Binding var odometerEnd: Double
     ///binding variable for reports array index.
-    @Binding var reportIndex: Int?
+ // var reportIndex: Int = 0
+    var vehicleIndex: Int = 0
+    
     var todaysDate: String {
         let date = Date()
         let year = Calendar.current.component(.year, from: date)
@@ -38,8 +41,8 @@ struct OdometerForm: View {
     
     var body: some View {
         ///form to edit odometer settings.
-        if let activeVehicle = vehicles.first(where: {$0.isActive}) {
-            if let thisSettings = activeVehicle.settings {
+      //  if let activeVehicle = vehicles.first(where: {$0.isActive}) {
+       //     if let thisSettings = activeVehicle.settings {
                 Form {
                     ///section with title for odometer start.
                     Section("Odometer readings on Jan 01, "+(String(calenderYear))) {
@@ -63,30 +66,15 @@ struct OdometerForm: View {
                     ///form submit button
                     Button {
                         ///check if the report index is not nil else dismiss the view.
-                        guard let index = reportIndex else {
-                            dismiss()
-                            print("no index found")
-                            return
-                        }
+                       
                         if !isEntryValid() {
                             return
                         }
-                        ///if distance unit in settings is set to km
-                        if thisSettings.distanceUnit == "km" {
-                            ///store the updated odometer start readings at the given index in the reports array.
-                            reports[index].odometerStart = odometerStart
-                            ///store the updated odometer stop readings at the given index in the reports array.
-                            reports[index].odometerEnd = odometerEnd
+                      
+                        AutoSummary.updateReport(viewContext: viewContext, distanceUnit: distanceUnit, year: calenderYear, vehicleIndex: vehicleIndex, odometerStart: Int(odometerStart), odometerEnd: Int(odometerEnd))
+                        if calenderYear == Calendar.current.component(.year, from: Date()) {
+                            Vehicle.updateOdometer(viewContext: viewContext, vehicleIndex: vehicleIndex, odometerEnd: odometerEnd, distanceUnit: distanceUnit)
                         }
-                        ///if distance unit in settings is set to mi
-                        else {
-                            ///store the updated odometer start readings at the given index in the reports array in miles.
-                            reports[index].odometerStartMiles = odometerStart
-                            ///store the updated odometer stop readings at the given index in the reports array in miles.
-                            reports[index].odometerEndMiles = odometerEnd
-                        }
-                        ///save the view context
-                        AutoSummary.saveContext(viewContext: viewContext)
                         ///dismiss this view.
                         dismiss()
                     }
@@ -96,9 +84,9 @@ struct OdometerForm: View {
                     }
                 }
             }
-        }
+      //  }
       
-    }
+   // }//
     func isEntryValid() -> Bool {
         if odometerStart > odometerEnd {
             return false
@@ -110,5 +98,5 @@ struct OdometerForm: View {
 }
 
 #Preview {
-    OdometerForm(calenderYear: 2023, odometerStart: .constant(0), odometerEnd: .constant(0), reportIndex: .constant(0))
+    OdometerForm(calenderYear: 2023, distanceUnit: "km", odometerStart: .constant(0), odometerEnd: .constant(0), vehicleIndex: 0)
 }

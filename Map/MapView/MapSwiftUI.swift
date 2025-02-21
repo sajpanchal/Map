@@ -168,24 +168,20 @@ struct Map: View {
                     guard let thisSettings = newVehicle.settings  else {
                     return
                     }
-                    
-                        if let thisDistanceUnit = DistanceUnit(rawValue: thisSettings.getDistanceUnit) {
-                            MapViewAPI.distanceUnit = thisDistanceUnit
-                        }
-                    print("Vehicle: ", thisSettings.vehicle ?? "n/a")
-                        print("Distance Unit: ",(thisSettings.getDistanceUnit))
-                        print("fuel Unit: \(thisSettings.getFuelVolumeUnit)")
-                        print("Engine type: \(thisSettings.getAutoEngineType)")
-                    print("fuel Mode: ", (thisSettings.vehicle?.getFuelMode) ?? "n/a")
-                        if let thisVehicle = vehicles.first(where: {$0.isActive}) {
-
-                        
-                        MapViewAPI.avoidHighways = thisSettings.avoidHighways
-                        MapViewAPI.avoidTolls = thisSettings.avoidTolls
-                        print("OnAppear()")
-                        print("avoid tolls: \( MapViewAPI.avoidTolls)")
-                        print("avoid highways: \( MapViewAPI.avoidHighways)")
+                    if let thisDistanceUnit = DistanceUnit(rawValue: thisSettings.getDistanceUnit) {
+                        MapViewAPI.distanceUnit = thisDistanceUnit
                     }
+                       
+                    print("Vehicle: ", thisSettings.vehicle ?? "n/a")
+                    print("Distance Unit: ",(thisSettings.getDistanceUnit))
+                    print("fuel Unit: \(thisSettings.getFuelVolumeUnit)")
+                    print("Engine type: \(thisSettings.getAutoEngineType)")
+                    print("fuel Mode: ", (thisSettings.vehicle?.getFuelMode) ?? "n/a")
+                    MapViewAPI.avoidHighways = thisSettings.avoidHighways
+                    MapViewAPI.avoidTolls = thisSettings.avoidTolls
+                    print("OnAppear()")
+                    print("avoid tolls: \( MapViewAPI.avoidTolls)")
+                    print("avoid highways: \( MapViewAPI.avoidHighways)")
                 }
 }
     ///custom function takes the DragGesture value. custom function we calculate the distance of the drag from 2D cooridinates of starting and ennding points. then we check if the distance is more than 10. if so, we undo the user-location re-center button tap.

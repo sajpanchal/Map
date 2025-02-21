@@ -205,6 +205,20 @@ extension Vehicle {
         ///return the array.
         return vehicles
     }
+    
+    static func updateOdometer(viewContext: NSManagedObjectContext, vehicleIndex: Int, odometerEnd: Double, distanceUnit: String) {
+        let vehicles = getResults(viewContext: viewContext)
+        if distanceUnit == "km" {
+            vehicles[vehicleIndex].odometer = odometerEnd
+            vehicles[vehicleIndex].odometerMiles = odometerEnd / 1.609
+        }
+        else {
+            vehicles[vehicleIndex].odometerMiles = odometerEnd
+            vehicles[vehicleIndex].odometer = odometerEnd * 1.609
+        }
+        Vehicle.saveContext(viewContext: viewContext)
+    }
+    
     static func AddNewVehicle(viewContext: NSManagedObjectContext, getModel: () -> (VehicleModel)) -> Vehicle? {
         ///create an instance of Vehicle entity
         let model = getModel()

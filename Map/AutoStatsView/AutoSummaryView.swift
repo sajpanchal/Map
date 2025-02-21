@@ -32,7 +32,7 @@ struct AutoSummaryView: View {
     @State var engineType: EngineType = .Hybrid
     @State var calenderYear: Int = 2024
     ///index number of the autosummary report.
-    @State var reportIndex: Int?
+    //@State var reportIndex: Int?
     var currency = ""
     
     var body: some View {
@@ -46,13 +46,10 @@ struct AutoSummaryView: View {
                     Spacer()
                     ///text view displays current vehicle title.
                     VStack {
-                       
                         Text((activeVehicle.getVehicleText) + "\n" + (activeVehicle.getFuelEngine == "Gas" ? "" : (activeVehicle.getFuelEngine)))
                                     .fontWeight(.bold)
                                     .font(.system(size: 16))
                                     .multilineTextAlignment(.trailing)
-                         
-                        
                     }
                 }
                 .padding()
@@ -65,11 +62,14 @@ struct AutoSummaryView: View {
                         Section {
                             ///navigation link to the odometerForm swiftuiview to update start and end odometer of a given year
                             NavigationLink {
-                                OdometerForm(calenderYear: calenderYear, odometerStart: $odometerStart, odometerEnd: $odometerEnd, reportIndex: $reportIndex)
+                                if let vehicleIndex = vehicles.firstIndex(where: {$0 == activeVehicle}) {
+                                    OdometerForm(calenderYear: calenderYear, distanceUnit: thisSettings.getDistanceUnit, odometerStart: $odometerStart, odometerEnd: $odometerEnd, vehicleIndex: vehicleIndex)
+                                }
                             }
                             ///navigation link label to display the odometer start and end readings.
                             label : {
                                 OdometerFormLabel(calenderYear: calenderYear, odometerStart: odometerStart, odometerEnd: odometerEnd, unit: "km")
+                                    .onAppear(perform: updateVehicleOdometer)
                             }
                         }
                         ///Section header with text view to show heading title.
@@ -83,12 +83,14 @@ struct AutoSummaryView: View {
                         Section {
                             ///navigation link to the odometerForm swiftuiview to update start and end odometer of a given year
                             NavigationLink {
-                                ///navigation link label to display the odometer start and end readings.
-                                OdometerForm(calenderYear: calenderYear, odometerStart: $odometerStartMiles, odometerEnd: $odometerEndMiles, reportIndex: $reportIndex)
+                                if let vehicleIndex = vehicles.firstIndex(where: {$0 == activeVehicle}) {
+                                    OdometerForm(calenderYear: calenderYear, distanceUnit: thisSettings.getDistanceUnit, odometerStart: $odometerStart, odometerEnd: $odometerEnd, vehicleIndex: vehicleIndex)
+                                }
                             }
                             ///navigation link label to display the odometer start and end readings.
                             label : {
                                 OdometerFormLabel(calenderYear: calenderYear, odometerStart: odometerStartMiles, odometerEnd: odometerEndMiles, unit: "mi")
+                                    .onAppear(perform: updateVehicleOdometer)
                             }
                         }
                         ///Section header with text view to show heading title.
@@ -141,10 +143,20 @@ struct AutoSummaryView: View {
         guard let summaryIndex = reports.firstIndex(where: {$0.vehicle == activeVehicle && $0.calenderYear == Int16(calenderYear)}) else {
             return
         }
-    
-        reports[summaryIndex].odometerEnd = odometerEnd
-        reports[summaryIndex].odometerEndMiles = odometerEndMiles
+        guard let thisSettings = activeVehicle.settings else {
+            return
+        }       
+        if calenderYear == Calendar.current.component(.year, from: Date()) {
+            reports[summaryIndex].odometerEnd = activeVehicle.odometer
+            reports[summaryIndex].odometerEndMiles = activeVehicle.odometerMiles
+        }
         AutoSummary.saveContext(viewContext: viewContext)
+        if thisSettings.getDistanceUnit == "km" {
+            odometerEnd = reports[summaryIndex].odometerEnd
+        }
+        else {
+            odometerEndMiles = reports[summaryIndex].odometerEndMiles
+        }
         
     }
     ///method to fill up the form with data gathered from autosummary of a given vehicle in a given year.
