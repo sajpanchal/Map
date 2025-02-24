@@ -363,6 +363,7 @@ extension AutoSummary {
             return
         }
         print("rIndex: \(index)")
+        
         if distanceUnit == "km" {
             reports[index].odometerStart = Double(odometerStart)
             reports[index].odometerStartMiles = Double(odometerStart) / 1.609
@@ -376,6 +377,27 @@ extension AutoSummary {
             reports[index].odometerEnd = Double(odometerEnd) * 1.609
         }
         
+        if let previousYearIndex = reports.firstIndex(where: {$0.vehicle == vehicles[vehicleIndex] && $0.calenderYear == (year - 1)}) {
+            if distanceUnit == "km" {
+                reports[previousYearIndex].odometerEnd = Double(odometerStart)
+                reports[previousYearIndex].odometerEndMiles = Double(odometerStart) / 1.609
+            }
+            else {
+                reports[previousYearIndex].odometerEnd = Double(odometerStart) * 1.609
+                reports[previousYearIndex].odometerEndMiles = Double(odometerStart)
+            }
+        }
+        
+        if let nextYearIndex = reports.firstIndex(where: {$0.vehicle == vehicles[vehicleIndex] && $0.calenderYear == (year + 1)}) {
+            if distanceUnit == "km" {
+                reports[nextYearIndex].odometerStart = Double(odometerEnd)
+                reports[nextYearIndex].odometerStartMiles = Double(odometerEnd) / 1.609
+            }
+            else {
+                reports[nextYearIndex].odometerStart = Double(odometerEnd) * 1.609
+                reports[nextYearIndex].odometerStartMiles = Double(odometerEnd)
+            }
+        }
         AutoSummary.saveContext(viewContext: viewContext)
     }
     ///method to accumulate service cost for a given vehicle in a given year.
