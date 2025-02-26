@@ -155,17 +155,17 @@ struct FuellingEntryForm: View {
                                             Spacer()
                                             Button {
                                                 if isTextFieldEntryValid() {
-                                                    let index = vehicles.firstIndex(where: {$0.uniqueID == vehicle.uniqueID})
+                                                    guard let index = vehicles.firstIndex(of: vehicle) else {
+                                                        return
+                                                    }
                                                  
                                                     addFuellingEntry(for: vehicle, at: index)
-                                                                                   
-                                                    if  let i = index {
-                                                      
-                                                        calculateFuelCost(for: vehicle, at: i)
-                                                        calculateFuelEfficiency(for: vehicle, at: i)
-                                                        updateAutoSummary(for: vehicle, at: i)
-                                                        resetTripData(at: i)
-                                                    }
+                                                    calculateFuelCost(for: vehicle, at: index)
+                                                    calculateFuelEfficiency(for: vehicle, at: index)
+                                                    updateAutoSummary(for: vehicle, at: index)
+                                                    resetTripData(at: index)
+                                                        
+                                                    
                                                 }
                                                 isTapped = true
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -218,7 +218,7 @@ struct FuellingEntryForm: View {
         return true
     }
     
-    func addFuellingEntry(for vehicle: Vehicle, at index: Int?) {
+    func addFuellingEntry(for vehicle: Vehicle, at index: Int) {
         let fuelling = AutoFuelling(context: viewContext)
         fuelling.uniqueID = UUID()
         fuelling.cost = cost
@@ -236,14 +236,14 @@ struct FuellingEntryForm: View {
                 ///if distance unit is set in km.
                 if thisSettings.distanceUnit == "Km" {
                     ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in km)
-                    fuelling.lasttrip = index != nil ? vehicles[index!].trip : 0.0
+                    fuelling.lasttrip = vehicles[index].trip
                     ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in miles)
                     fuelling.lastTripMiles = fuelling.lasttrip * 0.6214
                 }
                 ///if distance unit is set in miles.
                 else {
                     ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in miles)
-                    fuelling.lastTripMiles = index != nil ? vehicles[index!].tripMiles : 0.0
+                    fuelling.lastTripMiles = vehicles[index].tripMiles
                     ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in km)
                     fuelling.lasttrip = fuelling.lastTripMiles / 0.6214
                 }
@@ -251,9 +251,9 @@ struct FuellingEntryForm: View {
             ///if hyrid vehicle is currently set to ev engine mode
             else {
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in km)
-                fuelling.lasttrip = index != nil ? vehicles[index!].tripHybridEV : 0.0
+                fuelling.lasttrip = vehicles[index].tripHybridEV
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in miles)
-                fuelling.lastTripMiles = index != nil ? vehicles[index!].tripHybridEVMiles : 0.0
+                fuelling.lastTripMiles = vehicles[index].tripHybridEVMiles
             }
         }
         ///if fuel engine is not hybrid
@@ -261,14 +261,14 @@ struct FuellingEntryForm: View {
             ///if distance unit is set in km.
             if thisSettings.distanceUnit == "Km" {
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in km)
-                fuelling.lasttrip = index != nil ? vehicles[index!].trip : 0.0
+                fuelling.lasttrip = vehicles[index].trip
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in miles)
                 fuelling.lastTripMiles = fuelling.lasttrip * 0.6214
             }
             ///if distance unit is set in miles.
             else {
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in miles)
-                fuelling.lastTripMiles = index != nil ? vehicles[index!].tripMiles : 0.0
+                fuelling.lastTripMiles = vehicles[index].tripMiles
                 ///set the fuelling entry trip property with the given vehicle's dashboard trip. (in km)
                 fuelling.lasttrip = fuelling.lastTripMiles / 0.6214
             }
@@ -294,6 +294,7 @@ struct FuellingEntryForm: View {
         withAnimation(.easeIn(duration: 0.5)) {
             showAlert = true
         }
+        Vehicle.saveContext(viewContext: viewContext)
     }
     
     ///reset the trip data at a given index of the vehicle
@@ -322,6 +323,7 @@ struct FuellingEntryForm: View {
             ///reset trip in miles
             vehicles[index].tripMiles = 0
         }
+        Vehicle.saveContext(viewContext: viewContext)
     }
     
     ///function to calculate fuel cost in total
@@ -338,6 +340,7 @@ struct FuellingEntryForm: View {
             ///accumulate the fuel cost
             vehicles[index].fuelCost += thisFuelEntry.cost
         }
+        Vehicle.saveContext(viewContext: viewContext)
     }
     
     ///function to calculate the fuel efficiency of a given vehicle from the fuelling history
@@ -412,6 +415,7 @@ struct FuellingEntryForm: View {
         }
         ///call the method in AutoSummary to accumulate the fuelling data and travel data for a given year and save it.
         AutoSummary.accumulateFuellingsAndTravelSummary(viewContext: viewContext, in: thisSettings, for: vehicle, year: year, cost: cost, amount: fuelAmount)
+        Vehicle.saveContext(viewContext: viewContext)
     }
 }
 

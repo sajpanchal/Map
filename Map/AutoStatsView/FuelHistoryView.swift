@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FuelHistoryView: View {
     @FetchRequest(entity: Settings.entity(), sortDescriptors:[]) var settings: FetchedResults<Settings>
+    @FetchRequest(entity: Vehicle.entity(), sortDescriptors:[]) var vehicles: FetchedResults<Vehicle>
     @FetchRequest(entity: AutoSummary.entity(), sortDescriptors: []) var reports: FetchedResults<AutoSummary>
     @Environment(\.colorScheme) var bgMode: ColorScheme
     @Environment(\.managedObjectContext) private var viewContext
@@ -21,6 +22,7 @@ struct FuelHistoryView: View {
                 ForEach(vehicle.getFuellingDates.sorted(by: >), id: \.self) { thisDate in
                     
                     Section(header: Text(getString(from: thisDate)).fontWeight(.bold)) {
+                        
                         if let thisSettings = vehicle.settings  {
                             ///get the fuel mode (gas or ev) from the saved settings for a selected vehicle.
                             if let fuelMode = vehicle.fuelMode {
@@ -116,6 +118,9 @@ struct FuelHistoryView: View {
                                 }
                                 ///on deletion
                                 .onDelete { indexSet in
+                                    guard let vehicleIndex = vehicles.firstIndex(of: vehicle) else {
+                                        return
+                                    }
                                     print("fuel mode is: \(fuelMode)")
                                     ///iterate through the indexsets where indexset will be single item array having the index of a selected list item.
                                     var calendarYear: Int?
@@ -127,6 +132,8 @@ struct FuelHistoryView: View {
                                     guard let i = Array(indexSet).first else {
                                         return
                                     }
+                                    print("vehicle: ", vehicles[vehicleIndex].getVehicleText)
+                                    
                                     ///get the fuelling entry at a given index.
                                     let thisfuellingEntry = vehicle.getFuellings.filter({$0.fuelType == fuelMode})[i]
                                     
@@ -136,10 +143,10 @@ struct FuelHistoryView: View {
                                     print(thisfuellingEntry.lasttrip)
                                     ///remove this entry from fuellings entity of a given vehicle
                                     if thisfuellingEntry.fuelType == fuelMode {
-                                        vehicle.removeFromFuellings(thisfuellingEntry)
+                                        vehicles[vehicleIndex].removeFromFuellings(thisfuellingEntry)
                                         calendarYear = thisfuellingEntry.getYearFromDate
                                         ///subtract the fuel cost of this entry from the total fuel cost.
-                                        vehicle.fuelCost -= thisfuellingEntry.cost
+                                        vehicles[vehicleIndex].fuelCost -= thisfuellingEntry.cost
                                         amount = thisfuellingEntry.percent
                                       
                                         ///save changes
@@ -177,7 +184,7 @@ struct FuelHistoryView: View {
                                     }
                                     AutoSummary.accumulateFuellingsAndTravelSummary(viewContext: viewContext, in: thisSettings, for: vehicle, year: year, cost: vehicle.fuelCost, amount: amount)
                                     ///calculate the fuel efficiency by dividing accumulated trip by fuel volume.
-                                    vehicle.fuelEfficiency = accumulatedTrip/accumulatedFuelVolume
+                                    vehicles[vehicleIndex].fuelEfficiency = accumulatedTrip/accumulatedFuelVolume
                                     ///save changes.
                                     Vehicle.saveContext(viewContext: viewContext)
                                 }

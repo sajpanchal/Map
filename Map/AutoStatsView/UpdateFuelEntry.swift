@@ -179,15 +179,15 @@ struct UpdateFuelEntry: View {
                                             Spacer()
                                             Button {
                                                 if isTextFieldEntryValid() {
-                                                    let index = vehicles.firstIndex(where: {$0.uniqueID == activeVehicle.uniqueID})
+                                                    guard let index = vehicles.firstIndex(of: activeVehicle) else {
+                                                        return
+                                                    }
                                                     
                                                     addFuellingEntry(for: activeVehicle, at: index)
-                                                                                   
-                                                    if  let i = index {
-                                                        calculateFuelCost(for: activeVehicle, at: i)
-                                                        calculateFuelEfficiency(for: activeVehicle, at: i)
-                                                        updateAutoSummary(for: activeVehicle, at: i)
-                                                    }
+                                                    calculateFuelCost(for: activeVehicle, at: index)
+                                                    calculateFuelEfficiency(for: activeVehicle, at: index)
+                                                    updateAutoSummary(for: activeVehicle, at: index)
+                                                    
                                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                                         showFuelHistoryView = false
                                                     }
@@ -275,7 +275,7 @@ struct UpdateFuelEntry: View {
         }
         return true
     }
-    func addFuellingEntry(for vehicle: Vehicle, at index: Int?) {
+    func addFuellingEntry(for vehicle: Vehicle, at index: Int) {
         if let i = fuelEntries.firstIndex(where: {$0.uniqueID == fuelEntry.uniqueID && $0.vehicle == vehicle}) {           
             fuelEntries[i].cost = cost
             fuelEntries[i].date = date
