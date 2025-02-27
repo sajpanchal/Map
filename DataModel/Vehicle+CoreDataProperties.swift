@@ -244,40 +244,24 @@ extension Vehicle {
         }
       
         newVehicle.fuelMode = model.fuelMode
-       
         ///set vehicle as not active
         newVehicle.isActive = vehicles.isEmpty
         ///set vehicle year
         newVehicle.year = Int16(model.year)
         ///set vehicle odometer
         newVehicle.odometer = Double(model.odometer)
-       
-       
         ///set vehicle odometer
         newVehicle.odometerMiles = Double(model.odometerMiles)
-    
-                
-        
-        
-            ///set new vehicle's trip odometer as trip inputed
-            newVehicle.trip = model.trip
-           
-            ///set new vehicle's trip odometer converted in miles
-            newVehicle.tripMiles = model.tripMiles
-           
-       
+        ///set new vehicle's trip odometer as trip inputed
+        newVehicle.trip = model.trip
+        ///set new vehicle's trip odometer converted in miles
+        newVehicle.tripMiles = model.tripMiles
         ///if engine type is hybrid set EV props
         if model.engineType == "Hybrid" {
-           
-                //set vehicle trip odometer
+            //set vehicle trip odometer
             newVehicle.tripHybridEV = model.tripHybridEV
-               
             newVehicle.tripHybridEVMiles = model.tripHybridEVMiles
-           
-                                
         }
-       
-       
         return newVehicle
                         
     }
