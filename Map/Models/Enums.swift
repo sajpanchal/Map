@@ -195,8 +195,10 @@ enum Model: String, CaseIterable, Identifiable {
     case GT6, Spitfire, Stag, TR
     case Tuscan
     case VF_8
-   // case _411, Arteon, Atlas, Atlas_Cross_Sport, Beetle, Cabrio, Cabriolet, CC, Corrado, E_Golf, Eos, Eurovan, GLI, Golf, Golf_Alltrack, Golf_GTI, Golf_R, Golf_SportWagen, Golf_Wagon, GTI,ID_Buzz, ID_4, Jetta, Jetta_GLI, Jetta_SportWagen, Jetta_Wegon, Karmann_Ghia, Kombi, Passat, Passat_CC, Passat_Wagon, Paheton, 
-    
+    case _411, Arteon, Atlas, Atlas_Cross_Sport, Beetle, Cabrio, CC, Corrado, E_Golf, Eos, Eurovan, GLI, Golf, Golf_Alltrack, Golf_GTI, Golf_R, Golf_SportWagen, Golf_Wagon, GTI,ID_Buzz, ID_4, Jetta, Jetta_GLI, Jetta_SportWagen, Jetta_Wegon, Karmann_Ghia, Kombi, Passat, Passat_CC, Passat_Wagon, Paheton, R32, Rabbit, Routan, Scirocco, Taos, The_Thing, Tiguan, Touareg, Touareg_2, Transporter, Type_2, Type_3, Vanagon, Westfalia
+    case _122S, _1800, _240, C30, C40_Recharge_Pure_Electric, C70, EC40, EX30, EX40, EX90, Polestar_1, PV544, S40, S60, S60_Cross_Country, S60_Plug_In_Hybrid, S60_Recharge, S70, S80, S90, S90_Recharge, V40, V50, V60, V60_Cross_Country, V60_Polestar, V70, V90, V90_Cross_Country, XC40, XC60_Plug_In_Hybrid, XC60_Recharge, XC70, XC90, XC90_Hybrid, XC90_Plug_in_Hybrid, XC90_Recharge
+    case MV_1
+    case CJ_3A, M38
     var id: Self {
         self
     }
@@ -226,6 +228,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     case Saab, Saturn, Scion, Seat, Shelby, Smart, Spyker, Standard, Sterling, Studebaker, Subaru, Sunbeam, Suzuki
     case Tesla, Toyota, Triumph, TVR
     case VinFast, Volga, Volkswagen, Volvo, VPG
+    case Willys
  
     
     var models: [Model] {
@@ -416,7 +419,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
         case .Nash:
             return [.Metropolitan_1500, .Series_Six, .Other]
         case .Nissan:
-            return [._240SX, ._300ZX, ._350Z, ._370Z, .Altima, .Ariya, .Armada, .Axxess, .Cab_and_Chassis, .Cube, .Elgrand, .Fairlady, .Frontier, .GTR, .Hardbody_2WD, .Juke, .Kicks, .Kicks_Play, .Leaf, .Maxima, .Micra, .Murano, .Murano_CrossCabriolet, .NV, .NV_2500, .NV_3500, .NV_Cargo, .NV200, .NV200_Compact_Cargo, .NX, .Pathfinder, .Pathfinder_Armada, .Qashqai, .Quest, .Roque, .Safari, .Sentra, .Slivia, .Skyline, .Stagea, .Terrano, .Titan, .Titan_XD, .Trucks_4WD, .Van, .Versa, .Versa_Note, .X_Trail, .Xterra, .Z]
+            return [._240SX, ._300ZX, ._350Z, ._370Z, .Altima, .Ariya, .Armada, .Axxess, .Cab_and_Chassis, .Cube, .Elgrand, .Fairlady, .Frontier, .GTR, .Hardbody_2WD, .Juke, .Kicks, .Kicks_Play, .Leaf, .Maxima, .Micra, .Murano, .Murano_CrossCabriolet, .NV, .NV_2500, .NV_3500, .NV_Cargo, .NV200, .NV200_Compact_Cargo, .NX, .Pathfinder, .Pathfinder_Armada, .Qashqai, .Quest, .Roque, .Safari, .Sentra, .Slivia, .Skyline, .Stagea, .Terrano, .Titan, .Titan_XD, .Trucks_4WD, .Van, .Versa, .Versa_Note, .X_Trail, .Xterra, .Z, .Other]
         case .Oldsmobile:
             return  [._442, ._88, ._98, ._98_Regency_Elite, .Alero, .Custom_Cruiser, .Cutlass, .Cutlass_Supreme, .Intrigue, .Omega, .Starfire, .Toronado, .Touring, .Other]
         case .Packard:
@@ -426,7 +429,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
         case .Peugeot:
             return [._106, .Other]
         case .Plymouth:
-            return [.Barracuda, .Belvedere, .Breeze, .Cambridge, .Deluxe, .Duster, .GTX, .PD_Deluxe, .Prowler, .Road_Runner, .Satellite, .Scamp, .Sport_Fury, .Suburban, .Valiant]
+            return [.Barracuda, .Belvedere, .Breeze, .Cambridge, .Deluxe, .Duster, .GTX, .PD_Deluxe, .Prowler, .Road_Runner, .Satellite, .Scamp, .Sport_Fury, .Suburban, .Valiant, .Other]
         case .Polestar:
             return [._1, ._2, .Other]
         case .Pontiac:
@@ -442,7 +445,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
         case .Rivian:
             return [.R1S, .R1T, .Other]
         case .Rolls_Royce:
-            return [.Black_Badge_Cullinan, .Corniche, .Cullinan, .Dawn, .Ghost, .Phantom, .Phantom_Coupe, .Silver_Shadow, .Silver_Spirit, .Silver_Spur, .Silver_Wraith, .Spectre, .Wraith]
+            return [.Black_Badge_Cullinan, .Corniche, .Cullinan, .Dawn, .Ghost, .Phantom, .Phantom_Coupe, .Silver_Shadow, .Silver_Spirit, .Silver_Spur, .Silver_Wraith, .Spectre, .Wraith, .Other]
         case .Rover:
             return [.P5, .Other]
         case .Saab:
@@ -470,9 +473,9 @@ enum VehicleMake: String, CaseIterable, Identifiable {
         case .Sunbeam:
             return [.Alpine, .Tiger, .Other]
         case .Suzuki:
-            return [.Aerio, .Carry, .Equator, .Grand_Vitara, .Jimmy_4WD, .Kizashi, .Sidekick, .Swift, .SX4, .Vitara, .XL7]
+            return [.Aerio, .Carry, .Equator, .Grand_Vitara, .Jimmy_4WD, .Kizashi, .Sidekick, .Swift, .SX4, .Vitara, .XL7, .Other]
         case .Tesla:
-            return [.Cybertruck, .Model_3, .Model_S, .Model_X, .Model_Y, .Roadster]
+            return [.Cybertruck, .Model_3, .Model_S, .Model_X, .Model_Y, .Roadster,.Other]
         case .Toyota:
             return [._2WD_Compact_Pickups, ._4Runner, ._4Runner_4WD, ._4WD_Compact_Pickups, ._4WD_Pickups, ._86, .Alphard, .Avalon, .bZ4X, .C_HR, .Camry, .Camry_Solara, .Celica, .Century, .Commercial_Chassis_Cabs, .Corolla, .Corolla_Cross, .Corolla_Hatchback, .Corolla_iM, .Corona, .Cressida, .Crown, .Crown_Signia, .Echo, .Estima, .FJ_Cruiser, .GR_86, .GR_Corolla, .GR_Supra, .Grand_Highlander, .Hiace, .Highlander, .Land_Cruiser, .Lite_Ace, .Mark_II, .Matrix, .Mirai, .MR2, .MR2_Spyder, .Prius, .Prius_C, .Prius_Plug_In, .Prius_Prime, .Prius_V, .RAV4, .RAV4_Plug_in_Hybrid, .RAV4_Prime, .Sequoia, .Sienna, .Soarer, .Solara, .Supra, .Tacoma, .Tacoma_Hybrid, .Tacoma_Pickups, .Tercel, .Tundra, .Van_Wagon, .Venza, .Yaris, .Other]
         case .Triumph:
@@ -484,11 +487,13 @@ enum VehicleMake: String, CaseIterable, Identifiable {
         case .Volga:
             return [.Other]
         case .Volkswagen:
-            return []
+            return [._411, .Arteon, .Atlas, .Atlas_Cross_Sport, .Beetle, .Cabrio, .Cabriolet, .CC, .Corrado, .E_Golf, .Eos, .Eurovan, .GLI, .Golf, .Golf_Alltrack, .Golf_GTI, .Golf_R, .Golf_SportWagen, .Golf_Wagon, .GTI, .ID_Buzz, .ID_4, .Jetta, .Jetta_GLI, .Jetta_SportWagen, .Jetta_Wegon, .Karmann_Ghia, .Kombi, .Passat, .Passat_CC, .Passat_Wagon, .Paheton, .R32, .Rabbit, .Routan, .Scirocco, .Taos, .The_Thing, .Tiguan, .Touareg, .Touareg_2, .Transporter, .Type_2, .Type_3, .Vanagon, .Westfalia, .Other]
         case .Volvo:
-            return []
+            return [._122S, ._1800, ._240, ._850, .C30, .C40_Recharge_Pure_Electric, .C70, .EC40, .EX30, .EX40, .EX90, .Polestar_1, .PV544, .S40, .S60, .S60_Cross_Country, .S60_Plug_In_Hybrid, .S60_Recharge, .S70, .S80, .S90, .S90_Recharge, .V40, .V50, .V60, .V60_Cross_Country, .V60_Polestar, .V70, .V90, .V90_Cross_Country, .XC40, .XC60_Plug_In_Hybrid, .XC60_Recharge, .XC70, .XC90, .XC90_Hybrid, .XC90_Plug_in_Hybrid, .XC90_Recharge, .Other]
         case .VPG:
-            return []
+            return [.MV_1, .Other]
+        case .Willys:
+            return [.CJ_3A, .M38, .Other]
         }
 
         
@@ -499,7 +504,7 @@ enum VehicleMake: String, CaseIterable, Identifiable {
     }
 }
 enum Alphbets: String, CaseIterable, Identifiable {
-    case A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,R,S,T,U,V//,W,X,Y,Z
+    case A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,R,S,T,U,V,W
  
     var makes: [VehicleMake] {
         switch self {
@@ -545,6 +550,8 @@ enum Alphbets: String, CaseIterable, Identifiable {
             return[]
         case .V:
             return[.VinFast, .Volga, .Volkswagen, .Volvo, .VPG]
+        case .W:
+            return[.Willys]
         }
     }
     var id: Self {
