@@ -13,6 +13,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     @Published var isSpeaking = false
     ///bool variable to detect if synthesizer has finished speaking or not.
     @Published var isFinished = false
+    @Published var isMuted = UserDefaults.standard.bool(forKey: "isMuted")
     ///AVAudioSession Instance to create or destroy the audio session
     var audioSession = AVAudioSession.sharedInstance()
     ///AVSpeechSynthesizer object to speak, pause, stop utterances.
@@ -25,7 +26,7 @@ class SpeechViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
         ///set SpeechViewModlel object as synthesizer's delegate
         synthesizer.delegate = self
         ///call setupAudioSession method to setup the audio session.
-        self.setupAudioSession()
+       
     }
 ///deinitializer
     deinit {

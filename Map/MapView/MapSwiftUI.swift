@@ -18,6 +18,7 @@ struct Map: View {
     @Environment(\.colorScheme) var bgMode: ColorScheme
     ///this will make our MapView update if any @published value in location manager changes.
     @StateObject var locationDataManager: LocationDataManager
+    @StateObject var speechViewModel = SpeechViewModel()
     /// this variable is used to store the status of our mapview. it is bound to our MapView file
     @State private var mapViewStatus: MapViewStatus = .idle
     ///this variable is used to store the actions inputted by the user by tapping buttons or other gestures to mapView
@@ -97,7 +98,7 @@ struct Map: View {
                         
                     }
                     else if isMapInNavigationMode(for: mapViewStatus).0  {
-                        DirectionsView(instruction: $instruction, nextStepDistance: $nextStepDistance, showDirectionsList: $showDirectionsList, nextInstruction: $nextInstruction, stepInstructions: $stepInstructions, locationDataManager: locationDataManager)
+                        DirectionsView(instruction: $instruction, nextStepDistance: $nextStepDistance, showDirectionsList: $showDirectionsList, nextInstruction: $nextInstruction, stepInstructions: $stepInstructions, locationDataManager: locationDataManager, speechViewModel: speechViewModel)
                     }
                     if showGreetings {
                         GreetingsView(showGreetings: $showGreetings, destination: $destination)
@@ -120,7 +121,7 @@ struct Map: View {
                     }
                     if !showDirectionsList {
                         ///this view is reponsible to show the map interation buttons and the bottom stack with route info and navigation related buttons on top of MapView.
-                        MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, locationDataManager: locationDataManager, localSearch: localSearch, destination: destination, routeTravelTime: $routeTravelTime, routeData: $routeData, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions, ETA: $ETA, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnoation)
+                        MapInteractionsView(mapViewStatus: $mapViewStatus, mapViewAction: $mapViewAction, locationDataManager: locationDataManager, localSearch: localSearch, speechViewModel: speechViewModel, destination: destination, routeTravelTime: $routeTravelTime, routeData: $routeData, routeDistance: $routeDistance, remainingDistance: remainingDistance, instruction: $instruction, nextStepLocation: $nextStepLocation, stepInstructions: $stepInstructions, ETA: $ETA, isRouteSelectTapped: $isRouteSelectTapped, tappedAnnotation: $tappedAnnoation)
                     }
             }
                 .onAppear {

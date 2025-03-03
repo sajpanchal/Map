@@ -18,10 +18,11 @@ struct DirectionsView: View {
     @Binding var stepInstructions: [(String, String)]
     ///locationDataManager is an instance of a class that has a delegate of LocationManager and its methods.
     @StateObject var locationDataManager: LocationDataManager
+    @StateObject var speechViewModel: SpeechViewModel
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
-                DirectionHeaderView(directionSign: getDirectionSign(for: instruction), nextStepDistance: nextStepDistance, instruction: instruction, showDirectionsList: $showDirectionsList, height: $expandedDirectionsViewHeight, locationDataManager: locationDataManager)
+                DirectionHeaderView(directionSign: getDirectionSign(for: instruction), nextStepDistance: nextStepDistance, instruction: instruction, showDirectionsList: $showDirectionsList, height: $expandedDirectionsViewHeight, locationDataManager: locationDataManager, speechViewModel: speechViewModel)
                     .gesture(DragGesture().onChanged(directionViewDragChanged)
                         .onEnded(directionViewDragEnded))
                 ZStack {
@@ -79,5 +80,5 @@ struct DirectionsView: View {
 }
 
 #Preview {
-    DirectionsView(instruction: .constant(""), nextStepDistance: .constant(""), showDirectionsList: .constant(false), nextInstruction: .constant(""), stepInstructions: .constant([]), locationDataManager: LocationDataManager())
+    DirectionsView(instruction: .constant(""), nextStepDistance: .constant(""), showDirectionsList: .constant(false), nextInstruction: .constant(""), stepInstructions: .constant([]), locationDataManager: LocationDataManager(), speechViewModel: SpeechViewModel())
 }

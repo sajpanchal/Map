@@ -23,6 +23,7 @@ struct MapInteractionsView: View {
     @StateObject var locationDataManager: LocationDataManager
     ///state object of local search to check if the destination location has been selected or not
     @StateObject var localSearch: LocalSearch
+    @StateObject var speechViewModel: SpeechViewModel
     ///this variable is going to store the address and name of the destination location.
     var destination: String
     ///bounded property to display the travel time of the selected route
@@ -50,15 +51,31 @@ struct MapInteractionsView: View {
            Spacer()
             if isMapInNavigationMode().0 && isMapInNavigationMode().1 != .inNavigationNotCentered {
                 MapViewButton(speed: locationDataManager.speed)
-                MapViewButton(imageName: "location.fill")
-                    .gesture(TapGesture().onEnded(centerMapToUserLocation))
-                    .hidden()
+                VStack {
+                    MapViewButton(imageName: "location.fill")
+                        .gesture(TapGesture().onEnded(centerMapToUserLocation))
+                        .hidden()
+                    MapViewButton(imageName: !speechViewModel.isMuted ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                        .gesture(TapGesture().onEnded({
+                            speechViewModel.isMuted.toggle()
+                            UserDefaults.standard.set(speechViewModel.isMuted, forKey: "isMuted")
+                        }))
+                }
+               
             }
             ///custom buttons that is floating on our  if map is navigating but it is not centered to user location show the location button to center it on tap.
             if isMapInNavigationMode().0 && isMapInNavigationMode().1 == .inNavigationNotCentered {
                 MapViewButton(speed: locationDataManager.speed)
-                MapViewButton(imageName: "location.fill")
-                    .gesture(TapGesture().onEnded(centerMapToUserLocation))
+                VStack {
+                    MapViewButton(imageName: "location.fill")
+                        .gesture(TapGesture().onEnded(centerMapToUserLocation))
+                    MapViewButton(imageName: !speechViewModel.isMuted ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                        .gesture(TapGesture().onEnded({
+                            speechViewModel.isMuted.toggle()
+                            UserDefaults.standard.set(speechViewModel.isMuted, forKey: "isMuted")
+                        }))
+                }
+                
             }
             ///if map is not navigating show the circle button to center the map to user location whenever tapped.
             if !isMapInNavigationMode().0 && mapViewStatus != .showingDirections {
@@ -114,7 +131,7 @@ struct MapInteractionsView: View {
 
 #Preview {
 
-    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""),remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation())/*, timer: Timer.publish(every: 30, on: .main, in: .common)*/)
+    MapInteractionsView(mapViewStatus: .constant(.idle), mapViewAction: .constant(.idle), locationDataManager: LocationDataManager(), localSearch: LocalSearch(), speechViewModel: SpeechViewModel(), destination: "", routeTravelTime: .constant(""), routeData: .constant([]), routeDistance: .constant(""),remainingDistance: "", instruction: .constant(""), nextStepLocation: .constant(CLLocation()), stepInstructions: .constant([]), ETA: .constant(""), isRouteSelectTapped: .constant(false), tappedAnnotation: .constant(MKPointAnnotation())/*, timer: Timer.publish(every: 30, on: .main, in: .common)*/)
 }
 
 

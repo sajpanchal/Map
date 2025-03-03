@@ -25,7 +25,7 @@ struct DirectionHeaderView: View {
     ///locationDataManager is an instance of a class that has a delegate of LocationManager and its methods.
     @StateObject var locationDataManager: LocationDataManager
    ///speech view Model object that controls the audio session and speech synthesizer operations.
-    @StateObject private var speechVm = SpeechViewModel()
+    @StateObject var speechViewModel: SpeechViewModel
     ///utterance distance variable will store the step distance from the next step to be spoken by speech synthesizer
     @State private var utteranceDistance: String = ""
     ///flag to indicate whether the current step has been exited by user.
@@ -80,36 +80,45 @@ struct DirectionHeaderView: View {
         .background(bgMode == .dark ? Color.black.gradient : Color.white.gradient)
     }
     func startVoiceNavigation(with utterance: String) {
+        if speechViewModel.isMuted {
+            speechViewModel.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
+            return
+        }
         ///if instruction is empty return the function call
         if instruction.isEmpty || utterance.isEmpty {
             print("instruction empty")
-            speechVm.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
+            speechViewModel.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
             return
         }
         ///if instruction says re-calculating the route stop synthesizer to speak immidiately.
         if instruction.contains("Re-calculating the route...") {
-            speechVm.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
+            speechViewModel.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
             return
         }
         ///
-        if speechVm.audioSession.category != .playback || speechVm.audioSession.categoryOptions.rawValue != 3 {
-            speechVm.setupAudioSession()
+        if speechViewModel.audioSession.category != .playback || speechViewModel.audioSession.categoryOptions.rawValue != 3 {
+            speechViewModel.setupAudioSession()
+            
         }
         ///create a speech utterance instance from utterance string
         let thisUttarance = AVSpeechUtterance(string: utterance)
+        thisUttarance.pitchMultiplier = 1.0
+        
+        
         DispatchQueue.main.async {
        ///making sure the audio session is set the a given category and options
-            if speechVm.audioSession.category == .playback && speechVm.audioSession.categoryOptions.rawValue == 3 {
+            if speechViewModel.audioSession.category == .playback && speechViewModel.audioSession.categoryOptions.rawValue == 3 {
+                
                 ///command synthesizer to speak the utterance
-                speechVm.synthesizer.speak(thisUttarance)
+                speechViewModel.synthesizer.speak(thisUttarance)
             }
             ///if audio session is not configured.
             else {
                 ///setup the audio session
-                speechVm.setupAudioSession()
+                speechViewModel.setupAudioSession()
                 ///command the synthesizer to speak.
                 DispatchQueue.main.async {
-                    speechVm.synthesizer.speak(thisUttarance)
+                    speechViewModel.synthesizer.speak(thisUttarance)
                 }
             }
         }
@@ -331,6 +340,10 @@ struct DirectionHeaderView: View {
     }
     
     func prepareForVoiceNavigation() {
+        if speechViewModel.isMuted {
+            speechViewModel.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
+            return
+        }
         ///flag the step as not exited yet
         isStepExited = false
         ///set the utteranceDistance by the updated next step distance on appear of instruction text
@@ -369,6 +382,10 @@ struct DirectionHeaderView: View {
     }
     
     func alertUserWithVoiceNavigation() {
+        if speechViewModel.isMuted {
+            speechViewModel.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
+            return
+        }
         ///get the range for starting voice instruction from max step distance received.
         range = nextStepRange(distance: maxDistance)
         ///get the current distance from user to the next step in number format
@@ -463,5 +480,5 @@ struct DirectionHeaderView: View {
 }
 
 #Preview {
-    DirectionHeaderView(directionSign: "", nextStepDistance: "", instruction: "", showDirectionsList: .constant(false), height: .constant(0), locationDataManager: LocationDataManager())
+    DirectionHeaderView(directionSign: "", nextStepDistance: "", instruction: "", showDirectionsList: .constant(false), height: .constant(0), locationDataManager: LocationDataManager(), speechViewModel: SpeechViewModel())
 }
